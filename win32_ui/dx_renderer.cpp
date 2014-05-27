@@ -890,7 +890,7 @@ struct callback_dat{
 
 void dx_renderer::init_di()
 {
-	DirectInputCreate(m_hinst,DIRECTINPUT_VERSION,&m_pdi,NULL);
+	DirectInput8Create(m_hinst,DIRECTINPUT_VERSION,IID_IDirectInput8,(LPVOID*)&m_pdi,NULL);
 	m_pdi->CreateDevice(GUID_SysKeyboard,&m_pkeyboad,NULL);
 	m_pkeyboad->SetDataFormat(&c_dfDIKeyboard);
 	m_pkeyboad->SetCooperativeLevel(m_hwnd,DISCL_BACKGROUND|DISCL_NONEXCLUSIVE);
@@ -907,7 +907,7 @@ void dx_renderer::init_di()
 	cdat.lpdi=m_pdi;
 	cdat.lpdev=m_pjoystick;
 	cdat.devs=&joysticks;
-	m_pdi->EnumDevices(DIDEVTYPE_JOYSTICK,pad_callback,&cdat,DIEDFL_ATTACHEDONLY/*DIEDFL_ALLDEVICES*/);
+	m_pdi->EnumDevices(DI8DEVTYPE_JOYSTICK,pad_callback,&cdat,DIEDFL_ATTACHEDONLY/*DIEDFL_ALLDEVICES*/);
 	b_can_use_ffb=false;
 
 	for (int i=0;i<joysticks;i++){

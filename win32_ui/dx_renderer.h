@@ -27,7 +27,7 @@ using namespace std;
 
 #define DIRECTDRAW_VERSION 0x0300
 #define DIRECTSOUND_VERSION 0x0300
-#define DIRECTINPUT_VERSION 0x0500
+#define DIRECTINPUT_VERSION 0x0800
 
 #include <ddraw.h>
 #include <dsound.h>

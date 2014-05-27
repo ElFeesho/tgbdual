@@ -2952,7 +2952,8 @@ static BOOL CALLBACK ConnectProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam
 			else{
 				// ipアドレス履歴の更新
 				char (*p)[20]=config->ip_addrs;
-				for (int i=0;i<4;i++)
+				int i;
+				for (i=0;i<4;i++)
 					if (strcmp(target,p[i])==0) break;
 				for (int j=(i==4?3:i);j>0;j--)
 					strcpy(p[j],p[j-1]);
