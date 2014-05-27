@@ -18,17 +18,21 @@
 */
 
 //--------------------------------------------------
-// キー名
 
-static char keyboad_map[0x100][10]={
+// ***NOTE***
+// If you get a compiler error here saying "array bounds overflow", you need to either:
+//   A) convert all the files with Japanese text to UTF-16 little-endian encoding (with BOM), or
+//   B) make sure the program doesn't have any Japanese or other non-ASCII text.
+
+static char keyboad_map[0x100][7]={
 	"","ESC","1","2","3","4","5","6","7","8","9","0","-","","BS","TAB",
 	"Q","W","E","R","T","Y","U","I","O","P","[","]","Enter","L-Ctrl","A","S",
-	"D","F","G","H","J","K","L",";","","","L-Shft","_","Z","X","C","V",
+	"D","F","G","H","J","K","L",";","","","L-Shft","BSlash","Z","X","C","V",
 	"B","N","M",",",".","/","R-Shft","Num-*","L-Alt","Space","英数","F1","F2","F3","F4","F5",
 	"F6","F7","F8","F9","F10","Num-Lk","Scrl","Num-7","Num-8","Num-9","Num -","Num-4","Num-5","Num-6","Num +","Num-1",
 	"Num-2","Num-3","Num-0","Num .","","","","F11","F12","","","","","","","",
 	"","","","","","","","","","","","","","","","",
-	"かな","","","","","","","","","変換","","無変換","","\\","","",
+	"かな","","","","","","","","","変換","","無変換","","¥","","",
 	"","","","","","","","","","","","","","","","",
 	"^","@",":","","漢字","","","","","","","","NuEnt","R-Ctrl","","",
 	"","","","","","","","","","","","","","","","",

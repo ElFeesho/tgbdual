@@ -1,0 +1,11 @@
+# For this .gitattributes file to work, you must have the following filter defined in ~/.gitconfig, /etc/gitconfig, or .git/config:
+# [filter "utf16le"]
+# 	clean = iconv -f utf-16 -t utf-8
+# 	smudge = sh -c \"printf '\\xff\\xfe'&& iconv -f utf-8 -t utf-16le\"
+#
+# The newest versions of Git for Windows (since 1.8.4) come with a copy of iconv, which you need to run the filter.
+
+# These files may contain Japanese text and should use Unicode.
+win32_ui/*.cpp filter=utf16le
+win32_ui/*.h filter=utf16le
+win32_ui/*.rc filter=utf16le
