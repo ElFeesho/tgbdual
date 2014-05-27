@@ -971,7 +971,7 @@ void dx_renderer::init_di()
 
 	pad_state=0;
 	memset(&key_config,0,sizeof(key_config));
-	bool b_auto=false;
+	b_auto=false;
 }
 
 BOOL CALLBACK dx_renderer::pad_callback(LPCDIDEVICEINSTANCE pdinst,LPVOID pvRef)
