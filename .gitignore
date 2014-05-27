@@ -4,3 +4,7 @@
 *.exe
 tgbdual
 .goutputstream-*
+*.opensdf
+*.sdf
+*.suo
+*.aps
