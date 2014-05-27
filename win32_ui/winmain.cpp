@@ -511,6 +511,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 				SetCurrentDirectory(sv_dir);
 
 				char name[256];
+				name[0] = '\0';
 
 				OPENFILENAME ofn;
 				ZeroMemory(&ofn,sizeof(ofn));
@@ -521,7 +522,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 				ofn.lpstrFilter="TGB movie file\0*.tmv\0All Files (*.*)\0*.*\0\0";
 				ofn.nMaxFile=256;
 				ofn.nMaxFileTitle=256;
-				ofn.lpstrFileTitle=name;
+				ofn.lpstrFile=name;
 				ofn.lpstrTitle="GB Movie Save";
 				ofn.lpstrInitialDir=sv_dir;
 				if (GetSaveFileName(&ofn)==IDOK){
@@ -563,6 +564,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 				SetCurrentDirectory(sv_dir);
 
 				char name[256];
+				name[0] = '\0';
 
 				OPENFILENAME ofn;
 				ZeroMemory(&ofn,sizeof(ofn));
@@ -573,7 +575,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 				ofn.lpstrFilter="TGB movie file\0*.tmv\0All Files (*.*)\0*.*\0\0";
 				ofn.nMaxFile=256;
 				ofn.nMaxFileTitle=256;
-				ofn.lpstrFileTitle=name;
+				ofn.lpstrFile=name;
 				ofn.lpstrTitle="GB Movie Play";
 				ofn.lpstrInitialDir=sv_dir;
 				if (GetOpenFileName(&ofn)==IDOK){
@@ -636,7 +638,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 			n++;
 		case ID_LOADROM:
 			if (cur_mode==NETWORK_MODE||cur_mode==NETWORK_PREPARING) break;
-			char buf[256],dir[256];
+			char buf[256], dir[256];
+			buf[0] = dir[0] = '\0';
 			if (render[0])
 				render[0]->pause_sound();
 			GetCurrentDirectory(256,dir);
@@ -649,7 +652,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 			ofn.lpstrFilter="Game Boy Rom Image (include archive file) (*.gb;*.gbc;*.cab;*.zip;*.rar;*.lzh;*.gbr)\0*.gb;*.gbc;*.cab;*.rar;*.zip;*.lzh;*.gbr\0All Files (*.*)\0*.*\0\0";
 			ofn.nMaxFile=256;
 			ofn.nMaxFileTitle=256;
-			ofn.lpstrFileTitle=buf;
+			ofn.lpstrFile=buf;
 			ofn.lpstrTitle="GB Rom Load";
 			ofn.lpstrInitialDir=dir;
 			if (GetOpenFileName(&ofn)==IDOK){
