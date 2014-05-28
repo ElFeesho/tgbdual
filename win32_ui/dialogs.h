@@ -149,7 +149,7 @@ BYTE *load_archive(char *path, int *size)
 	if (strstr(path,".lzh")){ // LZH
 		hModule=LoadLibrary("UnLha32.dll");
 		if (!hModule){
-			MessageBox(hWnd,"UnLha32.dllが存在しません。LZH書庫を解凍できません。","TGB Dual",MB_OK);
+			MessageBoxW(hWnd,L"UnLha32.dllが存在しません。LZH書庫を解凍できません。",L"TGB Dual",MB_OK);
 			return NULL;
 		}
 		arc=(unarc)GetProcAddress(hModule,"Unlha");
@@ -161,7 +161,7 @@ BYTE *load_archive(char *path, int *size)
 		if ((hFind=FindFirstFile(ext_filename,&wfd))==INVALID_HANDLE_VALUE){
 			sprintf(ext_filename,"%s*.gbc",tmp_dir,tmp_dir);
 			if ((hFind=FindFirstFile(ext_filename,&wfd))==INVALID_HANDLE_VALUE){
-				MessageBox(hWnd,"LZH ファイルが GB ファイルを含んでいません","TGB Dual",MB_OK);
+				MessageBoxW(hWnd,L"LZH ファイルが GB ファイルを含んでいません",L"TGB Dual",MB_OK);
 				FreeLibrary(hModule);
 				return NULL;
 			}
@@ -172,7 +172,7 @@ BYTE *load_archive(char *path, int *size)
 	else if (strstr(path,".zip")){ // ZIP
 		hModule=LoadLibrary("UnZip32.dll");
 		if (!hModule){
-			MessageBox(hWnd,"UnZip32.dllが存在しません。ZIP書庫を解凍できません。","TGB Dual",MB_OK);
+			MessageBoxW(hWnd,L"UnZip32.dllが存在しません。ZIP書庫を解凍できません。",L"TGB Dual",MB_OK);
 			return NULL;
 		}
 		arc=(unarc)GetProcAddress(hModule,"UnZip");
@@ -187,7 +187,7 @@ BYTE *load_archive(char *path, int *size)
 
 			sprintf(ext_filename,"%s*.gbc",tmp_dir,tmp_dir);
 			if ((hFind=FindFirstFile(ext_filename,&wfd))==INVALID_HANDLE_VALUE){
-				MessageBox(hWnd,"ZIP ファイルが GB ファイルを含んでいません","TGB Dual",MB_OK);
+				MessageBoxW(hWnd,L"ZIP ファイルが GB ファイルを含んでいません",L"TGB Dual",MB_OK);
 				FreeLibrary(hModule);
 				return NULL;
 			}
@@ -198,7 +198,7 @@ BYTE *load_archive(char *path, int *size)
 	else if (strstr(path,".rar")){//RAR書庫
 		hModule=LoadLibrary("UnRAR32.dll");
 		if (!hModule){
-			MessageBox(hWnd,"UnRAR32.dllが存在しません。RAR書庫を解凍できません。","TGB Dual",MB_OK);
+			MessageBoxW(hWnd,L"UnRAR32.dllが存在しません。RAR書庫を解凍できません。",L"TGB Dual",MB_OK);
 			return NULL;
 		}
 		arc=(unarc)GetProcAddress(hModule,"Unrar");
@@ -213,7 +213,7 @@ BYTE *load_archive(char *path, int *size)
 
 			sprintf(ext_filename,"%s*.gbc",tmp_dir,tmp_dir);
 			if ((hFind=FindFirstFile(ext_filename,&wfd))==INVALID_HANDLE_VALUE){
-				MessageBox(hWnd,"RAR ファイルが GB ファイルを含んでいません","TGB Dual",MB_OK);
+				MessageBoxW(hWnd,L"RAR ファイルが GB ファイルを含んでいません",L"TGB Dual",MB_OK);
 				FreeLibrary(hModule);
 				return NULL;
 			}
@@ -224,7 +224,7 @@ BYTE *load_archive(char *path, int *size)
 	else if (strstr(path,".cab")){//CAB書庫
 		hModule=LoadLibrary("cab32.dll");
 		if (!hModule){
-			MessageBox(hWnd,"cab32.dllが存在しません。cab書庫を解凍できません。","TGB Dual",MB_OK);
+			MessageBoxW(hWnd,L"cab32.dllが存在しません。cab書庫を解凍できません。",L"TGB Dual",MB_OK);
 			return NULL;
 		}
 		arc=(unarc)GetProcAddress(hModule,"Cab");
@@ -239,7 +239,7 @@ BYTE *load_archive(char *path, int *size)
 
 			sprintf(ext_filename,"%s*.gbc",tmp_dir,tmp_dir);
 			if ((hFind=FindFirstFile(ext_filename,&wfd))==INVALID_HANDLE_VALUE){
-				MessageBox(hWnd,"CAB ファイルが GB ファイルを含んでいません","TGB Dual",MB_OK);
+				MessageBoxW(hWnd,L"CAB ファイルが GB ファイルを含んでいません",L"TGB Dual",MB_OK);
 				FreeLibrary(hModule);
 				return NULL;
 			}
@@ -248,7 +248,7 @@ BYTE *load_archive(char *path, int *size)
 		FindClose(hFind);
 	}
 	else{
-		//MessageBox(hWnd,"このファイルを実行することはできません","TGB Dual",MB_OK);
+		//MessageBoxW(hWnd,L"このファイルを実行することはできません","TGB Dual",MB_OK);
 		return NULL;
 	}
 
@@ -366,7 +366,7 @@ bool load_rom(char *buf,int num)
 			SendMessage(hWnd,WM_OUTLOG,0,(LPARAM)tmp);
 		}
 		else{
-			MessageBox(hWnd,"tgbr_dll.dllが存在しません。このファイルは実行できません。","TGB Dual Notice",MB_OK);
+			MessageBoxW(hWnd,L"tgbr_dll.dllが存在しません。このファイルは実行できません。",L"TGB Dual Notice",MB_OK);
 		}
 		SetCurrentDirectory(cur_di);
 
@@ -2291,7 +2291,7 @@ static BOOL CALLBACK CheatProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 			}
 		}
 		else if (LOWORD(wParam)==ID_ALL_DELETE){
-			if (MessageBox(hwnd,"よろしいですか？","TGB Cheat Code",MB_OKCANCEL)==IDOK){
+			if (MessageBoxW(hWnd,L"よろしいですか？",L"TGB Cheat Code",MB_OKCANCEL)==IDOK){
 				ListView_DeleteAllItems(hlist);
 				g_gb[0]->get_cheat()->clear();
 			}
