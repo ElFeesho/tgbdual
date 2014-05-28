@@ -889,7 +889,7 @@ static void view_help(HWND hwnd,char *name)
 		dat[size]='\0';
 		HWND text_hwnd;
 
-		ShowWindow(text_hwnd=CreateDialog(hInstance,MAKEINTRESOURCE(IDD_TEXTVIEW),hwnd,TextProc),SW_SHOW);
+		ShowWindow(text_hwnd=CreateDialogW(hInstance,MAKEINTRESOURCEW(IDD_TEXTVIEW),hwnd,TextProc),SW_SHOW);
 		SendMessage(text_hwnd,WM_OUTLOG,0,(LPARAM)dat);
 		delete []dat;
 	}
