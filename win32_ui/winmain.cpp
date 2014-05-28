@@ -699,7 +699,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 			ShowWindow(mes_hwnd,SW_SHOW);
 			break;
 		case ID_KEY:
-			ShowWindow(CreateDialog(hInstance,MAKEINTRESOURCE(IDD_KEY),hwnd,KeyProc),SW_SHOW);
+			ShowWindow(CreateDialogW(hInstance,MAKEINTRESOURCEW(IDD_KEY),hwnd,KeyProc),SW_SHOW);
 			break;
 		case ID_SOUND:
 			ShowWindow(CreateDialog(hInstance,MAKEINTRESOURCE(IDD_SOUND),hwnd,SoundProc),SW_SHOW);

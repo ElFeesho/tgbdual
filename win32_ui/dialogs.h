@@ -1128,7 +1128,7 @@ static BOOL CALLBACK KeyProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 	static const int map[]={0,1,3,2,5,4,6,7,8,9,11,10,13,12,14,15};
 	int key[32];
 	int dev;
-	char buf[20];
+	wchar_t buf[20];
 	int pad_id,pad_dir;
 	int i;
 	WORD any;
@@ -1171,24 +1171,24 @@ static BOOL CALLBACK KeyProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 		for (i=0;i<16;i++){
 			dev=key[map[i]*2];
 			if (dev==DI_KEYBOARD)
-				sprintf(buf,"%s",keyboad_map[key[map[i]*2+1]]);
+				swprintf(buf, L"%s", keyboad_map[key[map[i]*2+1]]);
 			else if (dev==DI_MOUSE_X)
-				strcpy(buf,key[map[i]*2+1]?"Mouse -X":"Mouse +X");
+				swprintf(buf, key[map[i] * 2 + 1] ? L"Mouse -X" : L"Mouse +X");
 			else if (dev==DI_MOUSE_Y)
-				strcpy(buf,key[map[i]*2+1]?"Mouse -Y":"Mouse +Y");
+				swprintf(buf, key[map[i] * 2 + 1] ? L"Mouse -Y" : L"Mouse +Y");
 			else if (dev==DI_MOUSE)
-				sprintf(buf,"Mouse %d",key[map[i]*2+1]);
+				swprintf(buf, L"Mouse %d", key[map[i] * 2 + 1]);
 			else{
 				pad_id=(dev-DI_PAD_X)/NEXT_PAD;
 				pad_dir=(dev-DI_PAD_X)%NEXT_PAD;
 				if (pad_dir==0)
-					sprintf(buf,"Pad%d %s",pad_id,key[map[i]*2+1]?"-X":"+X");
+					swprintf(buf, L"Pad%d %s", pad_id, key[map[i] * 2 + 1] ? "-X" : "+X");
 				else if (pad_dir==1)
-					sprintf(buf,"Pad%d %s",pad_id,key[map[i]*2+1]?"-Y":"+Y");
+					swprintf(buf, L"Pad%d %s", pad_id, key[map[i] * 2 + 1] ? "-Y" : "+Y");
 				else
-					sprintf(buf,"Pad%d %d",pad_id,key[map[i]*2+1]);
+					swprintf(buf, L"Pad%d %d", pad_id, key[map[i] * 2 + 1]);
 			}
-			SetDlgItemText(hwnd,IDC_1A+i,buf);
+			SetDlgItemTextW(hwnd,IDC_1A+i,buf);
 		}
 
 		int tmp_type[5]={config->fast_forwerd[0],config->save_key[0],config->load_key[0],config->auto_key[0],config->pause_key[0]};
@@ -1197,24 +1197,24 @@ static BOOL CALLBACK KeyProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 		for (i=0;i<5;i++){
 			dev=tmp_type[i];
 			if (dev==DI_KEYBOARD)
-				sprintf(buf,"%s",keyboad_map[tmp_code[i]]);
+				swprintf(buf, L"%s", keyboad_map[tmp_code[i]]);
 			else if (dev==DI_MOUSE_X)
-				strcpy(buf,tmp_code[i]?"Mouse -X":"Mouse +X");
+				wcscpy(buf,tmp_code[i] ? L"Mouse -X" : L"Mouse +X");
 			else if (dev==DI_MOUSE_Y)
-				strcpy(buf,tmp_code[i]?"Mouse -Y":"Mouse +Y");
+				wcscpy(buf, tmp_code[i] ? L"Mouse -Y" : L"Mouse +Y");
 			else if (dev==DI_MOUSE)
-				sprintf(buf,"Mouse %d",tmp_code[i]);
+				swprintf(buf, L"Mouse %d", tmp_code[i]);
 			else{
 				pad_id=(dev-DI_PAD_X)/NEXT_PAD;
 				pad_dir=(dev-DI_PAD_X)%NEXT_PAD;
 				if (pad_dir==0)
-					sprintf(buf,"Pad%d %s",pad_id,tmp_code[i]?"-X":"+X");
+					swprintf(buf, L"Pad%d %s", pad_id, tmp_code[i] ? L"-X" : L"+X");
 				else if (pad_dir==1)
-					sprintf(buf,"Pad%d %s",pad_id,tmp_code[i]?"-Y":"+Y");
+					swprintf(buf, L"Pad%d %s", pad_id, tmp_code[i] ? L"-Y" : L"+Y");
 				else
-					sprintf(buf,"Pad%d %d",pad_id,tmp_code[i]);
+					swprintf(buf, L"Pad%d %d", pad_id, tmp_code[i]);
 			}
-			SetDlgItemText(hwnd,IDC_1A+16+i,buf);
+			SetDlgItemTextW(hwnd,IDC_1A+16+i,buf);
 		}
 
 		break;
