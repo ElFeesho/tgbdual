@@ -1,6 +1,9 @@
 TGB Dual is an open source (GPLv2) GB/GBC emulator with game link cable support.
 
-This is a port of it to libretro.  To emulate two units side by side, use
+libretro_ui
+-----------
+
+This is a port of TGB Dual to libretro. To emulate two units side by side, use
 your frontend's "Sufami Turbo" interface, placing the ROMs in "slots" A and B.
 The Sufami Turbo BIOS itself can be any file; it is ignored by the emulator.
 Use the Player 1 and Player 2 controllers to control each unit.
@@ -9,7 +12,30 @@ In addition, some of the Japanese comments in the source code have been run
 through Google Translate to English, and CP932 and EUC-JP encoded files have
 been converted to UTF-8.
 
+win32_ui
+--------
+
+(by libertyernie)
+This is an update of TGB Dual designed primarily to get it compiling and
+working correctly on new computers.
+
+Changes made:
+* The program now uses the DirectInput 8 API, not the old one which isn't
+  available anymore.
+* Minor bugfix: turbo mode is now off by default.
+* All text files are now Unicode instead of using the local code page, which
+  should enable Japanese text to display on any computer.
+  * However, Windows uses UTF-16 and Git uses UTF-8. So I wrote a tiny program
+    (endian_conv) that runs before and after TGB_Dual is built, and on project
+    clean, so get the files encoded correctly.
+  * I'm still working on changing Windows API dialogs to use UTF-16 strings,
+    instead of UTF-8.
+
+Additions:
+* The "english" branch in Git contains an English-language version of the app.
+  This is also still a work in progess. Someday, this may be merged into the
+  main branch and a "japanese" branch might be created.
+
 Original sources from
 http://gigo.retrogames.com/download.html#tgb-dual
 http://shinh.skr.jp/tgbdualsdl/
-
