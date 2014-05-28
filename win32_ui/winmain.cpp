@@ -223,7 +223,7 @@ static void network_preparing()
 	pair<char*,int> p=net->get_sram();
 	memcpy(g_gb[1]->get_rom()->get_sram(),p.first,p.second);
 
-	ShowWindow(CreateDialog(hInstance,MAKEINTRESOURCE(IDD_CHAT),hWnd,ChatProc),SW_SHOW);
+	ShowWindow(CreateDialogW(hInstance,MAKEINTRESOURCEW(IDD_CHAT),hWnd,ChatProc),SW_SHOW);
 
 	{
 		static char buf[256];
@@ -689,55 +689,55 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 		case ID_CONNECT:
 			if (cur_mode==NETWORK_MODE||cur_mode==NETWORK_PREPARING) break;
 			if ((!g_gb[0])&&(!g_gb[1])){
-				trans_hwnd=CreateDialog(hInstance,MAKEINTRESOURCE(IDD_CONNECT),hwnd,ConnectProc);
+				trans_hwnd=CreateDialogW(hInstance,MAKEINTRESOURCEW(IDD_CONNECT),hwnd,ConnectProc);
 				ShowWindow(trans_hwnd,SW_SHOW);
 			}
 			break;
 		case ID_SHOWLOG:
 			if (!mes_hwnd)
-				mes_hwnd=CreateDialog(hInstance,MAKEINTRESOURCE(IDD_LOG),hwnd,LogProc);
+				mes_hwnd=CreateDialogW(hInstance,MAKEINTRESOURCEW(IDD_LOG),hwnd,LogProc);
 			ShowWindow(mes_hwnd,SW_SHOW);
 			break;
 		case ID_KEY:
 			ShowWindow(CreateDialogW(hInstance,MAKEINTRESOURCEW(IDD_KEY),hwnd,KeyProc),SW_SHOW);
 			break;
 		case ID_SOUND:
-			ShowWindow(CreateDialog(hInstance,MAKEINTRESOURCE(IDD_SOUND),hwnd,SoundProc),SW_SHOW);
+			ShowWindow(CreateDialogW(hInstance,MAKEINTRESOURCEW(IDD_SOUND),hwnd,SoundProc),SW_SHOW);
 			break;
 		case ID_SPEED:
-			ShowWindow(CreateDialog(hInstance,MAKEINTRESOURCE(IDD_SPEED),hwnd,SpeedProc),SW_SHOW);
+			ShowWindow(CreateDialogW(hInstance,MAKEINTRESOURCEW(IDD_SPEED),hwnd,SpeedProc),SW_SHOW);
 			break;
 		case ID_FILTER:
-			ShowWindow(CreateDialog(hInstance,MAKEINTRESOURCE(IDD_FILTER),hwnd,FilterProc),SW_SHOW);
+			ShowWindow(CreateDialogW(hInstance,MAKEINTRESOURCEW(IDD_FILTER),hwnd,FilterProc),SW_SHOW);
 			break;
 		case ID_KOROKORO:
-			ShowWindow(CreateDialog(hInstance,MAKEINTRESOURCE(IDD_KOROKORO),hwnd,KorokoroProc),SW_SHOW);
+			ShowWindow(CreateDialogW(hInstance,MAKEINTRESOURCEW(IDD_KOROKORO),hwnd,KorokoroProc),SW_SHOW);
 			break;
 		case ID_REALTIMECLOCK:
 			if (g_gb[0]&&((g_gb[0]->get_rom()->get_info()->cart_type==0x0f)||(g_gb[0]->get_rom()->get_info()->cart_type==0x10)))
-				ShowWindow(CreateDialog(hInstance,MAKEINTRESOURCE(IDD_CLOCK),hwnd,ClockProc),SW_SHOW);
+				ShowWindow(CreateDialogW(hInstance,MAKEINTRESOURCEW(IDD_CLOCK),hwnd,ClockProc),SW_SHOW);
 			break;
 		case ID_DIRECTORY:
-			ShowWindow(CreateDialog(hInstance,MAKEINTRESOURCE(IDD_DIRECTORY),hwnd,DirectoryProc),SW_SHOW);
+			ShowWindow(CreateDialogW(hInstance,MAKEINTRESOURCEW(IDD_DIRECTORY),hwnd,DirectoryProc),SW_SHOW);
 			break;
 		case ID_PAR:
 			if (g_gb[0])
-				ShowWindow(CreateDialog(hInstance,MAKEINTRESOURCE(IDD_PAR),hwnd,ParProc),SW_SHOW);
+				ShowWindow(CreateDialogW(hInstance,MAKEINTRESOURCEW(IDD_PAR),hwnd,ParProc),SW_SHOW);
 			break;
 		case ID_CHEAT:
 			if (g_gb[0])
-				ShowWindow(CreateDialog(hInstance,MAKEINTRESOURCE(IDD_CHEAT),hwnd,CheatProc),SW_SHOW);
+				ShowWindow(CreateDialogW(hInstance,MAKEINTRESOURCEW(IDD_CHEAT),hwnd,CheatProc),SW_SHOW);
 			break;
 		case ID_MEM_DUMP:
 			if (g_gb[0])
-				ShowWindow(CreateDialog(hInstance,MAKEINTRESOURCE(IDD_MEM_DUMP),hwnd,MemProc),SW_SHOW);
+				ShowWindow(CreateDialogW(hInstance,MAKEINTRESOURCEW(IDD_MEM_DUMP),hwnd,MemProc),SW_SHOW);
 			break;
 		case ID_NOMEM_DUMP:
 			if (g_gb[0])
-				ShowWindow(CreateDialog(hInstance,MAKEINTRESOURCE(IDD_MEM_DUMP),hwnd,NoMemProc),SW_SHOW);
+				ShowWindow(CreateDialogW(hInstance,MAKEINTRESOURCEW(IDD_MEM_DUMP),hwnd,NoMemProc),SW_SHOW);
 			break;
 		case ID_VERSION:
-			ShowWindow(CreateDialog(hInstance,MAKEINTRESOURCE(IDD_VERSION),hwnd,VerProc),SW_SHOW);
+			ShowWindow(CreateDialogW(hInstance,MAKEINTRESOURCEW(IDD_VERSION),hwnd,VerProc),SW_SHOW);
 			break;
 		case ID_FULLSCREEN:
 			render[0]->pause_sound();
