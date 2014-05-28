@@ -1585,29 +1585,29 @@ static BOOL CALLBACK KorokoroProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lPara
 	case WM_USER+1:
 	{
 		int i,dev,pad_id,pad_dir;
-		char buf[16];
+		wchar_t buf[16];
 
 		for (i=0;i<4;i++){
 			dev=config->koro_key[i*2];
 			if (dev==DI_KEYBOARD)
-				sprintf(buf,"%s",keyboad_map[config->koro_key[i*2+1]]);
+				swprintf(buf,L"%s",keyboad_map[config->koro_key[i*2+1]]);
 			else if (dev==DI_MOUSE_X)
-				strcpy(buf,config->koro_key[i*2+1]?"Mouse -X":"Mouse +X");
+				wcscpy(buf,config->koro_key[i*2+1]?L"Mouse -X":L"Mouse +X");
 			else if (dev==DI_MOUSE_Y)
-				strcpy(buf,config->koro_key[i*2+1]?"Mouse -Y":"Mouse +Y");
+				wcscpy(buf, config->koro_key[i * 2 + 1] ? L"Mouse -Y" : L"Mouse +Y");
 			else if (dev==DI_MOUSE)
-				sprintf(buf,"Mouse %d",config->koro_key[i*2+1]);
+				swprintf(buf, L"Mouse %d", config->koro_key[i * 2 + 1]);
 			else{
 				pad_id=(dev-DI_PAD_X)/NEXT_PAD;
 				pad_dir=(dev-DI_PAD_X)%NEXT_PAD;
 				if (pad_dir==0)
-					sprintf(buf,"Pad%d %s",pad_id,config->koro_key[i*2+1]?"-X":"+X");
+					swprintf(buf, L"Pad%d %s", pad_id, config->koro_key[i * 2 + 1] ? L"-X" : L"+X");
 				else if (pad_dir==1)
-					sprintf(buf,"Pad%d %s",pad_id,config->koro_key[i*2+1]?"-Y":"+Y");
+					swprintf(buf, L"Pad%d %s", pad_id, config->koro_key[i * 2 + 1] ? L"-Y" : L"+Y");
 				else
-					sprintf(buf,"Pad%d %d",pad_id,config->koro_key[i*2+1]);
+					swprintf(buf, L"Pad%d %d", pad_id, config->koro_key[i * 2 + 1]);
 			}
-			SetDlgItemText(hwnd,IDC_KUP+i,buf);
+			SetDlgItemTextW(hwnd,IDC_KUP+i,buf);
 		}
 
 		SetDlgItemInt(hwnd,IDC_SENSITIVE,config->koro_sensitive,TRUE);
