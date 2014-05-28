@@ -1,8 +1,27 @@
 TGB Dual - libertyernie's version
 https://github.com/libertyernie/tgbdual
-README_2014.txt last updated: May 26, 2014
 
-This is a version of TGB Dual (original site: http://gigo.retrogames.com/download.html#tgb-dual) that fixes at least one bug and compiles on Visual Studio 2013 using DirectInput 8.
-The project is actually forked from https://github.com/libretro/tgbdual-libretro, and so the emulator core (gb_code) contains updates made for the libretro interface.
+This is an update of TGB Dual designed primarily to get it compiling and
+working correctly on new computers.
 
-My English translation is available in the "english" branch, which should contain all changes from the master branch as well. If not, try merging them.
+Changes made:
+* The program now uses the DirectInput 8 API, not the old one which isn't
+  available anymore.
+* Minor bugfix: turbo mode is now off by default.
+* All text files are now Unicode instead of using the local code page, which
+  should enable Japanese text to display on any computer.
+  * However, Windows uses UTF-16 and Git uses UTF-8. So I wrote a tiny program
+    (endian_conv) that runs before and after TGB_Dual is built, and on project
+    clean, so get the files encoded correctly.
+  * I'm still working on changing Windows API dialogs to use UTF-16 strings,
+    instead of UTF-8.
+
+Additions:
+* The "english" branch in Git contains an English-language version of the app.
+  This is also still a work in progess. Someday, this may be merged into the
+  main branch and a "japanese" branch might be created.
+
+Original sources from
+http://gigo.retrogames.com/download.html#tgb-dual
+http://shinh.skr.jp/tgbdualsdl/
+https://github.com/libretro/tgbdual-libretro
