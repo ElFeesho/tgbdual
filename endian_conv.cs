@@ -51,8 +51,10 @@ utf-8 is a special case - this program will NOT write a BOM for UTF-8.");
 			Console.Write("Converting to " + target.WebName + ": ");
 			foreach (string filename in toProcess) {
 				string native = File.ReadAllText(filename);
+				var time = File.GetLastWriteTime(filename);
 				Console.Write(Path.GetFileName(filename) + " ");
 				File.WriteAllText(filename, native, target);
+				File.SetLastWriteTime(filename, time);
 			}
 			Console.WriteLine();
 		}
