@@ -19,6 +19,10 @@
 
 #include "keymap.h"
 
+// For Unicode columns in ListView
+#define ListView_InsertColumnW(hwnd, iCol, pcol) \
+	(int)::SendMessageW((hwnd), LVM_INSERTCOLUMNW, (WPARAM)(int)(iCol), (LPARAM)(const LV_COLUMN *)(pcol))
+
 static int rom_size_tbl[]={2,4,8,16,32,64,128,256,512};
 
 static char tmp_sram_name[2][256];
@@ -1585,29 +1589,29 @@ static BOOL CALLBACK KorokoroProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lPara
 	case WM_USER+1:
 	{
 		int i,dev,pad_id,pad_dir;
-		char buf[16];
+		wchar_t buf[16];
 
 		for (i=0;i<4;i++){
 			dev=config->koro_key[i*2];
 			if (dev==DI_KEYBOARD)
-				sprintf(buf,"%s",keyboad_map[config->koro_key[i*2+1]]);
+				swprintf(buf,L"%s",keyboad_map[config->koro_key[i*2+1]]);
 			else if (dev==DI_MOUSE_X)
-				strcpy(buf,config->koro_key[i*2+1]?"Mouse -X":"Mouse +X");
+				wcscpy(buf,config->koro_key[i*2+1]?L"Mouse -X":L"Mouse +X");
 			else if (dev==DI_MOUSE_Y)
-				strcpy(buf,config->koro_key[i*2+1]?"Mouse -Y":"Mouse +Y");
+				wcscpy(buf, config->koro_key[i * 2 + 1] ? L"Mouse -Y" : L"Mouse +Y");
 			else if (dev==DI_MOUSE)
-				sprintf(buf,"Mouse %d",config->koro_key[i*2+1]);
+				swprintf(buf, L"Mouse %d", config->koro_key[i * 2 + 1]);
 			else{
 				pad_id=(dev-DI_PAD_X)/NEXT_PAD;
 				pad_dir=(dev-DI_PAD_X)%NEXT_PAD;
 				if (pad_dir==0)
-					sprintf(buf,"Pad%d %s",pad_id,config->koro_key[i*2+1]?"-X":"+X");
+					swprintf(buf, L"Pad%d %s", pad_id, config->koro_key[i * 2 + 1] ? L"-X" : L"+X");
 				else if (pad_dir==1)
-					sprintf(buf,"Pad%d %s",pad_id,config->koro_key[i*2+1]?"-Y":"+Y");
+					swprintf(buf, L"Pad%d %s", pad_id, config->koro_key[i * 2 + 1] ? L"-Y" : L"+Y");
 				else
-					sprintf(buf,"Pad%d %d",pad_id,config->koro_key[i*2+1]);
+					swprintf(buf, L"Pad%d %d", pad_id, config->koro_key[i * 2 + 1]);
 			}
-			SetDlgItemText(hwnd,IDC_KUP+i,buf);
+			SetDlgItemTextW(hwnd,IDC_KUP+i,buf);
 		}
 
 		SetDlgItemInt(hwnd,IDC_SENSITIVE,config->koro_sensitive,TRUE);
@@ -2251,19 +2255,19 @@ static BOOL CALLBACK CheatProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 	case WM_INITDIALOG:
 		hlist=GetDlgItem(hwnd,IDC_LIST);
 
-		LVCOLUMN lvc;
+		LVCOLUMNW lvc;
 		lvc.mask=LVCF_TEXT|LVCF_ORDER|LVCF_WIDTH|LVCF_FMT;
 		lvc.fmt=LVCFMT_LEFT;
 		lvc.iOrder=0;
-		lvc.pszText="Name";
+		lvc.pszText=L"Name";
 		lvc.cx=180;
 		ListView_InsertColumn(hlist,0,&lvc);
-		lvc.pszText="Code";
+		lvc.pszText=L"Code";
 		lvc.cx=80;
 		ListView_InsertColumn(hlist,0,&lvc);
-		lvc.pszText="On/Off";
+		lvc.pszText=L"On/Off";
 		lvc.cx=40;
-		ListView_InsertColumn(hlist,0,&lvc);
+		ListView_InsertColumnW(hlist, 0, &lvc);
 
 		struct_list(hlist);
 
