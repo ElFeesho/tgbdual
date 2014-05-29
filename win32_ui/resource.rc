@@ -457,7 +457,7 @@ BEGIN
     CONTROL         "Forever",IDC_FOREVER,"Button",BS_AUTORADIOBUTTON,177,235,
                     31,10
     CONTROL         "Equal (=)",IDC_CMP_EQUAL,"Button",BS_AUTORADIOBUTTON,177,
-                    245,39,10
+                    245,42,10
     PUSHBUTTON      "Add",IDC_ADD_SEARCH,177,295,28,15
     CONTROL         "Less (<)",IDC_CMP_LESS,"Button",BS_AUTORADIOBUTTON,177,
                     255,39,10
@@ -477,7 +477,7 @@ BEGIN
                     WS_HSCROLL | WS_TABSTOP
     PUSHBUTTON      "Delete All",IDC_ALL_CLEAR,175,185,35,14
     PUSHBUTTON      "Delete",IDC_DELETE,215,185,35,14
-    LTEXT           "PAR Modoki (PARもどき) Ver 0.30",IDC_STATIC,9,325,65,8
+    LTEXT           "PAR もどき Ver 0.30",IDC_STATIC,9,325,65,8
     PUSHBUTTON      "Save",IDC_CHEAT_SAVE,85,325,31,14
     PUSHBUTTON      "Read",IDC_CHEAT_READ,155,325,34,14
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,315,247,1
