@@ -218,7 +218,7 @@ CAPTION "TGB バージョン情報"
 FONT 9, "Tahoma", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,39,40,50,13
-    CTEXT           "TGB Dual (2014-June)",IDC_STATIC,13,7,99,8
+    CTEXT           "☁ TGB Dual (2014-June) ☁",IDC_STATIC,13,7,99,8
     CTEXT           "Copyright (C) 2000-2004 Hii, (C) 2014 lifning, libertyernie",IDC_STATIC,13,18,99,17
 END
 
