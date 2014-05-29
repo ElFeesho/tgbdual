@@ -19,6 +19,10 @@
 
 #include "keymap.h"
 
+// For Unicode columns in ListView
+#define ListView_InsertColumnW(hwnd, iCol, pcol) \
+	(int)::SendMessageW((hwnd), LVM_INSERTCOLUMNW, (WPARAM)(int)(iCol), (LPARAM)(const LV_COLUMN *)(pcol))
+
 static int rom_size_tbl[]={2,4,8,16,32,64,128,256,512};
 
 static char tmp_sram_name[2][256];
@@ -2251,19 +2255,19 @@ static BOOL CALLBACK CheatProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 	case WM_INITDIALOG:
 		hlist=GetDlgItem(hwnd,IDC_LIST);
 
-		LVCOLUMN lvc;
+		LVCOLUMNW lvc;
 		lvc.mask=LVCF_TEXT|LVCF_ORDER|LVCF_WIDTH|LVCF_FMT;
 		lvc.fmt=LVCFMT_LEFT;
 		lvc.iOrder=0;
-		lvc.pszText="名前";
+		lvc.pszText=L"名前";
 		lvc.cx=180;
-		ListView_InsertColumn(hlist,0,&lvc);
-		lvc.pszText="コード";
+		ListView_InsertColumnW(hlist,0,&lvc);
+		lvc.pszText=L"コード";
 		lvc.cx=80;
-		ListView_InsertColumn(hlist,0,&lvc);
-		lvc.pszText="有効";
+		ListView_InsertColumnW(hlist,0,&lvc);
+		lvc.pszText=L"有効";
 		lvc.cx=40;
-		ListView_InsertColumn(hlist,0,&lvc);
+		ListView_InsertColumnW(hlist, 0, &lvc);
 
 		struct_list(hlist);
 
