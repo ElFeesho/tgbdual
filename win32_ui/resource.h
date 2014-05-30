@@ -125,8 +125,10 @@
 #define IDC_FFB                         1073
 #define IDC_CMP_LESS                    1074
 #define IDC_RR                          1074
+#define IDC_SRAM1_PATH                  1074
 #define IDC_CMP_LARGE                   1075
 #define IDC_RG                          1075
+#define IDC_SRAM2_PATH                  1075
 #define IDC_LOOP                        1076
 #define IDC_RB                          1076
 #define IDC_RDIV                        1077

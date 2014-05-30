@@ -22,6 +22,7 @@
 #include <stdio.h>
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
+#include <exception>
 
 setting::setting()
 {
@@ -196,6 +197,12 @@ setting::setting()
 	if (!SetCurrentDirectory(media_dir))
 		CreateDirectory(media_dir,NULL);
 
+	strcpy(tmp_save,"sav");
+	GetPrivateProfileString("directory","sram1_ext",tmp_save,sram_exts[0],sizeof(sram_exts[0]),ini_name);
+
+	strcpy(tmp_save,"sa2");
+	GetPrivateProfileString("directory","sram2_ext",tmp_save,sram_exts[1],sizeof(sram_exts[1]),ini_name);
+
 	strcpy(dev_dir,home_dir);
 	strcat(dev_dir,"\\devices");
 
@@ -216,6 +223,8 @@ setting::~setting()
 	WritePrivateProfileString("directory","last_load",tmp,ini_name);
 	WritePrivateProfileString("directory","save_dir",save_dir,ini_name);
 	WritePrivateProfileString("directory","media_dir",media_dir,ini_name);
+	WritePrivateProfileString("directory","sram1_ext",sram_exts[0],ini_name);
+	WritePrivateProfileString("directory","sram2_ext",sram_exts[1],ini_name);
 
 	// キー情報
 	sprintf(tmp,"%d",key_setting[0][0]);
@@ -451,6 +460,27 @@ void setting::get_media_dir(char *buf)
 void setting::set_media_dir(char *dat)
 {
 	strcpy(media_dir,dat);
+}
+
+void setting::get_sram_ext(char *buf, int num)
+{
+	if (num < 0 || num > 1) {
+		MessageBoxW(NULL, L"Invalid call to setting::get_sram_ext", L"TGB Dual", MB_OK);
+		strcpy(buf, "sav");
+		return;
+	}
+	strcpy(buf, sram_exts[num]);
+}
+
+void setting::set_sram_ext(char *dat, int num)
+{
+	if (num < 0 || num > 1) {
+		MessageBoxW(NULL, L"Invalid call to setting::set_sram_ext", L"TGB Dual", MB_OK);
+		return;
+	}
+	size_t buflen = sizeof(sram_exts[num]);
+	strncpy(sram_exts[num], dat, buflen - 1);
+	sram_exts[num][buflen - 1] = '\0';
 }
 
 void setting::get_dev_dir(char *buf)
