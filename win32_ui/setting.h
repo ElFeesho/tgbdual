@@ -31,6 +31,8 @@ public:
 	void set_save_dir(char *dat);
 	void get_media_dir(char *buf);
 	void set_media_dir(char *dat);
+	void get_sram_ext(char *buf, int num);
+	void set_sram_ext(char *dat, int num);
 	void get_dev_dir(char *buf);
 	void get_home_dir(char *buf);
 
@@ -73,4 +75,5 @@ public:
 private:
 	int key_setting[2][16];
 	char cur_dir[256],home_dir[256],save_dir[256],media_dir[256],dev_dir[256];
+	char sram_exts[2][16]; // Maximum 15 letters for extension, not including period
 };

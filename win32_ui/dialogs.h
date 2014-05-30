@@ -433,7 +433,9 @@ bool load_rom(char *buf,int num)
 	char sram_name[256],cur_di[256],sv_dir[256];
 	BYTE *ram;
 	int ram_size=0x2000*tbl_ram[dat[0x149]];
-	char *suffix=num?".sa2":".sav";
+	char suffix[16];
+	suffix[0] = '.';
+	config->get_sram_ext(suffix + 1, num);
 	{
 		char *p=(char*)_mbsrchr((unsigned char*)buf,(unsigned char)'\\');
 		if (!p) p=buf; else p++;
@@ -536,7 +538,9 @@ bool load_rom_only(char *buf,int num)
 	char sram_name[256],cur_di[256],sv_dir[256];
 	BYTE *ram;
 	int ram_size=0x2000*tbl_ram[dat[0x149]];
-	char *suffix=num?".sa2":".sav";
+	char suffix[16];
+	suffix[0] = '.';
+	config->get_sram_ext(suffix + 1, num);
 	{
 		char *p=(char*)_mbsrchr((unsigned char*)buf,(unsigned char)'\\');
 		if (!p) p=buf; else p++;
@@ -1319,20 +1323,30 @@ static BOOL CALLBACK DirectoryProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lPar
 {
 	static char cur_sv_dir[256];
 	static char cur_md_dir[256];
+	static char cur_sram1_ext[16];
+	static char cur_sram2_ext[16];
 
 	switch(uMsg)
 	{
 	case WM_INITDIALOG:
 		config->get_save_dir(cur_sv_dir);
 		config->get_media_dir(cur_md_dir);
+		config->get_sram_ext(cur_sram1_ext, 0);
+		config->get_sram_ext(cur_sram2_ext, 1);
 		SetDlgItemText(hwnd,IDC_SAVE_PATH,cur_sv_dir);
 		SetDlgItemText(hwnd,IDC_MEDIA_PATH,cur_md_dir);
+		SetDlgItemText(hwnd,IDC_SRAM1_PATH,cur_sram1_ext);
+		SetDlgItemText(hwnd,IDC_SRAM2_PATH,cur_sram2_ext);
 		return TRUE;
 	
 	case WM_COMMAND:
 		if(LOWORD(wParam)==IDOK){
+			GetDlgItemText(hwnd, IDC_SRAM1_PATH, cur_sram1_ext, 15);
+			GetDlgItemText(hwnd, IDC_SRAM2_PATH, cur_sram2_ext, 15);
 			config->set_save_dir(cur_sv_dir);
 			config->set_media_dir(cur_md_dir);
+			config->set_sram_ext(cur_sram1_ext, 0);
+			config->set_sram_ext(cur_sram2_ext, 1);
 			DestroyWindow(hwnd);
 			return TRUE;
 		}
