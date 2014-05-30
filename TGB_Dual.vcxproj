@@ -92,8 +92,10 @@
       <Message>Converting win32_ui files to UTF-16</Message>
     </PreBuildEvent>
     <PreLinkEvent>
-      <Command>endian_conv utf-8 win32_ui *.cpp *.h *.rc</Command>
-      <Message>Converting win32_ui files back to UTF-8</Message>
+      <Command>
+      </Command>
+      <Message>
+      </Message>
     </PreLinkEvent>
     <CustomBuildStep>
       <Command>endian_conv utf-8 win32_ui *.cpp *.h *.rc</Command>
@@ -147,8 +149,10 @@
       <Message>Converting win32_ui files to UTF-16</Message>
     </PreBuildEvent>
     <PreLinkEvent>
-      <Command>endian_conv utf-8 win32_ui *.cpp *.h *.rc</Command>
-      <Message>Converting win32_ui files back to UTF-8</Message>
+      <Command>
+      </Command>
+      <Message>
+      </Message>
     </PreLinkEvent>
     <CustomBuildStep>
       <Command>endian_conv utf-8 win32_ui *.cpp *.h *.rc</Command>
