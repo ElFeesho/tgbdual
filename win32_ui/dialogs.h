@@ -292,6 +292,12 @@ BYTE *load_archive(char *path, int *size)
 	return ret;
 }
 
+bool is_gb_ext(const char* buf) {
+	const char* period = strrchr(buf, '.');
+	if (period == NULL) return false;
+	return (strcmp(period, ".gb") == 0 || strcmp(period, ".gbc") == 0 || strcmp(period, ".sgb") == 0);
+}
+
 HMODULE h_gbr_dll;
 
 bool load_rom(char *buf,int num)
@@ -376,7 +382,7 @@ bool load_rom(char *buf,int num)
 
 		return true;
 	}
-	else if (strstr(buf,".gb")||strstr(buf,".gbc")){
+	else if (is_gb_ext(buf)){
 		file=fopen(buf,"rb");
 		if (!file) return false;
 		fseek(file,0,SEEK_END);
