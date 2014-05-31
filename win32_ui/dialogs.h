@@ -391,6 +391,12 @@ bool load_rom(char *buf,int num)
 		dat=(BYTE*)malloc(size);
 		fread(dat,1,size,file);
 		fclose(file);
+
+		if (dat[0x149] < 0 || dat[0x149] >= 6) {
+			MessageBoxW(hWnd, L"Invalid ROM image", L"TGB Dual Notice", MB_OK);
+			free(dat);
+			return false;
+		}
 	}
 	else
 		if (!(dat=load_archive(buf,&size)))
