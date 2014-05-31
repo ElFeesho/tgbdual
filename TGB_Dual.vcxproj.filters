@@ -95,6 +95,9 @@
     <ClCompile Include="goomba\goombasav.c">
       <Filter>Source Files\goomba</Filter>
     </ClCompile>
+    <ClCompile Include="goomba\minilzo-2.06\minilzo.c">
+      <Filter>Source Files\goomba</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="win32_ui\resource.rc">
@@ -160,6 +163,15 @@
       <Filter>Header Files\_goomba</Filter>
     </ClInclude>
     <ClInclude Include="goomba\goombasav.h">
+      <Filter>Header Files\_goomba</Filter>
+    </ClInclude>
+    <ClInclude Include="goomba\minilzo-2.06\minilzo.h">
+      <Filter>Header Files\_goomba</Filter>
+    </ClInclude>
+    <ClInclude Include="goomba\minilzo-2.06\lzoconf.h">
+      <Filter>Header Files\_goomba</Filter>
+    </ClInclude>
+    <ClInclude Include="goomba\minilzo-2.06\lzodefs.h">
       <Filter>Header Files\_goomba</Filter>
     </ClInclude>
   </ItemGroup>
