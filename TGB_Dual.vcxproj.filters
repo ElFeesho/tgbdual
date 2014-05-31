@@ -36,6 +36,12 @@
       <UniqueIdentifier>{d89f486d-ad71-45ad-874e-b01406f8a834}</UniqueIdentifier>
       <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
+    <Filter Include="Source Files\goomba">
+      <UniqueIdentifier>{6db6fde1-7e86-41c2-a9f5-95f82b890bdc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\_goomba">
+      <UniqueIdentifier>{fc1e6b62-4340-4b10-96a5-64e54f05d565}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="gb_core\apu.cpp">
@@ -82,6 +88,12 @@
     </ClCompile>
     <ClCompile Include="gbr_interface\gbr.cpp">
       <Filter>Source Files\gbr_interface</Filter>
+    </ClCompile>
+    <ClCompile Include="goomba\goombarom.c">
+      <Filter>Source Files\goomba</Filter>
+    </ClCompile>
+    <ClCompile Include="goomba\goombasav.c">
+      <Filter>Source Files\goomba</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -143,6 +155,12 @@
     </ClInclude>
     <ClInclude Include="gbr_interface\gbr.h">
       <Filter>Header Files\_gbr_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="goomba\goombarom.h">
+      <Filter>Header Files\_goomba</Filter>
+    </ClInclude>
+    <ClInclude Include="goomba\goombasav.h">
+      <Filter>Header Files\_goomba</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

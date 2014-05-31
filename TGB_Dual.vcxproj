@@ -168,6 +168,8 @@
     <ClCompile Include="gb_core\lcd.cpp" />
     <ClCompile Include="gb_core\mbc.cpp" />
     <ClCompile Include="gb_core\rom.cpp" />
+    <ClCompile Include="goomba\goombarom.c" />
+    <ClCompile Include="goomba\goombasav.c" />
     <ClCompile Include="win32_ui\dmy_renderer.cpp" />
     <ClCompile Include="win32_ui\dx_renderer.cpp" />
     <ClCompile Include="win32_ui\setting.cpp" />
@@ -184,6 +186,8 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="goomba\goombarom.h" />
+    <ClInclude Include="goomba\goombasav.h" />
     <ClInclude Include="win32_ui\resource.h" />
     <ClInclude Include="gb_core\gb.h" />
     <ClInclude Include="gb_core\gb_types.h" />
