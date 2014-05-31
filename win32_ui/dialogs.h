@@ -18,6 +18,7 @@
 */
 
 #include "keymap.h"
+#include "../goomba/goombarom.h"
 
 // For Unicode columns in ListView
 #define ListView_InsertColumnW(hwnd, iCol, pcol) \
@@ -252,7 +253,23 @@ BYTE *load_archive(char *path, int *size)
 		FindClose(hFind);
 	}
 	else{
-		//MessageBoxW(hWnd,L"このファイルを実行することはできません","TGB Dual",MB_OK);
+		// For any other kind of file
+		// If the ROMs are uncompressed and stored contiguously, goombarom.c can find them
+		// This works for Goomba / Goomba Color ROMs, and for TAR archives
+
+		// First step: read the whole file
+		FILE *file;
+		file = fopen(path, "rb");
+		fseek(file, 0, SEEK_END);
+		size_t archive_size=ftell(file);
+		fseek(file, 0, SEEK_SET);
+		void* buf = malloc(archive_size);
+		fread(buf, 1, archive_size, file);
+		fclose(file);
+
+		for (const void* rom = gb_first_rom(buf, archive_size); rom != NULL; rom = gb_next_rom(buf, archive_size, rom)) {
+			int r = MessageBoxA(hWnd, gb_get_title(rom, NULL), "TGB Dual", MB_YESNOCANCEL);
+		}
 		return NULL;
 	}
 
