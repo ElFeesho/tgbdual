@@ -1341,6 +1341,8 @@ static BOOL CALLBACK DirectoryProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lPar
 	
 	case WM_COMMAND:
 		if(LOWORD(wParam)==IDOK){
+			GetDlgItemText(hwnd, IDC_SAVE_PATH, cur_sv_dir, 255);
+			GetDlgItemText(hwnd, IDC_MEDIA_PATH, cur_md_dir, 255);
 			GetDlgItemText(hwnd, IDC_SRAM1_PATH, cur_sram1_ext, 15);
 			GetDlgItemText(hwnd, IDC_SRAM2_PATH, cur_sram2_ext, 15);
 			config->set_save_dir(cur_sv_dir);
