@@ -304,6 +304,32 @@ bool is_gb_ext(const char* buf) {
 
 HMODULE h_gbr_dll;
 
+BYTE* ram_load_helper(int ram_size, const char* sram_name, int num) {
+	BYTE* ram;
+	char tmp_sram[256];
+	strcpy(tmp_sram, sram_name);
+	
+	// Only check one SRAM path. Original program looked for two or three.
+	FILE *fs = fopen(tmp_sram, "rb");
+	if (fs) {
+		ram = (BYTE*)malloc(ram_size);
+		fread(ram, 1, ram_size, fs);
+		fseek(fs, 0, SEEK_END);
+		if (ftell(fs) & 0xff){
+			int tmp;
+			fseek(fs, -4, SEEK_END);
+			fread(&tmp, 4, 1, fs);
+			if (render[num])
+				render[num]->set_timer_state(tmp);
+		}
+		fclose(fs);
+	} else {
+		ram = (BYTE*)malloc(ram_size);
+		memset(ram, 0, ram_size);
+	}
+	return ram;
+}
+
 bool load_rom(char *buf,int num)
 {
 	FILE *file;
@@ -464,37 +490,7 @@ bool load_rom(char *buf,int num)
 	config->get_save_dir(sv_dir);
 	SetCurrentDirectory(sv_dir);
 
-	{
-		char tmp_sram[256];
-		strcpy(tmp_sram,sram_name);
-
-		// そのまま、先頭のピリオドから拡張子に、さらにそれを拡張子RAM化、の3通りしらべないかん…
-		int i;
-		for (i=0;i<3;i++){
-			if (i==1) strcpy(strstr(tmp_sram,"."),suffix);
-			else if (i==2) strcpy(strstr(tmp_sram,"."),num?".ra2":"ram");
-
-			FILE *fs=fopen(tmp_sram,"rb");
-			if (fs){
-				ram=(BYTE*)malloc(ram_size);
-				fread(ram,1,ram_size,fs);
-				fseek(fs,0,SEEK_END);
-				if (ftell(fs)&0xff){
-					int tmp;
-					fseek(fs,-4,SEEK_END);
-					fread(&tmp,4,1,fs);
-					if (render[num])
-						render[num]->set_timer_state(tmp);
-				}
-				fclose(fs);
-				break;
-			}
-		}
-		if (i==3){
-			ram=(BYTE*)malloc(ram_size);
-			memset(ram,0,ram_size);
-		}
-	}
+	ram = ram_load_helper(ram_size, sram_name, num);
 	strcpy(tmp_sram_name[num],sram_name);
 
 	SetCurrentDirectory(cur_di);
@@ -569,37 +565,7 @@ bool load_rom_only(char *buf,int num)
 	config->get_save_dir(sv_dir);
 	SetCurrentDirectory(sv_dir);
 
-	{
-		char tmp_sram[256];
-		strcpy(tmp_sram,sram_name);
-
-		// そのまま、先頭のピリオドから拡張子に、さらにそれを拡張子RAM化、の3通りしらべないかん…
-		int i;
-		for (i=0;i<3;i++){
-			if (i==1) strcpy(strstr(tmp_sram,"."),suffix);
-			else if (i==2) strcpy(strstr(tmp_sram,"."),num?".ra2":"ram");
-
-			FILE *fs=fopen(tmp_sram,"rb");
-			if (fs){
-				ram=(BYTE*)malloc(ram_size);
-				fread(ram,1,ram_size,fs);
-				fseek(fs,0,SEEK_END);
-				if (ftell(fs)&0xff){
-					int tmp;
-					fseek(fs,-4,SEEK_END);
-					fread(&tmp,4,1,fs);
-					if (render[num])
-						render[num]->set_timer_state(tmp);
-				}
-				fclose(fs);
-				break;
-			}
-		}
-		if (i==3){
-			ram=(BYTE*)malloc(ram_size);
-			memset(ram,0,ram_size);
-		}
-	}
+	ram = ram_load_helper(ram_size, sram_name, num);
 	strcpy(tmp_sram_name[num],sram_name);
 
 	SetCurrentDirectory(cur_di);
