@@ -49,6 +49,10 @@ static const char mbc_types[0x101][40]={"ROM Only","ROM + MBC1","ROM + MBC1 + RA
 									"","","","","","","","","","","","","","Bandai TAMA5","Hudson HuC-3","Hudson HuC-1",//#FF
 									"mmm01" // 逃げ
 };
+static const char* FILE_FILTERS = "All formats (*.gb;*.sgb;*.gbc;*.cab;*.zip;*.rar;*.lzh)\0*.gb;*.sgb;*.gbc;*.cab;*.rar;*.zip;*.lzh\0"
+"Game Boy ROMs (*.gb;*.sgb;*.gbc)\0*.gb;*.sgb;*.gbc\0"
+"Archive files (external DLLs required) (*.cab;*.zip;*.rar;*.lzh)\0*.cab;*.zip;*.rar;*.lzh\0"
+"All Files (*.*)\0*.*\0\0";
 static byte org_gbtype[2];
 static bool sys_win2000;
 
@@ -2966,7 +2970,7 @@ static BOOL CALLBACK ConnectProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam
 			ofn.hwndOwner=hWnd;
 			ofn.lStructSize=sizeof(ofn);
 			ofn.lpstrDefExt="gb";
-			ofn.lpstrFilter="Game Boy Rom Image (include archive file) (*.gb;*.gbc;*.cab;*.zip;*.rar;*.lzh)\0*.gb;*.gbc;*.cab;*.rar;*.zip;*.lzh\0All Files (*.*)\0*.*\0\0";
+			ofn.lpstrFilter=FILE_FILTERS;
 			ofn.nMaxFile=256;
 			ofn.nMaxFileTitle=256;
 			ofn.lpstrFile=buf;
