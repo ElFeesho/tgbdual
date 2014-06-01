@@ -273,6 +273,10 @@ BYTE *load_archive(char *path, int *size)
 			num_roms++;
 		}
 
+		if (num_roms == 0) {
+			MessageBoxW(hWnd, L"This file does not contain any Game Boy ROM images.", L"TGB Dual", MB_OK | MB_ICONERROR);
+		}
+
 		char msgbuf[32];
 		ret = NULL;
 		int curr_rom = 1; // For dialog
