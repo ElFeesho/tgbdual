@@ -649,7 +649,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 			ofn.hwndOwner=hWnd;
 			ofn.lStructSize=sizeof(ofn);
 			ofn.lpstrDefExt="gb";
-			ofn.lpstrFilter="Game Boy Rom Image (include archive file) (*.gb;*.gbc;*.cab;*.zip;*.rar;*.lzh;*.gbr)\0*.gb;*.gbc;*.cab;*.rar;*.zip;*.lzh;*.gbr\0All Files (*.*)\0*.*\0\0";
+			ofn.lpstrFilter=FILE_FILTERS;
 			ofn.nMaxFile=256;
 			ofn.nMaxFileTitle=256;
 			ofn.lpstrFile=buf;
