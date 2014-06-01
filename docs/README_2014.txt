@@ -19,13 +19,6 @@ New features:
     (endian_conv) that runs before TGB_Dual is built and when it the project
     is cleaned, to get the files encoded correctly.
 
-Branches:
-* The "english" branch in Git contains an English-language version of the app.
-  Eventually, this will probably be merged into the main branch and a
-  "japanese" branch will be created.
-* The "goombasav" branch has support for Goomba/Goomba Color ROMs, and will
-  also have support for Goomba's SRAM data format once I get around to it.
-
 Original sources from
 http://gigo.retrogames.com/download.html#tgb-dual
 http://shinh.skr.jp/tgbdualsdl/

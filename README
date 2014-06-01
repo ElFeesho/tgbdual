@@ -19,6 +19,14 @@ win32_ui
 This is an update of TGB Dual designed primarily to get it compiling and
 working correctly on new computers.
 
+Branches: (https://github.com/libertyernie/tgbdual)
+* The "master" branch contains all the bugfixes, new features (except for
+  goombasav), and English-language dialogs/menus.
+* The "japanese" branch uses the original Japanese text (features that I added
+  later are still in English.)
+* The "goombasav" branch has support for Goomba/Goomba Color ROMs, and will
+  also have support for Goomba's SRAM data format once I get around to it.
+
 See docs/README_2014.txt for a changelist.
 
 Original sources from
