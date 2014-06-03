@@ -278,8 +278,26 @@ word dx_renderer::get_sensor(bool x_y)
 
 //------------------------------------------------------------
 
+typedef HRESULT(WINAPI * DIRECTDRAWCREATE)(GUID*, LPDIRECTDRAW*, IUnknown*);
 void dx_renderer::init_dd()
 {
+	// From GetDXVer.cpp.
+	// First see if DDRAW.DLL even exists.
+	HINSTANCE hDDrawDLL = LoadLibrary("DDRAW.DLL");
+	if (hDDrawDLL == NULL)
+	{
+		MessageBoxW(m_hwnd, L"Couldn't load ddraw.dll.", L"Renderer Error", MB_OK);
+		return;
+	}
+
+	// See if we can create the DirectDraw object.
+	DIRECTDRAWCREATE DirectDrawCreate = (DIRECTDRAWCREATE)GetProcAddress(hDDrawDLL, "DirectDrawCreate");
+	if (DirectDrawCreate == NULL)
+	{
+		MessageBoxW(m_hwnd, L"Couldn't load ddraw.dll.", L"Renderer Error", MB_OK);
+		return;
+	}
+
 	if (DirectDrawCreate(NULL,&m_pdd,NULL)!=DD_OK){
 		MessageBox(m_hwnd,"Direct Draw オブジェクト生成に失敗しました","レンダラーエラー",MB_OK);
 		return;
