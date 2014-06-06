@@ -19,6 +19,7 @@
 
 #include "keymap.h"
 #include "../goomba/goombarom.h"
+#include "../goomba/goombasav.h"
 
 // For Unicode columns in ListView
 #define ListView_InsertColumnW(hwnd, iCol, pcol) \
@@ -347,7 +348,37 @@ bool is_gb_ext(const char* buf) {
 
 HMODULE h_gbr_dll;
 
-BYTE* ram_load_helper(int ram_size, const char* sram_name, int num) {
+bool try_load_goomba(void* ram, int ram_size, FILE* fs, const char* cart_name, int num) {
+	fseek(fs, 0, SEEK_SET);
+	char gba_data[GOOMBA_COLOR_SRAM_SIZE];
+	fread(gba_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
+	fclose(fs);
+
+	stateheader* sh = stateheader_for(gba_data, cart_name);
+	if (sh == NULL) {
+		MessageBoxA(hWnd, goomba_last_error(), "Goombasav Error", MB_OK);
+		return false;
+	}
+
+	size_t output_size;
+	void* gbc_data = goomba_extract(gba_data, sh, &output_size);
+	if (gbc_data == NULL) {
+		MessageBoxA(hWnd, goomba_last_error(), "Goombasav Error", MB_OK);
+		return false;
+	}
+	
+	if (output_size > ram_size) {
+		MessageBoxA(hWnd, "Extracted SRAM is too big", "TGB Dual", MB_OK);
+		free(gbc_data);
+		return false;
+	} else {
+		memcpy(ram, gbc_data, output_size);
+		free(gbc_data);
+		return true;
+	}
+}
+
+BYTE* ram_load_helper(int ram_size, const char* sram_name, const char* cart_name, int num) {
 	BYTE* ram;
 	char tmp_sram[256];
 	strcpy(tmp_sram, sram_name);
@@ -357,6 +388,13 @@ BYTE* ram_load_helper(int ram_size, const char* sram_name, int num) {
 	if (fs) {
 		ram = (BYTE*)malloc(ram_size);
 		fread(ram, 1, ram_size, fs);
+		if (*(unsigned __int32*)ram == GOOMBA_STATEID) {
+			memset(ram, 0, ram_size); // in case try_load_goomba fails
+			if (!try_load_goomba(ram, ram_size, fs, cart_name, num)) {
+				MessageBoxW(hWnd, L"Goomba SRAM could not be loaded - please rename the SRAM file now, or it will be overwritten.", L"TGB Dual", MB_OK | MB_ICONERROR);
+			}
+			return ram;
+		}
 		fseek(fs, 0, SEEK_END);
 		if (ftell(fs) & 0xff){
 			int tmp;
@@ -533,7 +571,8 @@ bool load_rom(char *buf,int num)
 	config->get_save_dir(sv_dir);
 	SetCurrentDirectory(sv_dir);
 
-	ram = ram_load_helper(ram_size, sram_name, num);
+	const char* cart_name = (const char*)dat + 0x134;
+	ram = ram_load_helper(ram_size, sram_name, cart_name, num);
 	strcpy(tmp_sram_name[num],sram_name);
 
 	SetCurrentDirectory(cur_di);
@@ -608,7 +647,8 @@ bool load_rom_only(char *buf,int num)
 	config->get_save_dir(sv_dir);
 	SetCurrentDirectory(sv_dir);
 
-	ram = ram_load_helper(ram_size, sram_name, num);
+	const char* cart_name = (const char*)dat + 0x134;
+	ram = ram_load_helper(ram_size, sram_name, cart_name, num);
 	strcpy(tmp_sram_name[num],sram_name);
 
 	SetCurrentDirectory(cur_di);
