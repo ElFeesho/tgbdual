@@ -69,7 +69,36 @@ void save_sram(BYTE *buf,int size,int num)
 	GetCurrentDirectory(256,cur_di);
 	config->get_save_dir(sv_dir);
 	SetCurrentDirectory(sv_dir);
-	FILE *fs=fopen(tmp_sram_name[num],"wb");
+
+	unsigned __int32 stateid = 0;
+	FILE* fs = fopen(tmp_sram_name[num], "r+b");
+	if (fs != NULL) {
+		fread(&stateid, 1, 4, fs);
+		fseek(fs, 0, SEEK_SET);
+		if (stateid == GOOMBA_STATEID) {
+			byte gba_data[GOOMBA_COLOR_SRAM_SIZE];
+			fread(gba_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
+			fseek(fs, 0, SEEK_SET);
+
+			stateheader* sh = stateheader_for(gba_data,
+				g_gb[num]->get_rom()->get_info()->cart_name);
+			if (sh == NULL) {
+				MessageBoxA(hWnd, goomba_last_error(), "Goombasav Error", MB_ICONERROR | MB_OK);
+				return;
+			}
+			void* new_data = goomba_new_sav(gba_data, sh, buf, 0x2000 * sram_tbl[size]);
+			if (new_data == NULL) {
+				MessageBoxA(hWnd, goomba_last_error(), "Goombasav Error", MB_ICONERROR | MB_OK);
+				return;
+			}
+			fwrite(new_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
+			fclose(fs);
+			SetCurrentDirectory(cur_di);
+			return;
+		}
+	}
+
+	if (fs == NULL) fs = fopen(tmp_sram_name[num], "wb");
 	fwrite(buf,1,0x2000*sram_tbl[size],fs);
 	if ((g_gb[num]->get_rom()->get_info()->cart_type>=0x0f)&&(g_gb[num]->get_rom()->get_info()->cart_type<=0x13)){
 		int tmp=render[0]->get_timer_state();
