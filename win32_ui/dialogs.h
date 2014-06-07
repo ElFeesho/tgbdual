@@ -58,46 +58,52 @@ static const char* FILE_FILTERS = "All formats (*.gb;*.sgb;*.gbc;*.gba;*.cab;*.z
 "All Files (*.*)\0*.*\0\0";
 static byte org_gbtype[2];
 static bool sys_win2000;
+static int sram_tbl[] = { 1, 1, 1, 4, 16, 8 };
+
+void try_save_goomba(const void* buf, int size, int num, FILE* fs) {
+	byte gba_data[GOOMBA_COLOR_SRAM_SIZE];
+	fread(gba_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
+	fseek(fs, 0, SEEK_SET);
+
+	stateheader* sh = stateheader_for(gba_data,
+		g_gb[num]->get_rom()->get_info()->cart_name);
+	if (sh == NULL) {
+		MessageBoxA(hWnd, goomba_last_error(), "Goombasav Error", MB_ICONERROR | MB_OK);
+		return; // don't try to save sram
+	}
+	void* new_data = goomba_new_sav(gba_data, sh, buf, 0x2000 * sram_tbl[size]);
+	if (new_data == NULL) {
+		MessageBoxA(hWnd, goomba_last_error(), "Goombasav Error", MB_ICONERROR | MB_OK);
+		return;
+	}
+	fwrite(new_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
+}
 
 void save_sram(BYTE *buf,int size,int num)
 {
 	if (strstr(tmp_sram_name[num],".srt"))
 		return;
 
-	int sram_tbl[]={1,1,1,4,16,8};
 	char cur_di[256],sv_dir[256];
 	GetCurrentDirectory(256,cur_di);
 	config->get_save_dir(sv_dir);
 	SetCurrentDirectory(sv_dir);
 
-	unsigned __int32 stateid = 0;
 	FILE* fs = fopen(tmp_sram_name[num], "r+b");
 	if (fs != NULL) {
+		// if file exists, check for goomba
+		unsigned __int32 stateid = 0;
 		fread(&stateid, 1, 4, fs);
 		fseek(fs, 0, SEEK_SET);
 		if (stateid == GOOMBA_STATEID) {
-			byte gba_data[GOOMBA_COLOR_SRAM_SIZE];
-			fread(gba_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
-			fseek(fs, 0, SEEK_SET);
-
-			stateheader* sh = stateheader_for(gba_data,
-				g_gb[num]->get_rom()->get_info()->cart_name);
-			if (sh == NULL) {
-				MessageBoxA(hWnd, goomba_last_error(), "Goombasav Error", MB_ICONERROR | MB_OK);
-				return;
-			}
-			void* new_data = goomba_new_sav(gba_data, sh, buf, 0x2000 * sram_tbl[size]);
-			if (new_data == NULL) {
-				MessageBoxA(hWnd, goomba_last_error(), "Goombasav Error", MB_ICONERROR | MB_OK);
-				return;
-			}
-			fwrite(new_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
+			try_save_goomba(buf, size, num, fs);
 			fclose(fs);
 			SetCurrentDirectory(cur_di);
 			return;
 		}
 	}
 
+	// Create file if it does not exist
 	if (fs == NULL) fs = fopen(tmp_sram_name[num], "wb");
 	fwrite(buf,1,0x2000*sram_tbl[size],fs);
 	if ((g_gb[num]->get_rom()->get_info()->cart_type>=0x0f)&&(g_gb[num]->get_rom()->get_info()->cart_type<=0x13)){
