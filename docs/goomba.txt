@@ -1,0 +1,19 @@
+** Using Goomba / Goomba Color ROMs **
+
+Goomba and Goomba Color are Game Boy emulators for the Game Boy Advance. This
+version of TGB Dual can load Goomba ROMs, and read and write Goomba save data.
+
+First, you should go to Options -> Directories. Set the save directory to the
+folder where your Goomba .sav files are stored. (You should also set the slot2
+SRAM extension to "sav" instead of "sa2" - just don't run the same ROM in both
+windows.)
+
+Then, you can open the Goomba / Goomba Color ROM with TGB Dual. The program
+will go through every Game Boy ROM found in the file, asking whether you want
+to load that ROM. Press "Yes" to load it or "No" to see what the next ROM is.
+
+Notes:
+* If no Goomba save file exists, TGB Dual will create a regular Game Boy
+  save file - which is probably not what you want!
+* TGB Dual can only save to a Goomba .sav file if the .sav file already contains
+  save data for the game you are playing.
