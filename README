@@ -21,11 +21,16 @@ working correctly on new computers.
 
 Branches: (https://github.com/libertyernie/tgbdual)
 * The "master" branch contains all the bugfixes, new features (except for
-  goombasav), and English-language dialogs/menus.
+  goombasav), English-language dialogs/menus, and Goomba ROM/SRAM support.
 * The "japanese" branch uses the original Japanese text (features that I added
   later are still in English.)
-* The "goombasav" branch has support for Goomba/Goomba Color ROMs, and will
-  also have support for Goomba's SRAM data format once I get around to it.
+
+All source code is now Unicode instead of using the local code page, which
+should enable Japanese text to display on any computer. However, Windows uses
+UTF-16 and Git uses UTF-8, so I wrote a tiny program (endian_conv) that runs
+before TGB_Dual is built and when it the project is cleaned, to get the files
+encoded correctly. (When you make a Git commit, you should first clean the
+project in Visual Studio.)
 
 See docs/README_2014.txt for a changelist.
 

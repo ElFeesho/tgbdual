@@ -18,6 +18,8 @@
 */
 
 #include "keymap.h"
+#include "../goomba/goombarom.h"
+#include "../goomba/goombasav.h"
 
 // For Unicode columns in ListView
 #define ListView_InsertColumnW(hwnd, iCol, pcol) \
@@ -48,24 +50,61 @@ static const char mbc_types[0x101][40]={"ROM Only","ROM + MBC1","ROM + MBC1 + RA
 									"","","","","","","","","","","","","","Bandai TAMA5","Hudson HuC-3","Hudson HuC-1",//#FF
 									"mmm01" // 逃げ
 };
-static const char* FILE_FILTERS = "All formats (*.gb;*.sgb;*.gbc;*.cab;*.zip;*.rar;*.lzh)\0*.gb;*.sgb;*.gbc;*.cab;*.rar;*.zip;*.lzh\0"
+static const char* FILE_FILTERS = "All formats (*.gb;*.sgb;*.gbc;*.gba;*.cab;*.zip;*.rar;*.lzh;*.tar)\0*.gb;*.sgb;*.gbc;*.gba;*.cab;*.rar;*.zip;*.lzh;*.tar\0"
 "Game Boy ROMs (*.gb;*.sgb;*.gbc)\0*.gb;*.sgb;*.gbc\0"
+"Goomba/Goomba Color ROMs (*.gba)\0*.gba\0"
 "Archive files (external DLLs required) (*.cab;*.zip;*.rar;*.lzh)\0*.cab;*.zip;*.rar;*.lzh\0"
+"Uncompressed, contiguous archives (*.tar)\0*.tar\0"
 "All Files (*.*)\0*.*\0\0";
 static byte org_gbtype[2];
 static bool sys_win2000;
+static int sram_tbl[] = { 1, 1, 1, 4, 16, 8 };
+
+void try_save_goomba(const void* buf, int size, int num, FILE* fs) {
+	byte gba_data[GOOMBA_COLOR_SRAM_SIZE];
+	fread(gba_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
+	fseek(fs, 0, SEEK_SET);
+
+	stateheader* sh = stateheader_for(gba_data,
+		g_gb[num]->get_rom()->get_info()->cart_name);
+	if (sh == NULL) {
+		MessageBoxA(hWnd, goomba_last_error(), "Goombasav Error", MB_ICONERROR | MB_OK);
+		return; // don't try to save sram
+	}
+	void* new_data = goomba_new_sav(gba_data, sh, buf, 0x2000 * sram_tbl[size]);
+	if (new_data == NULL) {
+		MessageBoxA(hWnd, goomba_last_error(), "Goombasav Error", MB_ICONERROR | MB_OK);
+		return;
+	}
+	fwrite(new_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
+}
 
 void save_sram(BYTE *buf,int size,int num)
 {
 	if (strstr(tmp_sram_name[num],".srt"))
 		return;
 
-	int sram_tbl[]={1,1,1,4,16,8};
 	char cur_di[256],sv_dir[256];
 	GetCurrentDirectory(256,cur_di);
 	config->get_save_dir(sv_dir);
 	SetCurrentDirectory(sv_dir);
-	FILE *fs=fopen(tmp_sram_name[num],"wb");
+
+	FILE* fs = fopen(tmp_sram_name[num], "r+b");
+	if (fs != NULL) {
+		// if file exists, check for goomba
+		unsigned __int32 stateid = 0;
+		fread(&stateid, 1, 4, fs);
+		fseek(fs, 0, SEEK_SET);
+		if (stateid == GOOMBA_STATEID) {
+			try_save_goomba(buf, size, num, fs);
+			fclose(fs);
+			SetCurrentDirectory(cur_di);
+			return;
+		}
+	}
+
+	// Create file if it does not exist
+	if (fs == NULL) fs = fopen(tmp_sram_name[num], "wb");
 	fwrite(buf,1,0x2000*sram_tbl[size],fs);
 	if ((g_gb[num]->get_rom()->get_info()->cart_type>=0x0f)&&(g_gb[num]->get_rom()->get_info()->cart_type<=0x13)){
 		int tmp=render[0]->get_timer_state();
@@ -256,8 +295,48 @@ BYTE *load_archive(char *path, int *size)
 		FindClose(hFind);
 	}
 	else{
-		//MessageBoxW(hWnd,L"このファイルを実行することはできません","TGB Dual",MB_OK);
-		return NULL;
+		// For any other kind of file
+		// If the ROMs are uncompressed and stored contiguously, goombarom.c can find them
+		// This works for Goomba / Goomba Color ROMs, and for TAR archives
+
+		// First step: read the whole file
+		FILE *file;
+		file = fopen(path, "rb");
+		fseek(file, 0, SEEK_END);
+		size_t archive_size=ftell(file);
+		fseek(file, 0, SEEK_SET);
+		void* buf = malloc(archive_size);
+		fread(buf, 1, archive_size, file);
+		fclose(file);
+
+		// Count number of roms
+		int num_roms = 0;
+		for (const void* rom = gb_first_rom(buf, archive_size); rom != NULL; rom = gb_next_rom(buf, archive_size, rom)) {
+			num_roms++;
+		}
+
+		if (num_roms == 0) {
+			MessageBoxW(hWnd, L"This file does not contain any Game Boy ROM images.", L"TGB Dual", MB_OK | MB_ICONERROR);
+		}
+
+		char msgbuf[32];
+		ret = NULL;
+		int curr_rom = 1; // For dialog
+		for (const void* rom = gb_first_rom(buf, archive_size); rom != NULL; rom = gb_next_rom(buf, archive_size, rom)) {
+			sprintf(msgbuf, "(%d/%d) Load %s?", curr_rom, num_roms, gb_get_title(rom, NULL));
+			int r = MessageBoxA(hWnd, msgbuf, "TGB Dual", MB_YESNOCANCEL);
+			if (r == IDYES) {
+				*size = gb_rom_size(rom);
+				ret = (BYTE*)malloc(*size);
+				memcpy(ret, rom, *size);
+				break;
+			} else if (r == IDCANCEL) {
+				break;
+			}
+			curr_rom++;
+		}
+		free(buf);
+		return ret;
 	}
 
 	FILE *file;
@@ -304,7 +383,37 @@ bool is_gb_ext(const char* buf) {
 
 HMODULE h_gbr_dll;
 
-BYTE* ram_load_helper(int ram_size, const char* sram_name, int num) {
+bool try_load_goomba(void* ram, int ram_size, FILE* fs, const char* cart_name, int num) {
+	fseek(fs, 0, SEEK_SET);
+	char gba_data[GOOMBA_COLOR_SRAM_SIZE];
+	fread(gba_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
+	fclose(fs);
+
+	stateheader* sh = stateheader_for(gba_data, cart_name);
+	if (sh == NULL) {
+		MessageBoxA(hWnd, goomba_last_error(), "Goombasav Error", MB_OK);
+		return false;
+	}
+
+	size_t output_size;
+	void* gbc_data = goomba_extract(gba_data, sh, &output_size);
+	if (gbc_data == NULL) {
+		MessageBoxA(hWnd, goomba_last_error(), "Goombasav Error", MB_OK);
+		return false;
+	}
+	
+	if (output_size > ram_size) {
+		MessageBoxA(hWnd, "Extracted SRAM is too big", "TGB Dual", MB_OK);
+		free(gbc_data);
+		return false;
+	} else {
+		memcpy(ram, gbc_data, output_size);
+		free(gbc_data);
+		return true;
+	}
+}
+
+BYTE* ram_load_helper(int ram_size, const char* sram_name, const char* cart_name, int num) {
 	BYTE* ram;
 	char tmp_sram[256];
 	strcpy(tmp_sram, sram_name);
@@ -314,6 +423,13 @@ BYTE* ram_load_helper(int ram_size, const char* sram_name, int num) {
 	if (fs) {
 		ram = (BYTE*)malloc(ram_size);
 		fread(ram, 1, ram_size, fs);
+		if (*(unsigned __int32*)ram == GOOMBA_STATEID) {
+			memset(ram, 0, ram_size); // in case try_load_goomba fails
+			if (!try_load_goomba(ram, ram_size, fs, cart_name, num)) {
+				MessageBoxW(hWnd, L"Goomba SRAM could not be loaded - please rename the SRAM file now, or it will be overwritten.", L"TGB Dual", MB_OK | MB_ICONERROR);
+			}
+			return ram;
+		}
 		fseek(fs, 0, SEEK_END);
 		if (ftell(fs) & 0xff){
 			int tmp;
@@ -490,7 +606,8 @@ bool load_rom(char *buf,int num)
 	config->get_save_dir(sv_dir);
 	SetCurrentDirectory(sv_dir);
 
-	ram = ram_load_helper(ram_size, sram_name, num);
+	const char* cart_name = (const char*)dat + 0x134;
+	ram = ram_load_helper(ram_size, sram_name, cart_name, num);
 	strcpy(tmp_sram_name[num],sram_name);
 
 	SetCurrentDirectory(cur_di);
@@ -565,7 +682,8 @@ bool load_rom_only(char *buf,int num)
 	config->get_save_dir(sv_dir);
 	SetCurrentDirectory(sv_dir);
 
-	ram = ram_load_helper(ram_size, sram_name, num);
+	const char* cart_name = (const char*)dat + 0x134;
+	ram = ram_load_helper(ram_size, sram_name, cart_name, num);
 	strcpy(tmp_sram_name[num],sram_name);
 
 	SetCurrentDirectory(cur_di);
