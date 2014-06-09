@@ -1,7 +1,8 @@
 ** Using Goomba / Goomba Color ROMs **
 
 Goomba and Goomba Color are Game Boy emulators for the Game Boy Advance. This
-version of TGB Dual can load Goomba ROMs, and read and write Goomba save data.
+version of TGB Dual can load the Game Boy ROMs stored within Goomba ROMs, and
+can read and update the Game Boy SRAM stored inside Goomba .sav files.
 
 First, you should go to Options -> Directories. Set the save directory to the
 folder where your Goomba .sav files are stored. (You should also set the slot2
