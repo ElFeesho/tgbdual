@@ -59,24 +59,31 @@ static const char* FILE_FILTERS = "All formats (*.gb;*.sgb;*.gbc;*.gba;*.cab;*.z
 static byte org_gbtype[2];
 static bool sys_win2000;
 static int sram_tbl[] = { 1, 1, 1, 4, 16, 8 };
+static bool goomba_load_error;
 
-void try_save_goomba(const void* buf, int size, int num, FILE* fs) {
-	byte gba_data[GOOMBA_COLOR_SRAM_SIZE];
-	fread(gba_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
-	fseek(fs, 0, SEEK_SET);
+bool save_goomba(const void* buf, int size, int num, FILE* fs) {
+	if (goomba_load_error) {
+		// don't save data - error occured when first loading, and user was notified
+		return true;
+	} else {
+		byte gba_data[GOOMBA_COLOR_SRAM_SIZE];
+		fread(gba_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
+		fseek(fs, 0, SEEK_SET);
 
-	stateheader* sh = stateheader_for(gba_data,
-		g_gb[num]->get_rom()->get_info()->cart_name);
-	if (sh == NULL) {
-		MessageBoxA(hWnd, goomba_last_error(), "Goombasav Error", MB_ICONERROR | MB_OK);
-		return; // don't try to save sram
+		stateheader* sh = stateheader_for(gba_data,
+			g_gb[num]->get_rom()->get_info()->cart_name);
+		if (sh == NULL) {
+			MessageBoxA(hWnd, goomba_last_error(), "Goombasav Error", MB_ICONERROR | MB_OK);
+			return false; // don't try to save sram
+		}
+		void* new_data = goomba_new_sav(gba_data, sh, buf, 0x2000 * sram_tbl[size]);
+		if (new_data == NULL) {
+			MessageBoxA(hWnd, goomba_last_error(), "Goombasav Error", MB_ICONERROR | MB_OK);
+			return false;
+		}
+		fwrite(new_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
+		return true;
 	}
-	void* new_data = goomba_new_sav(gba_data, sh, buf, 0x2000 * sram_tbl[size]);
-	if (new_data == NULL) {
-		MessageBoxA(hWnd, goomba_last_error(), "Goombasav Error", MB_ICONERROR | MB_OK);
-		return;
-	}
-	fwrite(new_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
 }
 
 void save_sram(BYTE *buf,int size,int num)
@@ -96,7 +103,9 @@ void save_sram(BYTE *buf,int size,int num)
 		fread(&stateid, 1, 4, fs);
 		fseek(fs, 0, SEEK_SET);
 		if (stateid == GOOMBA_STATEID) {
-			try_save_goomba(buf, size, num, fs);
+			if (!save_goomba(buf, size, num, fs)) {
+				MessageBoxW(hWnd, L"Goomba SRAM could not be saved.", L"TGB Dual", MB_OK | MB_ICONERROR);
+			}
 			fclose(fs);
 			SetCurrentDirectory(cur_di);
 			return;
@@ -434,8 +443,9 @@ BYTE* ram_load_helper(int ram_size, const char* sram_name, const char* cart_name
 		fread(ram, 1, ram_size, fs);
 		if (*(unsigned __int32*)ram == GOOMBA_STATEID) {
 			memset(ram, 0, ram_size); // in case try_load_goomba fails
-			if (!try_load_goomba(ram, ram_size, fs, cart_name, num)) {
-				MessageBoxW(hWnd, L"Goomba SRAM could not be loaded - please rename the SRAM file now, or it will be overwritten.", L"TGB Dual", MB_OK | MB_ICONERROR);
+			goomba_load_error = !try_load_goomba(ram, ram_size, fs, cart_name, num);
+			if (goomba_load_error) {
+				MessageBoxW(hWnd, L"Could not load Goomba SRAM. Your progress will not be saved.", L"TGB Dual", MB_OK | MB_ICONERROR);
 			}
 			return ram;
 		}
