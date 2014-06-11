@@ -389,6 +389,15 @@ bool try_load_goomba(void* ram, int ram_size, FILE* fs, const char* cart_name, i
 	fread(gba_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
 	fclose(fs);
 
+	void* cleaned = goomba_cleanup(gba_data);
+	if (cleaned == NULL) {
+		MessageBoxA(hWnd, goomba_last_error(), "Goombasav Error", MB_OK);
+		return false;
+	} else if (cleaned != gba_data) {
+		memcpy(gba_data, cleaned, GOOMBA_COLOR_SRAM_SIZE);
+		free(cleaned);
+	}
+
 	stateheader* sh = stateheader_for(gba_data, cart_name);
 	if (sh == NULL) {
 		MessageBoxA(hWnd, goomba_last_error(), "Goombasav Error", MB_OK);
