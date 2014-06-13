@@ -350,7 +350,7 @@ BYTE *load_archive(char *path, int *size)
 		int curr_rom = 1; // For dialog
 		for (const void* rom = gb_first_rom(buf, archive_size); rom != NULL; rom = gb_next_rom(buf, archive_size, rom)) {
 			sprintf(msgbuf, "(%d/%d) Load %s?", curr_rom, num_roms, gb_get_title(rom, NULL));
-			int r = MessageBoxA(hWnd, msgbuf, "TGB Dual", MB_YESNOCANCEL);
+			int r = num_roms == 1 ? IDYES : MessageBoxA(hWnd, msgbuf, "TGB Dual", MB_YESNOCANCEL);
 			if (r == IDYES) {
 				*size = gb_rom_size(rom);
 				ret = (BYTE*)malloc(*size);
