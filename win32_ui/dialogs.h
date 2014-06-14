@@ -86,6 +86,14 @@ bool save_goomba(const void* buf, int size, int num, FILE* fs) {
 		fread(gba_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
 		fseek(fs, 0, SEEK_SET);
 
+		void* cleaned = goomba_cleanup(gba_data);
+		if (cleaned == NULL) {
+			return false;
+		} else if (cleaned != gba_data) {
+			memcpy(gba_data, cleaned, GOOMBA_COLOR_SRAM_SIZE);
+			free(cleaned);
+		}
+
 		stateheader* sh = stateheader_for(gba_data,
 			g_gb[num]->get_rom()->get_info()->cart_name);
 		if (sh == NULL) {
