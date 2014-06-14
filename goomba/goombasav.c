@@ -1,5 +1,6 @@
 /* goombasav.c - functions to handle Goomba / Goomba Color SRAM
 
+last updated June 13, 2014
 Copyright (C) 2014 libertyernie
 
 This program is free software: you can redistribute it and/or modify
@@ -37,11 +38,18 @@ as C++ code (Properties -> C/C++ -> Advanced -> Compile As.)
 static const char* const sleeptxt[] = { "5min", "10min", "30min", "OFF" };
 static const char* const brightxt[] = { "I", "II", "III", "IIII", "IIIII" };
 
-static char last_error[256];
+static char last_error[256] = "No error has occured yet.";
 static char goomba_strbuf[256];
 
 const char* goomba_last_error() {
 	return (const char*)last_error;
+}
+
+size_t goomba_set_last_error(const char* msg) {
+	size_t len = strnlen(msg, sizeof(last_error)-1);
+	memcpy(last_error, msg, len);
+	last_error[sizeof(last_error)-1] = '\0';
+	return len;
 }
 
 // Covers every byte. It goes one byte at a time, so it's inefficient
@@ -99,8 +107,10 @@ const char* stateheader_typestr(uint16_t type) {
 		return "SRAM";
 	case GOOMBA_CONFIGSAVE:
 		return "Configuration";
+	case GOOMBA_PALETTE: // Used by Goomba Paletted
+		return "Palette";
 	default:
-		return "Unknown"; // Stateheaders with type >2 are rejected by stateheader_plausible
+		return "Unknown"; // Stateheaders with these types are rejected by stateheader_plausible
 	}
 }
 
@@ -136,7 +146,9 @@ const char* stateheader_summary_str(const stateheader* sh) {
 }
 
 int stateheader_plausible(const stateheader* sh) {
-	return F16(sh->type) < 3 && F16(sh->size) >= sizeof(stateheader) && // check type (0,1,2) and size (at least 48)
+	uint16_t type = F16(sh->type);
+	if (type < 0 || type == 3 || type == 4 || type > 5) return 0;
+	return F16(sh->size) >= sizeof(stateheader) && // check size (at least 48)
 		(F16(sh->type) == GOOMBA_CONFIGSAVE || sh->uncompressed_size != 0); // check uncompressed_size, but not for configsave
 	// when checking for whether something equals 0, endian conversion is not necessary
 }
@@ -284,7 +296,7 @@ void* goomba_extract(const void* gba_data, const stateheader* header_ptr, goomba
 	if (r == LZO_E_INPUT_NOT_CONSUMED) {
 		//goomba_error("Warning: input not fully used. Double-check the result to make sure it works.\n");
 	} else if (r < 0) {
-		goomba_error("LZO error code: %d\nLook this up in lzoconf.h.\n", r);
+		goomba_error("Cannot decompress data (lzoconf.h error code %d).\n", r);
 		free(uncompressed_data);
 		return NULL;
 	}

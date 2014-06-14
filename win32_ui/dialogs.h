@@ -50,33 +50,62 @@ static const char mbc_types[0x101][40]={"ROM Only","ROM + MBC1","ROM + MBC1 + RA
 									"","","","","","","","","","","","","","Bandai TAMA5","Hudson HuC-3","Hudson HuC-1",//#FF
 									"mmm01" // 逃げ
 };
-static const char* FILE_FILTERS = "All formats (*.gb;*.sgb;*.gbc;*.gba;*.cab;*.zip;*.rar;*.lzh;*.tar)\0*.gb;*.sgb;*.gbc;*.gba;*.cab;*.rar;*.zip;*.lzh;*.tar\0"
+static const char* FILE_FILTERS = "All formats (*.gb;*.sgb;*.gbc;*.gba;*.cab;*.zip;*.rar;*.lzh;*.tar;*.iso)\0*.gb;*.sgb;*.gbc;*.gba;*.cab;*.rar;*.zip;*.lzh;*.tar;*.iso\0"
 "Game Boy ROMs (*.gb;*.sgb;*.gbc)\0*.gb;*.sgb;*.gbc\0"
 "Goomba/Goomba Color ROMs (*.gba)\0*.gba\0"
 "Archive files (external DLLs required) (*.cab;*.zip;*.rar;*.lzh)\0*.cab;*.zip;*.rar;*.lzh\0"
-"Uncompressed, contiguous archives (*.tar)\0*.tar\0"
+"Uncompressed, contiguous archives (*.tar;*.iso)\0*.tarl*.iso\0"
 "All Files (*.*)\0*.*\0\0";
 static byte org_gbtype[2];
 static bool sys_win2000;
 static int sram_tbl[] = { 1, 1, 1, 4, 16, 8 };
+static bool goomba_load_error;
 
-void try_save_goomba(const void* buf, int size, int num, FILE* fs) {
-	byte gba_data[GOOMBA_COLOR_SRAM_SIZE];
-	fread(gba_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
-	fseek(fs, 0, SEEK_SET);
+// Allocates (with malloc) a buffer to hold the formatted string.
+wchar_t* format_ascii_to_utf16(const wchar_t* before, const char* inner_message, const wchar_t* after) {
+	size_t L = strlen(inner_message) + 1;
 
-	stateheader* sh = stateheader_for(gba_data,
-		g_gb[num]->get_rom()->get_info()->cart_name);
-	if (sh == NULL) {
-		MessageBoxA(hWnd, goomba_last_error(), "Goombasav Error", MB_ICONERROR | MB_OK);
-		return; // don't try to save sram
+	wchar_t* conv = (wchar_t*)malloc(2 * L);
+	for (int i = 0; i < L; i++) {
+		conv[i] = inner_message[i];
 	}
-	void* new_data = goomba_new_sav(gba_data, sh, buf, 0x2000 * sram_tbl[size]);
-	if (new_data == NULL) {
-		MessageBoxA(hWnd, goomba_last_error(), "Goombasav Error", MB_ICONERROR | MB_OK);
-		return;
+
+	size_t L2 = 2 * (wcslen(before) + L-1 + wcslen(after) + 1);
+	wchar_t* buf = (wchar_t*)malloc(L2);
+	swprintf(buf, L"%s%s%s", before, conv, after);
+	free(conv);
+	return buf;
+}
+
+bool save_goomba(const void* buf, int size, int num, FILE* fs) {
+	if (goomba_load_error) {
+		// don't save data - error occured when first loading, and user was notified
+		return true;
+	} else {
+		byte gba_data[GOOMBA_COLOR_SRAM_SIZE];
+		fread(gba_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
+		fseek(fs, 0, SEEK_SET);
+
+		void* cleaned = goomba_cleanup(gba_data);
+		if (cleaned == NULL) {
+			return false;
+		} else if (cleaned != gba_data) {
+			memcpy(gba_data, cleaned, GOOMBA_COLOR_SRAM_SIZE);
+			free(cleaned);
+		}
+
+		stateheader* sh = stateheader_for(gba_data,
+			g_gb[num]->get_rom()->get_info()->cart_name);
+		if (sh == NULL) {
+			return false; // don't try to save sram
+		}
+		void* new_data = goomba_new_sav(gba_data, sh, buf, 0x2000 * sram_tbl[size]);
+		if (new_data == NULL) {
+			return false;
+		}
+		fwrite(new_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
+		return true;
 	}
-	fwrite(new_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
 }
 
 void save_sram(BYTE *buf,int size,int num)
@@ -96,7 +125,12 @@ void save_sram(BYTE *buf,int size,int num)
 		fread(&stateid, 1, 4, fs);
 		fseek(fs, 0, SEEK_SET);
 		if (stateid == GOOMBA_STATEID) {
-			try_save_goomba(buf, size, num, fs);
+			if (!save_goomba(buf, size, num, fs)) {
+				wchar_t* buf = format_ascii_to_utf16(
+					L"Could not save SRAM (Goomba format).\n(", goomba_last_error(), L")");
+				MessageBoxW(hWnd, buf, L"TGB Dual", MB_OK | MB_ICONERROR);
+				free(buf);
+			}
 			fclose(fs);
 			SetCurrentDirectory(cur_di);
 			return;
@@ -324,7 +358,7 @@ BYTE *load_archive(char *path, int *size)
 		int curr_rom = 1; // For dialog
 		for (const void* rom = gb_first_rom(buf, archive_size); rom != NULL; rom = gb_next_rom(buf, archive_size, rom)) {
 			sprintf(msgbuf, "(%d/%d) Load %s?", curr_rom, num_roms, gb_get_title(rom, NULL));
-			int r = MessageBoxA(hWnd, msgbuf, "TGB Dual", MB_YESNOCANCEL);
+			int r = num_roms == 1 ? IDYES : MessageBoxA(hWnd, msgbuf, "TGB Dual", MB_YESNOCANCEL);
 			if (r == IDYES) {
 				*size = gb_rom_size(rom);
 				ret = (BYTE*)malloc(*size);
@@ -389,16 +423,22 @@ bool try_load_goomba(void* ram, int ram_size, FILE* fs, const char* cart_name, i
 	fread(gba_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
 	fclose(fs);
 
+	void* cleaned = goomba_cleanup(gba_data);
+	if (cleaned == NULL) {
+		return false;
+	} else if (cleaned != gba_data) {
+		memcpy(gba_data, cleaned, GOOMBA_COLOR_SRAM_SIZE);
+		free(cleaned);
+	}
+
 	stateheader* sh = stateheader_for(gba_data, cart_name);
 	if (sh == NULL) {
-		MessageBoxA(hWnd, goomba_last_error(), "Goombasav Error", MB_OK);
 		return false;
 	}
 
 	size_t output_size;
 	void* gbc_data = goomba_extract(gba_data, sh, &output_size);
 	if (gbc_data == NULL) {
-		MessageBoxA(hWnd, goomba_last_error(), "Goombasav Error", MB_OK);
 		return false;
 	}
 	
@@ -425,8 +465,12 @@ BYTE* ram_load_helper(int ram_size, const char* sram_name, const char* cart_name
 		fread(ram, 1, ram_size, fs);
 		if (*(unsigned __int32*)ram == GOOMBA_STATEID) {
 			memset(ram, 0, ram_size); // in case try_load_goomba fails
-			if (!try_load_goomba(ram, ram_size, fs, cart_name, num)) {
-				MessageBoxW(hWnd, L"Goomba SRAM could not be loaded - please rename the SRAM file now, or it will be overwritten.", L"TGB Dual", MB_OK | MB_ICONERROR);
+			goomba_load_error = !try_load_goomba(ram, ram_size, fs, cart_name, num);
+			if (goomba_load_error) {
+				wchar_t* buf = format_ascii_to_utf16(
+					L"Goomba SRAM load error - your progress will not be saved.\n(", goomba_last_error(), L")");
+				MessageBoxW(hWnd, buf, L"TGB Dual", MB_OK | MB_ICONERROR);
+				free(buf);
 			}
 			return ram;
 		}
