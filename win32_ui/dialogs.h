@@ -443,7 +443,7 @@ bool try_load_goomba(void* ram, int ram_size, FILE* fs, const char* cart_name, i
 	}
 	
 	if (output_size > ram_size) {
-		MessageBoxA(hWnd, "Extracted SRAM is too big", "TGB Dual", MB_OK);
+		goomba_set_last_error("The extracted SRAM is too big for this ROM.");
 		free(gbc_data);
 		return false;
 	} else {
