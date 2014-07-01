@@ -4,27 +4,34 @@ win32_ui
 --------
 
 (by libertyernie)
-This is an update of TGB Dual designed primarily to get it compiling and
-working correctly on new computers.
+This is an update of TGB Dual designed to:
+* get the program to compile and run on new computers
+* add an English translation
+* add support for Goomba / Goomba Color ROMs and save files (if you want to
+  run these ROMs on your PC, they run much faster in a GB emulator than in
+  a GBA emulator that itself emulates a GB!)
 
 Branches: (https://github.com/libertyernie/tgbdual)
 * The "master" branch contains all the bugfixes, English-language dialogs
   and menus, and new features. This includes automatic support for Goomba ROMS
   (see docs/goomba.txt.)
-* The "japanese" branch uses the original Japanese text (features that I added
-  later are still in English.)
+* The "japanese" branch contains the above, but uses the original Japanese
+  text (features that I added later are still in English.)
 
-All source code is now Unicode instead of using the local code page, which
-should enable Japanese text to display on any computer. However, Windows uses
-UTF-16 and Git uses UTF-8, so I wrote a tiny program (endian_conv) that runs
-before TGB_Dual is built and when it the project is cleaned, to get the files
+**See docs/README_2014.txt for more information.**
+
+GIT NOTE:
+All source code is now encoded in UTF-8 instead of Shift-JIS, which should
+enable Japanese text to display on any computer. However, Windows uses UTF-16
+and Git uses UTF-8, so I wrote a tiny program (endian_conv) that runs before
+TGB_Dual is built and when it the project is cleaned, to get the files
 encoded correctly. (When you make a Git commit, you should first clean the
 project in Visual Studio.)
 
-See docs/README_2014.txt for a changelist.
-
 libretro_ui
 -----------
+
+https://github.com/libretro/tgbdual-libretro
 
 This is a port of TGB Dual to libretro. To emulate two units side by side, use
 your frontend's "Sufami Turbo" interface, placing the ROMs in "slots" A and B.
