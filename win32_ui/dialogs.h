@@ -971,19 +971,14 @@ static void construct_help_menu(HMENU menu)
 	strcat(hlp_dir,"\\docs");
 	SetCurrentDirectory(hlp_dir);
 
-	sprintf(hf,"%s\\*.hlp",hlp_dir);
+	// find files with any extension
+	sprintf(hf,"%s\\*",hlp_dir);
 	hSearch=FindFirstFile(hf,&wfd);
 	if (hSearch!=INVALID_HANDLE_VALUE){
 		do{
-			sprintf(tgb_help[count],"%s\\%s",hlp_dir,wfd.cFileName);
-			AppendMenu(menu,MF_ENABLED,ID_TGBHELP+count++,wfd.cFileName);
-		}while(FindNextFile(hSearch,&wfd));
-		FindClose(hSearch);
-	}
-	sprintf(hf,"%s\\*.chm",hlp_dir);
-	hSearch=FindFirstFile(hf,&wfd);
-	if (hSearch!=INVALID_HANDLE_VALUE){
-		do{
+			// skip ".", "..", and folders
+			if (wfd.cFileName[0] == '.') continue;
+			if (wfd.dwFileAttributes & 16) continue;
 			sprintf(tgb_help[count],"%s\\%s",hlp_dir,wfd.cFileName);
 			AppendMenu(menu,MF_ENABLED,ID_TGBHELP+count++,wfd.cFileName);
 		}while(FindNextFile(hSearch,&wfd));
@@ -999,13 +994,35 @@ static void construct_help_menu(HMENU menu)
 	}
 	int bef_count=count;
 
-	sprintf(hf,"%s\\*.txt",hlp_dir);
+	sprintf(hf,"%s\\*",hlp_dir);
 	hSearch=FindFirstFile(hf,&wfd);
 	if (hSearch!=INVALID_HANDLE_VALUE){
 		do{
-			sprintf(tgb_help[count],"%s\\%s",hlp_dir,wfd.cFileName);
-			AppendMenu(menu,MF_ENABLED,ID_TGBHELP+count++,wfd.cFileName);
-		}while(FindNextFile(hSearch,&wfd));
+			// skip ".", "..", and anything that's not a folder
+			if (wfd.cFileName[0] == '.') continue;
+			if (!(wfd.dwFileAttributes & 16)) continue;
+
+			WIN32_FIND_DATA wfd2;
+			HANDLE hSearch2;
+			// find files with any extension
+			sprintf(hf, "%s\\%s\\*", hlp_dir, wfd.cFileName);
+			hSearch2 = FindFirstFile(hf, &wfd2);
+			if (hSearch2 != INVALID_HANDLE_VALUE){
+				HMENU submenu = NULL;
+				do{
+					// skip ".", "..", and folders
+					if (wfd2.cFileName[0] == '.') continue;
+					if (wfd2.dwFileAttributes & 16) continue;
+					if (submenu == NULL) {
+						submenu = CreatePopupMenu();
+						AppendMenu(menu, MF_POPUP, (UINT_PTR)submenu, wfd.cFileName);
+					}
+					sprintf(tgb_help[count], "%s\\%s\\%s", hlp_dir, wfd.cFileName, wfd2.cFileName);
+					AppendMenu(submenu, MF_ENABLED, ID_TGBHELP + count++, wfd2.cFileName);
+				} while (FindNextFile(hSearch2, &wfd2));
+				FindClose(hSearch2);
+			}
+		} while (FindNextFile(hSearch, &wfd));
 		FindClose(hSearch);
 	}
 
