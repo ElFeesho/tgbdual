@@ -1047,20 +1047,8 @@ static void view_help(HWND hwnd,char *name)
 		WinHelp(hwnd,name,HELP_INDEX,0);
 	else if (_mbsstr((BYTE*)name,(BYTE*)".chm")||_mbsstr((BYTE*)name,(BYTE*)".CHM"))
 		HtmlHelp(hwnd,name,HH_DISPLAY_TOC,0);
-	else if (_mbsstr((BYTE*)name,(BYTE*)".txt")||_mbsstr((BYTE*)name,(BYTE*)".TXT")){
-		FILE *file=fopen(name,"rb");
-		fseek(file,0,SEEK_END);
-		int size;
-		char *dat=new char[(size=ftell(file))+1];
-		fseek(file,0,SEEK_SET);
-		fread(dat,1,size,file);
-		fclose(file);
-		dat[size]='\0';
-		HWND text_hwnd;
-
-		ShowWindow(text_hwnd=CreateDialogW(hInstance,MAKEINTRESOURCEW(IDD_TEXTVIEW),hwnd,TextProc),SW_SHOW);
-		SendMessage(text_hwnd,WM_OUTLOG,0,(LPARAM)dat);
-		delete []dat;
+	else {
+		ShellExecute(hwnd, "open", name, NULL, NULL, SW_SHOWNORMAL);
 	}
 }
 
