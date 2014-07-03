@@ -26,19 +26,3 @@ Bugfixes:
   available anymore.
 * Turbo mode is now off by default.
 * .sgb is now a supported file extension.
-
---------------------
-
-Git branches:
-* The "master" branch contains all the bugfixes, English-language dialogs
-  and menus, and new features. This includes automatic support for Goomba ROMS
-  (see docs/goomba.txt.)
-* The "japanese" branch contains the above, but uses the original Japanese
-  text (features that I added later are still in English.)
-  
-GIT NOTE:
-All source code in the repo is now encoded in UTF-8; however, Windows uses
-UTF-16, which Git doesn't recognize as text. I wrote a tiny program
-(endian_conv) that runs before TGB_Dual is built and again when the project is
-cleaned, to get the files encoded correctly. (When you make a Git commit, you
-should first clean the project in Visual Studio.)

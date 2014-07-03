@@ -1,6 +1,6 @@
 /*--------------------------------------------------
    TGB Dual - Gameboy Emulator -
-   Copyright (C) 2001  Hii
+   Copyright (C) 2001  Hii, 2014 libertyernie
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License

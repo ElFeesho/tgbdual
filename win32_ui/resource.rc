@@ -218,8 +218,8 @@ CAPTION "TGB バージョン情報"
 FONT 9, "Tahoma", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,39,50,50,13
-    CTEXT           "☁ TGB Dual (2014-June) ☁",IDC_STATIC,13,7,99,8
-    CTEXT           "Copyright (C) 2000-2004 Hii, (C) 2014 lifning, libertyernie",IDC_STATIC,13,18,99,17
+    CTEXT           "☁ TGB Dual 0.9 ☁",IDC_STATIC,13,7,99,8
+    CTEXT           "Copyright © 2000-2004 Hii,\r\n© 2014 libertyernie",IDC_STATIC,13,18,99,17
     CTEXT           "License: GPLv2 or later",IDC_STATIC,13,37,99,8
 END
 
@@ -771,8 +771,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,8,3,1
- PRODUCTVERSION 0,8,3,1
+ FILEVERSION 0,9,0,0
+ PRODUCTVERSION 0,9,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -787,16 +787,13 @@ BEGIN
     BEGIN
         BLOCK "041104b0"
         BEGIN
-            VALUE "Comments", "Game Boy / Game Boy COLOR Emulator"
-            VALUE "CompanyName", "T's Emulator Laboratry Inc."
+            VALUE "Comments", "Game Boy / Game Boy Color Emulator"
             VALUE "FileDescription", "TGB Dual"
-            VALUE "FileVersion", "0, 8, 3, 1"
             VALUE "InternalName", "TGB_Dual"
-            VALUE "LegalCopyright", "Copyright (C) Hii 2000-2004"
-            VALUE "LegalTrademarks", "TGB Dual (R)"
+            VALUE "LegalCopyright", "Copyright (C) 2000-2004 Hii, 2014 libertyernie"
             VALUE "OriginalFilename", "TGB_Dual.exe"
-            VALUE "ProductName", "Yet Another ""TGB Dual"" ..."
-            VALUE "ProductVersion", "0, 8, 3, 1"
+            VALUE "ProductName", "TGB Dual"
+            VALUE "ProductVersion", "0.9"
         END
     END
     BLOCK "VarFileInfo"
