@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <malloc.h>
+#include "../goomba/goombarom.h"
 #include "../goomba/goombasav.h"
 
 rom::rom()
@@ -88,6 +89,14 @@ bool rom::load_rom(byte *buf,int size,byte *ram,int ram_size)
 			free(goomba_sram);
 			goomba_sram = NULL;
 		}
+	}
+
+	// If the file contains multiple ROMs, find the first one.
+	// If not, pretend it's at the start of the file (fake Nintendo logo?)
+	const void* first_rom = gb_first_rom(buf, size);
+	if (first_rom != NULL && first_rom != buf) {
+		buf = (byte*)first_rom;
+		size = gb_rom_size(first_rom);
 	}
 
 	memcpy(info.cart_name,buf+0x134,16);
