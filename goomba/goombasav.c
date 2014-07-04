@@ -190,7 +190,7 @@ stateheader* stateheader_for(const void* gba_data, const char* gbc_title) {
 	stateheader** headers = stateheader_scan(gba_data);
 	int i;
 	for (i = 0; headers[i] != NULL; i++) {
-		if (strcmp(headers[i]->title, title) == 0) {
+		if (strcmp(headers[i]->title, title) == 0 && headers[i]->type == GOOMBA_SRAMSAVE) {
 			use_this = headers[i];
 			break;
 		}
