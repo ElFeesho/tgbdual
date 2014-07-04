@@ -77,7 +77,7 @@ wchar_t* format_ascii_to_utf16(const wchar_t* before, const char* inner_message,
 	return buf;
 }
 
-bool save_goomba(const void* buf, int size, int num, FILE* fs) {
+bool save_goomba(const void* buf, int size_bytes, int num, FILE* fs) {
 	if (goomba_load_error) {
 		// don't save data - error occured when first loading, and user was notified
 		return true;
@@ -99,7 +99,7 @@ bool save_goomba(const void* buf, int size, int num, FILE* fs) {
 		if (sh == NULL) {
 			return false; // don't try to save sram
 		}
-		void* new_data = goomba_new_sav(gba_data, sh, buf, 0x2000 * sram_tbl[size]);
+		void* new_data = goomba_new_sav(gba_data, sh, buf, size_bytes);
 		if (new_data == NULL) {
 			return false;
 		}
@@ -108,7 +108,7 @@ bool save_goomba(const void* buf, int size, int num, FILE* fs) {
 	}
 }
 
-void save_sram(BYTE *buf,int size,int num)
+void save_sram(BYTE *buf,int size_bytes,int num)
 {
 	if (strstr(tmp_sram_name[num],".srt"))
 		return;
@@ -125,7 +125,7 @@ void save_sram(BYTE *buf,int size,int num)
 		fread(&stateid, 1, 4, fs);
 		fseek(fs, 0, SEEK_SET);
 		if (stateid == GOOMBA_STATEID) {
-			if (!save_goomba(buf, size, num, fs)) {
+			if (!save_goomba(buf, size_bytes, num, fs)) {
 				wchar_t* buf = format_ascii_to_utf16(
 					L"Could not save SRAM (Goomba format).\n(", goomba_last_error(), L")");
 				MessageBoxW(hWnd, buf, L"TGB Dual", MB_OK | MB_ICONERROR);
@@ -139,7 +139,7 @@ void save_sram(BYTE *buf,int size,int num)
 
 	// Create file if it does not exist
 	if (fs == NULL) fs = fopen(tmp_sram_name[num], "wb");
-	fwrite(buf,1,0x2000*sram_tbl[size],fs);
+	fwrite(buf, 1, size_bytes, fs);
 	if ((g_gb[num]->get_rom()->get_info()->cart_type>=0x0f)&&(g_gb[num]->get_rom()->get_info()->cart_type<=0x13)){
 		int tmp=render[0]->get_timer_state();
 		fwrite(&tmp,4,1,fs);
@@ -514,13 +514,13 @@ bool load_rom(char *buf,int num)
 
 		if (g_gb[0]){
 			if (g_gb[0]->get_rom()->has_battery())
-				save_sram(g_gb[0]->get_rom()->get_sram(),g_gb[0]->get_rom()->get_info()->ram_size,0);
+				save_sram(g_gb[0]->get_rom()->get_goomba_sram(),g_gb[0]->get_rom()->get_goomba_sram_size(),0);
 			delete g_gb[0];
 			g_gb[0]=NULL;
 		}
 		if (g_gb[1]){
 			if (g_gb[1]->get_rom()->has_battery())
-				save_sram(g_gb[1]->get_rom()->get_sram(),g_gb[1]->get_rom()->get_info()->ram_size,1);
+				save_sram(g_gb[1]->get_rom()->get_goomba_sram(), g_gb[1]->get_rom()->get_goomba_sram_size(), 1);
 			delete g_gb[1];
 			g_gb[1]=NULL;
 			delete render[1];
@@ -623,7 +623,7 @@ bool load_rom(char *buf,int num)
 	}
 	else{
 		if (g_gb[num]->get_rom()->has_battery())
-			save_sram(g_gb[num]->get_rom()->get_sram(),g_gb[num]->get_rom()->get_info()->ram_size,num);
+			save_sram(g_gb[num]->get_rom()->get_goomba_sram(),g_gb[num]->get_rom()->get_goomba_sram_size(),num);
 	}
 	if (g_gbr){
 		FreeLibrary(h_gbr_dll);
@@ -767,7 +767,7 @@ void free_rom(int slot)
 
 	if (g_gb[slot]){
 		if (g_gb[slot]->get_rom()->has_battery())
-			save_sram(g_gb[slot]->get_rom()->get_sram(),g_gb[slot]->get_rom()->get_info()->ram_size,slot);
+			save_sram(g_gb[slot]->get_rom()->get_goomba_sram(),g_gb[slot]->get_rom()->get_goomba_sram_size(),slot);
 		delete g_gb[slot];
 		g_gb[slot]=NULL;
 	}

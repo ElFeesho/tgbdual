@@ -1,6 +1,6 @@
 /*--------------------------------------------------
    TGB Dual - Gameboy Emulator -
-   Copyright (C) 2001  Hii
+   Copyright (C) 2001  Hii, 2014 libertyernie
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <malloc.h>
+#include "../goomba/goombasav.h"
 
 rom::rom()
 {
@@ -31,6 +32,7 @@ rom::rom()
 
 	dat=NULL;
 	sram=NULL;
+	goomba_sram = NULL;
 }
 
 rom::~rom()
@@ -55,6 +57,23 @@ int rom::get_sram_size()
 	return 0x2000*tbl_ram[info.ram_size];
 }
 
+byte *rom::get_goomba_sram()
+{
+	if (goomba_sram != NULL) {
+		void* new_sram = goomba_new_sav(goomba_sram, stateheader_for(goomba_sram, info.cart_name), sram, get_sram_size());
+		memcpy(goomba_sram, new_sram, GOOMBA_COLOR_SRAM_SIZE);
+		free(new_sram);
+		return goomba_sram;
+	} else {
+		return sram;
+	}
+}
+
+int rom::get_goomba_sram_size()
+{
+	return goomba_sram != NULL ? GOOMBA_COLOR_SRAM_SIZE : get_sram_size();
+}
+
 bool rom::load_rom(byte *buf,int size,byte *ram,int ram_size)
 {
 	int tbl[]={2,4,8,16,32,64,128,256,512};
@@ -65,6 +84,10 @@ bool rom::load_rom(byte *buf,int size,byte *ram,int ram_size)
 	if (b_loaded){
 		free(dat);
 		free(sram);
+		if (goomba_sram != NULL) {
+			free(goomba_sram);
+			goomba_sram = NULL;
+		}
 	}
 
 	memcpy(info.cart_name,buf+0x134,16);
@@ -73,6 +96,16 @@ bool rom::load_rom(byte *buf,int size,byte *ram,int ram_size)
 	info.cart_type=buf[0x147];
 	info.rom_size=buf[0x148];
 	info.ram_size=buf[0x149];
+
+	void* extracted = NULL;
+	size_t extracted_size;
+	if (ram_size == GOOMBA_COLOR_SRAM_SIZE && goomba_is_sram(ram)) {
+		extracted = goomba_extract(ram, stateheader_for(ram, info.cart_name), &extracted_size);
+		if (extracted == NULL) return false;
+
+		goomba_sram = (byte*)malloc(GOOMBA_COLOR_SRAM_SIZE);
+		memcpy(goomba_sram, sram, GOOMBA_COLOR_SRAM_SIZE);
+	}
 
 	if (memcmp(info.cart_name,momocol_title,16)==0){
 		info.cart_type=0x100;//mmm01
@@ -93,8 +126,12 @@ bool rom::load_rom(byte *buf,int size,byte *ram,int ram_size)
 	word sum=0;
 
 	sram=(byte*)malloc(get_sram_size());
-	if (ram)
+	if (extracted) {
+		memcpy(sram, extracted, extracted_size);
+		free(extracted);
+	} else if (ram) {
 		memcpy(sram,ram,ram_size&0xffffff00);
+	}
 
 	b_loaded=true;
 

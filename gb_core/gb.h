@@ -1,6 +1,6 @@
 /*--------------------------------------------------
    TGB Dual - Gameboy Emulator -
-   Copyright (C) 2001  Hii
+   Copyright (C) 2001  Hii, 2014 libertyernie
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -458,6 +458,9 @@ public:
 	bool has_battery();
 	int get_sram_size(); // byte単位
 
+	byte *get_goomba_sram();
+	int get_goomba_sram_size();
+
 	void set_first(int page) { first_page=dat+0x4000*page; }
 
 	bool load_rom(byte *buf,int size,byte *ram,int ram_size);
@@ -469,6 +472,8 @@ private:
 
 	byte *dat;
 	byte *sram;
+
+	byte* goomba_sram;
 
 	byte *first_page;
 

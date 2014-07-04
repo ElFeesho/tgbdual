@@ -664,7 +664,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 				SendMessage(hWnd_sub,WM_CLOSE,0,0);
 				CloseWindow(hWnd_sub);
 				if (g_gb[1]){
-					save_sram(g_gb[1]->get_rom()->get_sram(),g_gb[1]->get_rom()->get_info()->ram_size,1);
+					save_sram(g_gb[1]->get_rom()->get_goomba_sram(),g_gb[1]->get_rom()->get_goomba_sram_size(),1);
 					delete g_gb[1];
 					g_gb[1]=NULL;
 				}
