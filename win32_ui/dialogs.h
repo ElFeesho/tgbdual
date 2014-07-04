@@ -81,6 +81,8 @@ void save_sram(BYTE *buf,int size_bytes,int num)
 	if (strstr(tmp_sram_name[num],".srt"))
 		return;
 
+	if (buf == NULL) return; // ROM loading probably failed - don't try to save
+
 	char cur_di[256],sv_dir[256];
 	GetCurrentDirectory(256,cur_di);
 	config->get_save_dir(sv_dir);
@@ -570,7 +572,12 @@ bool load_rom(char *buf,int num)
 		dat[0x143]|=0x80;
 
 	g_gb[num]->set_use_gba(config->gb_type==0?config->use_gba:(config->gb_type==4?true:false));
-	g_gb[num]->load_rom(dat,size,ram,ram_size);
+	if (!g_gb[num]->load_rom(dat, size, ram, ram_size)) {
+		MessageBoxA(hWnd, goomba_last_error(), "Goomba SRAM error", MB_OK | MB_ICONERROR);
+		free(dat);
+		free(ram);
+		return false;
+	}
 
 	free(dat);
 	free(ram);

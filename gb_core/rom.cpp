@@ -102,7 +102,9 @@ bool rom::load_rom(byte *buf,int size,byte *ram,int ram_size)
 	if (ram_size == GOOMBA_COLOR_SRAM_SIZE && goomba_is_sram(ram)) {
 		void* cleaned = goomba_cleanup(ram);
 		if (cleaned == NULL) return false;
-		extracted = goomba_extract(cleaned, stateheader_for(cleaned, info.cart_name), &extracted_size);
+		stateheader* sh = stateheader_for(cleaned, info.cart_name);
+		if (sh == NULL) return false;
+		extracted = goomba_extract(cleaned, sh, &extracted_size);
 		if (cleaned != ram) free(cleaned);
 		if (extracted == NULL) return false;
 
