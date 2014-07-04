@@ -371,7 +371,7 @@ bool is_gb_ext(const char* buf) {
 
 HMODULE h_gbr_dll;
 
-BYTE* ram_load_helper(int* ram_size, const char* sram_name, const char* cart_name, int num) {
+BYTE* ram_load_helper(int* ram_size_out, const char* sram_name, const char* cart_name, int num) {
 	BYTE* ram;
 	char tmp_sram[256];
 	strcpy(tmp_sram, sram_name);
@@ -381,7 +381,7 @@ BYTE* ram_load_helper(int* ram_size, const char* sram_name, const char* cart_nam
 	if (fs) {
 		ram = (BYTE*)malloc(GOOMBA_COLOR_SRAM_SIZE);
 		size_t br = fread(ram, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
-		if (br == GOOMBA_COLOR_SRAM_SIZE) *ram_size = GOOMBA_COLOR_SRAM_SIZE;
+		*ram_size_out = br;
 		fseek(fs, 0, SEEK_END);
 		if (ftell(fs) & 0xff){
 			int tmp;
@@ -392,8 +392,7 @@ BYTE* ram_load_helper(int* ram_size, const char* sram_name, const char* cart_nam
 		}
 		fclose(fs);
 	} else {
-		ram = (BYTE*)malloc(*ram_size);
-		memset(ram, 0, *ram_size);
+		ram = NULL;
 	}
 	return ram;
 }
@@ -542,7 +541,7 @@ bool load_rom(char *buf,int num)
 	int tbl_ram[]={1,1,1,4,16,8};//0と1は保険
 	char sram_name[256],cur_di[256],sv_dir[256];
 	BYTE *ram;
-	int ram_size=0x2000*tbl_ram[dat[0x149]];
+	int ram_size;// = 0x2000 * tbl_ram[dat[0x149]];
 	char suffix[16];
 	suffix[0] = '.';
 	config->get_sram_ext(suffix + 1, num);
@@ -572,15 +571,13 @@ bool load_rom(char *buf,int num)
 		dat[0x143]|=0x80;
 
 	g_gb[num]->set_use_gba(config->gb_type==0?config->use_gba:(config->gb_type==4?true:false));
-	if (!g_gb[num]->load_rom(dat, size, ram, ram_size)) {
-		MessageBoxA(hWnd, goomba_last_error(), "Goomba SRAM error", MB_OK | MB_ICONERROR);
-		free(dat);
-		free(ram);
-		return false;
-	}
+	bool load_success = g_gb[num]->load_rom(dat, size, ram, ram_size);
+	if (!load_success) MessageBoxA(hWnd, goomba_last_error(), "Goomba SRAM error", MB_OK | MB_ICONERROR);
 
 	free(dat);
-	free(ram);
+	if (ram) free(ram);
+
+	if (!load_success) return false;
 
 	char pb[256];
 	sprintf(pb,"Load ROM \"%s\" slot[%d] :\ntype-%d:%s\nsize=%dKB : name=%s\n\n",buf,num+1,g_gb[num]->get_rom()->get_info()->cart_type,mbc_types[g_gb[num]->get_rom()->get_info()->cart_type],size/1024,g_gb[num]->get_rom()->get_info()->cart_name);
