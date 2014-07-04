@@ -100,11 +100,14 @@ bool rom::load_rom(byte *buf,int size,byte *ram,int ram_size)
 	void* extracted = NULL;
 	size_t extracted_size;
 	if (ram_size == GOOMBA_COLOR_SRAM_SIZE && goomba_is_sram(ram)) {
-		extracted = goomba_extract(ram, stateheader_for(ram, info.cart_name), &extracted_size);
+		void* cleaned = goomba_cleanup(ram);
+		if (cleaned == NULL) return false;
+		extracted = goomba_extract(cleaned, stateheader_for(cleaned, info.cart_name), &extracted_size);
+		if (cleaned != ram) free(cleaned);
 		if (extracted == NULL) return false;
 
 		goomba_sram = (byte*)malloc(GOOMBA_COLOR_SRAM_SIZE);
-		memcpy(goomba_sram, sram, GOOMBA_COLOR_SRAM_SIZE);
+		memcpy(goomba_sram, ram, GOOMBA_COLOR_SRAM_SIZE);
 	}
 
 	if (memcmp(info.cart_name,momocol_title,16)==0){
