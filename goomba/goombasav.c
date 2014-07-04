@@ -28,7 +28,7 @@ as C++ code (Properties -> C/C++ -> Advanced -> Compile As.)
 #include <stdlib.h>
 #include <string.h>
 #include "goombasav.h"
-#include "minilzo-2.06/minilzo.h"
+#include "minilzo.h"
 
 #define goomba_error(...) { sprintf(last_error, __VA_ARGS__); }
 

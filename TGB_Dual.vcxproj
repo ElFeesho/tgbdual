@@ -172,7 +172,7 @@
     <ClCompile Include="gb_core\rom.cpp" />
     <ClCompile Include="goomba\goombarom.c" />
     <ClCompile Include="goomba\goombasav.c" />
-    <ClCompile Include="goomba\minilzo-2.06\minilzo.c" />
+    <ClCompile Include="goomba\minilzo.c" />
     <ClCompile Include="win32_ui\dmy_renderer.cpp" />
     <ClCompile Include="win32_ui\dx_renderer.cpp" />
     <ClCompile Include="win32_ui\setting.cpp" />
@@ -191,9 +191,9 @@
   <ItemGroup>
     <ClInclude Include="goomba\goombarom.h" />
     <ClInclude Include="goomba\goombasav.h" />
-    <ClInclude Include="goomba\minilzo-2.06\lzoconf.h" />
-    <ClInclude Include="goomba\minilzo-2.06\lzodefs.h" />
-    <ClInclude Include="goomba\minilzo-2.06\minilzo.h" />
+    <ClInclude Include="goomba\lzoconf.h" />
+    <ClInclude Include="goomba\lzodefs.h" />
+    <ClInclude Include="goomba\minilzo.h" />
     <ClInclude Include="win32_ui\resource.h" />
     <ClInclude Include="gb_core\gb.h" />
     <ClInclude Include="gb_core\gb_types.h" />
