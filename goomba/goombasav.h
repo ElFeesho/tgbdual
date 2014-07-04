@@ -26,6 +26,10 @@ as C++ code (Properties -> C/C++ -> Advanced -> Compile As.)
 #define __GOOMBASAV_H
 
 #include <stdint.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define GOOMBA_COLOR_SRAM_SIZE 65536
 #define GOOMBA_COLOR_AVAILABLE_SIZE 57344
 #define GOOMBA_STATEID 0x57a731d8
@@ -181,4 +185,7 @@ void* goomba_extract(const void* gba_data, const stateheader* header_ptr, goomba
 */
 char* goomba_new_sav(const void* gba_data, const void* gba_header, const void* gbc_sram, goomba_size_t gbc_length);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

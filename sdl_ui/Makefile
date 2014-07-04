@@ -2,7 +2,7 @@
 
 INCLUDES += `sdl-config --cflags` 
 #INCLUDES += `sdl-config --cflags` -Dmain=SDL_main -DQWS -D_REENTRANT
-LIBS += `sdl-config --libs` ../gb_core/*.o -lz
+LIBS += `sdl-config --libs` -lz
 CXXFLAGS = -O3 -fPIC
 
 ifdef TGB_INI_DIR
@@ -14,10 +14,12 @@ CSOURCES=$(wildcard *.c)
 OBJS = $(SOURCES:.cpp=.o)
 OBJS += $(CSOURCES:.c=.o)
 
+CORE = ../gb_core/*.o ../goomba/*.o
+
 all: tgbdual
 
-tgbdual: $(OBJS)
-	$(CXX) -o tgbdual $(OBJS) $(LIBS) $(CXXFLAGS) $(INCLUDES)
+tgbdual: $(OBJS) $(CORE)
+	$(CXX) -o tgbdual $(OBJS) $(CORE) $(LIBS) $(CXXFLAGS) $(INCLUDES)
 
 sdlmain.o: dialogs.h
 
