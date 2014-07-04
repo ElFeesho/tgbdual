@@ -25,6 +25,8 @@
 
 #include <zlib.h>
 
+#define GOOMBA_COLOR_SRAM_SIZE 65536
+
 static int rom_size_tbl[]={2,4,8,16,32,64,128,256,512};
 
 char tmp_sram_name[2][256];
@@ -53,23 +55,31 @@ static const char mbc_types[0x101][40]={"ROM Only","ROM + MBC1","ROM + MBC1 + RA
 static byte org_gbtype[2];
 static bool sys_win2000;
 
-void save_sram(byte *buf,int size,int num)
+// New save_sram function pulled directly from windows version. I don't think gzipping the save files is necessary.
+void save_sram(BYTE *buf,int size_bytes,int num)
 {
+	printf("%p, %d, %d\n", buf, size_bytes, num);
 	if (strstr(tmp_sram_name[num],".srt"))
 		return;
 
-	int sram_tbl[]={1,1,1,4,16,8};
+	if (buf == NULL) return; // ROM loading probably failed - don't try to save
+
 	char cur_di[256],sv_dir[256];
 	GetCurrentDirectory(256,cur_di);
 	config->get_save_dir(sv_dir);
 	SetCurrentDirectory(sv_dir);
-	gzFile fs=gzopen(tmp_sram_name[num],"wb");
-	gzwrite(fs,buf,0x2000*sram_tbl[size]);
-	if ((g_gb[num]->get_rom()->get_info()->cart_type>=0x0f)&&(g_gb[num]->get_rom()->get_info()->cart_type<=0x13)){
-		int tmp=render[num]->get_timer_state();
-		gzwrite(fs,&tmp,4);
+
+	// Create file if it does not exist
+	FILE* fs = fopen(tmp_sram_name[num], "wb");
+	fwrite(buf, 1, size_bytes, fs);
+	if (g_gb[num]->get_rom()->get_info()->cart_type >= 0x0f
+		&& g_gb[num]->get_rom()->get_info()->cart_type <= 0x13
+		&& size_bytes != GOOMBA_COLOR_SRAM_SIZE) {
+		// Don't save RTC information for Goomba save format
+		int tmp=render[0]->get_timer_state();
+		fwrite(&tmp,4,1,fs);
 	}
-	gzclose(fs);
+	fclose(fs);
 	SetCurrentDirectory(cur_di);
 }
 
@@ -281,7 +291,7 @@ int load_rom(char *buf,int num)
 	else{
 		int has_bat[]={0,0,0,1,0,0,1,0,0,1,0,0,1,1,0,1,1,0,0,1,0,0,0,0,0,0,0,1,0,1,1,0, 0,0,0,0,0,0,0,0}; // 0x20以下
 		if (has_bat[(g_gb[num]->get_rom()->get_info()->cart_type>0x20)?3:g_gb[num]->get_rom()->get_info()->cart_type])
-			save_sram(g_gb[num]->get_rom()->get_sram(),g_gb[num]->get_rom()->get_info()->ram_size,num);
+			save_sram(g_gb[num]->get_rom()->get_goomba_sram(),g_gb[num]->get_rom()->get_goomba_sram_size(),num);
 	}
 /**
 	if (g_gbr){
@@ -294,7 +304,7 @@ int load_rom(char *buf,int num)
 	int tbl_ram[]={1,1,1,4,16,8};//0と1は保険
 	char sram_name[256],cur_di[256],sv_dir[256];
 	BYTE *ram;
-	int ram_size=0x2000*tbl_ram[dat[0x149]];
+	int ram_size;//=0x2000*tbl_ram[dat[0x149]];
 	char* sram_name_only;
 	strcpy(sram_name,buf);
 	strcpy(strstr(sram_name,"."),num?".sa2":".sav");
@@ -306,13 +316,14 @@ int load_rom(char *buf,int num)
 	SetCurrentDirectory(sv_dir);
 	gzFile fs=gzopen(sram_name_only,"rb");
 	if (fs){
-		ram=(BYTE*)malloc(ram_size);
-		gzread(fs,ram,ram_size);
+		ram=(BYTE*)malloc(GOOMBA_COLOR_SRAM_SIZE);
+		size_t br = gzread(fs,ram,GOOMBA_COLOR_SRAM_SIZE);
+		ram_size = br;
 		gzseek(fs,0,SEEK_END);
 		if (gztell(fs)&0xff){
+			// Copy last 4 bytes read and use those for RTC value
 			int tmp;
-			gzseek(fs,-4,SEEK_END);
-			gzread(fs,&tmp,4);
+			memcpy(&tmp, ram + (br - 4), 4);
 			render[num]->set_timer_state(tmp);
 		}
 		gzclose(fs);
@@ -320,20 +331,19 @@ int load_rom(char *buf,int num)
 	else{
 		strcpy(strstr(sram_name_only,"."),num?".ra2":".ram");
 		if (fs=gzopen(sram_name_only,"rb")){
-			ram=(BYTE*)malloc(ram_size);
-			gzread(fs,ram,ram_size);
+			ram=(BYTE*)malloc(GOOMBA_COLOR_SRAM_SIZE);
+			size_t br = gzread(fs,ram,GOOMBA_COLOR_SRAM_SIZE);
 			gzseek(fs,0,SEEK_END);
 			if (gztell(fs)&0xff){
 				int tmp;
-				gzseek(fs,-4,SEEK_END);
-				gzread(fs,&tmp,4);
+				memcpy(&tmp, ram + (br - 4), 4);
 				render[num]->set_timer_state(tmp);
 			}
 			gzclose(fs);
 		}
 		else{
-			ram=(BYTE*)malloc(ram_size);
-			memset(ram,0,ram_size);
+			// Why not just let load_rom handle this?
+			ram = NULL;
 		}
 	}
 	strcpy(strstr(sram_name_only,"."),num?".sa2":".sav");
@@ -352,7 +362,7 @@ int load_rom(char *buf,int num)
 	g_gb[num]->load_rom(dat,size,ram,ram_size);
 
 	free(dat);
-	free(ram);
+	if (ram) free(ram);
 
 	char pb[256];
 	sprintf(pb,"Load ROM \"%s\" slot[%d] :\ntype-%d:%s\nsize=%dKB : name=%s\n\n",buf,num+1,g_gb[num]->get_rom()->get_info()->cart_type,mbc_types[g_gb[num]->get_rom()->get_info()->cart_type],size/1024,g_gb[num]->get_rom()->get_info()->cart_name);

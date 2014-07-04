@@ -323,13 +323,13 @@ int main(int argc, char* argv[])
 	int has_bat[]={0,0,0,1,0,0,1,0,0,1,0,0,1,1,0,1,1,0,0,1,0,0,0,0,0,0,0,1,0,1,1,0, 0,0,0,0,0,0,0,0}; // 0x20以下
 	if (g_gb[0]){
 		if (has_bat[(g_gb[0]->get_rom()->get_info()->cart_type>0x20)?3:g_gb[0]->get_rom()->get_info()->cart_type])
-			save_sram(g_gb[0]->get_rom()->get_sram(),g_gb[0]->get_rom()->get_info()->ram_size,0);
+			save_sram(g_gb[0]->get_rom()->get_goomba_sram(),g_gb[0]->get_rom()->get_goomba_sram_size(),0);
 		delete g_gb[0];
 		g_gb[0]=NULL;
 	}
 	if (g_gb[1]){
 		if (has_bat[(g_gb[1]->get_rom()->get_info()->cart_type>0x20)?3:g_gb[1]->get_rom()->get_info()->cart_type])
-			save_sram(g_gb[1]->get_rom()->get_sram(),g_gb[1]->get_rom()->get_info()->ram_size,1);
+			save_sram(g_gb[1]->get_rom()->get_goomba_sram(),g_gb[1]->get_rom()->get_goomba_sram_size(),1);
 		delete g_gb[1];
 		g_gb[1]=NULL;
 	}
