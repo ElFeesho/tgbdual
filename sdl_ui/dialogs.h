@@ -255,7 +255,7 @@ int load_rom(char *buf,int num)
 		if (!(dat=load_archive(buf,&size)))
 			return;
 */
-	static const char* exts[] = { "gb", "gbc", 0 };
+	static const char* exts[] = { "gb", "gbc", "sgb", "gba", 0 };
 	dat = file_read(buf, exts, &size);
 	if (!dat) return -1;
 
