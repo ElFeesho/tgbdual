@@ -107,7 +107,7 @@ bool rom::load_rom(byte *buf,int size,byte *ram,int ram_size)
 	info.ram_size=buf[0x149];
 
 	void* extracted = NULL;
-	size_t extracted_size;
+	goomba_size_t extracted_size;
 	if (ram_size == GOOMBA_COLOR_SRAM_SIZE && goomba_is_sram(ram)) {
 		void* cleaned = goomba_cleanup(ram);
 		if (cleaned == NULL) return false;
