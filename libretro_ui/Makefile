@@ -1,5 +1,5 @@
 
-LIBS += ../gb_core/*.o -lm
+LIBS += ../gb_core/*.o ../goomba/*.o -lm
 CFLAGS += -O3 -fPIC
 CXXFLAGS = $(CFLAGS)
 LDFLAGS = -shared -Wl,--version-script=link.T
