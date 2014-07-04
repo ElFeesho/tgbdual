@@ -39,7 +39,7 @@ namespace {
 
 	bool is_allowable(std::string name, const char** exts) {
 		std::string ext = get_suffix_lc(name);
-		for (; exts; exts++) {
+		for (; *exts; exts++) {
 			if (ext == *exts) return true;
 		}
 		return false;
