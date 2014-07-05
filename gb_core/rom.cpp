@@ -27,6 +27,8 @@
 #include "../goomba/goombarom.h"
 #include "../goomba/goombasav.h"
 
+std::list<byte*> rom::goomba_srams;
+
 rom::rom()
 {
 	b_loaded=false;
@@ -86,7 +88,18 @@ bool rom::load_rom(byte *buf,int size,byte *ram,int ram_size)
 		free(dat);
 		free(sram);
 		if (goomba_sram != NULL) {
-			free(goomba_sram);
+			// using the list as a miniature garbage detector
+			std::list<byte*>::iterator first_entry = std::find(goomba_srams.begin(), goomba_srams.end(), goomba_sram);
+			if (first_entry != goomba_srams.end()) {
+				goomba_srams.erase(first_entry);
+			} else {
+				throw new std::exception("programming error");
+			}
+			std::list<byte*>::iterator second_entry = std::find(goomba_srams.begin(), goomba_srams.end(), goomba_sram);
+			if (second_entry == goomba_srams.end()) {
+				// no other GB is using this sram
+				free(goomba_sram);
+			}
 			goomba_sram = NULL;
 		}
 	}
@@ -112,9 +125,20 @@ bool rom::load_rom(byte *buf,int size,byte *ram,int ram_size)
 		void* cleaned = goomba_cleanup(ram);
 		if (cleaned == NULL) return false;
 
-		goomba_sram = (byte*)malloc(GOOMBA_COLOR_SRAM_SIZE);
-		memcpy(goomba_sram, cleaned, GOOMBA_COLOR_SRAM_SIZE);
+		for (std::list<byte*>::iterator it = goomba_srams.begin(); it != goomba_srams.end(); it++) {
+			if (memcmp(*it, cleaned, GOOMBA_COLOR_SRAM_SIZE) == 0) {
+				// Same Goomba SRAM file is already loaded in the other GB - share the stored copy in memory
+				goomba_sram = *it;
+				break;
+			}
+		}
+		if (goomba_sram == NULL) { // still
+			goomba_sram = (byte*)malloc(GOOMBA_COLOR_SRAM_SIZE);
+			memcpy(goomba_sram, cleaned, GOOMBA_COLOR_SRAM_SIZE);
+		}
 		if (cleaned != ram) free(cleaned);
+
+		goomba_srams.push_back(goomba_sram);
 
 		stateheader* sh = stateheader_for(goomba_sram, info.cart_name);
 		if (sh == NULL) return false;

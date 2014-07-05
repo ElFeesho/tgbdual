@@ -474,6 +474,7 @@ private:
 	byte *sram;
 
 	byte* goomba_sram;
+	static std::list<byte*> goomba_srams; // can contain multiple copies of one pointer, if both GBs are using same sram file
 
 	byte *first_page;
 
