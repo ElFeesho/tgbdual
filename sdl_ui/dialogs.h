@@ -1,6 +1,6 @@
 /*--------------------------------------------------
    TGB Dual - Gameboy Emulator -
-   Copyright (C) 2001  Hii
+   Copyright (C) 2001  Hii, 2014 libertyernie
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -20,10 +20,10 @@
 ///#include "keymap.h"
 
 #include "w32_posix.h"
-
 #include "zlibwrap.h"
-
 #include <zlib.h>
+#include "../goomba/goombarom.h"
+#include "../goomba/goombasav.h"
 
 static int rom_size_tbl[]={2,4,8,16,32,64,128,256,512};
 
@@ -52,17 +52,68 @@ static const char mbc_types[0x101][40]={"ROM Only","ROM + MBC1","ROM + MBC1 + RA
 };
 static byte org_gbtype[2];
 static bool sys_win2000;
+static int sram_tbl[] = { 1, 1, 1, 4, 16, 8 };
+static bool goomba_load_error;
+
+bool save_goomba(const void* buf, int size, int num, FILE* fs) {
+	if (goomba_load_error) {
+		// don't save data - error occured when first loading, and user was notified
+		return true;
+	} else {
+		byte gba_data[GOOMBA_COLOR_SRAM_SIZE];
+		fread(gba_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
+		fseek(fs, 0, SEEK_SET);
+
+		void* cleaned = goomba_cleanup(gba_data);
+		if (cleaned == NULL) {
+			return false;
+		} else if (cleaned != gba_data) {
+			memcpy(gba_data, cleaned, GOOMBA_COLOR_SRAM_SIZE);
+			free(cleaned);
+		}
+
+		stateheader* sh = stateheader_for(gba_data,
+			g_gb[num]->get_rom()->get_info()->cart_name);
+		if (sh == NULL) {
+			return false; // don't try to save sram
+		}
+		void* new_data = goomba_new_sav(gba_data, sh, buf, 0x2000 * sram_tbl[size]);
+		if (new_data == NULL) {
+			return false;
+		}
+		fwrite(new_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
+		return true;
+	}
+}
 
 void save_sram(byte *buf,int size,int num)
 {
 	if (strstr(tmp_sram_name[num],".srt"))
 		return;
 
-	int sram_tbl[]={1,1,1,4,16,8};
 	char cur_di[256],sv_dir[256];
 	GetCurrentDirectory(256,cur_di);
 	config->get_save_dir(sv_dir);
 	SetCurrentDirectory(sv_dir);
+
+	FILE* fsu = fopen(tmp_sram_name[num], "r+b");
+	if (fsu != NULL) {
+		// if file exists, check for goomba
+		uint32_t stateid = 0;
+		fread(&stateid, 1, 4, fsu);
+		fseek(fsu, 0, SEEK_SET);
+		if (stateid == GOOMBA_STATEID) {
+			if (!save_goomba(buf, size, num, fsu)) {
+				fprintf(stderr, "Could not save SRAM (Goomba format).\n(%s)\n", goomba_last_error());
+			}
+			fclose(fsu);
+			SetCurrentDirectory(cur_di);
+			return;
+		} else {
+			fclose(fsu);
+		}
+	}
+
 	gzFile fs=gzopen(tmp_sram_name[num],"wb");
 	gzwrite(fs,buf,0x2000*sram_tbl[size]);
 	if ((g_gb[num]->get_rom()->get_info()->cart_type>=0x0f)&&(g_gb[num]->get_rom()->get_info()->cart_type<=0x13)){
@@ -132,6 +183,42 @@ void load_key_config(int num)
 	cof.b_g=config->b_g;
 	cof.b_b=config->b_b;
 	render[num]->set_filter(&cof);
+}
+
+bool try_load_goomba(void* ram, int ram_size, gzFile fs, const char* cart_name, int num) {
+	gzseek(fs, 0, SEEK_SET);
+	char gba_data[GOOMBA_COLOR_SRAM_SIZE];
+	gzread(fs, gba_data, GOOMBA_COLOR_SRAM_SIZE);
+	gzclose(fs);
+
+	void* cleaned = goomba_cleanup(gba_data);
+	if (cleaned == NULL) {
+		return false;
+	} else if (cleaned != gba_data) {
+		memcpy(gba_data, cleaned, GOOMBA_COLOR_SRAM_SIZE);
+		free(cleaned);
+	}
+
+	stateheader* sh = stateheader_for(gba_data, cart_name);
+	if (sh == NULL) {
+		return false;
+	}
+
+	size_t output_size;
+	void* gbc_data = goomba_extract(gba_data, sh, &output_size);
+	if (gbc_data == NULL) {
+		return false;
+	}
+	
+	if (output_size > ram_size) {
+		goomba_set_last_error("The extracted SRAM is too big for this ROM.");
+		free(gbc_data);
+		return false;
+	} else {
+		memcpy(ram, gbc_data, output_size);
+		free(gbc_data);
+		return true;
+	}
 }
 
 int load_rom(char *buf,int num)
@@ -245,9 +332,42 @@ int load_rom(char *buf,int num)
 		if (!(dat=load_archive(buf,&size)))
 			return;
 */
-	static const char* exts[] = { "gb", "gbc", 0 };
-	dat = file_read(buf, exts, &size);
-	if (!dat) return -1;
+	static const char* exts[] = { "gb", "gbc", "sgb", "gba", 0 };
+	BYTE* tmpbuf = file_read(buf, exts, &size);
+	if (!tmpbuf) return -1;
+
+	// Count number of roms
+	int num_roms = 0;
+	for (const void* rom = gb_first_rom(tmpbuf, size); rom != NULL; rom = gb_next_rom(tmpbuf, size, rom)) {
+		num_roms++;
+	}
+
+	if (num_roms == 0) {
+		fprintf(stderr, "This file does not contain any Game Boy ROM images.");
+		free(tmpbuf);
+		return -1;
+	} else if (num_roms == 1) {
+		const void* first_rom = gb_first_rom(tmpbuf, size);
+		size = gb_rom_size(first_rom);
+		dat = (BYTE*)malloc(size);
+		memcpy(dat, first_rom, size);
+		free(tmpbuf);
+	} else {
+		printf("Choose a ROM image to load:\n");
+		int i = 1;
+		for (const void* rom = gb_first_rom(tmpbuf, size); rom != NULL; rom = gb_next_rom(tmpbuf, size, rom)) {
+			printf("%d. %s\n", i++, gb_get_title(rom, NULL));
+		}
+		int res = 0;
+		while (res <= 0) scanf("%d", &res);
+		
+		const void* rom = gb_first_rom(tmpbuf, size);
+		for (i = 1; i < res; i++) rom = gb_next_rom(tmpbuf, size, rom);
+		size = gb_rom_size(rom);
+		dat = (BYTE*)malloc(size);
+		memcpy(dat, rom, size);
+		free(tmpbuf);
+	}
 
 	if ((num==1)&&(!render[1])){
 		render[1]=new sdl_renderer();
@@ -291,10 +411,9 @@ int load_rom(char *buf,int num)
 	}
 */
 
-	int tbl_ram[]={1,1,1,4,16,8};//0と1は保険
 	char sram_name[256],cur_di[256],sv_dir[256];
 	BYTE *ram;
-	int ram_size=0x2000*tbl_ram[dat[0x149]];
+	int ram_size=0x2000*sram_tbl[dat[0x149]];
 	char* sram_name_only;
 	strcpy(sram_name,buf);
 	strcpy(strstr(sram_name,"."),num?".sa2":".sav");
@@ -304,32 +423,50 @@ int load_rom(char *buf,int num)
 	GetCurrentDirectory(256,cur_di);
 	config->get_save_dir(sv_dir);
 	SetCurrentDirectory(sv_dir);
+
+	const char* cart_name = (const char*)dat + 0x134;
 	gzFile fs=gzopen(sram_name_only,"rb");
 	if (fs){
 		ram=(BYTE*)malloc(ram_size);
 		gzread(fs,ram,ram_size);
-		gzseek(fs,0,SEEK_END);
-		if (gztell(fs)&0xff){
-			int tmp;
-			gzseek(fs,-4,SEEK_END);
-			gzread(fs,&tmp,4);
-			render[num]->set_timer_state(tmp);
-		}
-		gzclose(fs);
-	}
-	else{
-		strcpy(strstr(sram_name_only,"."),num?".ra2":".ram");
-		if (fs=gzopen(sram_name_only,"rb")){
-			ram=(BYTE*)malloc(ram_size);
-			gzread(fs,ram,ram_size);
+		if (*(uint32_t*)ram == GOOMBA_STATEID) {
+			memset(ram, 0, ram_size); // in case try_load_goomba fails
+			goomba_load_error = !try_load_goomba(ram, ram_size, fs, cart_name, num);
+			if (goomba_load_error) {
+				fprintf(stderr, "Goomba SRAM load error - your progress will not be saved.\n(%s)", goomba_last_error());
+			}
+		} else {
 			gzseek(fs,0,SEEK_END);
-			if (gztell(fs)&0xff){
+			if (gztell(fs)&0xff){ // RTC won't work with gzip save files
 				int tmp;
 				gzseek(fs,-4,SEEK_END);
 				gzread(fs,&tmp,4);
 				render[num]->set_timer_state(tmp);
 			}
 			gzclose(fs);
+		}
+	}
+	else{
+		strcpy(strstr(sram_name_only,"."),num?".ra2":".ram");
+		if (fs=gzopen(sram_name_only,"rb")){
+			ram=(BYTE*)malloc(ram_size);
+			gzread(fs,ram,ram_size);
+			if (*(uint32_t*)ram == GOOMBA_STATEID) {
+				memset(ram, 0, ram_size); // in case try_load_goomba fails
+				goomba_load_error = !try_load_goomba(ram, ram_size, fs, cart_name, num);
+				if (goomba_load_error) {
+					fprintf(stderr, "Goomba SRAM load error - your progress will not be saved.\n(%s)", goomba_last_error());
+				}
+			} else {
+				gzseek(fs,0,SEEK_END);
+				if (gztell(fs)&0xff){
+					int tmp;
+					gzseek(fs,-4,SEEK_END);
+					gzread(fs,&tmp,4);
+					render[num]->set_timer_state(tmp);
+				}
+				gzclose(fs);
+			}
 		}
 		else{
 			ram=(BYTE*)malloc(ram_size);
