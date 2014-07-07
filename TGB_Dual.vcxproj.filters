@@ -95,7 +95,7 @@
     <ClCompile Include="goomba\goombasav.c">
       <Filter>Source Files\goomba</Filter>
     </ClCompile>
-    <ClCompile Include="goomba\minilzo-2.06\minilzo.c">
+    <ClCompile Include="goomba\minilzo.c">
       <Filter>Source Files\goomba</Filter>
     </ClCompile>
   </ItemGroup>
@@ -165,13 +165,13 @@
     <ClInclude Include="goomba\goombasav.h">
       <Filter>Header Files\_goomba</Filter>
     </ClInclude>
-    <ClInclude Include="goomba\minilzo-2.06\minilzo.h">
+    <ClInclude Include="goomba\lzoconf.h">
       <Filter>Header Files\_goomba</Filter>
     </ClInclude>
-    <ClInclude Include="goomba\minilzo-2.06\lzoconf.h">
+    <ClInclude Include="goomba\lzodefs.h">
       <Filter>Header Files\_goomba</Filter>
     </ClInclude>
-    <ClInclude Include="goomba\minilzo-2.06\lzodefs.h">
+    <ClInclude Include="goomba\minilzo.h">
       <Filter>Header Files\_goomba</Filter>
     </ClInclude>
   </ItemGroup>
