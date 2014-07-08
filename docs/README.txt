@@ -1,9 +1,19 @@
 TGB Dual - libertyernie's version
 https://github.com/libertyernie/tgbdual
 
-TGB Dual is an open source (GPLv2) GB/GBC emulator with link cable support.
-There are three frontends to the emulator core:
-* Win32 - originally written by Hii in 2000-2004 (http://gigo.retrogames.com/download.html#tgb-dual)
+TGB Dual (originally written by Hii in 2000–2004) is an open-source Game Boy
+Color emulator with link cable support.
+
+TGB Dual makes it possible to emulate two Game Boy consoles at once (Slot 1
+and Slot 2), using two different ROMs and save files. Opening a ROM in Slot 2
+will open a new window. The two slots have different button mappings; you can
+check or change them with Options > Keys.
+
+Note: I have not checked whether network play (File > Netplay) works in this
+version. If it doesn't, download the original version at:
+http://gigo.retrogames.com/download.html#tgb-dual
+
+Besides Win32, there are two other frontends to the emulator core:
 * SDL - written in 2004 by shinichiro.h (http://shinh.skr.jp/tgbdualsdl) - no link cable support
 * libretro - written in 2012 by lifning (https://github.com/libretro/tgbdual-libretro)
 
@@ -11,10 +21,10 @@ New features:
 * Windows and SDL versions:
   * TGB Dual can now load ROMs built with Goomba and Goomba Color (GB emulators
     for the GBA), and can read and write to those emulators' save files. This
-    is helpful if you want to run a Goomba-based ROM on your PC, because the
-    ROMs run faster in a GB emulator than in a GBA emulator trying to run
-	Goomba. (Also, you can use link cable emulation for games like Pokémon.)
-    See goomba.txt for more information.
+    is helpful if you want to share your save data between PC and GBA, because
+    the ROMs run faster in a GB emulator than they would in a GBA emulator
+    trying to run Goomba. (Also, you can use link cable emulation for games
+    like Pokémon.) See goomba.txt for more information.
 	* Because RetroArch loads/saves SRAM directly to a memory address instead
 	  of calling a function, implementing this feature in the libretro port
 	  would be more difficult.

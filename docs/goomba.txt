@@ -7,8 +7,8 @@ don't need to use Goomba / Gooomba Color, you can skip reading this file.)
 
 First, you should go to Options -> Directories. Set the save directory to the
 folder where your Goomba .sav files are stored. (You should also set the slot2
-SRAM extension to "sav" instead of "sa2" - just don't run the same ROM in both
-windows.)
+SRAM extension to "sav" instead of "sa2" - just don't run the same game with
+the same save file in both windows.)
 
 Then, you can open the Goomba / Goomba Color ROM with TGB Dual. The program
 will go through every Game Boy ROM found in the file, asking whether you want
