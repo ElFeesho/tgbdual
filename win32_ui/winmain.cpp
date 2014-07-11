@@ -131,7 +131,8 @@ int APIENTRY WinMain(HINSTANCE hInst,HINSTANCE hPrev,LPSTR lpCmdLine,int nCmdSho
 	render[0]->set_vsync(config->vsync);
 
 	render[0]->set_render_pass(config->render_pass);
-	render[0]->show_fps(config->show_fps);
+	render[0]->set_mirror(false);
+	render[0]->show_fps(config->show_fps & 0x1);
 
 	cur_mode=UNLOADED;
 
@@ -812,6 +813,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 			if (g_gb[0])
 				g_gb[0]->get_lcd()->set_enable(2,!g_gb[0]->get_lcd()->get_enable(2));
 			break;
+		case ID_MIRROR:
+			if (render[0])
+				render[0]->set_mirror(!render[0]->get_mirror());
+			break;
 		case ID_VSYNC:
 			config->vsync=!config->vsync;
 			if (render[0]) render[0]->set_vsync(config->vsync);
@@ -977,6 +982,8 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 			SetMenuItemInfo(hMenu,ID_WINDOW,FALSE,&mii);
 			mii.fState=(g_gb[0]&&g_gb[0]->get_lcd()->get_enable(2))?MFS_CHECKED:MFS_UNCHECKED;
 			SetMenuItemInfo(hMenu,ID_SPRITE,FALSE,&mii);
+			mii.fState=(render[0]&&render[0]->get_mirror())?MFS_CHECKED:MFS_UNCHECKED;
+			SetMenuItemInfo(hMenu,ID_MIRROR,FALSE,&mii);
 			mii.fState=config->vsync?MFS_CHECKED:MFS_UNCHECKED;
 			SetMenuItemInfo(hMenu,ID_VSYNC,FALSE,&mii);
 		}

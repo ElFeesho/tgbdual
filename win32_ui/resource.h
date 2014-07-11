@@ -43,11 +43,14 @@
 #define IDC_1DOWN                       1008
 #define IDC_LIMITTER2                   1008
 #define IDC_1LEFT                       1009
-#define IDC_SHOWFPS                     1009
+#define IDC_SHOWFPS0                    1009
 #define IDC_1RIGHT                      1010
+#define IDC_SHOWFPS1                    1010
 #define IDC_2A                          1011
+#define IDC_SHOWFPS2                    1011
 #define IDC_2B                          1012
 #define IDC_DAT                         1012
+#define IDC_SHOWFPS3                    1012
 #define IDC_2START                      1013
 #define IDC_DAT2                        1013
 #define IDC_2SELECT                     1014
@@ -192,6 +195,7 @@
 #define ID_RELEASE_2                    40040
 #define ID_SNAPSHOT                     40041
 #define ID_SOUNDRECORD                  40042
+#define ID_MIRROR                       40044
 #define ID_FILTER                       40045
 #define ID_NOMEM_DUMP                   40046
 #define ID_PAUSE                        40047
