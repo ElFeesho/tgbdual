@@ -95,7 +95,9 @@ BEGIN
             MENUITEM "BG Layer",                    ID_BG
             MENUITEM "Window Layer",                ID_WINDOW
             MENUITEM "Sprite Layer",                ID_SPRITE
-            MENUITEM SEPARATOR
+			MENUITEM SEPARATOR
+			MENUITEM "Mirror Mode",                 ID_MIRROR
+			MENUITEM SEPARATOR
             MENUITEM "Filter (&F)",                 ID_FILTER
         END
         POPUP "Machine Type (&G)"

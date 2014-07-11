@@ -96,6 +96,7 @@ public:
 	void show_message(char *message);
 	word get_any_key();
 	void set_vsync(bool v){ vsync=v; }
+	bool get_mirror(){ return b_mirror; }
 	void set_mirror(bool m){ b_mirror=m; }
 
 	int get_timer_state();
