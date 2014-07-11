@@ -595,6 +595,7 @@ bool load_rom(char *buf,int num)
 	if ((num==1)&&(!render[1])){
 		render[1]=new dx_renderer(hWnd_sub,hInstance);
 		render[1]->set_render_pass(config->render_pass);
+		render[1]->show_fps(config->show_fps & 0x2);
 		load_key_config(1);
 	}
 	if (!g_gb[num]){
@@ -781,7 +782,7 @@ void free_rom(int slot)
 		buf=(BYTE*)calloc(160*144,2);
 		render[slot]->show_fps(false);
 		render[slot]->render_screen(buf,160,144,16);
-		render[slot]->show_fps(config->show_fps);
+		render[slot]->show_fps(config->show_fps & 0x1);
 		free(buf);
 
 		SetWindowText(hWnd,WINDOW_TITLE_UNLOADED);
@@ -1977,7 +1978,7 @@ static BOOL CALLBACK SpeedProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 			EnableWindow(GetDlgItem(hwnd,IDC_FPS2),FALSE);
 		}
 		if (config->show_fps)
-			CheckDlgButton(hwnd,IDC_SHOWFPS,BST_CHECKED);
+			CheckRadioButton(hwnd, IDC_SHOWFPS0, IDC_SHOWFPS3, IDC_SHOWFPS0 + config->show_fps);
 		return TRUE;
 	case WM_COMMAND:
 		if(LOWORD(wParam)==IDOK){
@@ -2016,9 +2017,15 @@ static BOOL CALLBACK SpeedProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 			else
 				EnableWindow(GetDlgItem(hwnd,IDC_FPS2),TRUE);
 		}
-		else if (LOWORD(wParam)==IDC_SHOWFPS){
-			config->show_fps=(IsDlgButtonChecked(hwnd,IDC_SHOWFPS)==BST_CHECKED);
-			render[0]->show_fps(config->show_fps);
+		else if (LOWORD(wParam) >= IDC_SHOWFPS0 && LOWORD(wParam) <= IDC_SHOWFPS3){
+			for (int i = 0; i < 4; i++) {
+				if (IsDlgButtonChecked(hwnd, IDC_SHOWFPS0 + i) == BST_CHECKED) {
+					config->show_fps = i;
+					break;
+				}
+			}
+			render[0]->show_fps(config->show_fps & 1);
+			if (render[1]) render[1]->show_fps(config->show_fps & 2);
 		}
 		break;
 	case WM_CLOSE:

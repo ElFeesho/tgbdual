@@ -39,7 +39,7 @@ public:
 	bool speed_limit,fast_speed_limit;
 	int frame_skip,virtual_fps;
 	int fast_frame_skip,fast_virtual_fps;
-	bool show_fps;
+	int show_fps;
 
 	int win_pos[4];
 	bool vsync;

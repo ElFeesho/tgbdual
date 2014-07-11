@@ -146,7 +146,7 @@ setting::setting()
 	fast_frame_skip=GetPrivateProfileInt("speed","fast_frame_skip",9,ini_name);
 	fast_virtual_fps=GetPrivateProfileInt("speed","fast_fps",9999,ini_name);
 	fast_speed_limit=(GetPrivateProfileInt("speed","fast_limit",0,ini_name))?true:false;
-	show_fps=(GetPrivateProfileInt("speed","show_fps",0,ini_name))?true:false;
+	show_fps=(GetPrivateProfileInt("speed","show_fps",0,ini_name));
 
 	// カラーフィルタ
 	r_def=GetPrivateProfileInt("filter","r_def",0,ini_name);
@@ -374,7 +374,7 @@ setting::~setting()
 	WritePrivateProfileString("speed","fast_fps",tmp,ini_name);
 	sprintf(tmp,"%d",fast_speed_limit?1:0);
 	WritePrivateProfileString("speed","fast_limit",tmp,ini_name);
-	sprintf(tmp,"%d",show_fps?1:0);
+	sprintf(tmp,"%d",show_fps);
 	WritePrivateProfileString("speed","show_fps",tmp,ini_name);
 
 	// カラーフィルタ
