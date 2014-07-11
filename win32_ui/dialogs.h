@@ -596,6 +596,7 @@ bool load_rom(char *buf,int num)
 		render[1]=new dx_renderer(hWnd_sub,hInstance);
 		render[1]->set_render_pass(config->render_pass);
 		render[1]->show_fps(config->show_fps & 0x2);
+		render[1]->set_mirror(false);
 		load_key_config(1);
 	}
 	if (!g_gb[num]){

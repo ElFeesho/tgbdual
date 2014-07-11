@@ -96,6 +96,7 @@ public:
 	void show_message(char *message);
 	word get_any_key();
 	void set_vsync(bool v){ vsync=v; }
+	void set_mirror(bool m){ b_mirror=m; }
 
 	int get_timer_state();
 	void set_timer_state(int timer);
@@ -166,6 +167,7 @@ private:
 
 	bool b_window;
 	bool b_showfps;
+	bool b_mirror;
 	int fps;
 	int mul;
 	char mes[128];

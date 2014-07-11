@@ -560,12 +560,23 @@ void dx_renderer::render_screen(byte *buf,int width,int height,int depth)
 			DWORD *ddat=(DWORD*)sdat,*spare=ddat;
 			WORD *wbuf=(WORD*)buf;
 			int dpitch=ddsd.lPitch/4;
-			for (i=0;i<height;i++){
-				for (j=0;j<width;j++){
-					*(ddat++)=map_24[*(wbuf++)];
+			if (b_mirror) {
+				for (i = 0; i < height; i++){
+					ddat += dpitch;
+					for (j = 0; j < width; j++){
+						*(--ddat) = map_24[*(wbuf++)];
+					}
+					spare += dpitch;
+					ddat = spare;
 				}
-				spare+=dpitch;
-				ddat=spare;
+			} else {
+				for (i = 0; i < height; i++){
+					for (j = 0; j < width; j++){
+						*(ddat++) = map_24[*(wbuf++)];
+					}
+					spare += dpitch;
+					ddat = spare;
+				}
 			}
 		}
 		else if (bpp==24){
@@ -1162,12 +1173,14 @@ void dx_renderer::update_pad()
 		if (phase)
 			for (i=0;i<2;i++)
 				pad_state|=check_press(key_config+i)?(1<<i):0;
-		for (i=2;i<8;i++)
+		for (i=2;i<6;i++)
 			pad_state|=check_press(key_config+i)?(1<<i):0;
 	}
 	else
-		for (i=0;i<8;i++)
+		for (i=0;i<6;i++)
 			pad_state|=check_press(key_config+i)?(1<<i):0;
+	for (i=6;i<8;i++)
+		pad_state|=check_press(key_config+(b_mirror?13-i:i))?(1<<i):0;
 
 	phase=!phase;
 

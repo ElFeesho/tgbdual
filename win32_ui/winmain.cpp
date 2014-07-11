@@ -131,6 +131,7 @@ int APIENTRY WinMain(HINSTANCE hInst,HINSTANCE hPrev,LPSTR lpCmdLine,int nCmdSho
 	render[0]->set_vsync(config->vsync);
 
 	render[0]->set_render_pass(config->render_pass);
+	render[0]->set_mirror(false);
 	render[0]->show_fps(config->show_fps & 0x1);
 
 	cur_mode=UNLOADED;
