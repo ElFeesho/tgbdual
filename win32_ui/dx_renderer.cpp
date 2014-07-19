@@ -584,13 +584,26 @@ void dx_renderer::render_screen(byte *buf,int width,int height,int depth)
 			BYTE *spare=ddat;
 			WORD *wbuf=(WORD*)buf;
 			int dpitch=ddsd.lPitch;
-			for (i=0;i<height;i++){
-				for (j=0;j<width;j++){
-					*((DWORD*)ddat)=map_24[*(wbuf++)];
-					ddat+=3;
+			if (b_mirror) {
+				memset(ddat, 0, height * width * 3);
+				for (i = 0; i < height; i++){
+					ddat += dpitch;
+					for (j = 0; j < width; j++){
+						ddat -= 3;
+						*((DWORD*)ddat) |= map_24[*(wbuf++)]; // avoid overwriting of one of the color bits by using |=
+					}
+					spare += dpitch;
+					ddat = spare;
 				}
-				spare+=dpitch;
-				ddat=spare;
+			} else {
+				for (i = 0; i < height; i++){
+					for (j = 0; j < width; j++){
+						*((DWORD*)ddat) = map_24[*(wbuf++)];
+						ddat += 3;
+					}
+					spare += dpitch;
+					ddat = spare;
+				}
 			}
 		}
 	}
