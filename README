@@ -1,3 +1,14 @@
+*This repository is no longer maintained!*
+
+I'm in the process of porting the changes in this repository onto a fork of TGB Dual Kai, itdself a fork of the original that has additional debugging features.
+http://blog.gameboymania.com/search/label/GBハック
+My fork will be called TGB Dual L to distinguish it from the others, and because my username beings with the letter L :)
+https://github.com/libertyernie/tgbdual_L
+
+libretro (the upstream for this repo) has removed the win32 and sdl code.
+
+--------------------------------------------------------------------------------
+
 TGB Dual - libertyernie's version
 https://github.com/libertyernie/tgbdual
 
