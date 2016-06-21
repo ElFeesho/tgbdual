@@ -1007,19 +1007,26 @@ extern int ZEXPORT unzReadCurrentFile  (file, buf, len)
 	unz_s* s;
 	file_in_zip_read_info_s* pfile_in_zip_read_info;
 	if (file==NULL)
-		return UNZ_PARAMERROR;
+	{
+			return UNZ_PARAMERROR;
+	}
+	
 	s=(unz_s*)file;
     pfile_in_zip_read_info=s->pfile_in_zip_read;
 
 	if (pfile_in_zip_read_info==NULL)
-		return UNZ_PARAMERROR;
+	{
+			return UNZ_PARAMERROR;
+	}
 
-
-	if ((pfile_in_zip_read_info->read_buffer == NULL))
+	if (pfile_in_zip_read_info->read_buffer == NULL)
+	{
 		return UNZ_END_OF_LIST_OF_FILE;
+	}
 	if (len==0)
+	{	
 		return 0;
-
+	}
 	pfile_in_zip_read_info->stream.next_out = (Bytef*)buf;
 
 	pfile_in_zip_read_info->stream.avail_out = (uInt)len;

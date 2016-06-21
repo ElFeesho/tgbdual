@@ -23,41 +23,40 @@
 
 #include "../gb_core/gb_types.h"
 typedef unsigned char BYTE;
-class sock
-{
-public:
-///	sock(HWND hwnd);
-	sock();
-	~sock();
+class sock {
+   public:
+    ///	sock(HWND hwnd);
+    sock();
+    ~sock();
 
-	bool init(bool b_serv);
-	void uninit();
-	void connect_server(char *ip_addr);
+    bool init(bool b_serv);
+    void uninit();
+    void connect_server(char *ip_addr);
 
-	int send(BYTE *dat,int len);
-	int recv(BYTE *dat);
-	int direct_recv(BYTE *dat);
+    int send(BYTE *dat, int len);
+    int recv(BYTE *dat);
+    int direct_recv(BYTE *dat);
 
-	void set_blocking(bool block);
+    void set_blocking(bool block);
 
-	bool is_server() { return b_server; }
-	bool is_connected() { return b_connected; }
+    bool is_server() { return b_server; }
+    bool is_connected() { return b_connected; }
 
-///	void handle_message(WPARAM wParam,LPARAM lParam);
-	void get_my_addr(char *buf);
+    ///	void handle_message(WPARAM wParam,LPARAM lParam);
+    void get_my_addr(char *buf);
 
-	void out_log(char *mes,...);
+    void out_log(char *mes, ...);
 
-private:
-	bool b_server;
-	bool b_connected;
-	bool b_blocking;
+   private:
+    bool b_server;
+    bool b_connected;
+    bool b_blocking;
 
-///	SOCKET listen_sock;
-///	SOCKET target_sock;
+    ///	SOCKET listen_sock;
+    ///	SOCKET target_sock;
 
-	BYTE buf[256];
-	int message_size;
+    BYTE buf[256];
+    int message_size;
 
-///	HWND m_hwnd;
+    ///	HWND m_hwnd;
 };

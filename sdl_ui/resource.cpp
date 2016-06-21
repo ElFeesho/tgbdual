@@ -32,43 +32,42 @@
 
 Resource::Resource() {}
 
-void Resource::addResourceFile(const std::string& file) {
-	std::ifstream is(file.c_str());
-	check(is.is_open(), file + ": resource file not found.");
+void Resource::addResourceFile(const std::string &file) {
+    std::ifstream is(file.c_str());
+    check(is.is_open(), file + ": resource file not found.");
 
-	addResourceStream(is);
+    addResourceStream(is);
 }
 
-void Resource::addResourceStream(std::istream& is) {
+void Resource::addResourceStream(std::istream &is) {
     static const int MAXBUF = 256;
     char ln[MAXBUF];
-	std::string opt = "";
+    std::string opt = "";
 
     while (is.getline(ln, MAXBUF)) {
-		std::string line(ln);
-		unsigned int s;
+        std::string line(ln);
+        unsigned long s;
 
-		// コメントの除去
-		if ((s = line.find("#")) != std::string::npos)
-			line.erase(s);
+        if ((s = line.find("#")) != std::string::npos)
+            line.erase(s);
 
-		// [ が先頭にある行は無視
-		if ((s = line.find("[")) == 0) {
-			s = line.find("]");
-			opt = line.substr(1, s-1);
-			line = "";
-		}
+        // [ が先頭にある行は無視
+        if ((s = line.find("[")) == 0) {
+            s = line.find("]");
+            opt = line.substr(1, s - 1);
+            line = "";
+        }
 
-		// 行頭空白の除去
-		if (!line.empty() && line[0] == ' ')
-			line.erase(0, line.find_first_not_of(' '));
+        // 行頭空白の除去
+        if (!line.empty() && line[0] == ' ')
+            line.erase(0, line.find_first_not_of(' '));
 
-		s = line.find("=");
-		std::string key, val;
-		key = line.substr(0, s);
-		val = line.substr(s+1, std::string::npos);
+        s = line.find("=");
+        std::string key, val;
+        key = line.substr(0, s);
+        val = line.substr(s + 1, std::string::npos);
 
-/*
+        /*
 		while (ss) {
 			std::string add;
 			ss >> add;
@@ -76,32 +75,31 @@ void Resource::addResourceStream(std::istream& is) {
 		}
 */
 
-		if (key != "") {
-			if (opt != "") {
-//				printf("%s => %s\n", (opt+":"+key).c_str(), val.c_str());
-				setString(opt+":"+key, val);
-			}
-			else {
-				setString(key, val);
-			}
-		}
+        if (key != "") {
+            if (opt != "") {
+                //				printf("%s => %s\n", (opt+":"+key).c_str(), val.c_str());
+                setString(opt + ":" + key, val);
+            } else {
+                setString(key, val);
+            }
+        }
     }
 }
 
-void Resource::addArgument(int argc, char** argv) {
+void Resource::addArgument(int argc, char **argv) {
 #ifdef HAVE_GETOPT_H
-	int optc;
+    int optc;
     while ((optc = getopt(argc, argv, "m:c")) != -1) {
         switch (optc) {
-		default:
-			break;
-		}
-	}
-	if (optind < argc) {
-	}
+            default:
+                break;
+        }
+    }
+    if (optind < argc) {
+    }
 #else
-	if (1 < argc) {
-	}
+    if (1 < argc) {
+    }
 #endif
 }
 
@@ -131,38 +129,34 @@ std::ostream& operator<< (std::ostream& os, const Resource& rc) {
 
 */
 
-bool Resource::has(const std::string& key) const {
-	try {
-		RcMap::const_iterator ite = resource_.find(key);
-		return ite != resource_.end();
-	}
-	catch (...) {
-		error("broken config file: key = " + key);
-	}
-	return false; // dummy...
+bool Resource::has(const std::string &key) const {
+    try {
+        RcMap::const_iterator ite = resource_.find(key);
+        return ite != resource_.end();
+    } catch (...) {
+        error("broken config file: key = " + key);
+    }
+    return false; // dummy...
 }
 
-std::string Resource::get_string(const std::string& key) const {
-	try {
-		RcMap::const_iterator ite = resource_.find(key);
-		check(ite != resource_.end(), key + ": unknow key in resource.");
-		return ite->second.first;
-	}
-	catch (...) {
-		error("broken config file: key = " + key);
-	}
-	return ""; // dummy...
+std::string Resource::get_string(const std::string &key) const {
+    try {
+        RcMap::const_iterator ite = resource_.find(key);
+        check(ite != resource_.end(), key + ": unknow key in resource.");
+        return ite->second.first;
+    } catch (...) {
+        error("broken config file: key = " + key);
+    }
+    return ""; // dummy...
 }
 
-int Resource::get_int(const std::string& key) const {
-	try {
-		RcMap::const_iterator ite = resource_.find(key);
-		check(ite != resource_.end(), key + ": unknow key in resource.");
-		return atoi(ite->second.first.c_str());
-	}
-	catch (...) {
-		error("broken config file: key = " + key);
-	}
-	return 0; // dummy...
+int Resource::get_int(const std::string &key) const {
+    try {
+        RcMap::const_iterator ite = resource_.find(key);
+        check(ite != resource_.end(), key + ": unknow key in resource.");
+        return atoi(ite->second.first.c_str());
+    } catch (...) {
+        error("broken config file: key = " + key);
+    }
+    return 0; // dummy...
 }
-

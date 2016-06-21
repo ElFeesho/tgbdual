@@ -32,72 +32,72 @@
 #include <stdlib.h>
 
 class Resource {
-public:
-	Resource();
+   public:
+    Resource();
 
-	void addDefault();
-	void addResourceFile();
-	void addAdditionalResourceFile();
-	void addResourceFile(const std::string& file);
-	void addResourceStream(std::istream& is);
-	void addArgument(int argc, char** argv);
+    void addDefault();
+    void addResourceFile();
+    void addAdditionalResourceFile();
+    void addResourceFile(const std::string &file);
+    void addResourceStream(std::istream &is);
+    void addArgument(int argc, char **argv);
 
-	template <class Iterator_>
-	void saveResource(const std::string& file, Iterator_ begin, Iterator_ end);
+    template <class Iterator_>
+    void saveResource(const std::string &file, Iterator_ begin, Iterator_ end);
 
-	std::string get_string(const char* key) const {
-		return get_string(std::string(key));
-	}
-	std::string get_string(const std::string& key) const;
-	int get_int(const char* key) const {
-		return get_int(std::string(key));
-	}
-	int get_int(const std::string& key) const;
+    std::string get_string(const char *key) const {
+        return get_string(std::string(key));
+    }
+    std::string get_string(const std::string &key) const;
+    int get_int(const char *key) const {
+        return get_int(std::string(key));
+    }
+    int get_int(const std::string &key) const;
 
-	bool has(const char* key) const {
-		return has(std::string(key));
-	}
-	bool has(const std::string& key) const;
+    bool has(const char *key) const {
+        return has(std::string(key));
+    }
+    bool has(const std::string &key) const;
 
-	void set(const std::string& key, const std::string& val, bool save =true) {
-		setString(key, val, save);
-	}
-	void setString(const std::string& key,
-				   const std::string& val, bool save =true) {
-		resource_[key] = std::make_pair(val, save);
-	}
+    void set(const std::string &key, const std::string &val, bool save = true) {
+        setString(key, val, save);
+    }
+    void setString(const std::string &key,
+                   const std::string &val,
+                   bool save = true) {
+        resource_[key] = std::make_pair(val, save);
+    }
 
-	void dump() const;
+    void dump() const;
 
-public:
-	typedef std::pair<std::string, bool> RcVal;
-	typedef std::map<std::string, RcVal> RcMap;
+   public:
+    typedef std::pair<std::string, bool> RcVal;
+    typedef std::map<std::string, RcVal> RcMap;
 
-public:
-	typedef RcMap::iterator iterator;
-	typedef RcMap::const_iterator const_iterator;
-	iterator begin() { return resource_.begin(); }
-	iterator end() { return resource_.end(); }
-	const_iterator begin() const { return resource_.begin(); }
-	const_iterator end() const { return resource_.end(); }
+   public:
+    typedef RcMap::iterator iterator;
+    typedef RcMap::const_iterator const_iterator;
+    iterator begin() { return resource_.begin(); }
+    iterator end() { return resource_.end(); }
+    const_iterator begin() const { return resource_.begin(); }
+    const_iterator end() const { return resource_.end(); }
 
-private:
-	RcMap resource_;
+   private:
+    RcMap resource_;
 
-private:
-	friend std::istream& operator>> (std::istream& is, Resource& rc);
-	friend std::ostream& operator<< (std::ostream& os, const Resource& rc);
-
+   private:
+    friend std::istream &operator>>(std::istream &is, Resource &rc);
+    friend std::ostream &operator<<(std::ostream &os, const Resource &rc);
 };
 
 template <class Iterator_>
-void Resource::saveResource(const std::string& file,
-							Iterator_ begin, Iterator_ end)
-{
-	std::ofstream os(file.c_str());
-	for (Iterator_ ite = begin; ite != end; ++ite) {
-		os << *ite << " " << get_string(*ite) << std::endl;
-	}
+void Resource::saveResource(const std::string &file,
+                            Iterator_ begin,
+                            Iterator_ end) {
+    std::ofstream os(file.c_str());
+    for (Iterator_ ite = begin; ite != end; ++ite) {
+        os << *ite << " " << get_string(*ite) << std::endl;
+    }
 }
 
 #endif // ! resource_h_

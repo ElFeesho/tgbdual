@@ -21,31 +21,25 @@
 
 #include "dmy_renderer.h"
 
-dmy_renderer::dmy_renderer()
-{
-	key_state=0;
+dmy_renderer::dmy_renderer() {
+    key_state = 0;
 }
 
-dmy_renderer::~dmy_renderer()
-{
+dmy_renderer::~dmy_renderer() {
 }
 
-word dmy_renderer::map_color(word gb_col)
-{
-	return gb_col;
+word dmy_renderer::map_color(word gb_col) {
+    return gb_col;
 }
 
-word dmy_renderer::unmap_color(word gb_col)
-{
-	return gb_col;
+word dmy_renderer::unmap_color(word gb_col) {
+    return gb_col;
 }
 
-void dmy_renderer::set_pad(int state)
-{
-	key_state=state;
+void dmy_renderer::set_pad(int state) {
+    key_state = state;
 }
 
-int dmy_renderer::check_pad()
-{
-	return key_state;
+int dmy_renderer::check_pad() {
+    return key_state;
 }

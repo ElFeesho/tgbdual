@@ -14,8 +14,10 @@ CSOURCES=$(wildcard *.c)
 OBJS = $(SOURCES:.cpp=.o)
 OBJS += $(CSOURCES:.c=.o)
 
-EXT_OBJS = ../gb_core/*.o ../goomba/*.o
-
+EXT_CSOURCES = $(wildcard ../gb_core/*.c)
+EXT_CSOURCES += $(wildcard ../goomba/*.c)
+EXT_OBJS = $(EXT_CSOURCES:.c=.o)
+EXT_OBJS += $(wildcard ../gb_core/*.o)
 all: tgbdual
 
 tgbdual: $(OBJS) $(EXT_OBJS)

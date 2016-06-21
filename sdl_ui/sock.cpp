@@ -20,9 +20,8 @@
 #include "sock.h"
 #include <stdio.h>
 
-sock::sock()
-{
-/**
+sock::sock() {
+    /**
 	m_hwnd=hwnd;
 
 	listen_sock=INVALID_SOCKET;
@@ -36,17 +35,15 @@ sock::sock()
 */
 }
 
-sock::~sock()
-{
-/**
+sock::~sock() {
+    /**
 	uninit();
 	WSACleanup();
 */
 }
 
-void sock::out_log(char *mes,...)
-{
-/**
+void sock::out_log(char *mes, ...) {
+    /**
 	va_list vl;
 	char buf[256];
 
@@ -59,9 +56,8 @@ void sock::out_log(char *mes,...)
 */
 }
 
-void sock::get_my_addr(char *buf)
-{
-/**
+void sock::get_my_addr(char *buf) {
+    /**
 	char tmp[256];
 	gethostname(tmp,256);
 	hostent *host=gethostbyname(tmp);
@@ -71,9 +67,8 @@ void sock::get_my_addr(char *buf)
 */
 }
 
-void sock::uninit()
-{
-/**
+void sock::uninit() {
+    /**
 	if (listen_sock!=INVALID_SOCKET)
 		closesocket(listen_sock);
 	if (target_sock!=INVALID_SOCKET)
@@ -83,9 +78,8 @@ void sock::uninit()
 */
 }
 
-bool sock::init(bool b_serv)
-{
-/**
+bool sock::init(bool b_serv) {
+    /**
 	b_server=b_serv;
 
 	if (b_server){
@@ -114,12 +108,11 @@ bool sock::init(bool b_serv)
 	if (b_server)
 		out_log("クライアントの接続を待っています\n\n");
 */
-	return true;
+    return true;
 }
 
-void sock::connect_server(char *ip_addr)
-{
-/**
+void sock::connect_server(char *ip_addr) {
+    /**
 	if (b_server)
 		return;
 
@@ -143,9 +136,8 @@ void sock::connect_server(char *ip_addr)
 */
 }
 
-void sock::set_blocking(bool block)
-{
-/*
+void sock::set_blocking(bool block) {
+    /*
 	if (block)
 		WSAAsyncSelect(target_sock,m_hwnd,WM_SOCKET,FD_CLOSE);
 	else
@@ -153,21 +145,19 @@ void sock::set_blocking(bool block)
 */
 }
 
-int sock::send(BYTE *dat,int len)
-{
-/*
+int sock::send(BYTE *dat, int len) {
+    /*
 	if(target_sock!=INVALID_SOCKET){
 		::send(target_sock,(char*)dat,len,0);
 		return len;
 	}
 	else
 */
-		return 0;
+    return 0;
 }
 
-int sock::recv(BYTE *dat)
-{
-/*
+int sock::recv(BYTE *dat) {
+    /*
 	int ret=message_size;
 	if (message_size){
 		memcpy(dat,buf,message_size);
@@ -175,13 +165,12 @@ int sock::recv(BYTE *dat)
 	}
 	return ret;
 */
-	return 0;
+    return 0;
 }
 
-int sock::direct_recv(BYTE *dat)
-{
-//	return ::recv(target_sock,(char*)buf,256,0);
-	return 0;
+int sock::direct_recv(BYTE *dat) {
+    //	return ::recv(target_sock,(char*)buf,256,0);
+    return 0;
 }
 
 /**

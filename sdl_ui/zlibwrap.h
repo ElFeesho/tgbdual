@@ -22,7 +22,6 @@
 #ifndef zlibwrap_h_
 #define zlibwrap_h_
 
-unsigned char* file_read(const char* name, const char** exts, int* size);
+unsigned char *file_read(const char *name, const char **exts, int *size);
 
 #endif // ! zlibwrap_h_
-

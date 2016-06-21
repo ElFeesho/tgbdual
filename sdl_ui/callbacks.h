@@ -11,4 +11,3 @@ void cb_reset(int lParam);
 void cb_quit(int lParam);
 
 #endif // ! callbacks_h_
-

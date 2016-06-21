@@ -29,12 +29,11 @@
 typedef Uint32 DWORD;
 
 inline Uint32 timeGetTime() {
-	return SDL_GetTicks();
+    return SDL_GetTicks();
 }
 
 inline void Sleep(Uint32 t) {
-	SDL_Delay(t);
+    SDL_Delay(t);
 }
 
 #endif // ! w32_sdl_h_
-
