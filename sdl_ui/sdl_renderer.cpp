@@ -32,75 +32,76 @@
 
 #include "../gb_core/gb.h"
 
-extern gb *g_gb[2];
+extern gb *g_gb;
 extern setting *config;
 extern Uint8 *key_state;
 
-static inline Uint32 getpixel(SDL_Surface *surface, int x, int y)
-{
+static inline Uint32 getpixel(SDL_Surface *surface, int x, int y) {
     int bpp = surface->format->BytesPerPixel;
     /* Here p is the address to the pixel we want to retrieve */
     Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
 
-    switch(bpp) {
-    case 1:
-        return *p;
-        break;
+    switch (bpp) {
+        case 1:
+            return *p;
+            break;
 
-    case 2:
-        return *(Uint16 *)p;
-        break;
+        case 2:
+            return *(Uint16 *)p;
+            break;
 
-    case 3:
-        if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
-            return p[0] << 16 | p[1] << 8 | p[2];
-        else
-            return p[0] | p[1] << 8 | p[2] << 16;
-        break;
+        case 3:
+            if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
+                return p[0] << 16 | p[1] << 8 | p[2];
+            else
+                return p[0] | p[1] << 8 | p[2] << 16;
+            break;
 
-    case 4:
-        return *(Uint32 *)p;
-        break;
+        case 4:
+            return *(Uint32 *)p;
+            break;
 
-    default:
-        return 0;       /* shouldn't happen, but avoids warnings */
+        default:
+            return 0; /* shouldn't happen, but avoids warnings */
     }
 }
 
-static inline void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
-{
+static inline void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel) {
     int bpp = surface->format->BytesPerPixel;
     /* Here p is the address to the pixel we want to set */
     Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
 
-    switch(bpp) {
-    case 1:
-        *p = pixel;
-        break;
+    switch (bpp) {
+        case 1:
+            *p = pixel;
+            break;
 
-    case 2:
-        *(Uint16 *)p = pixel;
-        break;
+        case 2:
+            *(Uint16 *)p = pixel;
+            break;
 
-    case 3:
-        if(SDL_BYTEORDER == SDL_BIG_ENDIAN) {
-            p[0] = (pixel >> 16) & 0xff;
-            p[1] = (pixel >> 8) & 0xff;
-            p[2] = pixel & 0xff;
-        } else {
-            p[0] = pixel & 0xff;
-            p[1] = (pixel >> 8) & 0xff;
-            p[2] = (pixel >> 16) & 0xff;
-        }
-        break;
+        case 3:
+            if (SDL_BYTEORDER == SDL_BIG_ENDIAN) {
+                p[0] = (pixel >> 16) & 0xff;
+                p[1] = (pixel >> 8) & 0xff;
+                p[2] = pixel & 0xff;
+            } else {
+                p[0] = pixel & 0xff;
+                p[1] = (pixel >> 8) & 0xff;
+                p[2] = (pixel >> 16) & 0xff;
+            }
+            break;
 
-    case 4:
-        *(Uint32 *)p = pixel;
-        break;
+        case 4:
+            *(Uint32 *)p = pixel;
+            break;
     }
 }
 
 sdl_renderer::sdl_renderer() {
+
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+
     b_window = true;
     render_pass_type = 2;
 
@@ -138,7 +139,7 @@ void sdl_renderer::graphics_record(char *file) {
 void sdl_renderer::sound_record(char *file) {
 }
 
-void sdl_renderer::output_log(char *mes, ...) {
+void sdl_renderer::output_log(const char *mes, ...) {
     va_list vl;
     char buf[256];
 
@@ -286,8 +287,6 @@ word sdl_renderer::get_sensor(bool x_y) {
 //------------------------------------------------------------
 
 void sdl_renderer::init_sdlvideo() {
-    printf("init video\n");
-
     init_surface();
     mes_show = false;
     mes[0] = '\0';
@@ -350,11 +349,7 @@ void sdl_renderer::render_screen(byte *buf, int width, int height, int depth) {
     Uint64 *dp = (Uint64 *)scr->pixels;
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < (width >> 2); j++) {
-            // xBBBBBGGGGGRRRRR => RRRRRGGGGGxBBBBB
             *dp = *sp;
-            // ((*sp & 0x7c007c007c007c00ll) >> 10) |
-            //     ((*sp & 0x03e003e003e003e0ll) << 1) |
-            //     ((*sp & 0x001f001f001f001fll) << 11);
             dp++;
             sp++;
         }
@@ -381,22 +376,18 @@ void sdl_renderer::flip() {
     }
 
     if (dpy) {
-        for(int y = 0; y < 144; y++)
-        {
-            for (int x = 0; x < 160; x++)
-            {
+        for (int y = 0; y < 144; y++) {
+            for (int x = 0; x < 160; x++) {
                 Uint32 colour = getpixel(scr, x, y);
-                putpixel(dpy, x*2, y*2, colour);
-                putpixel(dpy, x*2+1, y*2, colour);
-                putpixel(dpy, x*2, y*2+1, colour);
-                putpixel(dpy, x*2+1, y*2+1, colour);
+                putpixel(dpy, x * 2, y * 2, colour);
+                putpixel(dpy, x * 2 + 1, y * 2, colour);
+                putpixel(dpy, x * 2, y * 2 + 1, colour);
+                putpixel(dpy, x * 2 + 1, y * 2 + 1, colour);
             }
         }
         //SDL_BlitSurface(scr, nullptr, dpy, &rect);
         SDL_UpdateRect(dpy, 0, 0, 0, 0);
-    }
-    else
-    {
+    } else {
         SDL_UpdateRect(scr, 0, 0, 0, 0);
     }
 
@@ -413,16 +404,14 @@ void sdl_renderer::show_message(const char *message) {
 
 namespace {
 void fill_audio(void *, Uint8 *stream, int len) {
-    if (g_gb[0]) {
-        apu_snd *snd_render = g_gb[0]->get_apu()->get_renderer();
+    if (g_gb) {
+        apu_snd *snd_render = g_gb->get_apu()->get_renderer();
         snd_render->render((short *)stream, len / 4);
     }
 }
 }
 
 void sdl_renderer::init_sdlaudio() {
-    printf("init audio\n");
-
     SDL_AudioSpec wanted;
 
     wanted.freq = 44100;
@@ -590,14 +579,6 @@ void sdl_renderer::refresh() {
         load_resurve = -1;
     } else if (!bef_auto && check_press(&auto_key)) {
         toggle_auto();
-    } else if (!bef_pause && check_press(&pause_key)) {
-        cb_pause(0);
-    } else if (!bef_full && check_press(&full_key)) {
-        cb_fullscreen(0);
-    } else if (!bef_reset && check_press(&reset_key)) {
-        cb_reset(0);
-    } else if (!bef_quit && check_press(&quit_key)) {
-        cb_quit(0);
     }
     bef_f5 = check_press(&save_key) ? true : false;
     bef_f7 = check_press(&load_key) ? true : false;

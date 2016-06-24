@@ -24,9 +24,9 @@
 #include "gb.h"
 #include <memory.h>
 #include <stdlib.h>
-#include <fcntl.h>
 #include <assert.h>
 #include <stdexcept>
+#include <string>
 
 gb::gb(renderer *ref, bool b_lcd, bool b_apu, int network_mode) {
     m_renderer = ref;
@@ -49,10 +49,6 @@ gb::gb(renderer *ref, bool b_lcd, bool b_apu, int network_mode) {
 
     nt_mode = network_mode;
 
-    // first, load up address structs with getaddrinfo():
-    perror("Before?");
-
-
     memset((char *)&theiraddr, 0, sizeof(myaddr));
     memset((char *)&myaddr, 0, sizeof(myaddr));
     theiraddr.sin_family = myaddr.sin_family = AF_INET;
@@ -60,24 +56,12 @@ gb::gb(renderer *ref, bool b_lcd, bool b_apu, int network_mode) {
     myaddr.sin_port = htons(network_mode == 0 ? 4301 : 4302);
     theiraddr.sin_port = htons(network_mode == 0 ? 4302 : 4301);
 
-    // make a socket:
-
     net_socket = socket(AF_INET, SOCK_DGRAM, 0);
-    perror("socket");
-    int flags = 0;
-    flags = fcntl(net_socket, F_GETFL, 0);
-    assert(flags != -1);
-    //fcntl(net_socket, F_SETFL, flags | O_NONBLOCK);
-    perror("Error?");
-    // bind it to the port we passed in to getaddrinfo():
-
+    
     if (bind(net_socket, (struct sockaddr*)&myaddr, sizeof(struct sockaddr_in)) != 0)
     {
-        printf("FAILED TO BIND SOCKET!\n");
+        throw std::domain_error("Failed to bind linkcable port");
     }
-    perror("bind");
-
-    send_linkcable_byte(255);
 }
 
 gb::~gb() {
@@ -124,9 +108,9 @@ void gb::reset() {
     skip = skip_buf = 0;
     re_render = 0;
 
-    char *gb_names[] = {"Invalid", "Gameboy", "SuperGameboy", "Gameboy Color", "Gameboy Advance"};
+    std::string gb_names[] = {"Invalid", "Gameboy", "SuperGameboy", "Gameboy Color", "Gameboy Advance"};
     if (m_rom->get_loaded()) {
-        m_renderer->output_log("Current GB Type : %s \n", gb_names[m_rom->get_info()->gb_type]);
+        m_renderer->output_log(("Current GB Type: " + gb_names[m_rom->get_info()->gb_type] + "\n").c_str());
     }
 }
 
@@ -254,10 +238,7 @@ void gb::serialize_firstrev(serializer &s) {
     int ram_page = (m_mbc->get_sram() - m_rom->get_sram()) / 0x2000;
     s.process(&rom_page, sizeof(int));   // rom_page
     s.process(&ram_page, sizeof(int));   // ram_page
-    m_mbc->set_page(rom_page, ram_page); // hackish, but should work.
-    // basically, if we're serializing to count or save, the set_page
-    // should have no effect assuming the calculations above are correct.
-    // tl;dr: "if it's good enough for saving, it's good enough for loading"
+    m_mbc->set_page(rom_page, ram_page); 
 
     if (true || gbc) { // why not for normal gb as well?
         m_cpu->save_state(cpu_dat);
@@ -337,11 +318,7 @@ void gb::refresh_pal() {
 
 void gb::send_linkcable_byte(byte data)
 {
-    if (sendto(net_socket, &data, 1, 0, (struct sockaddr *)&theiraddr, sizeof(theiraddr)) == 1)
-    {
-        printf("SENT SUCCESS %20X\n", data);
-    }
-    else
+    if (sendto(net_socket, &data, 1, 0, (struct sockaddr *)&theiraddr, sizeof(theiraddr)) != 1)
     {
         perror("sendto");
         throw std::domain_error("Failed to call sendto");
@@ -352,12 +329,10 @@ void gb::read_linkcable_byte(byte *buff)
 {
     socklen_t len = 0;
     struct sockaddr_in *incoming_addr = nullptr;
-    if (recvfrom(net_socket, buff, 1, 0, (struct sockaddr *)&incoming_addr, &len) == 1) {
-        printf("READ SUCCESS: %20X\n", *buff);
-    }
-    else
+    if (recvfrom(net_socket, buff, 1, 0, (struct sockaddr *)&incoming_addr, &len) != 1) 
     {
         perror("recvfrom");
+        throw std::domain_error("Failed to call recvfrom");
     }
 
 }
@@ -394,8 +369,6 @@ void gb::run() {
                 } else if (regs.LY == 153) {
                     m_cpu->exec(80);
                     regs.LY = 0;
-                    // 前のラインのかなり早目から0になるようだ。
-                    // It's pretty early to be 0 from the previous line.
                     m_cpu->exec(456 - 80);
                     regs.LY = 153;
                 } else
@@ -425,11 +398,7 @@ void gb::run() {
                             m_cpu->dma_src_bank = NULL;
                         m_cpu->b_dma_first = false;
                     }
-                    memcpy(m_cpu->dma_dest_bank + (m_cpu->dma_dest & 0x1ff0),
-                           m_cpu->dma_src_bank + m_cpu->dma_src, 16);
-                    //					fprintf(m_cpu->file,"%03d : dma exec %04X ->
-                    //%04X rest
-                    //%d\n",regs.LY,m_cpu->dma_src,m_cpu->dma_dest,m_cpu->dma_rest);
+                    memcpy(m_cpu->dma_dest_bank + (m_cpu->dma_dest & 0x1ff0), m_cpu->dma_src_bank + m_cpu->dma_src, 16);
 
                     m_cpu->dma_src += 16;
                     m_cpu->dma_src &= 0xfff0;

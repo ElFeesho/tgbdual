@@ -12,3 +12,5 @@ tgbdual
 Debug
 Release
 *.vcxproj.user
+*.gbc
+*/save/

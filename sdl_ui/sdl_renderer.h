@@ -71,7 +71,7 @@ class sdl_renderer : public renderer {
     int check_pad();
     void set_pad(int stat);
     void refresh();
-    void output_log(char *mes, ...);
+    void output_log(const char *mes, ...);
     void reset() {}
     word map_color(word gb_col);
     word unmap_color(word gb_col);

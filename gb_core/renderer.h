@@ -33,6 +33,7 @@ class sound_renderer {
 
 class renderer {
    public:
+    virtual ~renderer() {}
     void set_sound_renderer(sound_renderer *ref) { snd_render = ref; };
 
     virtual void reset() = 0;
@@ -49,7 +50,7 @@ class renderer {
 
     virtual void set_bibrate(bool bibrate) = 0;
 
-    virtual void output_log(char *mes, ...) = 0;
+    virtual void output_log(const char *mes, ...) = 0;
 
    protected:
     sound_renderer *snd_render;

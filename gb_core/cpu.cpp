@@ -44,12 +44,9 @@ cpu::cpu(gb *ref) {
     }
 
     reset();
-
-    //	file=fopen("cpu_log.txt","w");
 }
 
 cpu::~cpu() {
-    //	fclose(file);
 }
 
 void cpu::reset() {
@@ -235,10 +232,8 @@ byte cpu::io_read(word adr) {
             return 0x00;
         case 0xFF01:
             ref_gb->read_linkcable_byte(&ref_gb->get_regs()->SB);
-            printf("Read SB %02X\n", ref_gb->get_regs()->SB);
             return ref_gb->get_regs()->SB;
         case 0xFF02:
-            printf("Read SC %02X\n", ref_gb->get_regs()->SC);
             return (ref_gb->get_regs()->SC & 0x83) | 0x7C;
         case 0xFF04: // DIV(ディバイダー?) // DIV (divider?)
             return ref_gb->get_regs()->DIV;
@@ -326,42 +321,20 @@ byte cpu::io_read(word adr) {
             return ref_gb->get_cregs()->BCPS;
         case 0xFF69: // BCPD(BGパレット書きこみデータ) // BG palette data written
             if (ref_gb->get_cregs()->BCPS & 1)
-                ret =
-                    ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) &
-                                               7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] >>
-                    8;
+                ret = ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] >> 8;
             else
-                ret =
-                    ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) &
-                                               7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] &
-                    0xff;
-            /*		if (ref_gb->get_cregs()->BCPS&1)
-			ret=ref_gb->get_renderer()->unmap_color(ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS>>3)&7)[(ref_gb->get_cregs()->BCPS>>1)&3])>>8;
-		else
-			ret=ref_gb->get_renderer()->unmap_color(ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS>>3)&7)[(ref_gb->get_cregs()->BCPS>>1)&3])&0xff;
-*/ //ポインタはインクリメントされない(おじゃる丸)
-                                                      //// pointer is not
-                                                      //incremented (Round
-                                                      //Ojaru)
+                ret = ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] & 0xff;
             return ret;
         case 0xFF6A: // OCPS(OBJパレット書きこみ指定) // OBJ palette specified written
             return ref_gb->get_cregs()->OCPS;
         case 0xFF6B: // OCPD(OBJパレット書きこみデータ) // Write data OBJ palette
-            if (ref_gb->get_cregs()->OCPS & 1)
-                ret =
-                    ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) +
-                                               8)[(ref_gb->get_cregs()->OCPS >> 1) & 3] >>
-                    8;
-            else
-                ret =
-                    ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) +
-                                               8)[(ref_gb->get_cregs()->OCPS >> 1) & 3] &
-                    0xff;
-            /*		if (ref_gb->get_cregs()->OCPS&1)
-			ret=ref_gb->get_renderer()->unmap_color(ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS>>3)&7)+8)[(ref_gb->get_cregs()->OCPS>>1)&3])>>8;
-		else
-			ret=ref_gb->get_renderer()->unmap_color(ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS>>3)&7)+8)[(ref_gb->get_cregs()->OCPS>>1)&3])&0xff;
-*/ return ret;
+            if (ref_gb->get_cregs()->OCPS & 1) {
+                ret = ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) + 8)[(ref_gb->get_cregs()->OCPS >> 1) & 3] >> 8;
+            }
+            else {
+                ret = ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) + 8)[(ref_gb->get_cregs()->OCPS >> 1) & 3] & 0xff;
+            }
+            return ret;
         case 0xFF70: // SVBK(内部RAMバンク切り替え) // Internal RAM bank switching
             return ref_gb->get_cregs()->SVBK;
 
@@ -568,19 +541,7 @@ void cpu::io_write(word adr, byte dat) {
                 b_dma_first = true;
                 dma_rest = (dat & 0x7F) + 1;
                 ref_gb->get_cregs()->HDMA5 = 0;
-/*				dma_dest_bank=vram_bank;
-				if (dma_src<0x4000)
-					dma_src_bank=ref_gb->get_rom()->get_rom();
-				else if (dma_src<0x8000)
-					dma_src_bank=ref_gb->get_mbc()->get_rom()-0x4000;
-				else if (dma_src>=0xA000&&dma_src<0xC000)
-					dma_src_bank=ref_gb->get_mbc()->get_sram()-0xA000;
-				else if (dma_src>=0xC000&&dma_src<0xD000)
-					dma_src_bank=ram-0xC000;
-				else if (dma_src>=0xD000&&dma_src<0xE000)
-					dma_src_bank=ram_bank-0xD000;
-				else dma_src_bank=NULL;
-*/			}
+			}
 			else{ //通常DMA // Normal DMA
     if (dma_executing) {
         dma_executing = false;
@@ -589,13 +550,6 @@ void cpu::io_write(word adr, byte dat) {
         //					fprintf(file,"dma stopped\n");
         return;
     }
-    // どうやら､HBlank以外ならいつでもOKみたいだ
-    // Apparently, it seems OK except HBlank anytime
-    //				if
-    //(!(((ref_gb->get_regs()->STAT&3)==1)||(!(ref_gb->get_regs()->LCDC&0x80)))){
-    //					ref_gb->get_cregs()->HDMA5=0;
-    //					return;
-    //				}
 
     dma_executing = false;
     dma_rest = 0;
@@ -710,33 +664,19 @@ return;
                 ref_gb->get_renderer()->map_color(ref_gb->get_lcd()->get_pal(
                     ((ref_gb->get_cregs()->OCPS >> 3) & 7) +
                     8)[(ref_gb->get_cregs()->OCPS >> 1) & 3]);
-            /*			if (ref_gb->get_cregs()->OCPS&1){
-                                    ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS>>3)&7)+8)[(ref_gb->get_cregs()->OCPS>>1)&3]=
-                                            ref_gb->get_renderer()->map_color(((ref_gb->get_renderer()->unmap_color(ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS>>3)&7)+8)[(ref_gb->get_cregs()->OCPS>>1)&3])&0xff)|(dat<<8)));
-                            }
-                            else{
-                                    ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS>>3)&7)+8)[(ref_gb->get_cregs()->OCPS>>1)&3]=
-                                            ref_gb->get_renderer()->map_color(((ref_gb->get_renderer()->unmap_color(ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS>>3)&7)+8)[(ref_gb->get_cregs()->OCPS>>1)&3])&0xff00)|(dat)));
-                            }*/
             ref_gb->get_cregs()->OCPD = dat;
             if (ref_gb->get_cregs()->OCPS & 0x80)
                 ref_gb->get_cregs()->OCPS =
                     0x80 | ((ref_gb->get_cregs()->OCPS + 1) & 0x3f);
             return;
-        case 0xFF70: // SVBK(内部RAMバンク切り替え) // SVBK (RAM internal bank
-                     // switching)
-            //			if (dma_executing)
-            //				return;
-
+        case 0xFF70:
             dat = (!(dat & 7)) ? 1 : (dat & 7);
             ref_gb->get_cregs()->SVBK = dat;
             ram_bank = ram + 0x1000 * dat;
             return;
 
-        case 0xFFFF: // IE(割りこみマスク) // IE (Interrupt mask)
+        case 0xFFFF:
             ref_gb->get_regs()->IE = dat;
-            //			ref_gb->get_regs()->IF=0;
-            //			fprintf(file,"IE = %02X\n",dat);
             return;
 
         // undocumented register
@@ -764,27 +704,6 @@ return;
                 ext_mem[adr - 0xff71] = dat;
     }
 }
-/*
-static int cycles[256] =
-{
-        4,12,8,8,4,4,8,4,4,12,8,8,4,4,8,4,
-        8,12,8,8,4,4,8,4,8,12,8,8,4,4,8,4,
-        8,12,8,8,4,4,8,4,8,12,8,8,4,4,8,4,
-        8,12,8,8,12,12,12,4,8,12,8,8,4,4,8,4,
-        4,4,4,4,4,4,8,4,4,4,4,4,4,4,8,4,
-        4,4,4,4,4,4,8,4,4,4,4,4,4,4,8,4,
-        4,4,4,4,4,4,8,4,4,4,4,4,4,4,8,4,
-        8,8,8,8,8,8,4,8,4,4,4,4,4,4,8,4,
-        4,4,4,4,4,4,8,4,4,4,4,4,4,4,8,4,
-        4,4,4,4,4,4,8,4,4,4,4,4,4,4,8,4,
-        4,4,4,4,4,4,8,4,4,4,4,4,4,4,8,4,
-        4,4,4,4,4,4,8,4,4,4,4,4,4,4,8,4,
-        8,12,16,16,12,16,8,16,8,16,16,0,12,24,8,16,
-        8,12,16,16,12,16,8,16,8,16,16,16,12,24,8,16,
-        12,12,8,12,12,16,8,16,16,4,16,12,12,12,8,16,
-        12,12,8,4,12,16,8,16,12,8,16,4,12,12,8,16
-};
-*/
 
 static int cycles[256] = {
     //   0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F
@@ -806,27 +725,6 @@ static int cycles[256] = {
     12, 12, 8, 4, 0, 16, 8, 16, 12, 8, 16, 4, 0, 0, 8, 16      // F
 };
 
-/*
-static int cycles[256] =
-{
-   4,12, 8, 8, 4, 4, 8, 4,20, 8, 8, 8, 4, 4, 8, 4,
-   4,12, 8, 8, 4, 4, 8, 4, 8, 8, 8, 8, 4, 4, 8, 4,
-   8,12, 8, 8, 4, 4, 8, 4, 8, 8, 8, 8, 4, 4, 8, 4,
-   8,12, 8, 8,12,12,12, 4, 8, 8, 8, 8, 4, 4, 8, 4,
-   4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-   4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-   4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-   8, 8, 8, 8, 8, 8, 4, 8, 4, 4, 4, 4, 4, 4, 8, 4,
-   4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-   4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-   4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-   4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-   8,12,12,12,12,16, 8,32, 8, 8,12, 0,12,12, 8,32,
-   8,12,12, 0,12,16, 8,32, 8, 8,12, 0,12, 0, 8,32,
-  12,12, 8, 0, 0,16, 8,32,16, 4,16, 0, 0, 0, 8,32,
-  12,12, 8, 4, 0,16, 8,32,12, 8,16, 4, 0, 0, 8,32
-};
-*/
 
 static int cycles_cb[256] = {
     8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,
@@ -841,26 +739,6 @@ static int cycles_cb[256] = {
     8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,
     8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8};
 
-/*static int cycles_cb[256] =
-{
-   8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-   8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-   8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-   8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-   8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-   8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-   8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-   8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-   8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-   8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-   8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-   8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-   8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-   8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-   8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-   8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8
-};
-*/
 static const byte ZTable[256] = {
     Z_FLAG, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -876,13 +754,7 @@ static const byte ZTable[256] = {
 };
 
 byte cpu::seri_send(byte dat) {
-    //	if
-    //((!(ref_gb->get_regs()->IE&INT_SERIAL))||(ref_gb->get_regs()->IF&INT_SERIAL))
-    //		return 0xFF;
-
     if ((ref_gb->get_regs()->SC & 0x81) == 0x80) {
-        //		fprintf(file,"seri_recv my:%02X tar:%02X state
-        //SC:%02X\n",ref_gb->get_regs()->SB,dat,ref_gb->get_regs()->SC);
         byte ret = ref_gb->get_regs()->SB;
         ref_gb->get_regs()->SB = dat;
         ref_gb->get_regs()->SC &= 1;
@@ -893,12 +765,10 @@ byte cpu::seri_send(byte dat) {
 }
 
 void cpu::irq(int irq_type) {
-    //	fprintf(file,"irq %02X LCDC %02X\n",irq_type,ref_gb->get_regs()->LCDC);
     if (!((irq_type == INT_VBLANK || irq_type == INT_LCDC) &&
           (!(ref_gb->get_regs()->LCDC & 0x80))))
-        //		if (last_int!=irq_type)
-        ref_gb->get_regs()->IF |= (irq_type /*&ref_gb->get_regs()->IE*/);
-    //	ref_gb->get_regs()->IF|=irq_type;
+        ref_gb->get_regs()->IF |= (irq_type);
+   
 }
 
 void cpu::irq_process() {
@@ -929,7 +799,6 @@ void cpu::irq_process() {
             ref_gb->get_regs()->IF &= 0xFB;
             last_int = INT_TIMER;
         } else if (ref_gb->get_regs()->IF & ref_gb->get_regs()->IE & INT_SERIAL) { // Serial
-            printf("Serial interrupt\n");
             regs.PC = 0x58;
             ref_gb->get_regs()->IF &= 0xF7;
             last_int = INT_SERIAL;
