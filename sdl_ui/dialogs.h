@@ -17,8 +17,6 @@
    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-///#include "keymap.h"
-
 #include <zlib.h>
 #include "../goomba/goombarom.h"
 #include "../goomba/goombasav.h"
@@ -152,20 +150,6 @@ void load_key_config(int num) {
 
     render->set_key(keys);
 
-    keys[0].device_type = config->koro_key[0];
-    keys[1].device_type = config->koro_key[2];
-    keys[2].device_type = config->koro_key[4];
-    keys[3].device_type = config->koro_key[6];
-    keys[0].key_code = config->koro_key[1];
-    keys[1].key_code = config->koro_key[3];
-    keys[2].key_code = config->koro_key[5];
-    keys[3].key_code = config->koro_key[7];
-
-    render->set_koro_key(keys);
-
-    render->set_koro_analog(config->koro_use_analog);
-    render->set_koro_sensitivity(config->koro_sensitive);
-
     render->set_use_ffb(config->use_ffb);
 
     col_filter cof;
@@ -223,13 +207,13 @@ bool try_load_goomba(void *ram, int ram_size, gzFile fs, const char *cart_name, 
     }
 }
 
-int load_rom(char *buf, bool isServer) {
+int load_rom(char *romFile, bool isServer) {
     FILE *file;
     int size;
     BYTE *dat;
-    char *p = buf;
+    char *p = romFile;
 
-    p = strstr(buf, ".");
+    p = strstr(romFile, ".");
     if (!p) {
         return -1;
     }
@@ -240,7 +224,7 @@ int load_rom(char *buf, bool isServer) {
     }
 
     static const char *exts[] = {"gb", "gbc", "sgb", "gba", 0};
-    BYTE *tmpbuf = file_read(buf, exts, &size);
+    BYTE *tmpbuf = file_read(romFile, exts, &size);
     if (!tmpbuf) {
         return -1;
     }
@@ -260,30 +244,10 @@ int load_rom(char *buf, bool isServer) {
         dat = (BYTE *)malloc(size);
         memcpy(dat, first_rom, size);
         free(tmpbuf);
-    } else {
-        printf("Choose a ROM image to load:\n");
-        int i = 1;
-        for (const void *rom = gb_first_rom(tmpbuf, size); rom != NULL; rom = gb_next_rom(tmpbuf, size, rom)) {
-            printf("%d. %s\n", i++, gb_get_title(rom, NULL));
-        }
-
-        int res = 0;
-        while (res <= 0) {
-            scanf("%d", &res);
-        }
-
-        const void *rom = gb_first_rom(tmpbuf, size);
-        for (i = 1; i < res; i++) {
-            rom = gb_next_rom(tmpbuf, size, rom);
-        }
-        size = gb_rom_size(rom);
-        dat = (BYTE *)malloc(size);
-        memcpy(dat, rom, size);
-        free(tmpbuf);
     }
 
     if (!g_gb) {
-        g_gb = new gb(render, true, isServer ? 0 : 1, isServer ? 1 : 0);
+        g_gb = new gb(render, true, true, isServer ? 1 : 0);
 
         if (config->sound_enable[4]) {
             g_gb->get_apu()->get_renderer()->set_enable(0, config->sound_enable[0] ? true : false);
@@ -300,21 +264,24 @@ int load_rom(char *buf, bool isServer) {
         g_gb->get_apu()->get_renderer()->set_lowpass(config->b_lowpass);
     } else {
         int has_bat[] = {0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // 0x20以下
-        if (has_bat[(g_gb->get_rom()->get_info()->cart_type > 0x20) ? 3 : g_gb->get_rom()->get_info()->cart_type])
+        if (has_bat[(g_gb->get_rom()->get_info()->cart_type > 0x20) ? 3 : g_gb->get_rom()->get_info()->cart_type]) {
             save_sram(g_gb->get_rom()->get_sram(), g_gb->get_rom()->get_info()->ram_size, 0);
+        }
     }
 
     char sram_name[256], cur_di[256], sv_dir[256];
     BYTE *ram;
     int ram_size = 0x2000 * sram_tbl[dat[0x149]];
     char *sram_name_only;
-    strcpy(sram_name, buf);
+    strcpy(sram_name, romFile);
     strcpy(strstr(sram_name, "."), ".sav");
     sram_name_only = strrchr(sram_name, '/');
-    if (!sram_name_only)
+    if (!sram_name_only) {
         sram_name_only = sram_name;
-    else
+    } else {
         sram_name_only++;
+    }
+
     GetCurrentDirectory(256, cur_di);
     config->get_save_dir(sv_dir);
     SetCurrentDirectory(sv_dir);
@@ -322,10 +289,10 @@ int load_rom(char *buf, bool isServer) {
     const char *cart_name = (const char *)dat + 0x134;
     gzFile fs = gzopen(sram_name_only, "rb");
     if (fs != nullptr) {
-        ram = (BYTE *)malloc(ram_size);
+        ram = new BYTE[ram_size];
+        memset(ram, 0, ram_size);
         gzread(fs, ram, ram_size);
         if (*(uint32_t *)ram == GOOMBA_STATEID) {
-            memset(ram, 0, ram_size); // in case try_load_goomba fails
             goomba_load_error = !try_load_goomba(ram, ram_size, fs, cart_name, 0);
             if (goomba_load_error) {
                 fprintf(stderr, "Goomba SRAM load error - your progress will not be saved.\n(%s)", goomba_last_error());
@@ -343,8 +310,9 @@ int load_rom(char *buf, bool isServer) {
     } else {
         strcpy(strstr(sram_name_only, "."), ".ram");
         fs = gzopen(sram_name_only, "rb");
+        ram = new BYTE[ram_size];
+        memset(ram, 0, ram_size);
         if (fs != nullptr) {
-            ram = (BYTE *)malloc(ram_size);
             gzread(fs, ram, ram_size);
             if (*(uint32_t *)ram == GOOMBA_STATEID) {
                 memset(ram, 0, ram_size); // in case try_load_goomba fails
@@ -362,9 +330,6 @@ int load_rom(char *buf, bool isServer) {
                 }
                 gzclose(fs);
             }
-        } else {
-            ram = (BYTE *)malloc(ram_size);
-            memset(ram, 0, ram_size);
         }
     }
     strcpy(strstr(sram_name_only, "."), ".sav");
@@ -374,20 +339,17 @@ int load_rom(char *buf, bool isServer) {
 
     org_gbtype = dat[0x143] & 0x80;
 
-    if (config->gb_type == 1)
+    if (config->gb_type == 1) {
         dat[0x143] &= 0x7f;
-    else if (config->gb_type >= 3)
+    } else if (config->gb_type >= 3) {
         dat[0x143] |= 0x80;
+    }
 
     g_gb->set_use_gba(config->gb_type == 0 ? config->use_gba : (config->gb_type == 4 ? true : false));
     g_gb->load_rom(dat, size, ram, ram_size);
 
     free(dat);
-    free(ram);
-
-    char pb[256];
-    sprintf(pb, "Load ROM \"%s\" slot[%d] :\ntype-%d:%s\nsize=%dKB : name=%s\n\n", buf, 1, g_gb->get_rom()->get_info()->cart_type, mbc_types[g_gb->get_rom()->get_info()->cart_type], size / 1024, g_gb->get_rom()->get_info()->cart_name);
-    printf("%s", pb);
+    delete[] ram;
 
     SDL_WM_SetCaption(g_gb->get_rom()->get_info()->cart_name, 0);
 
@@ -511,33 +473,4 @@ static void elapse_time(void) {
         ;
 
     lastdraw += wait;
-}
-
-static struct GBDEV_DAT {
-    void (*trash_device)();
-    byte (*send_dat)(byte);
-    bool (*get_led)();
-} dev_callback;
-
-static struct gbdev_dll {
-    char file_name[256];
-    char device_name[256];
-} dll_dat[256];
-
-static int dev_count = 0;
-
-static bool dev_loaded;
-
-static void trush_device() {
-}
-
-static byte send_dat(byte dat) {
-    return g_gb->get_cpu()->seri_send(dat);
-}
-
-static bool get_led() {
-    return (g_gb->get_cregs()->RP & 1) ? true : false;
-}
-
-static void purse_cmdline(int argc, char *argv[]) {
 }

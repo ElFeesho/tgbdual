@@ -102,7 +102,6 @@ sdl_renderer::sdl_renderer() {
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
-    b_window = true;
     render_pass_type = 2;
 
     init_sdlvideo();
@@ -116,27 +115,13 @@ sdl_renderer::sdl_renderer() {
     save_resurve = -1;
     load_resurve = -1;
 
-    b_sound = b_graphics = false;
     b_bibrating = false;
-
-    key_list.clear();
-    movie_playing = movie_recording = false;
-    movie_start = mov_cur_pos = 0;
-    movie_file = NULL;
 }
 
 sdl_renderer::~sdl_renderer() {
     uninit_sdlvideo();
     uninit_sdlaudio();
     uninit_sdlevent();
-}
-
-void sdl_renderer::graphics_record(char *file) {
-    strcpy(graphics_file, file);
-    b_graphics = true;
-}
-
-void sdl_renderer::sound_record(char *file) {
 }
 
 void sdl_renderer::output_log(const char *mes, ...) {
@@ -149,7 +134,6 @@ void sdl_renderer::output_log(const char *mes, ...) {
     printf("%s\n", buf);
 
     va_end(vl);
-    return;
 }
 
 word sdl_renderer::map_color(word gb_col) {
@@ -288,15 +272,6 @@ word sdl_renderer::get_sensor(bool x_y) {
 
 void sdl_renderer::init_sdlvideo() {
     init_surface();
-    mes_show = false;
-    mes[0] = '\0';
-    mul = 1;
-}
-
-void sdl_renderer::swith_screen_mode() {
-    release_surface();
-    b_window = !b_window;
-    init_surface();
 }
 
 void sdl_renderer::set_render_pass(int type) {
@@ -313,8 +288,6 @@ void sdl_renderer::init_surface() {
     static const int GB_W = 160;
     static const int GB_H = 144;
     Uint32 flags = SDL_SWSURFACE;
-    if (!b_window)
-        flags |= SDL_FULLSCREEN;
 
     if (w != GB_W || h != GB_H) {
         dpy = SDL_SetVideoMode(w, h, 16, flags);
@@ -338,12 +311,6 @@ void sdl_renderer::release_surface() {
     }
 }
 
-void sdl_renderer::on_move() {
-}
-
-void sdl_renderer::draw_menu(int n) {
-}
-
 void sdl_renderer::render_screen(byte *buf, int width, int height, int depth) {
     Uint64 *sp = (Uint64 *)buf;
     Uint64 *dp = (Uint64 *)scr->pixels;
@@ -359,21 +326,6 @@ void sdl_renderer::render_screen(byte *buf, int width, int height, int depth) {
 }
 
 void sdl_renderer::flip() {
-    static int count = 0, beforecount = 0;
-    if (b_showfps) {
-        static long beforetime = timeGetTime();
-        char buf[256];
-
-        sprintf(buf, "%4d  ", beforecount * mul);
-
-        if (timeGetTime() - beforetime > 1000) {
-            beforecount = count;
-            count = 0;
-            beforetime = timeGetTime();
-
-            printf("%sFPS.\n", buf);
-        }
-    }
 
     if (dpy) {
         for (int y = 0; y < 144; y++) {
@@ -385,22 +337,15 @@ void sdl_renderer::flip() {
                 putpixel(dpy, x * 2 + 1, y * 2 + 1, colour);
             }
         }
-        //SDL_BlitSurface(scr, nullptr, dpy, &rect);
         SDL_UpdateRect(dpy, 0, 0, 0, 0);
     } else {
         SDL_UpdateRect(scr, 0, 0, 0, 0);
     }
-
-    count++;
 }
 
 void sdl_renderer::show_message(const char *message) {
     printf("%s\n", message);
 }
-
-//----------------------------------------------
-
-#define BUF_LEN 160
 
 namespace {
 void fill_audio(void *, Uint8 *stream, int len) {
@@ -455,18 +400,6 @@ void sdl_renderer::set_key(key_dat *keys) {
     memcpy(key_config, keys, sizeof(key_dat) * 8);
 }
 
-void sdl_renderer::set_koro_key(key_dat *keys) {
-    memcpy(koro_key_config, keys, sizeof(key_dat) * 4);
-}
-
-void sdl_renderer::set_koro_analog(bool ana) {
-    b_koro_analog = ana;
-}
-
-void sdl_renderer::set_koro_sensitivity(int sence) {
-    koro_sence = sence;
-}
-
 void sdl_renderer::set_bibrate(bool bibrate) {
 }
 
@@ -495,18 +428,6 @@ void sdl_renderer::toggle_auto() {
     show_message(b_auto ? "auto fire enabled" : "auto fire disabled");
 }
 
-void sdl_renderer::movie_play_start(vector<mov_key> *list) {
-    movie_playing = true;
-    movie_start = 0;
-    mov_cur_pos = 0;
-
-    key_list.clear();
-    vector<mov_key>::iterator ite;
-    for (ite = list->begin(); ite != list->end(); ite++) {
-        key_list.push_back(*ite);
-    }
-}
-
 void sdl_renderer::update_pad() {
     SDL_PumpEvents();
     key_state = SDL_GetKeyState(0);
@@ -517,15 +438,18 @@ void sdl_renderer::update_pad() {
 
     if (b_auto) {
         if (phase) {
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 2; i++) {
                 pad_state |= check_press(key_config + i) ? (1 << i) : 0;
+            }
         }
-        for (int i = 2; i < 8; i++)
+        for (int i = 2; i < 8; i++) {
             pad_state |= check_press(key_config + i) ? (1 << i) : 0;
-    } else
-        for (int i = 0; i < 8; i++)
+        }
+    } else {
+        for (int i = 0; i < 8; i++) {
             pad_state |= check_press(key_config + i) ? (1 << i) : 0;
-
+        }
+    }
     phase = !phase;
 }
 
@@ -534,40 +458,13 @@ word sdl_renderer::get_any_key() {
 }
 
 bool sdl_renderer::check_press(key_dat *dat) {
-    int pad_id, pad_dir;
-
-    enum { JW = 8192 };
-
-    if (dat->device_type == DI_KEYBOARD) { // キーボード
-        return (key_state[dat->key_code]) ? true : false;
-    } else if (dat->device_type >= DI_PAD_X) { // ジョイスティック
-        pad_id = (dat->device_type - DI_PAD_X) / NEXT_PAD;
-        pad_dir = (dat->device_type - DI_PAD_X) % NEXT_PAD;
-        SDL_Joystick *j = SDL_JoystickOpen(pad_id);
-        if (!j)
-            return false;
-        if (pad_dir == 0) {     // X軸 // X axis
-            if (!dat->key_code) // 正方向 // Positive direction
-                return (SDL_JoystickGetAxis(j, 0) > JW) ? true : false;
-            else // 負方向 // Negative direction
-                return (SDL_JoystickGetAxis(j, 0) < -JW) ? true : false;
-        } else if (pad_dir == 1) { // Y軸 // Y axis
-            if (!dat->key_code)    // 正方向 // Positive direction
-                return (SDL_JoystickGetAxis(j, 1) > JW) ? true : false;
-            else // 負方向 // Negative direction
-                return (SDL_JoystickGetAxis(j, 1) < -JW) ? true : false;
-        } else if (pad_dir == 2) { // ボタン // Button
-            return (SDL_JoystickGetButton(j, dat->key_code)) ? true : false;
-        }
-    }
-
-    return false;
+    return (key_state[dat->key_code]) ? true : false;
 }
 
 void sdl_renderer::refresh() {
-    static bool bef_f5 = false, bef_f7 = false, bef_auto = false, bef_pause = false, bef_full = false, bef_reset = false, bef_quit = false;
+    static bool bef_f5 = false, bef_f7 = false, bef_auto = false;
 
-    if (b_pad_update || movie_playing || movie_recording) {
+    if (b_pad_update) {
         update_pad();
     }
 
@@ -580,11 +477,8 @@ void sdl_renderer::refresh() {
     } else if (!bef_auto && check_press(&auto_key)) {
         toggle_auto();
     }
+
     bef_f5 = check_press(&save_key) ? true : false;
     bef_f7 = check_press(&load_key) ? true : false;
     bef_auto = check_press(&auto_key) ? true : false;
-    bef_pause = check_press(&pause_key) ? true : false;
-    bef_full = check_press(&full_key) ? true : false;
-    bef_reset = check_press(&reset_key) ? true : false;
-    bef_quit = check_press(&quit_key) ? true : false;
 }
