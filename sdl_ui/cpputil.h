@@ -22,9 +22,9 @@
 #ifndef cpputil_h_
 #define cpputil_h_
 
-#include <string>
-#include <sstream>
 #include <iostream>
+#include <sstream>
+#include <string>
 
 inline void makeErrorOutput_(std::ostream &os, const std::string &str, const char *f, const int l) {
     os << f << ':' << l << ": " << str << std::endl;

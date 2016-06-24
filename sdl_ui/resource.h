@@ -24,10 +24,10 @@
 
 #include "cpputil.h"
 
-#include <string>
-#include <map>
-#include <utility>
 #include <fstream>
+#include <map>
+#include <string>
+#include <utility>
 
 #include <stdlib.h>
 

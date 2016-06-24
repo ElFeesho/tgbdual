@@ -26,35 +26,33 @@
 
 #include "gb_types.h"
 
-class sound_renderer
-{
-public:
-	virtual void render(short *buf,int samples)=0;
+class sound_renderer {
+   public:
+    virtual void render(short *buf, int samples) = 0;
 };
 
-class renderer
-{
-public:
-	void set_sound_renderer(sound_renderer *ref) { snd_render=ref; };
+class renderer {
+   public:
+    void set_sound_renderer(sound_renderer *ref) { snd_render = ref; };
 
-	virtual void reset()=0;
-	virtual void refresh()=0;
-	virtual void render_screen(byte *buf,int width,int height,int depth)=0;
-	virtual int check_pad()=0;
-	virtual word map_color(word gb_col)=0;
-	virtual word unmap_color(word gb_col)=0;
+    virtual void reset() = 0;
+    virtual void refresh() = 0;
+    virtual void render_screen(byte *buf, int width, int height, int depth) = 0;
+    virtual int check_pad() = 0;
+    virtual word map_color(word gb_col) = 0;
+    virtual word unmap_color(word gb_col) = 0;
 
-	virtual byte get_time(int type)=0;
-	virtual void set_time(int type,byte dat)=0;
+    virtual byte get_time(int type) = 0;
+    virtual void set_time(int type, byte dat) = 0;
 
-	virtual word get_sensor(bool x_y)=0;
+    virtual word get_sensor(bool x_y) = 0;
 
-	virtual void set_bibrate(bool bibrate)=0;
+    virtual void set_bibrate(bool bibrate) = 0;
 
-	virtual void output_log(char *mes,...)=0;
+    virtual void output_log(char *mes, ...) = 0;
 
-protected:
-	sound_renderer *snd_render;
+   protected:
+    sound_renderer *snd_render;
 };
 
 #endif

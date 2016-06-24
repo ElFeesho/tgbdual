@@ -19,11 +19,11 @@
 
 ///#include "keymap.h"
 
-#include "w32_posix.h"
-#include "zlibwrap.h"
 #include <zlib.h>
 #include "../goomba/goombarom.h"
 #include "../goomba/goombasav.h"
+#include "w32_posix.h"
+#include "zlibwrap.h"
 
 static int rom_size_tbl[] = {2, 4, 8, 16, 32, 64, 128, 256, 512};
 
@@ -220,7 +220,7 @@ bool try_load_goomba(void *ram, int ram_size, gzFile fs, const char *cart_name, 
     }
 }
 
-int load_rom(char *buf, int num) {
+int load_rom(char *buf, int num, bool isServer) {
     FILE *file;
     int size;
     BYTE *dat;
@@ -284,7 +284,7 @@ int load_rom(char *buf, int num) {
         load_key_config(1);
     }
     if (!g_gb[num]) {
-        g_gb[num] = new gb(render[num], true, (num) ? false : true);
+        g_gb[num] = new gb(render[num], true, (num) ? false : true, isServer ? 1 : 0);
         g_gb[num]->set_target(NULL);
 
         if (g_gb[num ? 0 : 1]) {

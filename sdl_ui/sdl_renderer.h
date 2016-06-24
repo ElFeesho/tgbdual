@@ -17,9 +17,9 @@
    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#include "../gb_core/renderer.h"
 #include <stdio.h>
 #include <vector>
+#include "../gb_core/renderer.h"
 
 #include "w32_sdl.h"
 

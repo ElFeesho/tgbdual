@@ -1,8 +1,8 @@
 #include "callbacks.h"
 
-#include "w32_posix.h"
-#include "setting.h"
 #include "sdl_renderer.h"
+#include "setting.h"
+#include "w32_posix.h"
 
 #include "../gb_core/gb.h"
 

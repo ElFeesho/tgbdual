@@ -20,12 +20,12 @@
 #include <list>
 #include "../gb_core/gb.h"
 
-#include "sdl_renderer.h"
 #include "dmy_renderer.h"
-#include "setting.h"
 #include "resource.h"
-#include "w32_posix.h"
+#include "sdl_renderer.h"
+#include "setting.h"
 #include "sock.h"
+#include "w32_posix.h"
 
 #include <SDL.h>
 
@@ -64,10 +64,7 @@ int main(int argc, char *argv[]) {
 
     printf("Current directory: %s\n", cur_dir);
 
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK);
-
-    SDL_JoystickOpen(0);
-    SDL_JoystickOpen(1);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
     config = new setting();
 
@@ -110,10 +107,10 @@ int main(int argc, char *argv[]) {
     endGame = false;
 
     purse_cmdline(argc, argv);
-    if (argc == 2) {
+    if (argc >= 2) {
         SetCurrentDirectory(cur_dir);
         printf("load rom %s\n", argv[1]);
-        if (load_rom(argv[1], 0) != 0) {
+        if (load_rom(argv[1], 0, argc == 3) != 0) {
             printf("ERROR: invalid rom, usage: %s rom_name\n", argv[0]);
             endGame = true;
         }

@@ -25,8 +25,8 @@
 
 #include <SDL.h>
 
-#include "w32_posix.h"
 #include "dinput_sdl.h"
+#include "w32_posix.h"
 
 namespace {
 int GetPrivateProfileInt(const char *opt, const char *key, int def, Resource &rc) {

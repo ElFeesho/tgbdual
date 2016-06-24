@@ -1,14 +1,14 @@
 #include "zlibwrap.h"
 
-#include <string.h>
+#include <ctype.h>
+#include <memory.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <memory.h>
-#include <ctype.h>
+#include <string.h>
 
-#include <vector>
-#include <string>
 #include <algorithm>
+#include <string>
+#include <vector>
 
 
 #define HAVE_LIBZ

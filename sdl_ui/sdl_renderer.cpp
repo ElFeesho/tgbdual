@@ -22,19 +22,83 @@
 // Using SDL implementation of interface renderer
 
 #include "sdl_renderer.h"
-#include "resource.h"
-#include <stdio.h>
 #include <stdarg.h>
+#include <stdio.h>
+#include "resource.h"
 
-#include "w32_posix.h"
 #include "callbacks.h"
 #include "setting.h"
+#include "w32_posix.h"
 
 #include "../gb_core/gb.h"
 
 extern gb *g_gb[2];
 extern setting *config;
 extern Uint8 *key_state;
+
+static inline Uint32 getpixel(SDL_Surface *surface, int x, int y)
+{
+    int bpp = surface->format->BytesPerPixel;
+    /* Here p is the address to the pixel we want to retrieve */
+    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+
+    switch(bpp) {
+    case 1:
+        return *p;
+        break;
+
+    case 2:
+        return *(Uint16 *)p;
+        break;
+
+    case 3:
+        if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
+            return p[0] << 16 | p[1] << 8 | p[2];
+        else
+            return p[0] | p[1] << 8 | p[2] << 16;
+        break;
+
+    case 4:
+        return *(Uint32 *)p;
+        break;
+
+    default:
+        return 0;       /* shouldn't happen, but avoids warnings */
+    }
+}
+
+static inline void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
+{
+    int bpp = surface->format->BytesPerPixel;
+    /* Here p is the address to the pixel we want to set */
+    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+
+    switch(bpp) {
+    case 1:
+        *p = pixel;
+        break;
+
+    case 2:
+        *(Uint16 *)p = pixel;
+        break;
+
+    case 3:
+        if(SDL_BYTEORDER == SDL_BIG_ENDIAN) {
+            p[0] = (pixel >> 16) & 0xff;
+            p[1] = (pixel >> 8) & 0xff;
+            p[2] = pixel & 0xff;
+        } else {
+            p[0] = pixel & 0xff;
+            p[1] = (pixel >> 8) & 0xff;
+            p[2] = (pixel >> 16) & 0xff;
+        }
+        break;
+
+    case 4:
+        *(Uint32 *)p = pixel;
+        break;
+    }
+}
 
 sdl_renderer::sdl_renderer() {
     b_window = true;
@@ -72,7 +136,6 @@ void sdl_renderer::graphics_record(char *file) {
 }
 
 void sdl_renderer::sound_record(char *file) {
-    
 }
 
 void sdl_renderer::output_log(char *mes, ...) {
@@ -83,33 +146,13 @@ void sdl_renderer::output_log(char *mes, ...) {
     vsprintf(buf, mes, vl);
 
     printf("%s\n", buf);
-    
+
     va_end(vl);
     return;
 }
 
 word sdl_renderer::map_color(word gb_col) {
-#define convert
-#ifdef convert
-    word r, g, b;
-    int r2, g2, b2;
 
-    r = ((gb_col >> 0) & 0x1f) << 3;
-    g = ((gb_col >> 5) & 0x1f) << 3;
-    b = ((gb_col >> 10) & 0x1f) << 3;
-
-    r2 = m_filter.r_def + ((r * m_filter.r_r + g * m_filter.r_g + b * m_filter.r_b) / ((!m_filter.r_div) ? 1 : m_filter.r_div));
-    g2 = m_filter.g_def + ((r * m_filter.g_r + g * m_filter.g_g + b * m_filter.g_b) / ((!m_filter.g_div) ? 1 : m_filter.g_div));
-    b2 = m_filter.b_def + ((r * m_filter.b_r + g * m_filter.b_g + b * m_filter.b_b) / ((!m_filter.b_div) ? 1 : m_filter.b_div));
-
-    r2 = (r2 > 255) ? 255 : ((r2 < 0) ? 0 : r2);
-    g2 = (g2 > 255) ? 255 : ((g2 < 0) ? 0 : g2);
-    b2 = (b2 > 255) ? 255 : ((b2 < 0) ? 0 : b2);
-
-    gb_col = (r2 >> 3) | ((g2 >> 3) << 5) | ((b2 >> 3) << 10);
-
-#endif
-    // xBBBBBGG GGGRRRRR から変換 // converted from xBBBBBGG GGGRRRRR
     if (color_type == 0) // ->RRRRRGGG GGxBBBBB に変換 (565) // converted to
         return ((gb_col & 0x1F) << 11) | ((gb_col & 0x3e0) << 1) | ((gb_col & 0x7c00) >> 10) | ((gb_col & 0x8000) >> 10);
     if (color_type == 1) // ->xRRRRRGG GGGBBBBB に変換 (1555) // converted to
@@ -266,8 +309,8 @@ void sdl_renderer::set_render_pass(int type) {
 }
 
 void sdl_renderer::init_surface() {
-    int w = 160;
-    int h = 144;
+    int w = 320;
+    int h = 288;
     static const int GB_W = 160;
     static const int GB_H = 144;
     Uint32 flags = SDL_SWSURFACE;
@@ -321,26 +364,41 @@ void sdl_renderer::render_screen(byte *buf, int width, int height, int depth) {
 }
 
 void sdl_renderer::flip() {
-    static long beforetime = timeGetTime();
     static int count = 0, beforecount = 0;
-    char buf[256];
+    if (b_showfps) {
+        static long beforetime = timeGetTime();
+        char buf[256];
 
-    sprintf(buf, "%4d  ", beforecount * mul);
+        sprintf(buf, "%4d  ", beforecount * mul);
 
-    if (timeGetTime() - beforetime > 1000) {
-        beforecount = count;
-        count = 0;
-        beforetime = timeGetTime();
+        if (timeGetTime() - beforetime > 1000) {
+            beforecount = count;
+            count = 0;
+            beforetime = timeGetTime();
 
-        if (b_showfps) {
             printf("%sFPS.\n", buf);
         }
     }
 
-    if (dpy)
+    if (dpy) {
+        for(int y = 0; y < 144; y++)
+        {
+            for (int x = 0; x < 160; x++)
+            {
+                Uint32 colour = getpixel(scr, x, y);
+                putpixel(dpy, x*2, y*2, colour);
+                putpixel(dpy, x*2+1, y*2, colour);
+                putpixel(dpy, x*2, y*2+1, colour);
+                putpixel(dpy, x*2+1, y*2+1, colour);
+            }
+        }
+        //SDL_BlitSurface(scr, nullptr, dpy, &rect);
         SDL_UpdateRect(dpy, 0, 0, 0, 0);
+    }
     else
+    {
         SDL_UpdateRect(scr, 0, 0, 0, 0);
+    }
 
     count++;
 }
@@ -402,20 +460,6 @@ void sdl_renderer::init_sdlevent() {
 }
 
 void sdl_renderer::uninit_sdlevent() {
-    /**
-	m_pkeyboad->Unacquire();
-	m_pkeyboad->Release();
-
-	if (b_can_use_ffb)
-		m_peffect->Release();
-
-	for (int i=0;i<joysticks;i++){
-		m_pjoystick2[i]->Release();
-		m_pjoystick[i]->Unacquire();
-		m_pjoystick[i]->Release();
-	}
-	m_pdi->Release();
-*/
 }
 
 void sdl_renderer::set_key(key_dat *keys) {
@@ -435,35 +479,6 @@ void sdl_renderer::set_koro_sensitivity(int sence) {
 }
 
 void sdl_renderer::set_bibrate(bool bibrate) {
-    /** たぶん実装できない ** probably can not be implemented
-	b_bibrating=bibrate;
-	if (!(b_use_ffb&&b_can_use_ffb))
-		return;
-
-	if (bibrate){
-		m_peffect->Start(1,0);
-		LONG rglDirection[2] = { 0, 0 };
-
-	    DICONSTANTFORCE cf;
-	    cf.lMagnitude = 10000;
-
-		DIEFFECT eff;
-		ZeroMemory( &eff, sizeof(eff) );
-		eff.dwSize                = sizeof(DIEFFECT);
-		eff.dwFlags               = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
-		eff.cAxes                 = 2;
-		eff.rglDirection          = rglDirection;
-		eff.lpEnvelope            = 0;
-		eff.cbTypeSpecificParams  = sizeof(DICONSTANTFORCE);
-		eff.lpvTypeSpecificParams = &cf;
-//		eff.dwStartDelay          = 0;
-
-		// Now set the new parameters and start the effect immediately.
-		m_peffect->SetParameters(&eff,DIEP_DIRECTION|DIEP_TYPESPECIFICPARAMS|DIEP_START);
-	}
-	else
-		m_peffect->Stop();
-*/
 }
 
 void sdl_renderer::set_use_ffb(bool use) {
@@ -498,8 +513,9 @@ void sdl_renderer::movie_play_start(vector<mov_key> *list) {
 
     key_list.clear();
     vector<mov_key>::iterator ite;
-    for (ite = list->begin(); ite != list->end(); ite++)
+    for (ite = list->begin(); ite != list->end(); ite++) {
         key_list.push_back(*ite);
+    }
 }
 
 void sdl_renderer::update_pad() {
@@ -562,8 +578,9 @@ bool sdl_renderer::check_press(key_dat *dat) {
 void sdl_renderer::refresh() {
     static bool bef_f5 = false, bef_f7 = false, bef_auto = false, bef_pause = false, bef_full = false, bef_reset = false, bef_quit = false;
 
-    if (b_pad_update || movie_playing || movie_recording)
+    if (b_pad_update || movie_playing || movie_recording) {
         update_pad();
+    }
 
     if ((!bef_f5 && check_press(&save_key)) || (save_resurve != -1)) {
         cb_save_state(save_resurve);
@@ -571,16 +588,17 @@ void sdl_renderer::refresh() {
     } else if ((!bef_f7 && check_press(&load_key)) || (load_resurve != -1)) {
         cb_load_state(load_resurve);
         load_resurve = -1;
-    } else if (!bef_auto && check_press(&auto_key))
+    } else if (!bef_auto && check_press(&auto_key)) {
         toggle_auto();
-    else if (!bef_pause && check_press(&pause_key))
+    } else if (!bef_pause && check_press(&pause_key)) {
         cb_pause(0);
-    else if (!bef_full && check_press(&full_key))
+    } else if (!bef_full && check_press(&full_key)) {
         cb_fullscreen(0);
-    else if (!bef_reset && check_press(&reset_key))
+    } else if (!bef_reset && check_press(&reset_key)) {
         cb_reset(0);
-    else if (!bef_quit && check_press(&quit_key))
+    } else if (!bef_quit && check_press(&quit_key)) {
         cb_quit(0);
+    }
     bef_f5 = check_press(&save_key) ? true : false;
     bef_f7 = check_press(&load_key) ? true : false;
     bef_auto = check_press(&auto_key) ? true : false;
