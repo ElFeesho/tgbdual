@@ -99,11 +99,7 @@ int main(int argc, char *argv[]) {
     bool endGame = false;
 
     SetCurrentDirectory(cur_dir);
-    gb *g_gb = load_rom(argv[1], &render, &config, argc == 3);
-    if (g_gb == nullptr) {
-        printf("ERROR: invalid rom, usage: %s rom_name\n", argv[0]);
-        endGame = true;
-    }
+    gb g_gb = load_rom(argv[1], &render, &config, argc == 3);
     
     SDL_Event e;
 
@@ -115,24 +111,24 @@ int main(int argc, char *argv[]) {
             } else if (e.type == SDL_KEYDOWN) {
                 auto sym = e.key.keysym.sym;
                 if (sym == config.load_key[1]) {
-                    render.set_timer_state(cb_load_state(g_gb, save_state_file, sv_dir));
+                    render.set_timer_state(cb_load_state(&g_gb, save_state_file, sv_dir));
                 } else if (sym == config.save_key[1]) {
-                    cb_save_state(g_gb, save_state_file, sv_dir, render.get_timer_state());
+                    cb_save_state(&g_gb, save_state_file, sv_dir, render.get_timer_state());
                 }
             }
         }
 
-        g_gb->run();
+        g_gb.run();
 
         if (!render.check_press(&fast_forward)) {
-            g_gb->set_skip(config.frame_skip);
+            g_gb.set_skip(config.frame_skip);
 
             if (config.speed_limit) {
                 elapse_wait = (1000 << 16) / config.virtual_fps;
                 elapse_time();
             }
         } else {
-            g_gb->set_skip(config.fast_frame_skip);
+            g_gb.set_skip(config.fast_frame_skip);
             if (config.fast_speed_limit) {
                 elapse_wait = (1000 << 16) / config.fast_virtual_fps;
                 elapse_time();
@@ -140,11 +136,9 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    if (g_gb->has_battery()) {
-        save_sram(g_gb, &config, render.get_timer_state(), sav_file, g_gb->get_rom()->get_sram(), g_gb->get_rom()->get_info()->ram_size);
+    if (g_gb.has_battery()) {
+        save_sram(&g_gb, &config, render.get_timer_state(), sav_file, g_gb.get_rom()->get_sram(), g_gb.get_rom()->get_info()->ram_size);
     }
-
-    delete g_gb;
 
     return 0;
 }

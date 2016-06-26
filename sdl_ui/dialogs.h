@@ -178,14 +178,14 @@ bool try_load_goomba(void *ram, int ram_size, gzFile fs, const char *cart_name, 
     }
 }
 
-gb *load_rom(char *romFile, sdl_renderer *render, setting *config, bool isServer) {
+gb load_rom(char *romFile, sdl_renderer *render, setting *config, bool isServer) {
     int size;
     BYTE *dat;
     char *p = romFile;
 
     p = strstr(romFile, ".");
     if (!p) {
-        return nullptr;
+        throw std::domain_error("Rom file does not have a suffix (e.g. .gbc)");
     }
 
     while (*p != '\0') {
@@ -196,7 +196,7 @@ gb *load_rom(char *romFile, sdl_renderer *render, setting *config, bool isServer
     static const char *exts[] = {"gb", "gbc", "sgb", "gba", 0};
     BYTE *tmpbuf = file_read(romFile, exts, &size);
     if (!tmpbuf) {
-        return nullptr;
+        throw std::domain_error("Could not open rom file " + std::string(romFile));
     }
 
     const void *first_rom = gb_first_rom(tmpbuf, size);
@@ -205,15 +205,15 @@ gb *load_rom(char *romFile, sdl_renderer *render, setting *config, bool isServer
     memcpy(dat, first_rom, size);
     free(tmpbuf);
 
-    gb *g_gb = new gb(render, true, true, isServer ? 1 : 0);
+    gb g_gb{render, true, true, isServer ? 1 : 0};
 
-    g_gb->get_apu()->get_renderer()->set_enable(0, config->sound_enable[0] ? true : false);
-    g_gb->get_apu()->get_renderer()->set_enable(1, config->sound_enable[1] ? true : false);
-    g_gb->get_apu()->get_renderer()->set_enable(2, config->sound_enable[2] ? true : false);
-    g_gb->get_apu()->get_renderer()->set_enable(3, config->sound_enable[3] ? true : false);
+    g_gb.get_apu()->get_renderer()->set_enable(0, config->sound_enable[0] ? true : false);
+    g_gb.get_apu()->get_renderer()->set_enable(1, config->sound_enable[1] ? true : false);
+    g_gb.get_apu()->get_renderer()->set_enable(2, config->sound_enable[2] ? true : false);
+    g_gb.get_apu()->get_renderer()->set_enable(3, config->sound_enable[3] ? true : false);
 
-    g_gb->get_apu()->get_renderer()->set_echo(config->b_echo);
-    g_gb->get_apu()->get_renderer()->set_lowpass(config->b_lowpass);
+    g_gb.get_apu()->get_renderer()->set_echo(config->b_echo);
+    g_gb.get_apu()->get_renderer()->set_lowpass(config->b_lowpass);
 
 
     char sram_name[256], cur_di[256], sv_dir[256];
@@ -292,13 +292,13 @@ gb *load_rom(char *romFile, sdl_renderer *render, setting *config, bool isServer
         dat[0x143] |= 0x80;
     }
 
-    g_gb->set_use_gba(config->gb_type == 0 ? config->use_gba : (config->gb_type == 4 ? true : false));
-    g_gb->load_rom(dat, size, ram, ram_size);
+    g_gb.set_use_gba(config->gb_type == 0 ? config->use_gba : (config->gb_type == 4 ? true : false));
+    g_gb.load_rom(dat, size, ram, ram_size);
 
     free(dat);
     delete[] ram;
 
-    SDL_WM_SetCaption(g_gb->get_rom()->get_info()->cart_name, 0);
+    SDL_WM_SetCaption(g_gb.get_rom()->get_info()->cart_name, 0);
 
     return g_gb;
 }
