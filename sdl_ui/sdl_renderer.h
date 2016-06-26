@@ -21,8 +21,6 @@
 #include <vector>
 #include "../gb_core/renderer.h"
 
-#include "w32_sdl.h"
-
 #include <SDL.h>
 
 using namespace std;
@@ -130,7 +128,7 @@ class sdl_renderer : public renderer {
 
     col_filter m_filter;
 
-    DWORD map_24[0x10000];
+    uint32_t map_24[0x10000];
 
 
     void init_sdlaudio();

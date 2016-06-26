@@ -28,29 +28,6 @@ static int rom_size_tbl[] = {2, 4, 8, 16, 32, 64, 128, 256, 512};
 typedef unsigned char BYTE;
 
 char tmp_sram_name[256];
-static const char mbc_types[0x101][40] = {
-    "ROM Only", "ROM + MBC1", "ROM + MBC1 + RAM", "ROM + MBC1 + RAM + Battery", "Unknown", "ROM + MBC2", "ROM + MBC2 + Battery", "Unknown",
-    "ROM + RAM", "ROM + RAM + Battery", "Unknown", "ROM + MMM01", "ROM + MMM01 + SRAM", "ROM + MMM01 + Battery", "Unknown",
-    "ROM + MBC3 + TIMER + Battery", "ROM + MBC3 + TIMER + RAM + Battery", "ROM + MBC3", "ROM + MBC3 + RAM", "ROM + MBC3 + RAM + Battery",
-    "Unknown", "Unknown", "Unknown", "Unknown", "Unknown",
-    "ROM + MBC5", "ROM + MBC5 + RAM", "ROM + MBC5 + RAM + Battery", "ROM + MBC5 + RUMBLE", "ROM + MBC5 + RUMBLE + SRAM", "ROM + MBC5 + RUMBLE + SRAM + Battery",
-    "Pocket Camera", "", "", "MBC7? + EEPROM + MOTIONSENSOR",                                           //#22
-    "", "", "", "", "", "", "", "", "", "", "", "", "",                                                 //#2F
-    "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",                                     //#3F
-    "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",                                     //#4F
-    "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",                                     //#5F
-    "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",                                     //#6F
-    "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",                                     //#7F
-    "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",                                     //#8F
-    "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",                                     //#9F
-    "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",                                     //#AF
-    "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",                                     //#BF
-    "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",                                     //#CF
-    "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",                                     //#DF
-    "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",                                     //#EF
-    "", "", "", "", "", "", "", "", "", "", "", "", "", "Bandai TAMA5", "Hudson HuC-3", "Hudson HuC-1", //#FF
-    "mmm01"                                                                                             // 逃げ
-};
 
 static byte org_gbtype;
 static bool sys_win2000;
@@ -59,7 +36,6 @@ static bool goomba_load_error;
 
 bool save_goomba(const void *buf, int size, int num, FILE *fs) {
     if (goomba_load_error) {
-        // don't save data - error occured when first loading, and user was notified
         return true;
     } else {
         byte gba_data[GOOMBA_COLOR_SRAM_SIZE];
@@ -74,8 +50,7 @@ bool save_goomba(const void *buf, int size, int num, FILE *fs) {
             free(cleaned);
         }
 
-        stateheader *sh = stateheader_for(gba_data,
-                                          g_gb->get_rom()->get_info()->cart_name);
+        stateheader *sh = stateheader_for(gba_data, g_gb->get_rom()->get_info()->cart_name);
         if (sh == NULL) {
             return false; // don't try to save sram
         }
@@ -127,7 +102,7 @@ void save_sram(byte *buf, int size) {
 
 void load_key_config(int num) {
     int buf[16];
-    key_dat keys[8]; // a,b,select,start,down,up,left,right の順
+    key_dat keys[8]; // a,b,select,start,down,up,left,right
 
     config->get_key_setting(buf, 0);
 
@@ -246,27 +221,23 @@ int load_rom(char *romFile, bool isServer) {
         free(tmpbuf);
     }
 
-    if (!g_gb) {
-        g_gb = new gb(render, true, true, isServer ? 1 : 0);
+    g_gb = new gb(render, true, true, isServer ? 1 : 0);
 
-        if (config->sound_enable[4]) {
-            g_gb->get_apu()->get_renderer()->set_enable(0, config->sound_enable[0] ? true : false);
-            g_gb->get_apu()->get_renderer()->set_enable(1, config->sound_enable[1] ? true : false);
-            g_gb->get_apu()->get_renderer()->set_enable(2, config->sound_enable[2] ? true : false);
-            g_gb->get_apu()->get_renderer()->set_enable(3, config->sound_enable[3] ? true : false);
-        } else {
-            g_gb->get_apu()->get_renderer()->set_enable(0, false);
-            g_gb->get_apu()->get_renderer()->set_enable(1, false);
-            g_gb->get_apu()->get_renderer()->set_enable(2, false);
-            g_gb->get_apu()->get_renderer()->set_enable(3, false);
-        }
-        g_gb->get_apu()->get_renderer()->set_echo(config->b_echo);
-        g_gb->get_apu()->get_renderer()->set_lowpass(config->b_lowpass);
+    if (config->sound_enable[4]) {
+        g_gb->get_apu()->get_renderer()->set_enable(0, config->sound_enable[0] ? true : false);
+        g_gb->get_apu()->get_renderer()->set_enable(1, config->sound_enable[1] ? true : false);
+        g_gb->get_apu()->get_renderer()->set_enable(2, config->sound_enable[2] ? true : false);
+        g_gb->get_apu()->get_renderer()->set_enable(3, config->sound_enable[3] ? true : false);
     } else {
-        if (g_gb->has_battery()) {
-            save_sram(g_gb->get_rom()->get_sram(), g_gb->get_rom()->get_info()->ram_size);
-        }
+        g_gb->get_apu()->get_renderer()->set_enable(0, false);
+        g_gb->get_apu()->get_renderer()->set_enable(1, false);
+        g_gb->get_apu()->get_renderer()->set_enable(2, false);
+        g_gb->get_apu()->get_renderer()->set_enable(3, false);
     }
+
+    g_gb->get_apu()->get_renderer()->set_echo(config->b_echo);
+    g_gb->get_apu()->get_renderer()->set_lowpass(config->b_lowpass);
+    
 
     char sram_name[256], cur_di[256], sv_dir[256];
     BYTE *ram;
@@ -355,110 +326,16 @@ int load_rom(char *romFile, bool isServer) {
     return 0;
 }
 
-void load_rom_only(char *buf) {
-    FILE *file;
-    int size;
-    BYTE *dat;
-    char *p = buf;
-
-    p = strstr(buf, ".");
-    for (int i = 0; i < strlen(p); i++) {
-        p[i] = tolower(p[i]);
-    }
-
-    if (strstr(buf, ".gb") || strstr(buf, ".gbc")) {
-        file = fopen(buf, "rb");
-        fseek(file, 0, SEEK_END);
-        size = ftell(file);
-        fseek(file, 0, SEEK_SET);
-        dat = (BYTE *)malloc(size);
-        fread(dat, 1, size, file);
-        fclose(file);
-    } else {
-        return;
-    }
-
-    int tbl_ram[] = {1, 1, 1, 4, 16, 8}; //0と1は保険
-    char sram_name[256], cur_di[256], sv_dir[256];
-    BYTE *ram;
-    int ram_size = 0x2000 * tbl_ram[dat[0x149]];
-    char *_p = buf, *pp = buf;
-    char *sram_name_only;
-    while ((_p = strstr(pp, "\\")))
-        pp = _p + 1;
-    strcpy(sram_name, pp);
-    strcpy(strstr(sram_name, "."), ".sav");
-    sram_name_only = strrchr(sram_name, '/');
-    if (!sram_name_only)
-        sram_name_only = sram_name;
-    else
-        sram_name_only++;
-    GetCurrentDirectory(256, cur_di);
-    config->get_save_dir(sv_dir);
-    SetCurrentDirectory(sv_dir);
-    gzFile fs = gzopen(sram_name_only, "rb");
-    if (fs) {
-        ram = (BYTE *)malloc(ram_size);
-        gzread(fs, ram, ram_size & 0xffffff00);
-        gzseek(fs, 0, SEEK_END);
-        if (gztell(fs) & 0xff) {
-            int tmp;
-            gzseek(fs, -4, SEEK_END);
-            gzread(fs, &tmp, 4);
-            render->set_timer_state(tmp);
-        }
-        gzclose(fs);
-    } else {
-        strcpy(strstr(sram_name_only, "."), ".ram");
-        fs = gzopen(sram_name_only, "rb");
-        if (fs != nullptr) {
-            ram = (BYTE *)malloc(ram_size);
-            gzread(fs, ram, ram_size & 0xffffff00);
-            gzseek(fs, 0, SEEK_END);
-            printf("%ld\n", gztell(fs));
-            if (gztell(fs) & 0xff) {
-                int tmp;
-                gzseek(fs, -4, SEEK_END);
-                gzread(fs, &tmp, 4);
-                render->set_timer_state(tmp);
-            }
-            gzclose(fs);
-        } else {
-            ram = (BYTE *)malloc(ram_size);
-            memset(ram, 0, ram_size);
-        }
-    }
-    strcpy(strstr(sram_name_only, "."), ".sav");
-    strcpy(tmp_sram_name, sram_name_only);
-
-    SetCurrentDirectory(cur_di);
-
-    org_gbtype = dat[0x143] & 0x80;
-
-    if (config->gb_type == 1) {
-        dat[0x143] &= 0x7f;
-    } else if (config->gb_type >= 3) {
-        dat[0x143] |= 0x80;
-    }
-
-    g_gb->set_use_gba(config->gb_type == 0 ? config->use_gba : (config->gb_type == 4 ? true : false));
-    g_gb->load_rom(dat, size, ram, ram_size);
-    free(dat);
-    free(ram);
-
-    SDL_WM_SetCaption(g_gb->get_rom()->get_info()->cart_name, 0);
-}
-
 static int elapse_wait = 0x10AAAA;
 
 static void elapse_time(void) {
-    static DWORD lastdraw = 0, rest = 0;
-    DWORD t = timeGetTime();
+    static uint32_t lastdraw = 0, rest = 0;
+    uint32_t t = SDL_GetTicks();
 
     rest = (rest & 0xffff) + elapse_wait;
 
-    DWORD wait = rest >> 16;
-    DWORD elp = (DWORD)(t - lastdraw);
+    uint32_t wait = rest >> 16;
+    uint32_t elp = (uint32_t)(t - lastdraw);
 
     if (elp >= wait) {
         lastdraw = t;
@@ -466,8 +343,11 @@ static void elapse_time(void) {
     }
 
     if (wait - elp >= 4)
-        Sleep(wait - elp - 3);
-    while ((timeGetTime() - lastdraw) < wait)
+    {
+        SDL_Delay(wait - elp - 3);
+    }
+    
+    while ((SDL_GetTicks() - lastdraw) < wait)
         ;
 
     lastdraw += wait;
