@@ -183,7 +183,6 @@ bool try_load_goomba(void *ram, int ram_size, gzFile fs, const char *cart_name, 
 }
 
 int load_rom(char *romFile, bool isServer) {
-    FILE *file;
     int size;
     BYTE *dat;
     char *p = romFile;
@@ -204,36 +203,18 @@ int load_rom(char *romFile, bool isServer) {
         return -1;
     }
 
-    int num_roms = 0;
-    for (const void *rom = gb_first_rom(tmpbuf, size); rom != NULL; rom = gb_next_rom(tmpbuf, size, rom)) {
-        num_roms++;
-    }
-
-    if (num_roms == 0) {
-        fprintf(stderr, "This file does not contain any Game Boy ROM images.");
-        free(tmpbuf);
-        return -1;
-    } else if (num_roms == 1) {
-        const void *first_rom = gb_first_rom(tmpbuf, size);
-        size = gb_rom_size(first_rom);
-        dat = (BYTE *)malloc(size);
-        memcpy(dat, first_rom, size);
-        free(tmpbuf);
-    }
+    const void *first_rom = gb_first_rom(tmpbuf, size);
+    size = gb_rom_size(first_rom);
+    dat = (BYTE *)malloc(size);
+    memcpy(dat, first_rom, size);
+    free(tmpbuf);
 
     g_gb = new gb(render, true, true, isServer ? 1 : 0);
 
-    if (config->sound_enable[4]) {
-        g_gb->get_apu()->get_renderer()->set_enable(0, config->sound_enable[0] ? true : false);
-        g_gb->get_apu()->get_renderer()->set_enable(1, config->sound_enable[1] ? true : false);
-        g_gb->get_apu()->get_renderer()->set_enable(2, config->sound_enable[2] ? true : false);
-        g_gb->get_apu()->get_renderer()->set_enable(3, config->sound_enable[3] ? true : false);
-    } else {
-        g_gb->get_apu()->get_renderer()->set_enable(0, false);
-        g_gb->get_apu()->get_renderer()->set_enable(1, false);
-        g_gb->get_apu()->get_renderer()->set_enable(2, false);
-        g_gb->get_apu()->get_renderer()->set_enable(3, false);
-    }
+    g_gb->get_apu()->get_renderer()->set_enable(0, config->sound_enable[0] ? true : false);
+    g_gb->get_apu()->get_renderer()->set_enable(1, config->sound_enable[1] ? true : false);
+    g_gb->get_apu()->get_renderer()->set_enable(2, config->sound_enable[2] ? true : false);
+    g_gb->get_apu()->get_renderer()->set_enable(3, config->sound_enable[3] ? true : false);
 
     g_gb->get_apu()->get_renderer()->set_echo(config->b_echo);
     g_gb->get_apu()->get_renderer()->set_lowpass(config->b_lowpass);
@@ -346,7 +327,7 @@ static void elapse_time(void) {
     {
         SDL_Delay(wait - elp - 3);
     }
-    
+
     while ((SDL_GetTicks() - lastdraw) < wait)
         ;
 

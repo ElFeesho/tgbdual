@@ -32,9 +32,9 @@
 
 #include "../gb_core/gb.h"
 
-extern gb *g_gb;
-extern setting *config;
 static Uint8 *key_state;
+
+#define WIN_MULTIPLIER 2
 
 static inline Uint32 getpixel(SDL_Surface *surface, int x, int y) {
     int bpp = surface->format->BytesPerPixel;
@@ -66,38 +66,6 @@ static inline Uint32 getpixel(SDL_Surface *surface, int x, int y) {
     }
 }
 
-static inline void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel) {
-    int bpp = surface->format->BytesPerPixel;
-    /* Here p is the address to the pixel we want to set */
-    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
-
-    switch (bpp) {
-        case 1:
-            *p = pixel;
-            break;
-
-        case 2:
-            *(Uint16 *)p = pixel;
-            break;
-
-        case 3:
-            if (SDL_BYTEORDER == SDL_BIG_ENDIAN) {
-                p[0] = (pixel >> 16) & 0xff;
-                p[1] = (pixel >> 8) & 0xff;
-                p[2] = pixel & 0xff;
-            } else {
-                p[0] = pixel & 0xff;
-                p[1] = (pixel >> 8) & 0xff;
-                p[2] = (pixel >> 16) & 0xff;
-            }
-            break;
-
-        case 4:
-            *(Uint32 *)p = pixel;
-            break;
-    }
-}
-
 sdl_renderer::sdl_renderer() {
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
@@ -108,9 +76,6 @@ sdl_renderer::sdl_renderer() {
 
     cur_time = 0;
     now_sensor_x = now_sensor_y = 2047;
-
-    save_resurve = -1;
-    load_resurve = -1;
 
     b_bibrating = false;
 }
@@ -200,10 +165,6 @@ static dword convert_to_second(SYSTEMTIME *sys) {
     return ret;
 }
 
-static int pathed_seconds(SYSTEMTIME from, SYSTEMTIME to) {
-    return convert_to_second(&to) - convert_to_second(&from);
-}
-
 byte sdl_renderer::get_time(int type) {
     SYSTEMTIME sys;
     GetSystemTime(&sys);
@@ -270,16 +231,16 @@ void sdl_renderer::init_sdlvideo() {
 }
 
 void sdl_renderer::init_surface() {
-    int w = 320;
-    int h = 288;
+    
     static const int GB_W = 160;
     static const int GB_H = 144;
+    int w = GB_W * WIN_MULTIPLIER;
+    int h = GB_H * WIN_MULTIPLIER;
     Uint32 flags = SDL_SWSURFACE;
 
     if (w != GB_W || h != GB_H) {
         dpy = SDL_SetVideoMode(w, h, 16, flags);
-        SDL_Surface *tmp =
-            SDL_CreateRGBSurface(SDL_SWSURFACE, GB_W, GB_H, 16, 0, 0, 0, 0);
+        SDL_Surface *tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, GB_W, GB_H, 16, 0, 0, 0, 0);
         scr = SDL_DisplayFormat(tmp);
         SDL_FreeSurface(tmp);
     } else {
@@ -314,14 +275,14 @@ void sdl_renderer::render_screen(byte *buf, int width, int height, int depth) {
 
 void sdl_renderer::flip() {
 
+    SDL_Rect loc = {0, 0, WIN_MULTIPLIER, WIN_MULTIPLIER};
     if (dpy) {
         for (int y = 0; y < 144; y++) {
             for (int x = 0; x < 160; x++) {
                 Uint32 colour = getpixel(scr, x, y);
-                putpixel(dpy, x * 2, y * 2, colour);
-                putpixel(dpy, x * 2 + 1, y * 2, colour);
-                putpixel(dpy, x * 2, y * 2 + 1, colour);
-                putpixel(dpy, x * 2 + 1, y * 2 + 1, colour);
+                loc.x = x * WIN_MULTIPLIER;
+                loc.y = y * WIN_MULTIPLIER;
+                SDL_FillRect(dpy, &loc, colour);
             }
         }
         SDL_UpdateRect(dpy, 0, 0, 0, 0);
@@ -330,17 +291,12 @@ void sdl_renderer::flip() {
     }
 }
 
-void sdl_renderer::show_message(const char *message) {
-    printf("%s\n", message);
-}
-
 namespace {
-void fill_audio(void *, Uint8 *stream, int len) {
-    if (g_gb) {
-        apu_snd *snd_render = g_gb->get_apu()->get_renderer();
+    void fill_audio(void *userData, Uint8 *stream, int len) {
+        sdl_renderer *renderer = static_cast<sdl_renderer*>(userData);
+        sound_renderer *snd_render = renderer->get_sound_renderer();
         snd_render->render((short *)stream, len / 4);
     }
-}
 }
 
 void sdl_renderer::init_sdlaudio() {
@@ -351,7 +307,7 @@ void sdl_renderer::init_sdlaudio() {
     wanted.channels = 2; /* 1 = モノラル, 2 = ステレオ */ /* 1 = mono, 2 = stereo */
     wanted.samples = 4096; /* 遅延も少なく推奨の値です */ /* Recommended value less delay */
     wanted.callback = fill_audio;
-    wanted.userdata = NULL;
+    wanted.userdata = (void*)this;
 
     if (SDL_OpenAudio(&wanted, NULL) < 0) {
         fprintf(stderr, "Could not open audio device: %s\n", SDL_GetError());
@@ -373,11 +329,9 @@ void sdl_renderer::resume_sound() {
 }
 
 void sdl_renderer::init_sdlevent() {
-    key_state = SDL_GetKeyState(0);
-
     pad_state = 0;
     memset(&key_config, 0, sizeof(key_config));
-    bool b_auto = false;
+    b_auto = false;
 }
 
 void sdl_renderer::uninit_sdlevent() {
@@ -404,7 +358,7 @@ void sdl_renderer::set_pad(int stat) {
 
 void sdl_renderer::toggle_auto() {
     b_auto = !b_auto;
-    show_message(b_auto ? "auto fire enabled" : "auto fire disabled");
+    printf("%s\n", (b_auto ? "auto fire enabled" : "auto fire disabled"));
 }
 
 void sdl_renderer::update_pad() {
@@ -445,12 +399,10 @@ void sdl_renderer::refresh() {
 
     update_pad();
 
-    if ((!bef_f5 && check_press(&save_key)) || (save_resurve != -1)) {
-        cb_save_state(save_resurve);
-        save_resurve = -1;
-    } else if ((!bef_f7 && check_press(&load_key)) || (load_resurve != -1)) {
-        cb_load_state(load_resurve);
-        load_resurve = -1;
+    if ((!bef_f5 && check_press(&save_key))) {
+        cb_save_state(0);
+    } else if ((!bef_f7 && check_press(&load_key))) {
+        cb_load_state(0);
     } else if (!bef_auto && check_press(&auto_key)) {
         toggle_auto();
     }

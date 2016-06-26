@@ -39,9 +39,7 @@ void cb_save_state(int lParam) {
             }
         }
 
-        int sav_slot = 0;
-
-        sprintf(p, ".sv%d", sav_slot);
+        sprintf(p, ".sv0");
 
         FILE *file = fopen(name, "wb");
         g_gb->save_state(file);
@@ -65,7 +63,6 @@ void cb_load_state(int lParam) {
             }
         }
 
-        int sav_slot = 0;
         sprintf(p, ".sv0");
 
         FILE *file = fopen(name, "rb");

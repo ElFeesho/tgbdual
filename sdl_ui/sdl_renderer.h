@@ -75,13 +75,12 @@ class sdl_renderer : public renderer {
     word unmap_color(word gb_col);
     byte get_time(int type);
     void set_time(int type, byte dat);
-    
+
     void set_key(key_dat *keys);
 
     void flip();
     void on_move();
     void draw_menu(int n);
-    void show_message(const char *message);
     word get_any_key();
 
     int get_timer_state();
@@ -96,9 +95,6 @@ class sdl_renderer : public renderer {
     void set_load_key(key_dat *key_code) { load_key = *key_code; }
     void set_auto_key(key_dat *key_code) { auto_key = *key_code; }
 
-    void set_save_resurve(int slot) { save_resurve = slot; }
-    void set_load_resurve(int slot) { load_resurve = slot; }
-
     bool check_press(key_dat *dat);
 
     void pause_sound();
@@ -107,6 +103,8 @@ class sdl_renderer : public renderer {
     void update_pad();
     void toggle_auto();
     void set_use_ffb(bool use);
+
+    sound_renderer *get_sound_renderer() { return snd_render; }
 
    private:
     void init_sdlvideo();
@@ -151,11 +149,6 @@ class sdl_renderer : public renderer {
     bool b_auto;
 
     key_dat save_key, load_key, auto_key;
-
-    int save_resurve;
-    int load_resurve;
-
-    int snd_size;
 
     int cur_time;
 
