@@ -1,0 +1,14 @@
+cmake_minimum_required(VERSION 3.0)
+
+project(tgbdual C CXX)
+
+set(SDL_UI_SOURCES callbacks.cpp callbacks.h cpputil.h dialogs.h dinput_sdl.c dinput_sdl.h resource.cpp resource.h sdl_renderer.cpp sdl_renderer.h sdlmain.cpp setting.cpp setting.h unzip.c unzip.h w32_posix.h w32_sdl.h zlibwrap.cpp zlibwrap.h)
+
+find_package(SDL)
+
+include_directories(${SDL_INCLUDE_DIR})
+
+add_executable(tgbdual ${SDL_UI_SOURCES})
+
+target_link_libraries(tgbdual gb_core goomba ${SDL_LIBRARY} z)
+target_compile_features(tgbdual PRIVATE cxx_lambdas)
