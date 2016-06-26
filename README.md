@@ -1,3 +1,8 @@
+# About this fork
+This emulator seems very thin on dependencies and has offered me a good opportunity to practise my _mad_ refactoring skills. 
+
+This is not a serious attempt at creating something super awesome so go to the original source instead of using this.
+
 *This repository is no longer maintained!*
 
 I'm in the process of porting the changes in this repository onto a fork of TGB Dual Kai, itdself a fork of the original that has additional debugging features.
