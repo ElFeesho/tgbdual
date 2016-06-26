@@ -265,7 +265,7 @@ void inline gb::render_frame() {
 }
 
 void inline gb::hblank_dma() {
-    
+
     if (m_cpu->b_dma_first) {
         m_cpu->dma_dest_bank = m_cpu->vram_bank;
         if (m_cpu->dma_src < 0x4000) {
