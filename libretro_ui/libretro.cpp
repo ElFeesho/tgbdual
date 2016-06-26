@@ -224,8 +224,6 @@ bool retro_load_game_special(unsigned type, const struct retro_game_info *info, 
 	g_gb[1] = new gb(render[1], true, true);
 	g_gb[1]->load_rom((byte*)info[1].data, info[1].size, NULL, 0);
 	// for link cables and IR:
-	g_gb[0]->set_target(g_gb[1]);
-	g_gb[1]->set_target(g_gb[0]);
 	return true;
 }
 

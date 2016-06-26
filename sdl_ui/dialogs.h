@@ -88,7 +88,7 @@ bool save_goomba(const void *buf, int size, int num, FILE *fs) {
     }
 }
 
-void save_sram(byte *buf, int size, int num) {
+void save_sram(byte *buf, int size) {
     if (strstr(tmp_sram_name, ".srt"))
         return;
 
@@ -263,9 +263,8 @@ int load_rom(char *romFile, bool isServer) {
         g_gb->get_apu()->get_renderer()->set_echo(config->b_echo);
         g_gb->get_apu()->get_renderer()->set_lowpass(config->b_lowpass);
     } else {
-        int has_bat[] = {0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // 0x20以下
-        if (has_bat[(g_gb->get_rom()->get_info()->cart_type > 0x20) ? 3 : g_gb->get_rom()->get_info()->cart_type]) {
-            save_sram(g_gb->get_rom()->get_sram(), g_gb->get_rom()->get_info()->ram_size, 0);
+        if (g_gb->has_battery()) {
+            save_sram(g_gb->get_rom()->get_sram(), g_gb->get_rom()->get_info()->ram_size);
         }
     }
 

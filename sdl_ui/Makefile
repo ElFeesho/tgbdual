@@ -3,10 +3,11 @@
 INCLUDES += `sdl-config --cflags` 
 #INCLUDES += `sdl-config --cflags` -Dmain=SDL_main -DQWS -D_REENTRANT
 LIBS += `sdl-config --libs` -lz
-CXXFLAGS = -O3 -fPIC
+CFLAGS = -O3 -fPIC
+CXXFLAGS = -O3 -fPIC -std=c++11
 
 ifdef TGB_INI_DIR
-CXXFLAGS += -DTGB_INI_DIR=\"$(TGB_INI_DIR)\"
+CXXFLAGS += -DTGB_INI_DIR=\"$(TGB_INI_DIR)\" -std=c++11
 endif
 
 SOURCES=$(wildcard *.cpp)
@@ -26,7 +27,7 @@ tgbdual: $(OBJS) $(EXT_OBJS)
 sdlmain.o: dialogs.h
 
 %.o:%.c
-	$(CC) -c $(CXXFLAGS) $(INCLUDES) $<
+	$(CC) -c $(CFLAGS) $(INCLUDES) $<
 
 %.o:%.cpp
 	$(CXX) -c $(CXXFLAGS) $(INCLUDES) $<

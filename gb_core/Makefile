@@ -1,6 +1,6 @@
 
 CFLAGS = -O3 -fPIC
-CXXFLAGS = $(CFLAGS)
+CXXFLAGS = $(CFLAGS) -std=c++11
 
 SOURCES = $(wildcard *.cpp)
 CSOURCES = $(wildcard *.c)

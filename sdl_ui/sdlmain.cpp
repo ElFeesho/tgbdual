@@ -55,6 +55,8 @@ int main(int argc, char *argv[]) {
     key_dat tmp_auto = {config->auto_key[0], config->auto_key[1]};
     render->set_auto_key(&tmp_auto);
 
+    key_dat fast_forward = {config->fast_forwerd[0], config->fast_forwerd[1]};
+
     endGame = false;
 
     if (argc >= 2) {
@@ -67,9 +69,6 @@ int main(int argc, char *argv[]) {
         printf("ERROR: usage: %s rom_name\n", argv[0]);
         endGame = true;
     }
-
-    int line = 0;
-    int phase = 0;
 
     while (!endGame) {
 
@@ -87,20 +86,16 @@ int main(int argc, char *argv[]) {
 
         render->enable_check_pad();
 
-        for (line = 0; line < 154; line++) {
-            g_gb->run();
-        }
+        g_gb->run();
 
-        key_dat tmp_key = {config->fast_forwerd[0], config->fast_forwerd[1]};
-
-        if (!render->check_press(&tmp_key)) {
+        if (!render->check_press(&fast_forward)) {
             g_gb->set_skip(config->frame_skip);
 
             if (config->speed_limit) {
                 elapse_wait = (1000 << 16) / config->virtual_fps;
                 elapse_time();
             }
-        } else { // Fast Forwerd 状態
+        } else { 
             g_gb->set_skip(config->fast_frame_skip);
             if (config->fast_speed_limit) {
                 elapse_wait = (1000 << 16) / config->fast_virtual_fps;
@@ -109,9 +104,8 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    int has_bat[] = {0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    if (has_bat[(g_gb->get_rom()->get_info()->cart_type > 0x20) ? 3 : g_gb->get_rom()->get_info()->cart_type]) {
-        save_sram(g_gb->get_rom()->get_sram(), g_gb->get_rom()->get_info()->ram_size, 0);
+    if (g_gb->has_battery()) {
+        save_sram(g_gb->get_rom()->get_sram(), g_gb->get_rom()->get_info()->ram_size);
     }
 
     delete g_gb;

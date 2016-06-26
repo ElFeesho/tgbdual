@@ -27,11 +27,11 @@
 #include "renderer.h"
 #include "serializer.h"
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/types.h>
 
 #define INT_VBLANK 1
 #define INT_LCDC 2
@@ -48,10 +48,6 @@ class rom;
 class mbc;
 class cheat;
 
-struct ext_hook {
-    byte (*send)(byte);
-    bool (*led)(void);
-};
 
 struct cheat_dat {
     bool enable;
@@ -184,7 +180,7 @@ class gb {
     mbc *get_mbc() { return m_mbc; }
     renderer *get_renderer() { return m_renderer; }
     cheat *get_cheat() { return m_cheat; }
-    gb *get_target() { return target; }
+    
     gb_regs *get_regs() { return &regs; }
     gbc_regs *get_cregs() { return &c_regs; }
 
@@ -195,8 +191,6 @@ class gb {
     bool load_rom(byte *buf, int size, byte *ram, int ram_size);
 
     void serialize(serializer &s);
-    void serialize_firstrev(serializer &s);
-    void serialize_legacy(serializer &s);
 
     size_t get_state_size(void);
     void save_state_mem(void *buf);
@@ -206,13 +200,10 @@ class gb {
 
     void refresh_pal();
 
-    void set_target(gb *tar) { target = tar; }
-
-    void hook_extport(ext_hook *ext);
-    void unhook_extport();
-
     void send_linkcable_byte(byte data);
     void read_linkcable_byte(byte *buff);
+
+    bool has_battery();
 
    private:
     cpu *m_cpu;
@@ -224,21 +215,16 @@ class gb {
 
     cheat *m_cheat;
 
-    gb *target;
-
     gb_regs regs;
     gbc_regs c_regs;
 
     word dmy[160 * 5]; // vframe はみ出した時用
     word vframe[160 * (144 + 100)];
 
-    ext_hook hook_proc;
-
     int skip, skip_buf;
     int now_frame;
     int re_render;
 
-    bool hook_ext;
     bool use_gba;
 
     int nt_mode;

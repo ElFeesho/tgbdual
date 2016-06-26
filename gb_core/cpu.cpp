@@ -287,36 +287,7 @@ byte cpu::io_read(word adr) {
         case 0xFF55: // HDMA5(転送実行) // HDMA5 (run forward)
             return (dma_executing ? ((dma_rest - 1) & 0x7f) : 0xFF);
         case 0xFF56: // RP(赤外線) // RP (infrared)
-            if (ref_gb->get_target()) {
-                if ((ref_gb->get_cregs()->RP & 0xC0) == 0xC0) {
-                    dword *que = ref_gb->get_target()->get_cpu()->rp_que;
-                    int que_cnt = 0;
-                    int cur;
-                    while ((que[que_cnt] & 0xffff) > rest_clock)
-                        cur = que[que_cnt++] >> 16;
-                    //				fprintf(file,"read RP
-                    //%02X\n",(ref_gb->get_cregs()->RP&1)|((cur&1)<<1)|0xC0);
-                    return (ref_gb->get_cregs()->RP & 1) | ((cur & 1) << 1) | 0xC0;
-
-                    //				fprintf(file,"read RP
-                    //%02X\n",(ref_gb->get_cregs()->RP&1)|((ref_gb->get_target()->get_cregs()->RP&1)<<1)|0xC0);
-                    //				return
-                    //(ref_gb->get_cregs()->RP&1)|((ref_gb->get_target()->get_cregs()->RP&1)<<1)|0xC0;
-                } else {
-                    //				fprintf(file,"read RP
-                    //%02X\n",(ref_gb->get_cregs()->RP&1));
-                    return (ref_gb->get_cregs()->RP & 1);
-                }
-            } else {
-                if (ref_gb->hook_ext) { // フックします // Hook
-                    if ((ref_gb->get_cregs()->RP & 0xC0) == 0xC0) {
-                        return (ref_gb->get_cregs()->RP & 1) |
-                               (ref_gb->hook_proc.led() ? 2 : 0) | 0xC0;
-                    }
-                    return (ref_gb->get_cregs()->RP & 0xC1);
-                }
-                return (ref_gb->get_cregs()->RP & 0xC1);
-            }
+            return (ref_gb->get_cregs()->RP & 0xC1);
         case 0xFF68: // BCPS(BGパレット書き込み指定) // BG write palette
             return ref_gb->get_cregs()->BCPS;
         case 0xFF69: // BCPD(BGパレット書きこみデータ) // BG palette data written
@@ -330,8 +301,7 @@ byte cpu::io_read(word adr) {
         case 0xFF6B: // OCPD(OBJパレット書きこみデータ) // Write data OBJ palette
             if (ref_gb->get_cregs()->OCPS & 1) {
                 ret = ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) + 8)[(ref_gb->get_cregs()->OCPS >> 1) & 3] >> 8;
-            }
-            else {
+            } else {
                 ret = ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) + 8)[(ref_gb->get_cregs()->OCPS >> 1) & 3] & 0xff;
             }
             return ret;
@@ -541,57 +511,56 @@ void cpu::io_write(word adr, byte dat) {
                 b_dma_first = true;
                 dma_rest = (dat & 0x7F) + 1;
                 ref_gb->get_cregs()->HDMA5 = 0;
-			}
-			else{ //通常DMA // Normal DMA
-    if (dma_executing) {
-        dma_executing = false;
-        dma_rest = 0;
-        ref_gb->get_cregs()->HDMA5 = 0xFF;
-        //					fprintf(file,"dma stopped\n");
-        return;
-    }
+            } else { //通常DMA // Normal DMA
+                if (dma_executing) {
+                    dma_executing = false;
+                    dma_rest = 0;
+                    ref_gb->get_cregs()->HDMA5 = 0xFF;
+                    //					fprintf(file,"dma stopped\n");
+                    return;
+                }
 
-    dma_executing = false;
-    dma_rest = 0;
-    ref_gb->get_cregs()->HDMA5 = 0xFF;
+                dma_executing = false;
+                dma_rest = 0;
+                ref_gb->get_cregs()->HDMA5 = 0xFF;
 
-    switch (dma_src >> 13) {
-        case 0:
-        case 1:
-            memcpy(vram_bank + (dma_dest & 0x1ff0),
-                   ref_gb->get_rom()->get_rom() + (dma_src), 16 * (dat & 0x7F) + 16);
-            break;
-        case 2:
-        case 3:
-            memcpy(vram_bank + (dma_dest & 0x1ff0),
-                   ref_gb->get_mbc()->get_rom() + (dma_src), 16 * (dat & 0x7F) + 16);
-            break;
-        case 4:
-            break;
-        case 5:
-            memcpy(vram_bank + (dma_dest & 0x1ff0),
-                   ref_gb->get_mbc()->get_sram() + (dma_src & 0x1FFF),
-                   16 * (dat & 0x7F) + 16);
-            break;
-        case 6:
-            if (dma_src & 0x1000)
-                memcpy(vram_bank + (dma_dest & 0x1ff0), ram_bank + (dma_src & 0x0FFF),
-                       16 * (dat & 0x7F) + 16);
-            else
-                memcpy(vram_bank + (dma_dest & 0x1ff0), ram + (dma_src & 0x0FFF),
-                       16 * (dat & 0x7F) + 16);
-            break;
-        case 7:
-            break;
-    }
-    dma_src += ((dat & 0x7F) + 1) * 16;
-    dma_dest += ((dat & 0x7F) + 1) * 16;
+                switch (dma_src >> 13) {
+                    case 0:
+                    case 1:
+                        memcpy(vram_bank + (dma_dest & 0x1ff0),
+                               ref_gb->get_rom()->get_rom() + (dma_src), 16 * (dat & 0x7F) + 16);
+                        break;
+                    case 2:
+                    case 3:
+                        memcpy(vram_bank + (dma_dest & 0x1ff0),
+                               ref_gb->get_mbc()->get_rom() + (dma_src), 16 * (dat & 0x7F) + 16);
+                        break;
+                    case 4:
+                        break;
+                    case 5:
+                        memcpy(vram_bank + (dma_dest & 0x1ff0),
+                               ref_gb->get_mbc()->get_sram() + (dma_src & 0x1FFF),
+                               16 * (dat & 0x7F) + 16);
+                        break;
+                    case 6:
+                        if (dma_src & 0x1000)
+                            memcpy(vram_bank + (dma_dest & 0x1ff0), ram_bank + (dma_src & 0x0FFF),
+                                   16 * (dat & 0x7F) + 16);
+                        else
+                            memcpy(vram_bank + (dma_dest & 0x1ff0), ram + (dma_src & 0x0FFF),
+                                   16 * (dat & 0x7F) + 16);
+                        break;
+                    case 7:
+                        break;
+                }
+                dma_src += ((dat & 0x7F) + 1) * 16;
+                dma_dest += ((dat & 0x7F) + 1) * 16;
 
-    gdma_rest = 456 * 2 +
-                ((dat & 0x7f) + 1) * 32 *
-                    (speed ? 2 : 1); // CPU パワーを占領 // Occupied the CPU power
-}
-return;
+                gdma_rest = 456 * 2 +
+                            ((dat & 0x7f) + 1) * 32 *
+                                (speed ? 2 : 1); // CPU パワーを占領 // Occupied the CPU power
+            }
+            return;
         case 0xFF56: // RP(赤外線) // RP (infrared)
             //			fprintf(file,"RP=%02X\n",dat);
             rp_que[que_cur++] = (((dword)dat) << 16) | ((word)rest_clock);
@@ -768,7 +737,6 @@ void cpu::irq(int irq_type) {
     if (!((irq_type == INT_VBLANK || irq_type == INT_LCDC) &&
           (!(ref_gb->get_regs()->LCDC & 0x80))))
         ref_gb->get_regs()->IF |= (irq_type);
-   
 }
 
 void cpu::irq_process() {
@@ -891,21 +859,8 @@ void cpu::exec(int clocks) {
 
         if (total_clock > seri_occer) {
             seri_occer = 0x7fffffff;
-            if (ref_gb->get_target()) {
-                byte ret =
-                    ref_gb->get_target()->get_cpu()->seri_send(ref_gb->get_regs()->SB);
-                ref_gb->get_regs()->SB = ret;
-                ref_gb->get_regs()->SC &= 3;
-            } else {
-                if (ref_gb->hook_ext) { // フックします // Hook
-                    byte ret = ref_gb->hook_proc.send(ref_gb->get_regs()->SB);
-                    ref_gb->get_regs()->SB = ret;
-                    ref_gb->get_regs()->SC &= 3;
-                } else {
-                    ref_gb->get_regs()->SB = 0xff;
-                    ref_gb->get_regs()->SC &= 3;
-                }
-            }
+            ref_gb->get_regs()->SB = 0xff;
+            ref_gb->get_regs()->SC &= 3;
             irq(INT_SERIAL);
         }
     }
