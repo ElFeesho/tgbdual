@@ -108,8 +108,6 @@ class sdl_renderer : public renderer {
     void resume_sound();
 
     void update_pad();
-    void disable_check_pad();
-    void enable_check_pad();
     void toggle_auto();
     void set_use_ffb(bool use);
 
@@ -152,7 +150,7 @@ class sdl_renderer : public renderer {
     bool b_use_ffb;
 
     int now_sensor_x, now_sensor_y;
-    bool b_pad_update;
+    
     bool b_auto;
 
     key_dat save_key, load_key, auto_key;

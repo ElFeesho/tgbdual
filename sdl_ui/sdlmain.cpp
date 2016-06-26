@@ -69,17 +69,16 @@ int main(int argc, char *argv[]) {
         endGame = true;
     }
 
+    SDL_Event e;
+
     while (!endGame) {
 
-        SDL_Event e;
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
                 endGame = true;
                 break;
             }
         }
-
-        render->enable_check_pad();
 
         g_gb->run();
 

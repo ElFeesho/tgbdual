@@ -110,7 +110,6 @@ sdl_renderer::sdl_renderer() {
 
     cur_time = 0;
     now_sensor_x = now_sensor_y = 2047;
-    b_pad_update = true;
 
     save_resurve = -1;
     load_resurve = -1;
@@ -415,14 +414,6 @@ void sdl_renderer::set_pad(int stat) {
     pad_state = stat;
 }
 
-void sdl_renderer::disable_check_pad() {
-    b_pad_update = false;
-}
-
-void sdl_renderer::enable_check_pad() {
-    b_pad_update = true;
-}
-
 void sdl_renderer::toggle_auto() {
     b_auto = !b_auto;
     show_message(b_auto ? "auto fire enabled" : "auto fire disabled");
@@ -464,9 +455,7 @@ bool sdl_renderer::check_press(key_dat *dat) {
 void sdl_renderer::refresh() {
     static bool bef_f5 = false, bef_f7 = false, bef_auto = false;
 
-    if (b_pad_update) {
-        update_pad();
-    }
+    update_pad();
 
     if ((!bef_f5 && check_press(&save_key)) || (save_resurve != -1)) {
         cb_save_state(save_resurve);
