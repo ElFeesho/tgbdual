@@ -34,8 +34,7 @@ lcd::lcd(gb *ref) {
     byte dat[] = {31, 21, 11, 0};
 
     for (int i = 0; i < 4; i++) {
-        m_pal16[i] = ref_gb->get_renderer()->map_color(dat[i] | (dat[i] << 5) |
-                                                       (dat[i] << 10));
+        m_pal16[i] = ref_gb->get_renderer()->map_color(dat[i] | (dat[i] << 5) | (dat[i] << 10));
         m_pal32[i] = ((dat[i] << 16) | (dat[i] << 8) | dat[i]);
     }
 
@@ -59,17 +58,13 @@ void lcd::reset() {
 }
 
 void lcd::bg_render(void *buf, int scanline) {
-    if (!(ref_gb->get_regs()->LCDC & 0x80) ||
-        !(ref_gb->get_regs()->LCDC & 0x01) ||
-        (ref_gb->get_regs()->WY <= (dword)scanline &&
-         ref_gb->get_regs()->WX < 8 && (ref_gb->get_regs()->LCDC & 0x20))) {
-        if (!(ref_gb->get_regs()->LCDC & 0x80) ||
-            !(ref_gb->get_regs()->LCDC & 0x01)) {
+    if (!(ref_gb->get_regs()->LCDC & 0x80) || !(ref_gb->get_regs()->LCDC & 0x01) || (ref_gb->get_regs()->WY <= (dword)scanline && ref_gb->get_regs()->WX < 8 && (ref_gb->get_regs()->LCDC & 0x20))) {
+        if (!(ref_gb->get_regs()->LCDC & 0x80) || !(ref_gb->get_regs()->LCDC & 0x01)) {
             word *tmp_w = (word *)buf + 160 * scanline;
             word tmp_dat = ref_gb->get_renderer()->map_color(0x7fff);
-            for (int t = 0; t < 160; t++)
+            for (int t = 0; t < 160; t++) {
                 *(tmp_w++) = tmp_dat;
-            //			memset(((word*)buf)+160*scanline,0xff,160*2);
+            }
         }
         return;
     }
@@ -89,8 +84,9 @@ void lcd::bg_render(void *buf, int scanline) {
     pal[3] = m_pal16[(ref_gb->get_regs()->BGP >> 6) & 0x3];
 
     y = scanline + ref_gb->get_regs()->SCY;
-    if (y >= 256)
+    if (y >= 256) {
         y -= 256;
+    }
     x = ref_gb->get_regs()->SCX;
 
     word *dat = ((word *)buf) + scanline * 160;
@@ -110,8 +106,7 @@ void lcd::bg_render(void *buf, int scanline) {
     dword calc1, calc2;
 
     tile = *(now_tile++);
-    tmp_dat =
-        (tile & 0x80) ? *(now_share + (tile << 3)) : *(now_pat + (tile << 3));
+    tmp_dat = (tile & 0x80) ? *(now_share + (tile << 3)) : *(now_pat + (tile << 3));
     calc1 = tmp_dat;
     calc2 = tmp_dat >> 7;
     calc1 &= 0x55;

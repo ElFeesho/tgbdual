@@ -34,7 +34,7 @@
 
 extern gb *g_gb;
 extern setting *config;
-extern Uint8 *key_state;
+static Uint8 *key_state;
 
 static inline Uint32 getpixel(SDL_Surface *surface, int x, int y) {
     int bpp = surface->format->BytesPerPixel;

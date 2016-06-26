@@ -11,8 +11,9 @@ void DX5_InitOSKeymap() {
     int i;
 
     /* Map the DIK scancodes to SDL keysyms */
-    for (i = 0; i < SDL_TABLESIZE(DIK_keymap); ++i)
+    for (i = 0; i < SDL_TABLESIZE(DIK_keymap); ++i) {
         DIK_keymap[i] = 0;
+    }
 
     /* Defined DIK_* constants */
     DIK_keymap[DIK_ESCAPE] = SDLK_ESCAPE;

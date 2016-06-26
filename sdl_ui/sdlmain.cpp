@@ -30,7 +30,6 @@
 gb *g_gb;
 sdl_renderer *render;
 setting *config;
-Uint8 *key_state;
 bool endGame;
 
 #include "dialogs.h"
@@ -80,10 +79,6 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        if (key_state[SDLK_ESCAPE]) {
-            endGame = true;
-        }
-
         render->enable_check_pad();
 
         g_gb->run();
@@ -95,7 +90,7 @@ int main(int argc, char *argv[]) {
                 elapse_wait = (1000 << 16) / config->virtual_fps;
                 elapse_time();
             }
-        } else { 
+        } else {
             g_gb->set_skip(config->fast_frame_skip);
             if (config->fast_speed_limit) {
                 elapse_wait = (1000 << 16) / config->fast_virtual_fps;

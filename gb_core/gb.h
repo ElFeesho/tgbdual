@@ -180,7 +180,7 @@ class gb {
     mbc *get_mbc() { return m_mbc; }
     renderer *get_renderer() { return m_renderer; }
     cheat *get_cheat() { return m_cheat; }
-    
+
     gb_regs *get_regs() { return &regs; }
     gbc_regs *get_cregs() { return &c_regs; }
 
@@ -204,6 +204,9 @@ class gb {
     void read_linkcable_byte(byte *buff);
 
     bool has_battery();
+
+    void inline render_frame();
+    void inline hblank_dma();
 
    private:
     cpu *m_cpu;

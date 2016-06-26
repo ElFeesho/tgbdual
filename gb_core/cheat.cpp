@@ -78,9 +78,11 @@ void cheat::create_unique_name(char *buf) {
     for (num = 0; !end; num++) {
         end = true;
         sprintf(tmp, "cheat_%03d", num);
-        for (ite = cheat_list.begin(); ite != cheat_list.end(); ite++)
-            if (strcmp(ite->name, tmp) == 0)
+        for (ite = cheat_list.begin(); ite != cheat_list.end(); ite++) {
+            if (strcmp(ite->name, tmp) == 0) {
                 end = false;
+            }
+        }
     }
 
     strcpy(buf, tmp);
@@ -127,40 +129,46 @@ byte cheat::cheat_read(word adr) {
     for (ite = cheat_list.begin(); ite != cheat_list.end(); ite++) {
         tmp = &(*ite);
 
-        if (!tmp->enable)
+        if (!tmp->enable) {
             continue;
+        }
 
         do {
             switch (tmp->code) {
                 case 0x01:
-                    if (tmp->adr == adr)
+                    if (tmp->adr == adr) {
                         return tmp->dat;
+                    }
                     tmp = NULL;
                     break;
                 case 0x10:
                     if ((tmp->next->adr <= adr) &&
                         ((adr - tmp->next->adr) < (tmp->adr + 1) * tmp->dat) &&
-                        (((adr - tmp->next->adr) % (tmp->adr + 1)) == 0))
+                        (((adr - tmp->next->adr) % (tmp->adr + 1)) == 0)) {
                         return tmp->next->dat;
+                    }
                     tmp = NULL;
                     break;
                 case 0x20:
-                    if (ref_gb->get_cpu()->read_direct(tmp->adr) == tmp->dat)
+                    if (ref_gb->get_cpu()->read_direct(tmp->adr) == tmp->dat) {
                         tmp = tmp->next;
-                    else
+                    } else {
                         tmp = NULL;
+                    }
                     break;
                 case 0x21:
-                    if (ref_gb->get_cpu()->read_direct(tmp->adr) < tmp->dat)
+                    if (ref_gb->get_cpu()->read_direct(tmp->adr) < tmp->dat) {
                         tmp = tmp->next;
-                    else
+                    } else {
                         tmp = NULL;
+                    }
                     break;
                 case 0x22:
-                    if (ref_gb->get_cpu()->read_direct(tmp->adr) > tmp->dat)
+                    if (ref_gb->get_cpu()->read_direct(tmp->adr) > tmp->dat) {
                         tmp = tmp->next;
-                    else
+                    } else {
                         tmp = NULL;
+                    }
                     break;
                 case 0x90:
                 case 0x91:
@@ -170,16 +178,17 @@ byte cheat::cheat_read(word adr) {
                 case 0x95:
                 case 0x96:
                 case 0x97:
-                    if (tmp->adr == adr)
-                        if ((adr >= 0xD000) && (adr < 0xE000))
-                            if (((ref_gb->get_cpu()->get_ram_bank() -
-                                  ref_gb->get_cpu()->get_ram()) /
-                                 0x1000) == (tmp->code - 0x90))
+                    if (tmp->adr == adr) {
+                        if ((adr >= 0xD000) && (adr < 0xE000)) {
+                            if (((ref_gb->get_cpu()->get_ram_bank() - ref_gb->get_cpu()->get_ram()) / 0x1000) == (tmp->code - 0x90)) {
                                 return tmp->dat;
-                            else
+                            } else {
                                 tmp = NULL;
-                        else
+                            }
+                        } else {
                             return tmp->dat;
+                        }
+                    }
                     break;
             }
         } while (tmp);
@@ -237,19 +246,22 @@ void cheat::load(FILE *file) {
             }
         } else {
             if (first) {
-                for (i = 0; i < 256; i++)
-                    if (buf[i] == '\n')
+                for (i = 0; i < 256; i++) {
+                    if (buf[i] == '\n') {
                         buf[i] = '\0';
+                    }
+                }
                 strcpy(tmp->name, buf);
                 first = false;
                 req = false;
             } else {
-                for (i = 0; i < 256; i++)
-                    if (buf[i] == '\n')
+                for (i = 0; i < 256; i++) {
+                    if (buf[i] == '\n') {
                         buf[i] = '\0';
-                    else
+                    } else {
                         buf[i] = toupper(buf[i]);
-
+                    }
+                }
                 if (req) {
                     tmp->next = new cheat_dat;
                     tmp = tmp->next;

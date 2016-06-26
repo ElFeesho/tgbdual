@@ -111,11 +111,11 @@ void gb::set_skip(int frame) {
 }
 
 bool gb::load_rom(byte *buf, int size, byte *ram, int ram_size) {
-    if (m_rom->load_rom(buf, size, ram, ram_size)) {
+    bool loadedSuccessfully = m_rom->load_rom(buf, size, ram, ram_size);
+    if (loadedSuccessfully) {
         reset();
-        return true;
     }
-    return false;
+    return loadedSuccessfully;
 }
 
 void gb::serialize(serializer &s) {
@@ -182,7 +182,7 @@ void gb::run() {
     for (int i = 0; i < 154; i++) {
         if (regs.LCDC & 0x80) {
             regs.LY = (regs.LY + 1) % 154;
-    
+
             regs.STAT &= 0xF8;
             if (regs.LYC == regs.LY) {
                 regs.STAT |= 4;
@@ -191,14 +191,7 @@ void gb::run() {
                 }
             }
             if (regs.LY == 0) {
-                m_renderer->refresh();
-                if (now_frame >= skip) {
-                    m_renderer->render_screen((byte *)vframe, 160, 144, 16);
-                    now_frame = 0;
-                } else {
-                    now_frame++;
-                }
-                m_lcd->clear_win_count();
+                render_frame();
                 skip = skip_buf;
             }
             if (regs.LY >= 144) {
@@ -226,48 +219,9 @@ void gb::run() {
                 m_cpu->exec(80); // state=2
                 regs.STAT |= 3;
                 m_cpu->exec(169); // state=3
-    
+
                 if (m_cpu->dma_executing) { // HBlank DMA
-                    if (m_cpu->b_dma_first) {
-                        m_cpu->dma_dest_bank = m_cpu->vram_bank;
-                        if (m_cpu->dma_src < 0x4000)
-                        {
-                            m_cpu->dma_src_bank = m_rom->get_rom();
-                        }
-                        else if (m_cpu->dma_src < 0x8000)
-                        {
-                            m_cpu->dma_src_bank = m_mbc->get_rom();
-                        }
-                        else if (m_cpu->dma_src >= 0xA000 && m_cpu->dma_src < 0xC000) {
-                            m_cpu->dma_src_bank = m_mbc->get_sram() - 0xA000;
-                        }
-                        else if (m_cpu->dma_src >= 0xC000 && m_cpu->dma_src < 0xD000) {
-                            m_cpu->dma_src_bank = m_cpu->ram - 0xC000;
-                        }
-                        else if (m_cpu->dma_src >= 0xD000 && m_cpu->dma_src < 0xE000) {
-                            m_cpu->dma_src_bank = m_cpu->ram_bank - 0xD000;
-                        }
-                        else
-                        {
-                            m_cpu->dma_src_bank = NULL;
-                        }
-                        m_cpu->b_dma_first = false;
-                    }
-                    memcpy(m_cpu->dma_dest_bank + (m_cpu->dma_dest & 0x1ff0), m_cpu->dma_src_bank + m_cpu->dma_src, 16);
-    
-                    m_cpu->dma_src += 16;
-                    m_cpu->dma_src &= 0xfff0;
-                    m_cpu->dma_dest += 16;
-                    m_cpu->dma_dest &= 0xfff0;
-                    m_cpu->dma_rest--;
-                    if (!m_cpu->dma_rest) {
-                        m_cpu->dma_executing = false;
-                    }
-                    if (now_frame >= skip) {
-                        m_lcd->render(vframe, regs.LY);
-                    }
-                    regs.STAT &= 0xfc;
-                    m_cpu->exec(207);
+                    hblank_dma();
                 } else {
                     regs.STAT &= 0xfc;
                     if (now_frame >= skip) {
@@ -284,14 +238,7 @@ void gb::run() {
             re_render++;
             if (re_render >= 154) {
                 memset(vframe, 0xff, 160 * 144 * 2);
-                m_renderer->refresh();
-                if (now_frame >= skip) {
-                    m_renderer->render_screen((byte *)vframe, 160, 144, 16);
-                    now_frame = 0;
-                } else {
-                    now_frame++;
-                }
-                m_lcd->clear_win_count();
+                render_frame();
                 re_render = 0;
             }
             regs.STAT &= 0xF8;
@@ -304,4 +251,55 @@ bool gb::has_battery() {
     auto cart_type = m_rom->get_info()->cart_type;
     int has_bat[] = {0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     return has_bat[(cart_type > 0x20) ? 3 : cart_type];
+}
+
+void inline gb::render_frame() {
+    m_renderer->refresh();
+    if (now_frame >= skip) {
+        m_renderer->render_screen((byte *)vframe, 160, 144, 16);
+        now_frame = 0;
+    } else {
+        now_frame++;
+    }
+    m_lcd->clear_win_count();
+}
+
+void inline gb::hblank_dma() {
+    
+    if (m_cpu->b_dma_first) {
+        m_cpu->dma_dest_bank = m_cpu->vram_bank;
+        if (m_cpu->dma_src < 0x4000) {
+            m_cpu->dma_src_bank = m_rom->get_rom();
+        } else if (m_cpu->dma_src < 0x8000) {
+            m_cpu->dma_src_bank = m_mbc->get_rom();
+        } else if (m_cpu->dma_src >= 0xA000 && m_cpu->dma_src < 0xC000) {
+            m_cpu->dma_src_bank = m_mbc->get_sram() - 0xA000;
+        } else if (m_cpu->dma_src >= 0xC000 && m_cpu->dma_src < 0xD000) {
+            m_cpu->dma_src_bank = m_cpu->ram - 0xC000;
+        } else if (m_cpu->dma_src >= 0xD000 && m_cpu->dma_src < 0xE000) {
+            m_cpu->dma_src_bank = m_cpu->ram_bank - 0xD000;
+        } else {
+            m_cpu->dma_src_bank = NULL;
+        }
+        m_cpu->b_dma_first = false;
+    }
+
+    memcpy(m_cpu->dma_dest_bank + (m_cpu->dma_dest & 0x1ff0), m_cpu->dma_src_bank + m_cpu->dma_src, 16);
+
+    m_cpu->dma_src += 16;
+    m_cpu->dma_src &= 0xfff0;
+    m_cpu->dma_dest += 16;
+    m_cpu->dma_dest &= 0xfff0;
+    m_cpu->dma_rest--;
+
+    if (!m_cpu->dma_rest) {
+        m_cpu->dma_executing = false;
+    }
+
+    if (now_frame >= skip) {
+        m_lcd->render(vframe, regs.LY);
+    }
+
+    regs.STAT &= 0xfc;
+    m_cpu->exec(207);
 }

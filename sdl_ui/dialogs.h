@@ -374,10 +374,9 @@ void load_rom_only(char *buf) {
         dat = (BYTE *)malloc(size);
         fread(dat, 1, size, file);
         fclose(file);
-    }
-    /// archive 対応必要
-    else
+    } else {
         return;
+    }
 
     int tbl_ram[] = {1, 1, 1, 4, 16, 8}; //0と1は保険
     char sram_name[256], cur_di[256], sv_dir[256];
