@@ -34,7 +34,7 @@ static bool sys_win2000;
 static int sram_tbl[] = {1, 1, 1, 4, 16, 8};
 static bool goomba_load_error;
 
-bool save_goomba(const void *buf, int size, int num, FILE *fs) {
+bool save_goomba(gb *g_gb, const void *buf, int size, int num, FILE *fs) {
     if (goomba_load_error) {
         return true;
     } else {
@@ -63,7 +63,7 @@ bool save_goomba(const void *buf, int size, int num, FILE *fs) {
     }
 }
 
-void save_sram(const std::string &file_name, byte *buf, int size) {
+void save_sram(gb *g_gb, setting *config, int timer_state, const std::string &file_name, byte *buf, int size) {
     char cur_di[256], sv_dir[256];
     GetCurrentDirectory(256, cur_di);
     config->get_save_dir(sv_dir);
@@ -76,7 +76,7 @@ void save_sram(const std::string &file_name, byte *buf, int size) {
         fread(&stateid, 1, 4, fsu);
         fseek(fsu, 0, SEEK_SET);
         if (stateid == GOOMBA_STATEID) {
-            if (!save_goomba(buf, size, 0, fsu)) {
+            if (!save_goomba(g_gb, buf, size, 0, fsu)) {
                 fprintf(stderr, "Could not save SRAM (Goomba format).\n(%s)\n", goomba_last_error());
             }
             fclose(fsu);
@@ -90,14 +90,13 @@ void save_sram(const std::string &file_name, byte *buf, int size) {
     gzFile fs = gzopen(file_name.c_str(), "wb");
     gzwrite(fs, buf, 0x2000 * sram_tbl[size]);
     if ((g_gb->get_rom()->get_info()->cart_type >= 0x0f) && (g_gb->get_rom()->get_info()->cart_type <= 0x13)) {
-        int tmp = render->get_timer_state();
-        gzwrite(fs, &tmp, 4);
+        gzwrite(fs, &timer_state, 4);
     }
     gzclose(fs);
     SetCurrentDirectory(cur_di);
 }
 
-void load_key_config() {
+void load_key_config(sdl_renderer *render, setting *config) {
     int buf[16];
     key_dat keys[8]; // a,b,select,start,down,up,left,right
 
@@ -179,14 +178,14 @@ bool try_load_goomba(void *ram, int ram_size, gzFile fs, const char *cart_name, 
     }
 }
 
-int load_rom(char *romFile, bool isServer) {
+gb *load_rom(char *romFile, sdl_renderer *render, setting *config, bool isServer) {
     int size;
     BYTE *dat;
     char *p = romFile;
 
     p = strstr(romFile, ".");
     if (!p) {
-        return -1;
+        return nullptr;
     }
 
     while (*p != '\0') {
@@ -197,7 +196,7 @@ int load_rom(char *romFile, bool isServer) {
     static const char *exts[] = {"gb", "gbc", "sgb", "gba", 0};
     BYTE *tmpbuf = file_read(romFile, exts, &size);
     if (!tmpbuf) {
-        return -1;
+        return nullptr;
     }
 
     const void *first_rom = gb_first_rom(tmpbuf, size);
@@ -206,7 +205,7 @@ int load_rom(char *romFile, bool isServer) {
     memcpy(dat, first_rom, size);
     free(tmpbuf);
 
-    g_gb = new gb(render, true, true, isServer ? 1 : 0);
+    gb *g_gb = new gb(render, true, true, isServer ? 1 : 0);
 
     g_gb->get_apu()->get_renderer()->set_enable(0, config->sound_enable[0] ? true : false);
     g_gb->get_apu()->get_renderer()->set_enable(1, config->sound_enable[1] ? true : false);
@@ -301,7 +300,7 @@ int load_rom(char *romFile, bool isServer) {
 
     SDL_WM_SetCaption(g_gb->get_rom()->get_info()->cart_name, 0);
 
-    return 0;
+    return g_gb;
 }
 
 static int elapse_wait = 0x10AAAA;

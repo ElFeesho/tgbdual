@@ -29,11 +29,6 @@
 
 #include <SDL.h>
 
-gb *g_gb;
-sdl_renderer *render;
-setting *config;
-bool endGame;
-
 #include "dialogs.h"
 
 
@@ -48,7 +43,7 @@ void in_directory(const char *dir, std::function<void()> dothis) {
     SetCurrentDirectory(cur_di);
 }
 
-void cb_save_state(const std::string &file_name, const char *save_dir, int timer_state) {
+void cb_save_state(gb *g_gb, const std::string &file_name, const char *save_dir, int timer_state) {
     in_directory(save_dir, [&]() {
         FILE *file = fopen(file_name.c_str(), "wb");
         g_gb->save_state(file);
@@ -59,7 +54,7 @@ void cb_save_state(const std::string &file_name, const char *save_dir, int timer
     });
 }
 
-uint32_t cb_load_state(const std::string &file_name, const char *save_dir) {
+uint32_t cb_load_state(gb *g_gb, const std::string &file_name, const char *save_dir) {
     uint32_t timer_state = 0;
 
     in_directory(save_dir, [&]() {
@@ -80,9 +75,9 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    config = new setting();
-    render = new sdl_renderer();
-
+    setting config;
+    sdl_renderer render;
+    
     std::string rom_file = argv[1];
     std::string sav_file = rom_file.substr(0, rom_file.find_last_of(".")) + ".sav";
     std::string save_state_file = rom_file.substr(0, rom_file.find_last_of(".")) + ".sv0";
@@ -95,27 +90,21 @@ int main(int argc, char *argv[]) {
     GetCurrentDirectory(256, cur_dir);
 
     char sv_dir[256];
-    config->get_save_dir(sv_dir);
+    config.get_save_dir(sv_dir);
 
-    load_key_config();
+    load_key_config(&render, &config);
 
-    key_dat fast_forward = {config->fast_forwerd[0], config->fast_forwerd[1]};
+    key_dat fast_forward = {config.fast_forwerd[0], config.fast_forwerd[1]};
 
-    endGame = false;
+    bool endGame = false;
 
-    if (argc >= 2) {
-        printf("%s\n", cur_dir);
-        SetCurrentDirectory(cur_dir);
-
-        if (load_rom(argv[1], argc == 3) != 0) {
-            printf("ERROR: invalid rom, usage: %s rom_name\n", argv[0]);
-            endGame = true;
-        }
-    } else {
-        printf("ERROR: usage: %s rom_name\n", argv[0]);
+    SetCurrentDirectory(cur_dir);
+    gb *g_gb = load_rom(argv[1], &render, &config, argc == 3);
+    if (g_gb == nullptr) {
+        printf("ERROR: invalid rom, usage: %s rom_name\n", argv[0]);
         endGame = true;
     }
-
+    
     SDL_Event e;
 
     while (!endGame) {
@@ -125,39 +114,37 @@ int main(int argc, char *argv[]) {
                 endGame = true;
             } else if (e.type == SDL_KEYDOWN) {
                 auto sym = e.key.keysym.sym;
-                if (sym == config->load_key[1]) {
-                    render->set_timer_state(cb_load_state(save_state_file, sv_dir));
-                } else if (sym == config->save_key[1]) {
-                    cb_save_state(save_state_file, sv_dir, render->get_timer_state());
+                if (sym == config.load_key[1]) {
+                    render.set_timer_state(cb_load_state(g_gb, save_state_file, sv_dir));
+                } else if (sym == config.save_key[1]) {
+                    cb_save_state(g_gb, save_state_file, sv_dir, render.get_timer_state());
                 }
             }
         }
 
         g_gb->run();
 
-        if (!render->check_press(&fast_forward)) {
-            g_gb->set_skip(config->frame_skip);
+        if (!render.check_press(&fast_forward)) {
+            g_gb->set_skip(config.frame_skip);
 
-            if (config->speed_limit) {
-                elapse_wait = (1000 << 16) / config->virtual_fps;
+            if (config.speed_limit) {
+                elapse_wait = (1000 << 16) / config.virtual_fps;
                 elapse_time();
             }
         } else {
-            g_gb->set_skip(config->fast_frame_skip);
-            if (config->fast_speed_limit) {
-                elapse_wait = (1000 << 16) / config->fast_virtual_fps;
+            g_gb->set_skip(config.fast_frame_skip);
+            if (config.fast_speed_limit) {
+                elapse_wait = (1000 << 16) / config.fast_virtual_fps;
                 elapse_time();
             }
         }
     }
 
     if (g_gb->has_battery()) {
-        save_sram(sav_file, g_gb->get_rom()->get_sram(), g_gb->get_rom()->get_info()->ram_size);
+        save_sram(g_gb, &config, render.get_timer_state(), sav_file, g_gb->get_rom()->get_sram(), g_gb->get_rom()->get_info()->ram_size);
     }
 
     delete g_gb;
-    delete render;
-    delete config;
 
     return 0;
 }
