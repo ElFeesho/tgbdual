@@ -63,16 +63,13 @@ bool save_goomba(const void *buf, int size, int num, FILE *fs) {
     }
 }
 
-void save_sram(byte *buf, int size) {
-    if (strstr(tmp_sram_name, ".srt"))
-        return;
-
+void save_sram(const std::string &file_name, byte *buf, int size) {
     char cur_di[256], sv_dir[256];
     GetCurrentDirectory(256, cur_di);
     config->get_save_dir(sv_dir);
     SetCurrentDirectory(sv_dir);
 
-    FILE *fsu = fopen(tmp_sram_name, "r+b");
+    FILE *fsu = fopen(file_name.c_str(), "r+b");
     if (fsu != NULL) {
         // if file exists, check for goomba
         uint32_t stateid = 0;
@@ -90,7 +87,7 @@ void save_sram(byte *buf, int size) {
         }
     }
 
-    gzFile fs = gzopen(tmp_sram_name, "wb");
+    gzFile fs = gzopen(file_name.c_str(), "wb");
     gzwrite(fs, buf, 0x2000 * sram_tbl[size]);
     if ((g_gb->get_rom()->get_info()->cart_type >= 0x0f) && (g_gb->get_rom()->get_info()->cart_type <= 0x13)) {
         int tmp = render->get_timer_state();
@@ -100,7 +97,7 @@ void save_sram(byte *buf, int size) {
     SetCurrentDirectory(cur_di);
 }
 
-void load_key_config(int num) {
+void load_key_config() {
     int buf[16];
     key_dat keys[8]; // a,b,select,start,down,up,left,right
 
@@ -218,7 +215,7 @@ int load_rom(char *romFile, bool isServer) {
 
     g_gb->get_apu()->get_renderer()->set_echo(config->b_echo);
     g_gb->get_apu()->get_renderer()->set_lowpass(config->b_lowpass);
-    
+
 
     char sram_name[256], cur_di[256], sv_dir[256];
     BYTE *ram;
@@ -323,8 +320,7 @@ static void elapse_time(void) {
         return;
     }
 
-    if (wait - elp >= 4)
-    {
+    if (wait - elp >= 4) {
         SDL_Delay(wait - elp - 3);
     }
 

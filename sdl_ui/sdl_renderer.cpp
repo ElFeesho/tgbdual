@@ -26,7 +26,6 @@
 #include <stdio.h>
 #include "resource.h"
 
-#include "callbacks.h"
 #include "setting.h"
 #include "w32_posix.h"
 
@@ -231,7 +230,7 @@ void sdl_renderer::init_sdlvideo() {
 }
 
 void sdl_renderer::init_surface() {
-    
+
     static const int GB_W = 160;
     static const int GB_H = 144;
     int w = GB_W * WIN_MULTIPLIER;
@@ -292,11 +291,11 @@ void sdl_renderer::flip() {
 }
 
 namespace {
-    void fill_audio(void *userData, Uint8 *stream, int len) {
-        sdl_renderer *renderer = static_cast<sdl_renderer*>(userData);
-        sound_renderer *snd_render = renderer->get_sound_renderer();
-        snd_render->render((short *)stream, len / 4);
-    }
+void fill_audio(void *userData, Uint8 *stream, int len) {
+    sdl_renderer *renderer = static_cast<sdl_renderer *>(userData);
+    sound_renderer *snd_render = renderer->get_sound_renderer();
+    snd_render->render((short *)stream, len / 4);
+}
 }
 
 void sdl_renderer::init_sdlaudio() {
@@ -307,7 +306,7 @@ void sdl_renderer::init_sdlaudio() {
     wanted.channels = 2; /* 1 = モノラル, 2 = ステレオ */ /* 1 = mono, 2 = stereo */
     wanted.samples = 4096; /* 遅延も少なく推奨の値です */ /* Recommended value less delay */
     wanted.callback = fill_audio;
-    wanted.userdata = (void*)this;
+    wanted.userdata = (void *)this;
 
     if (SDL_OpenAudio(&wanted, NULL) < 0) {
         fprintf(stderr, "Could not open audio device: %s\n", SDL_GetError());
@@ -331,7 +330,6 @@ void sdl_renderer::resume_sound() {
 void sdl_renderer::init_sdlevent() {
     pad_state = 0;
     memset(&key_config, 0, sizeof(key_config));
-    b_auto = false;
 }
 
 void sdl_renderer::uninit_sdlevent() {
@@ -356,34 +354,15 @@ void sdl_renderer::set_pad(int stat) {
     pad_state = stat;
 }
 
-void sdl_renderer::toggle_auto() {
-    b_auto = !b_auto;
-    printf("%s\n", (b_auto ? "auto fire enabled" : "auto fire disabled"));
-}
-
 void sdl_renderer::update_pad() {
     SDL_PumpEvents();
     key_state = SDL_GetKeyState(0);
 
-    static bool phase = false;
-
     pad_state = 0;
 
-    if (b_auto) {
-        if (phase) {
-            for (int i = 0; i < 2; i++) {
-                pad_state |= check_press(key_config + i) ? (1 << i) : 0;
-            }
-        }
-        for (int i = 2; i < 8; i++) {
-            pad_state |= check_press(key_config + i) ? (1 << i) : 0;
-        }
-    } else {
-        for (int i = 0; i < 8; i++) {
-            pad_state |= check_press(key_config + i) ? (1 << i) : 0;
-        }
+    for (int i = 0; i < 8; i++) {
+        pad_state |= check_press(key_config + i) ? (1 << i) : 0;
     }
-    phase = !phase;
 }
 
 word sdl_renderer::get_any_key() {
@@ -395,19 +374,5 @@ bool sdl_renderer::check_press(key_dat *dat) {
 }
 
 void sdl_renderer::refresh() {
-    static bool bef_f5 = false, bef_f7 = false, bef_auto = false;
-
     update_pad();
-
-    if ((!bef_f5 && check_press(&save_key))) {
-        cb_save_state(0);
-    } else if ((!bef_f7 && check_press(&load_key))) {
-        cb_load_state(0);
-    } else if (!bef_auto && check_press(&auto_key)) {
-        toggle_auto();
-    }
-
-    bef_f5 = check_press(&save_key) ? true : false;
-    bef_f7 = check_press(&load_key) ? true : false;
-    bef_auto = check_press(&auto_key) ? true : false;
 }

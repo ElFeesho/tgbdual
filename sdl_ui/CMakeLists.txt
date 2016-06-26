@@ -4,7 +4,7 @@ project(tgbdual C CXX)
 
 set(CMAKE_CXX_FLAGS "-O3 -Wall")
 
-set(SDL_UI_SOURCES callbacks.cpp callbacks.h cpputil.h dialogs.h dinput_sdl.c dinput_sdl.h resource.cpp resource.h sdl_renderer.cpp sdl_renderer.h sdlmain.cpp setting.cpp setting.h unzip.c unzip.h w32_posix.h zlibwrap.cpp zlibwrap.h)
+set(SDL_UI_SOURCES cpputil.h dialogs.h dinput_sdl.c dinput_sdl.h resource.cpp resource.h sdl_renderer.cpp sdl_renderer.h sdlmain.cpp setting.cpp setting.h unzip.c unzip.h w32_posix.h zlibwrap.cpp zlibwrap.h)
 
 find_package(SDL)
 

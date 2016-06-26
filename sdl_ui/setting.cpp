@@ -220,8 +220,8 @@ setting::setting() {
 
     if (SetCurrentDirectory(save_dir)) {
         CreateDirectory(save_dir, NULL);
-        SetCurrentDirectory(save_dir);
     }
+    SetCurrentDirectory(home_dir);
 }
 
 setting::~setting() {

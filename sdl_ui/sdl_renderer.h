@@ -91,17 +91,12 @@ class sdl_renderer : public renderer {
 
     void set_filter(col_filter *fil) { m_filter = *fil; };
 
-    void set_save_key(key_dat *key_code) { save_key = *key_code; }
-    void set_load_key(key_dat *key_code) { load_key = *key_code; }
-    void set_auto_key(key_dat *key_code) { auto_key = *key_code; }
-
     bool check_press(key_dat *dat);
 
     void pause_sound();
     void resume_sound();
 
     void update_pad();
-    void toggle_auto();
     void set_use_ffb(bool use);
 
     sound_renderer *get_sound_renderer() { return snd_render; }
@@ -133,8 +128,6 @@ class sdl_renderer : public renderer {
     void uninit_sdlaudio();
     void uninit_sdlevent();
 
-
-    int joysticks;
     int pad_state;
 
     key_dat key_config[8], koro_key_config[4];
@@ -145,10 +138,6 @@ class sdl_renderer : public renderer {
     bool b_use_ffb;
 
     int now_sensor_x, now_sensor_y;
-    
-    bool b_auto;
-
-    key_dat save_key, load_key, auto_key;
 
     int cur_time;
 

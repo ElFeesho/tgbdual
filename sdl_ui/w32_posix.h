@@ -38,29 +38,14 @@ inline int SetCurrentDirectory(const char *dir) {
 }
 
 inline void CreateDirectory(const char *dir, void *) {
-
-// 愛用しているマクロの引用文
-// I'd prefer to now treat cygwin much more unix like, and save the
-// declspec() for
-#if defined(WIN32) && !(defined(__CYGWIN__) || defined(__MINGW__))
-    // that way MSVC gets the declspec nastiness, and cygwin and mingw are
-    // spared. OR possibly
-    // #if defined(WIN32) && !defined(__CYGWIN__)
-    mkdir(dir);
-#else
     mkdir(dir, 0x1ff);
-#endif
 }
 
 typedef struct tm SYSTEMTIME;
 
 inline void GetSystemTime(SYSTEMTIME *sys) {
     time_t t = time(0);
-#if defined(WIN32) && !(defined(__CYGWIN__) || defined(__MINGW__))
-    localtime(&t);
-#else
     localtime_r(&t, sys);
-#endif
 }
 
 #endif // ! w32_posix_h_
