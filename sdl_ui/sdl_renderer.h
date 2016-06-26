@@ -75,8 +75,7 @@ class sdl_renderer : public renderer {
     word unmap_color(word gb_col);
     byte get_time(int type);
     void set_time(int type, byte dat);
-
-    void set_render_pass(int type);
+    
     void set_key(key_dat *keys);
 
     void flip();

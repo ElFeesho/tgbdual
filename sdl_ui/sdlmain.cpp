@@ -41,8 +41,6 @@ int main(int argc, char *argv[]) {
     config = new setting();
     render = new sdl_renderer();
 
-    render->set_render_pass(config->render_pass);
-
     load_key_config(0);
 
     key_dat tmp_save = {config->save_key[0], config->save_key[1]};

@@ -102,8 +102,6 @@ sdl_renderer::sdl_renderer() {
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
-    render_pass_type = 2;
-
     init_sdlvideo();
     init_sdlaudio();
     init_sdlevent();
@@ -267,18 +265,8 @@ word sdl_renderer::get_sensor(bool x_y) {
     return (x_y ? (now_sensor_x & 0x0fff) : (now_sensor_y & 0x0fff));
 }
 
-//------------------------------------------------------------
-
 void sdl_renderer::init_sdlvideo() {
     init_surface();
-}
-
-void sdl_renderer::set_render_pass(int type) {
-    if ((type >= 0) && (type <= 2) && (render_pass_type != type)) {
-        render_pass_type = type;
-        release_surface();
-        init_surface();
-    }
 }
 
 void sdl_renderer::init_surface() {
