@@ -28,10 +28,8 @@
 #include <stdexcept>
 #include <string>
 
-gb::gb(renderer *ref, bool b_lcd, bool b_apu, int network_mode) : m_renderer{ref}, m_lcd{this}, m_cheat{this}, m_mbc{this}, m_apu{this} {
-    
-    m_rom = rom();
-    m_cpu = new cpu(this);
+gb::gb(renderer *ref, bool b_lcd, bool b_apu, int network_mode)
+    : m_renderer{ref}, m_lcd{this}, m_cheat{this}, m_mbc{this}, m_apu{this}, m_cpu{this} {
 
     m_renderer->reset();
     m_renderer->set_sound_renderer(b_apu ? m_apu.get_renderer() : nullptr);
@@ -54,11 +52,6 @@ gb::gb(renderer *ref, bool b_lcd, bool b_apu, int network_mode) : m_renderer{ref
     if (bind(net_socket, (struct sockaddr *)&myaddr, sizeof(struct sockaddr_in)) != 0) {
         throw std::domain_error("Failed to bind linkcable port");
     }
-}
-
-gb::~gb() {
-    m_renderer->set_sound_renderer(NULL);
-    delete m_cpu;
 }
 
 void gb::reset() {
@@ -86,7 +79,7 @@ void gb::reset() {
     if (m_rom.get_loaded()) {
         m_rom.get_info()->gb_type = (m_rom.get_rom()[0x143] & 0x80) ? (use_gba ? 4 : 3) : 1;
     }
-    m_cpu->reset();
+    m_cpu.reset();
     m_lcd.reset();
     m_apu.reset();
     m_mbc.reset();
@@ -100,7 +93,7 @@ void gb::set_skip(int frame) {
     skip_buf = frame;
 }
 
-bool gb::load_rom(byte *buf, int size, byte *ram, int ram_size) {
+bool gb::load_rom(uint8_t *buf, int size, uint8_t *ram, int ram_size) {
     bool loadedSuccessfully = m_rom.load_rom(buf, size, ram, ram_size);
     if (loadedSuccessfully) {
         reset();
@@ -113,7 +106,7 @@ void gb::serialize(serializer &s) {
     s_VAR(c_regs);
 
     m_rom.serialize(s);
-    m_cpu->serialize(s);
+    m_cpu.serialize(s);
     m_mbc.serialize(s);
     m_lcd.serialize(s);
     m_apu.serialize(s);
@@ -152,14 +145,14 @@ void gb::refresh_pal() {
     }
 }
 
-void gb::send_linkcable_byte(byte data) {
+void gb::send_linkcable_byte(uint8_t data) {
     if (sendto(net_socket, &data, 1, 0, (struct sockaddr *)&theiraddr, sizeof(theiraddr)) != 1) {
         perror("sendto");
         throw std::domain_error("Failed to call sendto");
     }
 }
 
-void gb::read_linkcable_byte(byte *buff) {
+void gb::read_linkcable_byte(uint8_t *buff) {
     socklen_t len = 0;
     struct sockaddr_in *incoming_addr = nullptr;
     if (recvfrom(net_socket, buff, 1, 0, (struct sockaddr *)&incoming_addr, &len) != 1) {
@@ -177,7 +170,7 @@ void gb::run() {
             if (regs.LYC == regs.LY) {
                 regs.STAT |= 4;
                 if (regs.STAT & 0x40) {
-                    m_cpu->irq(INT_LCDC);
+                    m_cpu.irq(INT_LCDC);
                 }
             }
             if (regs.LY == 0) {
@@ -187,30 +180,30 @@ void gb::run() {
             if (regs.LY >= 144) {
                 regs.STAT |= 1;
                 if (regs.LY == 144) {
-                    m_cpu->exec(72);
-                    m_cpu->irq(INT_VBLANK);
+                    m_cpu.exec(72);
+                    m_cpu.irq(INT_VBLANK);
                     if (regs.STAT & 0x10) {
-                        m_cpu->irq(INT_LCDC);
+                        m_cpu.irq(INT_LCDC);
                     }
-                    m_cpu->exec(456 - 80);
+                    m_cpu.exec(456 - 80);
                 } else if (regs.LY == 153) {
-                    m_cpu->exec(80);
+                    m_cpu.exec(80);
                     regs.LY = 0;
-                    m_cpu->exec(456 - 80);
+                    m_cpu.exec(456 - 80);
                     regs.LY = 153;
                 } else {
-                    m_cpu->exec(456);
+                    m_cpu.exec(456);
                 }
             } else { // VBlank 期間外 // Period outside VBlank
                 regs.STAT |= 2;
                 if (regs.STAT & 0x20) {
-                    m_cpu->irq(INT_LCDC);
+                    m_cpu.irq(INT_LCDC);
                 }
-                m_cpu->exec(80); // state=2
+                m_cpu.exec(80); // state=2
                 regs.STAT |= 3;
-                m_cpu->exec(169); // state=3
+                m_cpu.exec(169); // state=3
 
-                if (m_cpu->dma_executing) { // HBlank DMA
+                if (m_cpu.dma_executing) { // HBlank DMA
                     hblank_dma();
                 } else {
                     regs.STAT &= 0xfc;
@@ -218,9 +211,9 @@ void gb::run() {
                         m_lcd.render(vframe, regs.LY);
                     }
                     if ((regs.STAT & 0x08)) {
-                        m_cpu->irq(INT_LCDC);
+                        m_cpu.irq(INT_LCDC);
                     }
-                    m_cpu->exec(207);
+                    m_cpu.exec(207);
                 }
             }
         } else {
@@ -232,7 +225,7 @@ void gb::run() {
                 re_render = 0;
             }
             regs.STAT &= 0xF8;
-            m_cpu->exec(456);
+            m_cpu.exec(456);
         }
     }
 }
@@ -246,7 +239,7 @@ bool gb::has_battery() {
 void inline gb::render_frame() {
     m_renderer->refresh();
     if (now_frame >= skip) {
-        m_renderer->render_screen((byte *)vframe, 160, 144, 16);
+        m_renderer->render_screen((uint8_t *)vframe, 160, 144, 16);
         now_frame = 0;
     } else {
         now_frame++;
@@ -256,34 +249,34 @@ void inline gb::render_frame() {
 
 void inline gb::hblank_dma() {
 
-    if (m_cpu->b_dma_first) {
-        m_cpu->dma_dest_bank = m_cpu->vram_bank;
-        if (m_cpu->dma_src < 0x4000) {
-            m_cpu->dma_src_bank = m_rom.get_rom();
-        } else if (m_cpu->dma_src < 0x8000) {
-            m_cpu->dma_src_bank = m_mbc.get_rom();
-        } else if (m_cpu->dma_src >= 0xA000 && m_cpu->dma_src < 0xC000) {
-            m_cpu->dma_src_bank = m_mbc.get_sram() - 0xA000;
-        } else if (m_cpu->dma_src >= 0xC000 && m_cpu->dma_src < 0xD000) {
-            m_cpu->dma_src_bank = m_cpu->ram - 0xC000;
-        } else if (m_cpu->dma_src >= 0xD000 && m_cpu->dma_src < 0xE000) {
-            m_cpu->dma_src_bank = m_cpu->ram_bank - 0xD000;
+    if (m_cpu.b_dma_first) {
+        m_cpu.dma_dest_bank = m_cpu.vram_bank;
+        if (m_cpu.dma_src < 0x4000) {
+            m_cpu.dma_src_bank = m_rom.get_rom();
+        } else if (m_cpu.dma_src < 0x8000) {
+            m_cpu.dma_src_bank = m_mbc.get_rom();
+        } else if (m_cpu.dma_src >= 0xA000 && m_cpu.dma_src < 0xC000) {
+            m_cpu.dma_src_bank = m_mbc.get_sram() - 0xA000;
+        } else if (m_cpu.dma_src >= 0xC000 && m_cpu.dma_src < 0xD000) {
+            m_cpu.dma_src_bank = m_cpu.ram - 0xC000;
+        } else if (m_cpu.dma_src >= 0xD000 && m_cpu.dma_src < 0xE000) {
+            m_cpu.dma_src_bank = m_cpu.ram_bank - 0xD000;
         } else {
-            m_cpu->dma_src_bank = NULL;
+            m_cpu.dma_src_bank = NULL;
         }
-        m_cpu->b_dma_first = false;
+        m_cpu.b_dma_first = false;
     }
 
-    memcpy(m_cpu->dma_dest_bank + (m_cpu->dma_dest & 0x1ff0), m_cpu->dma_src_bank + m_cpu->dma_src, 16);
+    memcpy(m_cpu.dma_dest_bank + (m_cpu.dma_dest & 0x1ff0), m_cpu.dma_src_bank + m_cpu.dma_src, 16);
 
-    m_cpu->dma_src += 16;
-    m_cpu->dma_src &= 0xfff0;
-    m_cpu->dma_dest += 16;
-    m_cpu->dma_dest &= 0xfff0;
-    m_cpu->dma_rest--;
+    m_cpu.dma_src += 16;
+    m_cpu.dma_src &= 0xfff0;
+    m_cpu.dma_dest += 16;
+    m_cpu.dma_dest &= 0xfff0;
+    m_cpu.dma_rest--;
 
-    if (!m_cpu->dma_rest) {
-        m_cpu->dma_executing = false;
+    if (!m_cpu.dma_rest) {
+        m_cpu.dma_executing = false;
     }
 
     if (now_frame >= skip) {
@@ -291,5 +284,5 @@ void inline gb::hblank_dma() {
     }
 
     regs.STAT &= 0xfc;
-    m_cpu->exec(207);
+    m_cpu.exec(207);
 }

@@ -51,7 +51,7 @@ class mbc {
     uint8_t mbc3_dayh;  // 1
 
     uint8_t mbc3_timer; // 4
-    bool ext_is_ram; // 1
+    bool ext_is_ram;    // 1
     // total 32bits
 
     int mbc5_dat;

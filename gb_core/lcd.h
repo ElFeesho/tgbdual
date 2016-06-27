@@ -1,7 +1,9 @@
 #pragma once
 
-class gb;
+#include <stdint.h>
 
+class gb;
+class serializer;
 
 class lcd {
    public:
@@ -10,8 +12,8 @@ class lcd {
     void render(void *buf, int scanline);
     void reset();
     void clear_win_count() { now_win_line = 9; }
-    word *get_pal(int num) { return col_pal[num]; }
-    word *get_mapped_pal(int num) { return mapped_pal[num]; }
+    uint16_t *get_pal(int num) { return col_pal[num]; }
+    uint16_t *get_mapped_pal(int num) { return mapped_pal[num]; }
 
     void set_enable(int layer, bool enable);
     bool get_enable(int layer);
@@ -28,10 +30,10 @@ class lcd {
     void win_render_color(void *buf, int scanline);
     void sprite_render_color(void *buf, int scanline);
 
-    word m_pal16[4];
-    dword m_pal32[4];
-    word col_pal[16][4];
-    word mapped_pal[16][4];
+    uint16_t m_pal16[4];
+    uint32_t m_pal32[4];
+    uint16_t col_pal[16][4];
+    uint16_t mapped_pal[16][4];
 
     int trans_count;
     uint8_t trans_tbl[160 + 160], priority_tbl[320];

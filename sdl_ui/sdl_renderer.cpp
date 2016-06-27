@@ -31,14 +31,14 @@
 
 #include "../gb_core/gb.h"
 
-static Uint8 *key_state;
+static uint8_t *key_state;
 
 #define WIN_MULTIPLIER 2
 
 static inline Uint32 getpixel(SDL_Surface *surface, int x, int y) {
     int bpp = surface->format->BytesPerPixel;
     /* Here p is the address to the pixel we want to retrieve */
-    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+    uint8_t *p = (uint8_t *)surface->pixels + y * surface->pitch + x * bpp;
 
     switch (bpp) {
         case 1:
@@ -97,7 +97,7 @@ void sdl_renderer::output_log(const char *mes, ...) {
     va_end(vl);
 }
 
-word sdl_renderer::map_color(word gb_col) {
+uint16_t sdl_renderer::map_color(uint16_t gb_col) {
 
     if (color_type == 0) // ->RRRRRGGG GGxBBBBB に変換 (565) // converted to
         return ((gb_col & 0x1F) << 11) | ((gb_col & 0x3e0) << 1) | ((gb_col & 0x7c00) >> 10) | ((gb_col & 0x8000) >> 10);
@@ -109,7 +109,7 @@ word sdl_renderer::map_color(word gb_col) {
         return gb_col;
 }
 
-word sdl_renderer::unmap_color(word gb_col) {
+uint16_t sdl_renderer::unmap_color(uint16_t gb_col) {
     // xBBBBBGG GGGRRRRR へ変換 // converted to xBBBBBGG GGGRRRRR
     if (color_type == 0) // ->RRRRRGGG GGxBBBBB から変換 (565) // convert from
         return (gb_col >> 11) | ((gb_col & 0x7c0) >> 1) | (gb_col << 10) | ((gb_col & 0x40) << 10);
@@ -121,8 +121,8 @@ word sdl_renderer::unmap_color(word gb_col) {
         return gb_col;
 }
 
-static dword convert_to_second(SYSTEMTIME *sys) {
-    dword i, ret = 0;
+static uint32_t convert_to_second(SYSTEMTIME *sys) {
+    uint32_t i, ret = 0;
     static int month_days[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
     for (i = 1; i + 1950 < sys->tm_year; i++)
@@ -164,34 +164,34 @@ static dword convert_to_second(SYSTEMTIME *sys) {
     return ret;
 }
 
-byte sdl_renderer::get_time(int type) {
+uint8_t sdl_renderer::get_time(int type) {
     SYSTEMTIME sys;
     GetSystemTime(&sys);
 
-    dword now = convert_to_second(&sys);
+    uint32_t now = convert_to_second(&sys);
     now -= cur_time;
 
     switch (type) {
         case 8: // 秒 // Second
-            return (byte)(now % 60);
+            return (uint8_t)(now % 60);
         case 9: // 分 // Minute
-            return (byte)((now / 60) % 60);
+            return (uint8_t)((now / 60) % 60);
         case 10: // 時 // Hour
-            return (byte)((now / (60 * 60)) % 24);
+            return (uint8_t)((now / (60 * 60)) % 24);
         case 11: // 日(L) // Day (L)
-            return (byte)((now / (24 * 60 * 60)) & 0xff);
+            return (uint8_t)((now / (24 * 60 * 60)) & 0xff);
         case 12: // 日(H) // Day (H)
-            return (byte)((now / (256 * 24 * 60 * 60)) & 1);
+            return (uint8_t)((now / (256 * 24 * 60 * 60)) & 1);
     }
     return 0;
 }
 
-void sdl_renderer::set_time(int type, byte dat) {
+void sdl_renderer::set_time(int type, uint8_t dat) {
     SYSTEMTIME sys;
     GetSystemTime(&sys);
 
-    dword now = convert_to_second(&sys);
-    dword adj = now - cur_time;
+    uint32_t now = convert_to_second(&sys);
+    uint32_t adj = now - cur_time;
 
     switch (type) {
         case 8: // 秒 // Second
@@ -221,7 +221,7 @@ void sdl_renderer::set_timer_state(int timer) {
     cur_time = timer;
 }
 
-word sdl_renderer::get_sensor(bool x_y) {
+uint16_t sdl_renderer::get_sensor(bool x_y) {
     return (x_y ? (now_sensor_x & 0x0fff) : (now_sensor_y & 0x0fff));
 }
 
@@ -258,7 +258,7 @@ void sdl_renderer::release_surface() {
     }
 }
 
-void sdl_renderer::render_screen(byte *buf, int width, int height, int depth) {
+void sdl_renderer::render_screen(uint8_t *buf, int width, int height, int depth) {
     Uint64 *sp = (Uint64 *)buf;
     Uint64 *dp = (Uint64 *)scr->pixels;
     for (int i = 0; i < height; i++) {
@@ -291,7 +291,7 @@ void sdl_renderer::flip() {
 }
 
 namespace {
-void fill_audio(void *userData, Uint8 *stream, int len) {
+void fill_audio(void *userData, uint8_t *stream, int len) {
     sdl_renderer *renderer = static_cast<sdl_renderer *>(userData);
     sound_renderer *snd_render = renderer->get_sound_renderer();
     snd_render->render((short *)stream, len / 4);
@@ -365,7 +365,7 @@ void sdl_renderer::update_pad() {
     }
 }
 
-word sdl_renderer::get_any_key() {
+uint16_t sdl_renderer::get_any_key() {
     return 0;
 }
 

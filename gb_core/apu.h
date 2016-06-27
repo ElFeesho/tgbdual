@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 #include "sound_renderer.h"
 
 class gb;
@@ -141,4 +143,3 @@ class apu {
     gb *ref_gb;
     apu_snd snd;
 };
-

@@ -27,20 +27,21 @@
     16384 // 1/256秒あたりのクロック数 (4MHz時) // Number of clock ticks per
           // second / 256 (at 4MHz)
 
+#include "apu.h"
 #include <memory.h>
 #include <stdlib.h>
-#include "apu.h"
 
 #include "gb.h"
-#include "sound_renderer.h"
 #include "serializer.h"
+#include "sound_renderer.h"
 
 static uint32_t sq1_cur_pos = 0;
 static uint32_t sq2_cur_pos = 0;
 static uint32_t wav_cur_pos = 0;
 static uint32_t noi_cur_pos = 0;
 
-apu::apu(gb *ref) : snd{this} {
+apu::apu(gb *ref)
+    : snd{this} {
     ref_gb = ref;
     reset();
 }
@@ -135,9 +136,9 @@ void apu_snd::reset() {
     memcpy(&stat_cpy, &stat, sizeof(stat));
 
     uint8_t gb_init_wav[] = {0x06, 0xFE, 0x0E, 0x7F, 0x00, 0xFF, 0x58, 0xDF,
-                          0x00, 0xEC, 0x00, 0xBF, 0x0C, 0xED, 0x03, 0xF7};
+                             0x00, 0xEC, 0x00, 0xBF, 0x0C, 0xED, 0x03, 0xF7};
     uint8_t gbc_init_wav[] = {0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF,
-                           0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF};
+                              0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF};
 
     if (ref_apu->ref_gb->get_rom()->get_info()->gb_type == 1) // 初期型GB // GB early type
         memcpy(mem + 20, gb_init_wav, 16);

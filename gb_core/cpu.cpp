@@ -30,8 +30,6 @@
 #define N_FLAG 0x02
 #define C_FLAG 0x01
 
-FILE *file;
-
 cpu::cpu(gb *ref) {
     ref_gb = ref;
     b_trace = false;
@@ -46,7 +44,10 @@ cpu::cpu(gb *ref) {
     reset();
 }
 
-cpu::~cpu() {
+uint8_t cpu::read(uint16_t adr) {
+    return (ref_gb->get_cheat()->get_cheat_map()[adr])
+               ? ref_gb->get_cheat()->cheat_read(adr)
+               : read_direct(adr);
 }
 
 void cpu::reset() {
@@ -123,7 +124,7 @@ void cpu::restore_state_ex(int *dat) {
     total_clock = dat[3];
 }
 
-byte cpu::read_direct(word adr) {
+uint8_t cpu::read_direct(uint16_t adr) {
     switch (adr >> 13) {
         case 0:
         case 1:
@@ -164,7 +165,7 @@ byte cpu::read_direct(word adr) {
     return 0;
 }
 
-void cpu::write(word adr, byte dat) {
+void cpu::write(uint16_t adr, uint8_t dat) {
     switch (adr >> 13) {
         case 0:
         case 1:
@@ -208,8 +209,8 @@ void cpu::write(word adr, byte dat) {
     }
 }
 
-byte cpu::io_read(word adr) {
-    byte ret;
+uint8_t cpu::io_read(uint16_t adr) {
+    uint8_t ret;
     switch (adr) {
         case 0xFF00: // P1(パッド制御) //P1 (control pad)
             int tmp;
@@ -336,7 +337,7 @@ byte cpu::io_read(word adr) {
     }
 }
 
-void cpu::io_write(word adr, byte dat) {
+void cpu::io_write(uint16_t adr, uint8_t dat) {
     switch (adr) {
         case 0xFF00: // P1(パッド制御) // P1 (control pad)
             ref_gb->get_regs()->P1 = dat;
@@ -388,8 +389,6 @@ void cpu::io_write(word adr, byte dat) {
                 ref_gb->get_lcd()->clear_win_count();
             }
             ref_gb->get_regs()->LCDC = dat;
-            //			fprintf(file,"LCDC=%02X at line
-            //%d\n",dat,ref_gb->get_regs()->LY);
             return;
         case 0xFF41: // STAT(LCDステータス) // STAT (LCD status)
             if (ref_gb->get_rom()->get_info()->gb_type == 1)
@@ -491,10 +490,8 @@ void cpu::io_write(word adr, byte dat) {
             dma_dest |= (dat & 0xF0);
             return;
         case 0xFF55: // HDMA5(転送実行) // HDMA5 (run forward)
-            word tmp_adr;
+            uint16_t tmp_adr;
             tmp_adr = 0x8000 + (dma_dest & 0x1ff0);
-            //			fprintf(file,"%03d : %04X -> %04X  %d byte
-            //%s\n",ref_gb->get_regs()->LY,dma_src,dma_dest,((dat&0x7f)+1)*16,(dat&0x80)?"delay":"immidiately");
             if ((dma_src >= 0x8000 && dma_src < 0xA000) || (dma_src >= 0xE000) ||
                 (!(tmp_adr >= 0x8000 && tmp_adr < 0xA000))) {
                 ref_gb->get_cregs()->HDMA5 = 0;
@@ -516,7 +513,6 @@ void cpu::io_write(word adr, byte dat) {
                     dma_executing = false;
                     dma_rest = 0;
                     ref_gb->get_cregs()->HDMA5 = 0xFF;
-                    //					fprintf(file,"dma stopped\n");
                     return;
                 }
 
@@ -561,9 +557,8 @@ void cpu::io_write(word adr, byte dat) {
                                 (speed ? 2 : 1); // CPU パワーを占領 // Occupied the CPU power
             }
             return;
-        case 0xFF56: // RP(赤外線) // RP (infrared)
-            //			fprintf(file,"RP=%02X\n",dat);
-            rp_que[que_cur++] = (((dword)dat) << 16) | ((word)rest_clock);
+        case 0xFF56: 
+            rp_que[que_cur++] = (((uint32_t)dat) << 16) | ((uint16_t)rest_clock);
             rp_que[que_cur] = 0x00000000;
             ref_gb->get_cregs()->RP = dat;
             return;
@@ -604,8 +599,6 @@ void cpu::io_write(word adr, byte dat) {
             if (ref_gb->get_cregs()->BCPS & 0x80)
                 ref_gb->get_cregs()->BCPS =
                     0x80 | ((ref_gb->get_cregs()->BCPS + 1) & 0x3f);
-            //			fprintf(file,"%d :BCPS =
-            //%02X\n",ref_gb->get_regs()->LY,dat);
             return;
         case 0xFF6A: // OCPS(OBJパレット書きこみ指定) // OCPS (Specify write OBJ
                      // palette)
@@ -708,7 +701,7 @@ static int cycles_cb[256] = {
     8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8,
     8, 8, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 16, 8};
 
-static const byte ZTable[256] = {
+static const uint8_t ZTable[256] = {
     Z_FLAG, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -722,9 +715,9 @@ static const byte ZTable[256] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 };
 
-byte cpu::seri_send(byte dat) {
+uint8_t cpu::seri_send(uint8_t dat) {
     if ((ref_gb->get_regs()->SC & 0x81) == 0x80) {
-        byte ret = ref_gb->get_regs()->SB;
+        uint8_t ret = ref_gb->get_regs()->SB;
         ref_gb->get_regs()->SB = dat;
         ref_gb->get_regs()->SC &= 1;
         irq(INT_SERIAL);
@@ -794,7 +787,7 @@ void cpu::exec(int clocks) {
 
     int op_code;
     int tmp_clocks;
-    byte tmpb;
+    uint8_t tmpb;
     pare_reg tmp;
     static const int timer_clocks[] = {1024, 16, 64, 256};
 

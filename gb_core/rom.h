@@ -1,7 +1,7 @@
 #pragma once
 
-#include <stdlib.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 class gb;
 class serializer;
@@ -27,7 +27,7 @@ class rom {
     bool get_loaded() { return b_loaded; }
 
     bool has_battery();
-    uint16_t get_sram_size(); 
+    uint16_t get_sram_size();
 
     void set_first(int32_t page) { first_page = dat + 0x4000 * page; }
 

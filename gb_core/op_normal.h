@@ -877,7 +877,7 @@ case 0xFB:
 case 0x76:
 #ifndef EXSACT_CORE
     if (ref_gb->get_regs()->TAC & 0x04) { //タイマ割りこみ
-        word tmp;
+        uint16_t tmp;
         tmp = ref_gb->get_regs()->TIMA +
               (sys_clock + rest_clock) / timer_clocks[ref_gb->get_regs()->TAC & 0x03];
 

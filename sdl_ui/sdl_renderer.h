@@ -65,28 +65,28 @@ class sdl_renderer : public renderer {
     sdl_renderer();
     ~sdl_renderer();
 
-    void render_screen(byte *buf, int width, int height, int depth);
+    void render_screen(uint8_t *buf, int width, int height, int depth);
     int check_pad();
     void set_pad(int stat);
     void refresh();
     void output_log(const char *mes, ...);
     void reset() {}
-    word map_color(word gb_col);
-    word unmap_color(word gb_col);
-    byte get_time(int type);
-    void set_time(int type, byte dat);
+    uint16_t map_color(uint16_t gb_col);
+    uint16_t unmap_color(uint16_t gb_col);
+    uint8_t get_time(int type);
+    void set_time(int type, uint8_t dat);
 
     void set_key(key_dat *keys);
 
     void flip();
     void on_move();
     void draw_menu(int n);
-    word get_any_key();
+    uint16_t get_any_key();
 
     int get_timer_state();
     void set_timer_state(int timer);
 
-    word get_sensor(bool x_y);
+    uint16_t get_sensor(bool x_y);
     void set_bibrate(bool bibrate);
 
     void set_filter(col_filter *fil) { m_filter = *fil; };

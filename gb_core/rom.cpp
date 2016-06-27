@@ -39,13 +39,13 @@ rom::~rom() {
 
 bool rom::has_battery() {
     static const int32_t has_bat[] = {0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1,
-                                  0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-                                  0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0}; 
+                                      0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
+                                      0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     return has_bat[(info.cart_type > 0x20) ? 3 : info.cart_type] == 1;
 }
 
 uint16_t rom::get_sram_size() {
-    static const uint16_t tbl_ram[] = {1, 1, 1, 4, 16, 8}; 
+    static const uint16_t tbl_ram[] = {1, 1, 1, 4, 16, 8};
     return 0x2000 * tbl_ram[info.ram_size];
 }
 

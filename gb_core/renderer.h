@@ -21,10 +21,7 @@
 // エミュレーション結果の表現法/インターフェース
 // Emulation interface representation method of result
 
-#ifndef RENDERER_H
-#define RENDERER_H
-
-#include "gb_types.h"
+#pragma once
 
 class sound_renderer;
 
@@ -35,15 +32,15 @@ class renderer {
 
     virtual void reset() = 0;
     virtual void refresh() = 0;
-    virtual void render_screen(byte *buf, int width, int height, int depth) = 0;
+    virtual void render_screen(uint8_t *buf, int width, int height, int depth) = 0;
     virtual int check_pad() = 0;
-    virtual word map_color(word gb_col) = 0;
-    virtual word unmap_color(word gb_col) = 0;
+    virtual uint16_t map_color(uint16_t gb_col) = 0;
+    virtual uint16_t unmap_color(uint16_t gb_col) = 0;
 
-    virtual byte get_time(int type) = 0;
-    virtual void set_time(int type, byte dat) = 0;
+    virtual uint8_t get_time(int type) = 0;
+    virtual void set_time(int type, uint8_t dat) = 0;
 
-    virtual word get_sensor(bool x_y) = 0;
+    virtual uint16_t get_sensor(bool x_y) = 0;
 
     virtual void set_bibrate(bool bibrate) = 0;
 
@@ -52,5 +49,3 @@ class renderer {
    protected:
     sound_renderer *snd_render;
 };
-
-#endif

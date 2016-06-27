@@ -29,7 +29,7 @@ typedef unsigned char BYTE;
 
 char tmp_sram_name[256];
 
-static byte org_gbtype;
+static uint8_t org_gbtype;
 static bool sys_win2000;
 static int sram_tbl[] = {1, 1, 1, 4, 16, 8};
 static bool goomba_load_error;
@@ -38,7 +38,7 @@ bool save_goomba(gb *g_gb, const void *buf, int size, int num, FILE *fs) {
     if (goomba_load_error) {
         return true;
     } else {
-        byte gba_data[GOOMBA_COLOR_SRAM_SIZE];
+        uint8_t gba_data[GOOMBA_COLOR_SRAM_SIZE];
         fread(gba_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
         fseek(fs, 0, SEEK_SET);
 
@@ -63,7 +63,7 @@ bool save_goomba(gb *g_gb, const void *buf, int size, int num, FILE *fs) {
     }
 }
 
-void save_sram(gb *g_gb, setting *config, int timer_state, const std::string &file_name, byte *buf, int size) {
+void save_sram(gb *g_gb, setting *config, int timer_state, const std::string &file_name, uint8_t *buf, int size) {
     char cur_di[256], sv_dir[256];
     GetCurrentDirectory(256, cur_di);
     config->get_save_dir(sv_dir);
