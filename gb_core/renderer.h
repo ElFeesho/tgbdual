@@ -26,10 +26,7 @@
 
 #include "gb_types.h"
 
-class sound_renderer {
-   public:
-    virtual void render(short *buf, int samples) = 0;
-};
+class sound_renderer;
 
 class renderer {
    public:

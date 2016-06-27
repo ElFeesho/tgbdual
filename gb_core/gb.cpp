@@ -28,18 +28,13 @@
 #include <stdexcept>
 #include <string>
 
-gb::gb(renderer *ref, bool b_lcd, bool b_apu, int network_mode) {
-    m_renderer = ref;
-
-    m_lcd = new lcd(this);
-    m_rom = new rom();
-    m_apu = new apu(this);
-    m_mbc = new mbc(this);
+gb::gb(renderer *ref, bool b_lcd, bool b_apu, int network_mode) : m_renderer{ref}, m_lcd{this}, m_cheat{this}, m_mbc{this}, m_apu{this} {
+    
+    m_rom = rom();
     m_cpu = new cpu(this);
-    m_cheat = new cheat(this);
 
     m_renderer->reset();
-    m_renderer->set_sound_renderer(b_apu ? m_apu->get_renderer() : NULL);
+    m_renderer->set_sound_renderer(b_apu ? m_apu.get_renderer() : nullptr);
 
     reset();
 
@@ -63,11 +58,6 @@ gb::gb(renderer *ref, bool b_lcd, bool b_apu, int network_mode) {
 
 gb::~gb() {
     m_renderer->set_sound_renderer(NULL);
-
-    delete m_mbc;
-    delete m_rom;
-    delete m_apu;
-    delete m_lcd;
     delete m_cpu;
 }
 
@@ -93,13 +83,13 @@ void gb::reset() {
 
     memset(&c_regs, 0, sizeof(c_regs));
 
-    if (m_rom->get_loaded()) {
-        m_rom->get_info()->gb_type = (m_rom->get_rom()[0x143] & 0x80) ? (use_gba ? 4 : 3) : 1;
+    if (m_rom.get_loaded()) {
+        m_rom.get_info()->gb_type = (m_rom.get_rom()[0x143] & 0x80) ? (use_gba ? 4 : 3) : 1;
     }
     m_cpu->reset();
-    m_lcd->reset();
-    m_apu->reset();
-    m_mbc->reset();
+    m_lcd.reset();
+    m_apu.reset();
+    m_mbc.reset();
 
     now_frame = 0;
     skip = skip_buf = 0;
@@ -111,7 +101,7 @@ void gb::set_skip(int frame) {
 }
 
 bool gb::load_rom(byte *buf, int size, byte *ram, int ram_size) {
-    bool loadedSuccessfully = m_rom->load_rom(buf, size, ram, ram_size);
+    bool loadedSuccessfully = m_rom.load_rom(buf, size, ram, ram_size);
     if (loadedSuccessfully) {
         reset();
     }
@@ -122,11 +112,11 @@ void gb::serialize(serializer &s) {
     s_VAR(regs);
     s_VAR(c_regs);
 
-    m_rom->serialize(s);
+    m_rom.serialize(s);
     m_cpu->serialize(s);
-    m_mbc->serialize(s);
-    m_lcd->serialize(s);
-    m_apu->serialize(s);
+    m_mbc.serialize(s);
+    m_lcd.serialize(s);
+    m_apu.serialize(s);
 }
 
 size_t gb::get_state_size(void) {
@@ -158,7 +148,7 @@ void gb::restore_state(FILE *file) {
 
 void gb::refresh_pal() {
     for (int i = 0; i < 64; i++) {
-        m_lcd->get_mapped_pal(i >> 2)[i & 3] = m_renderer->map_color(m_lcd->get_pal(i >> 2)[i & 3]);
+        m_lcd.get_mapped_pal(i >> 2)[i & 3] = m_renderer->map_color(m_lcd.get_pal(i >> 2)[i & 3]);
     }
 }
 
@@ -225,7 +215,7 @@ void gb::run() {
                 } else {
                     regs.STAT &= 0xfc;
                     if (now_frame >= skip) {
-                        m_lcd->render(vframe, regs.LY);
+                        m_lcd.render(vframe, regs.LY);
                     }
                     if ((regs.STAT & 0x08)) {
                         m_cpu->irq(INT_LCDC);
@@ -248,7 +238,7 @@ void gb::run() {
 }
 
 bool gb::has_battery() {
-    auto cart_type = m_rom->get_info()->cart_type;
+    auto cart_type = m_rom.get_info()->cart_type;
     int has_bat[] = {0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     return has_bat[(cart_type > 0x20) ? 3 : cart_type];
 }
@@ -261,7 +251,7 @@ void inline gb::render_frame() {
     } else {
         now_frame++;
     }
-    m_lcd->clear_win_count();
+    m_lcd.clear_win_count();
 }
 
 void inline gb::hblank_dma() {
@@ -269,11 +259,11 @@ void inline gb::hblank_dma() {
     if (m_cpu->b_dma_first) {
         m_cpu->dma_dest_bank = m_cpu->vram_bank;
         if (m_cpu->dma_src < 0x4000) {
-            m_cpu->dma_src_bank = m_rom->get_rom();
+            m_cpu->dma_src_bank = m_rom.get_rom();
         } else if (m_cpu->dma_src < 0x8000) {
-            m_cpu->dma_src_bank = m_mbc->get_rom();
+            m_cpu->dma_src_bank = m_mbc.get_rom();
         } else if (m_cpu->dma_src >= 0xA000 && m_cpu->dma_src < 0xC000) {
-            m_cpu->dma_src_bank = m_mbc->get_sram() - 0xA000;
+            m_cpu->dma_src_bank = m_mbc.get_sram() - 0xA000;
         } else if (m_cpu->dma_src >= 0xC000 && m_cpu->dma_src < 0xD000) {
             m_cpu->dma_src_bank = m_cpu->ram - 0xC000;
         } else if (m_cpu->dma_src >= 0xD000 && m_cpu->dma_src < 0xE000) {
@@ -297,7 +287,7 @@ void inline gb::hblank_dma() {
     }
 
     if (now_frame >= skip) {
-        m_lcd->render(vframe, regs.LY);
+        m_lcd.render(vframe, regs.LY);
     }
 
     regs.STAT &= 0xfc;

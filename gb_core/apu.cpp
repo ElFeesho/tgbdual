@@ -29,56 +29,56 @@
 
 #include <memory.h>
 #include <stdlib.h>
+#include "apu.h"
+
 #include "gb.h"
+#include "sound_renderer.h"
+#include "serializer.h"
 
-static dword sq1_cur_pos = 0;
-static dword sq2_cur_pos = 0;
-static dword wav_cur_pos = 0;
-static dword noi_cur_pos = 0;
+static uint32_t sq1_cur_pos = 0;
+static uint32_t sq2_cur_pos = 0;
+static uint32_t wav_cur_pos = 0;
+static uint32_t noi_cur_pos = 0;
 
-apu::apu(gb *ref) {
+apu::apu(gb *ref) : snd{this} {
     ref_gb = ref;
-    snd = new apu_snd(this);
     reset();
 }
 
-apu::~apu() {}
-
 void apu::reset() {
-    //
-    snd->reset();
+    snd.reset();
 }
 
-byte apu::read(word adr) {
+uint8_t apu::read(uint16_t adr) {
     if (adr == 0xff26)
-        return (!snd->stat.master_enable)
+        return (!snd.stat.master_enable)
                    ? 0x00
                    : (0x80 |
-                      (((snd->stat.sq1_playing && snd->stat.wav_vol) ? 1 : 0) |
-                       ((snd->stat.sq2_playing && snd->stat.wav_vol) ? 2 : 0) |
-                       ((snd->stat.wav_enable && snd->stat.wav_playing &&
-                         snd->stat.wav_vol)
+                      (((snd.stat.sq1_playing && snd.stat.wav_vol) ? 1 : 0) |
+                       ((snd.stat.sq2_playing && snd.stat.wav_vol) ? 2 : 0) |
+                       ((snd.stat.wav_enable && snd.stat.wav_playing &&
+                         snd.stat.wav_vol)
                             ? 4
                             : 0) |
-                       ((snd->stat.noi_playing && snd->stat.noi_vol) ? 8 : 0)));
+                       ((snd.stat.noi_playing && snd.stat.noi_vol) ? 8 : 0)));
     else
-        return snd->mem[adr - 0xff10];
+        return snd.mem[adr - 0xff10];
 }
 
-void apu::write(word adr, byte dat, int clock) {
+void apu::write(uint16_t adr, uint8_t dat, int clock) {
     static int bef_clock = clock;
     static int clocks = 0;
 
-    snd->mem[adr - 0xFF10] = dat;
+    snd.mem[adr - 0xFF10] = dat;
 
-    snd->write_que[snd->que_count].adr = adr;
-    snd->write_que[snd->que_count].dat = dat;
-    snd->write_que[snd->que_count++].clock = clock;
+    snd.write_que[snd.que_count].adr = adr;
+    snd.write_que[snd.que_count].dat = dat;
+    snd.write_que[snd.que_count++].clock = clock;
 
-    if (snd->que_count >= 0x10000)
-        snd->que_count = 0xffff;
+    if (snd.que_count >= 0x10000)
+        snd.que_count = 0xffff;
 
-    snd->process(adr, dat);
+    snd.process(adr, dat);
 
     if (bef_clock > clock)
         bef_clock = clock;
@@ -87,7 +87,7 @@ void apu::write(word adr, byte dat, int clock) {
 
     while (clocks >
            CLOKS_PER_INTERVAL * (ref_gb->get_cpu()->get_speed() ? 2 : 1)) {
-        snd->update();
+        snd.update();
         clocks -= CLOKS_PER_INTERVAL * (ref_gb->get_cpu()->get_speed() ? 2 : 1);
     }
 
@@ -97,15 +97,15 @@ void apu::write(word adr, byte dat, int clock) {
 void apu::update() {}
 
 apu_stat *apu::get_stat() {
-    return &snd->stat;
+    return &snd.stat;
 }
 
 apu_stat *apu::get_stat_cpy() {
-    return &snd->stat_cpy;
+    return &snd.stat_cpy;
 }
 
-byte *apu::get_mem() {
-    return snd->mem;
+uint8_t *apu::get_mem() {
+    return snd.mem;
 }
 
 //---------------------------------------------------------------------
@@ -116,8 +116,6 @@ apu_snd::apu_snd(apu *papu) {
     b_echo = false;
     b_lowpass = false;
 }
-
-apu_snd::~apu_snd() {}
 
 void apu_snd::reset() {
     que_count = 0;
@@ -136,13 +134,12 @@ void apu_snd::reset() {
 
     memcpy(&stat_cpy, &stat, sizeof(stat));
 
-    byte gb_init_wav[] = {0x06, 0xFE, 0x0E, 0x7F, 0x00, 0xFF, 0x58, 0xDF,
+    uint8_t gb_init_wav[] = {0x06, 0xFE, 0x0E, 0x7F, 0x00, 0xFF, 0x58, 0xDF,
                           0x00, 0xEC, 0x00, 0xBF, 0x0C, 0xED, 0x03, 0xF7};
-    byte gbc_init_wav[] = {0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF,
+    uint8_t gbc_init_wav[] = {0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF,
                            0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF};
 
-    if (ref_apu->ref_gb->get_rom()->get_info()->gb_type ==
-        1) // 初期型GB // GB early type
+    if (ref_apu->ref_gb->get_rom()->get_info()->gb_type == 1) // 初期型GB // GB early type
         memcpy(mem + 20, gb_init_wav, 16);
     else if (ref_apu->ref_gb->get_rom()->get_info()->gb_type >= 3) // GBC
         memcpy(mem + 20, gbc_init_wav, 16);
@@ -157,7 +154,7 @@ bool apu_snd::get_enable(int ch) {
 }
 extern FILE *file;
 
-void apu_snd::process(word adr, byte dat) {
+void apu_snd::process(uint16_t adr, uint8_t dat) {
     int tb[] = {0, 4, 2, 1};
     int mul_t[] = {2, 1, 1, 1, 1, 1, 1, 1};
     int div_t[] = {1, 1, 2, 3, 4, 5, 6, 7};
@@ -243,7 +240,7 @@ void apu_snd::process(word adr, byte dat) {
             break;
         case 0xFF1C:
             stat.wav_vol = tb[(dat >> 5) & 3];
-            //		byte tmp;
+            //		uint8_t tmp;
             //		tmp=stat.wav_vol*128/4;
             //		voice_kind_count++;
             break;
@@ -339,8 +336,8 @@ static int sq_wav_dat[4][8] = {{0, 1, 0, 0, 0, 0, 0, 0},
                                {0, 0, 1, 1, 1, 1, 1, 1}};
 
 inline short apu_snd::sq1_produce(int freq) {
-    static dword cur_sample = 0;
-    dword cur_freq;
+    static uint32_t cur_sample = 0;
+    uint32_t cur_freq;
     short ret;
 
     if (freq > 65000)
@@ -361,8 +358,8 @@ inline short apu_snd::sq1_produce(int freq) {
 }
 
 inline short apu_snd::sq2_produce(int freq) {
-    static dword cur_sample = 0;
-    dword cur_freq;
+    static uint32_t cur_sample = 0;
+    uint32_t cur_freq;
     short ret;
 
     if (freq > 65000)
@@ -383,9 +380,9 @@ inline short apu_snd::sq2_produce(int freq) {
 }
 
 inline short apu_snd::wav_produce(int freq, bool interpolation) {
-    static dword cur_pos2 = 0;
-    static byte bef_sample = 0, cur_sample = 0;
-    dword cur_freq;
+    static uint32_t cur_pos2 = 0;
+    static uint8_t bef_sample = 0, cur_sample = 0;
+    uint32_t cur_freq;
     short ret;
 
     if (freq > 65000)
@@ -416,7 +413,7 @@ inline short apu_snd::wav_produce(int freq, bool interpolation) {
     return ret;
 }
 
-static inline unsigned int _mrand(dword degree) {
+static inline unsigned int _mrand(uint32_t degree) {
     static int shift_reg = 0x7f;
     static int bef_degree = 0;
     int xor_reg = 0;
@@ -449,7 +446,7 @@ static inline unsigned int _mrand(dword degree) {
 inline short apu_snd::noi_produce(int freq)
 {
         static int cur_sample=10000;
-        dword cur_freq;
+        uint32_t cur_freq;
         short ret;
 
         if (freq){
@@ -469,7 +466,7 @@ inline short apu_snd::noi_produce(int freq)
 }*/
 inline short apu_snd::noi_produce(int freq) {
     static int cur_sample = 10000;
-    dword cur_freq;
+    uint32_t cur_freq;
     short ret;
     int sc;
     if (freq) {
@@ -704,11 +701,11 @@ void apu_snd::render(short *buf, int sample) {
 }
 
 void apu::serialize(serializer &s) {
-    snd->serialize(s);
+    snd.serialize(s);
 }
 void apu_snd::serialize(serializer &s) {
     // originally, the only things saved were stat, stat_cpy,
-    // and the first 0x30 bytes of mem.
+    // and the first 0x30 uint8_ts of mem.
     s_VAR(stat);
     s_VAR(stat_cpy);
     s_ARRAY(mem);

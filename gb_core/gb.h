@@ -20,11 +20,18 @@
 //--------------------------------------------------
 // GB クラス定義部,その他
 
+#pragma once
+
 #include <stdio.h>
 #include <list>
 
 #include "gb_types.h"
 #include "renderer.h"
+#include "rom.h"
+#include "lcd.h"
+#include "cheat.h"
+#include "apu.h"
+#include "mbc.h"
 #include "serializer.h"
 
 #include <arpa/inet.h>
@@ -41,22 +48,9 @@
 
 class gb;
 class cpu;
-class lcd;
 class apu;
 class apu_snd;
 class rom;
-class mbc;
-class cheat;
-
-
-struct cheat_dat {
-    bool enable;
-    byte code;
-    word adr;
-    byte dat;
-    char name[255];
-    cheat_dat *next;
-};
 
 struct gb_regs {
     byte P1, SB, SC, DIV, TIMA, TMA, TAC, IF, LCDC, STAT, SCY, SCX, LY, LYC, DMA,
@@ -85,86 +79,7 @@ struct cpu_regs {
     byte I;
 };
 
-struct apu_stat {
-    bool sq1_playing;
-    int sq1_sw_time;
-    int sq1_sw_dir;
-    int sq1_sw_shift;
 
-    int sq1_len;
-    int sq1_init_len;
-    int sq1_type;
-
-    int sq1_vol;
-    int sq1_init_vol;
-    int sq1_env_dir;
-    int sq1_env_speed;
-
-    int sq1_freq;
-    int sq1_init_freq;
-
-    int sq1_hold;
-
-    bool sq2_playing;
-
-    int sq2_len;
-    int sq2_init_len;
-    int sq2_type;
-
-    int sq2_vol;
-    int sq2_init_vol;
-    int sq2_env_dir;
-    int sq2_env_speed;
-
-    int sq2_freq;
-    int sq2_init_freq;
-
-    int sq2_hold;
-
-    bool wav_playing;
-    int wav_vol;
-    int wav_freq;
-    int wav_init_freq;
-    int wav_init_len;
-    int wav_len;
-    int wav_hold;
-
-    bool noi_playing;
-    int noi_len;
-    int noi_init_len;
-
-    int noi_vol;
-    int noi_init_vol;
-    int noi_env_dir;
-    int noi_env_speed;
-
-    int noi_freq;
-    int noi_init_freq;
-    int noi_hold;
-    int noi_step;
-
-    int master_enable;
-    int ch_enable[4][2];
-    int master_vol[2];
-    int ch_on[4];
-    int wav_enable;
-};
-
-struct apu_que {
-    word adr;
-    byte dat;
-    int clock;
-};
-
-struct rom_info {
-    char cart_name[18];
-    int cart_type;
-    byte rom_size;
-    byte ram_size;
-
-    bool check_sum;
-    int gb_type;
-};
 
 class gb {
     friend class cpu;
@@ -174,12 +89,12 @@ class gb {
     ~gb();
 
     cpu *get_cpu() { return m_cpu; }
-    lcd *get_lcd() { return m_lcd; }
-    apu *get_apu() { return m_apu; }
-    rom *get_rom() { return m_rom; }
-    mbc *get_mbc() { return m_mbc; }
+    lcd *get_lcd() { return &m_lcd; }
+    apu *get_apu() { return &m_apu; }
+    rom *get_rom() { return &m_rom; }
+    mbc *get_mbc() { return &m_mbc; }
     renderer *get_renderer() { return m_renderer; }
-    cheat *get_cheat() { return m_cheat; }
+    cheat *get_cheat() { return &m_cheat; }
 
     gb_regs *get_regs() { return &regs; }
     gbc_regs *get_cregs() { return &c_regs; }
@@ -209,14 +124,14 @@ class gb {
     void inline hblank_dma();
 
    private:
-    cpu *m_cpu;
-    lcd *m_lcd;
-    apu *m_apu;
-    rom *m_rom;
-    mbc *m_mbc;
     renderer *m_renderer;
+    lcd m_lcd;
+    cpu *m_cpu;
+    apu m_apu;
+    rom m_rom;
+    mbc m_mbc;
 
-    cheat *m_cheat;
+    cheat m_cheat;
 
     gb_regs regs;
     gbc_regs c_regs;
@@ -234,249 +149,6 @@ class gb {
 
     int net_socket;
     struct sockaddr_in theiraddr, myaddr;
-};
-
-class cheat {
-   public:
-    cheat(gb *ref);
-    ~cheat();
-
-    byte cheat_read(word adr);
-    void cheat_write(word adr, byte dat);
-
-    bool cheak_cheat(word adr);
-    void create_cheat_map();
-
-    void add_cheat(cheat_dat *dat);
-    void delete_cheat(char *name);
-    std::list<cheat_dat>::iterator find_cheat(char *name);
-    void create_unique_name(char *buf);
-
-    void clear();
-
-    std::list<cheat_dat>::iterator get_first() { return cheat_list.begin(); }
-    std::list<cheat_dat>::iterator get_end() { return cheat_list.end(); }
-
-    int *get_cheat_map() { return cheat_map; }
-
-    void save(FILE *file);
-    void load(FILE *file);
-
-   private:
-    std::list<cheat_dat> cheat_list;
-    int cheat_map[0x10000];
-
-    gb *ref_gb;
-};
-
-class lcd {
-   public:
-    lcd(gb *ref);
-    ~lcd();
-
-    void render(void *buf, int scanline);
-    void reset();
-    void clear_win_count() { now_win_line = 9; }
-    word *get_pal(int num) { return col_pal[num]; }
-    word *get_mapped_pal(int num) { return mapped_pal[num]; }
-
-    void set_enable(int layer, bool enable);
-    bool get_enable(int layer);
-
-    int get_sprite_count() { return sprite_count; };
-
-    void serialize(serializer &s);
-
-   private:
-    void bg_render(void *buf, int scanline);
-    void win_render(void *buf, int scanline);
-    void sprite_render(void *buf, int scanline);
-    void bg_render_color(void *buf, int scanline);
-    void win_render_color(void *buf, int scanline);
-    void sprite_render_color(void *buf, int scanline);
-
-    word m_pal16[4];
-    dword m_pal32[4];
-    word col_pal[16][4];
-    word mapped_pal[16][4];
-
-    int trans_count;
-    byte trans_tbl[160 + 160], priority_tbl[320];
-
-    int now_win_line;
-    int mul;
-    int sprite_count;
-
-    bool layer_enable[3];
-
-    gb *ref_gb;
-};
-
-class apu {
-    friend class apu_snd;
-
-   public:
-    apu(gb *ref);
-    ~apu();
-
-    apu_snd *get_renderer() { return snd; }
-    apu_stat *get_stat();
-    apu_stat *get_stat_cpy();
-    byte *get_mem();
-
-    byte read(word adr);
-    void write(word adr, byte dat, int clock);
-
-    void update();
-    void reset();
-
-    void serialize(serializer &s);
-
-   private:
-    gb *ref_gb;
-    apu_snd *snd;
-};
-
-class apu_snd : public sound_renderer {
-    friend class apu;
-
-   public:
-    apu_snd(apu *papu);
-    ~apu_snd();
-
-    void set_enable(int ch, bool enable);
-    bool get_enable(int ch);
-    void set_echo(bool echo) { b_echo = echo; };
-    void set_lowpass(bool lowpass) { b_lowpass = lowpass; };
-    bool get_echo() { return b_echo; };
-    bool get_lowpass() { return b_lowpass; };
-
-    void render(short *buf, int sample);
-    void reset();
-
-    void serialize(serializer &s);
-
-   private:
-    void process(word adr, byte dat);
-    void update();
-    short sq1_produce(int freq);
-    short sq2_produce(int freq);
-    short wav_produce(int freq, bool interpolation);
-    short noi_produce(int freq);
-
-    apu_stat stat;
-    apu_stat stat_cpy, stat_tmp;
-    apu_que write_que[0x10000];
-    int que_count;
-    int bef_clock;
-    apu *ref_apu;
-
-    bool b_echo;
-    bool b_lowpass;
-
-    byte mem[0x100];
-    bool b_enable[4];
-};
-
-class mbc {
-   public:
-    mbc(gb *ref);
-    ~mbc();
-
-    byte *get_rom() { return rom_page; }
-    byte *get_sram() { return sram_page; }
-    bool is_ext_ram() { return ext_is_ram; }
-    void set_ext_is(bool ext) { ext_is_ram = ext; }
-
-    int get_state();
-    void set_state(int dat);
-    void set_page(int rom, int sram);
-
-    byte read(word adr);
-    void write(word adr, byte dat);
-    byte ext_read(word adr);
-    void ext_write(word adr, byte dat);
-    void reset();
-
-    void serialize(serializer &s);
-
-   private:
-    void mbc1_write(word adr, byte dat);
-    void mbc2_write(word adr, byte dat);
-    void mbc3_write(word adr, byte dat);
-    void mbc5_write(word adr, byte dat);
-    void mbc7_write(word adr, byte dat);
-    void huc1_write(word adr, byte dat);
-    void huc3_write(word adr, byte dat);
-    void tama5_write(word adr, byte dat);
-    void mmm01_write(word adr, byte dat);
-
-    byte *rom_page;
-    byte *sram_page;
-
-    bool mbc1_16_8;
-    byte mbc1_dat;
-
-    byte mbc3_latch; // 1 bits
-    byte mbc3_sec;   // 6
-    byte mbc3_min;   // 6
-    byte mbc3_hour;  // 5
-    byte mbc3_dayl;  // 8
-    byte mbc3_dayh;  // 1
-
-    byte mbc3_timer; // 4
-    bool ext_is_ram; // 1
-    // total 32bits
-
-    int mbc5_dat;
-
-    bool mbc7_write_enable;
-    bool mbc7_idle;
-    byte mbc7_cs;
-    byte mbc7_sk;
-    byte mbc7_op_code;
-    byte mbc7_adr;
-    word mbc7_dat;
-    byte mbc7_ret;
-    byte mbc7_state;
-    word mbc7_buf;
-    byte mbc7_count;
-
-    bool huc1_16_8;
-    byte huc1_dat;
-
-    gb *ref_gb;
-};
-
-class rom {
-   public:
-    rom();
-    ~rom();
-
-    rom_info *get_info() { return &info; }
-    byte *get_rom() { return first_page; }
-    byte *get_sram() { return sram; }
-    bool get_loaded() { return b_loaded; }
-
-    bool has_battery();
-    int get_sram_size(); // byte単位
-
-    void set_first(int page) { first_page = dat + 0x4000 * page; }
-
-    bool load_rom(byte *buf, int size, byte *ram, int ram_size);
-
-    void serialize(serializer &s);
-
-   private:
-    gb *ref_gb;
-    rom_info info;
-
-    byte *dat;
-    byte *sram;
-
-    byte *first_page;
-
-    bool b_loaded;
 };
 
 class cpu {

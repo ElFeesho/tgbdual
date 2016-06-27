@@ -22,6 +22,7 @@
 // (MBC1/2/3/5/7,HuC-1,MMM01,Rumble,RTC,Motion-Sensor,etc...)
 // MBC emulation unit (MBC1/2/3/5/7,HuC-1,MMM01,Rumble,RTC,Motion-Sensor,etc...)
 
+#include "mbc.h"
 #include "gb.h"
 
 mbc::mbc(gb *ref) {
@@ -29,8 +30,6 @@ mbc::mbc(gb *ref) {
 
     reset();
 }
-
-mbc::~mbc() {}
 
 void mbc::reset() {
     ref_gb->get_rom()->set_first(0);
@@ -60,11 +59,11 @@ void mbc::reset() {
     }
 }
 
-byte mbc::read(word adr) {
+uint8_t mbc::read(uint16_t adr) {
     return 0;
 }
 
-void mbc::write(word adr, byte dat) {
+void mbc::write(uint16_t adr, uint8_t dat) {
     switch (ref_gb->get_rom()->get_info()->cart_type) {
         case 1:
         case 2:
@@ -108,7 +107,7 @@ void mbc::write(word adr, byte dat) {
     }
 }
 
-byte mbc::ext_read(word adr) {
+uint8_t mbc::ext_read(uint16_t adr) {
     switch (ref_gb->get_rom()->get_info()->cart_type) {
         case 1:
         case 2:
@@ -183,7 +182,7 @@ byte mbc::ext_read(word adr) {
     return 0;
 }
 
-void mbc::ext_write(word adr, byte dat) {
+void mbc::ext_write(uint16_t adr, uint8_t dat) {
     // char op_name[][20]={"プリフィックス","書込み","読込み","消去"};
     // char
     // pre_op_name[][20]={"書込み消去禁止","全アドレス書込み","全アドレス消去","書込み消去許可"};
@@ -355,7 +354,7 @@ void mbc::ext_write(word adr, byte dat) {
                                             } else if ((mbc7_adr >> 6) == 2) {
                                                 if (mbc7_write_enable) {
                                                     for (i = 0; i < 256; i++)
-                                                        *(word *)(ref_gb->get_rom()->get_sram() + i * 2) = 0xffff;
+                                                        *(uint16_t *)(ref_gb->get_rom()->get_sram() + i * 2) = 0xffff;
                                                 }
                                                 ////									fprintf(file,"全アドレス消去
                                                 ///ステート:なし\n");
@@ -531,7 +530,7 @@ void mbc::set_page(int rom, int sram) {
 static int rom_size_tbl[] = {2, 4, 8, 16, 32, 64, 128, 256, 512};
 static int ram_size_tbl[] = {0, 1, 1, 4, 16, 8};
 
-void mbc::mbc1_write(word adr, byte dat) {
+void mbc::mbc1_write(uint16_t adr, uint8_t dat) {
     if (mbc1_16_8) { // 16/8モード
         switch (adr >> 13) {
             case 0:
@@ -588,13 +587,13 @@ void mbc::mbc1_write(word adr, byte dat) {
     }
 }
 
-void mbc::mbc2_write(word adr, byte dat) {
+void mbc::mbc2_write(uint16_t adr, uint8_t dat) {
     if ((adr >= 0x2000) && (adr <= 0x3FFF))
         rom_page = ref_gb->get_rom()->get_rom() +
                    0x4000 * (((dat & 0x0F) == 0 ? 1 : dat & 0x0F) - 1);
 }
 
-void mbc::mbc3_write(word adr, byte dat) {
+void mbc::mbc3_write(uint16_t adr, uint8_t dat) {
     switch (adr >> 13) {
         case 0:
             if (dat == 0x0a)
@@ -642,7 +641,7 @@ void mbc::mbc3_write(word adr, byte dat) {
     }
 }
 
-void mbc::mbc5_write(word adr, byte dat) {
+void mbc::mbc5_write(uint16_t adr, uint8_t dat) {
     switch (adr >> 12) {
         case 0:
         case 1:
@@ -690,7 +689,7 @@ void mbc::mbc5_write(word adr, byte dat) {
     }
 }
 
-void mbc::mbc7_write(word adr, byte dat) {
+void mbc::mbc7_write(uint16_t adr, uint8_t dat) {
     switch (adr >> 13) {
         case 0:
             break;
@@ -717,7 +716,7 @@ void mbc::mbc7_write(word adr, byte dat) {
     }
 }
 
-void mbc::huc1_write(word adr, byte dat) {
+void mbc::huc1_write(uint16_t adr, uint8_t dat) {
     if (huc1_16_8) { // 16/8モード
         switch (adr >> 13) {
             case 0:
@@ -774,7 +773,7 @@ void mbc::huc1_write(word adr, byte dat) {
     }
 }
 
-void mbc::huc3_write(word adr, byte dat) {
+void mbc::huc3_write(uint16_t adr, uint8_t dat) {
     //	extern FILE *file;
     //	fprintf(file,"%04X : HuC-3 write %04X <=
     //%02X\n",ref_gb->get_cpu()->get_regs()->PC,adr,dat);
@@ -827,12 +826,12 @@ void mbc::huc3_write(word adr, byte dat) {
     }
 }
 
-void mbc::tama5_write(word adr, byte dat) {
+void mbc::tama5_write(uint16_t adr, uint8_t dat) {
     //	extern FILE *file;
     //	fprintf(file,"TAMA5 write %04X <= %02X\n",adr,dat);
 }
 
-void mbc::mmm01_write(word adr, byte dat) {
+void mbc::mmm01_write(uint16_t adr, uint8_t dat) {
     if (mbc1_16_8) { // 16/8モード // 16/8 mode
         switch (adr >> 13) {
             case 0:
@@ -893,8 +892,8 @@ void mbc::mmm01_write(word adr, byte dat) {
 }
 
 void mbc::serialize(serializer &s) {
-    byte *rom = ref_gb->get_rom()->get_rom();
-    byte *sram = ref_gb->get_rom()->get_sram();
+    uint8_t *rom = ref_gb->get_rom()->get_rom();
+    uint8_t *sram = ref_gb->get_rom()->get_sram();
 
     int tmp;
 

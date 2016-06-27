@@ -19,6 +19,7 @@
 
 #include <ctype.h>
 #include <string.h>
+#include "cheat.h"
 #include "gb.h"
 
 cheat::cheat(gb *ref) {
@@ -122,7 +123,7 @@ void cheat::create_cheat_map() {
     }
 }
 
-byte cheat::cheat_read(word adr) {
+uint8_t cheat::cheat_read(uint16_t adr) {
     std::list<cheat_dat>::iterator ite;
     cheat_dat *tmp;
 
@@ -198,7 +199,7 @@ byte cheat::cheat_read(word adr) {
     return ref_gb->get_cpu()->read_direct(adr);
 }
 
-void cheat::cheat_write(word adr, byte dat) {}
+void cheat::cheat_write(uint16_t adr, uint8_t dat) {}
 
 void cheat::save(FILE *file) {
     std::list<cheat_dat>::iterator ite;

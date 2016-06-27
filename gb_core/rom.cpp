@@ -20,9 +20,10 @@
 //-----------------------------------------------
 // ROMイメージ管理部 (含SRAM) // ROM image management unit (SRAM included)
 
+#include "rom.h"
 #include <memory.h>
 #include <stdlib.h>
-#include "gb.h"
+#include "serializer.h"
 
 rom::rom() {
     b_loaded = false;
@@ -37,24 +38,19 @@ rom::~rom() {
 }
 
 bool rom::has_battery() {
-    static const int has_bat[] = {0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1,
+    static const int32_t has_bat[] = {0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1,
                                   0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-                                  0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // 0x20以下
+                                  0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0}; 
     return has_bat[(info.cart_type > 0x20) ? 3 : info.cart_type] == 1;
 }
 
-int rom::get_sram_size() {
-    static const int tbl_ram[] = {1, 1, 1, 4, 16, 8}; // 0と1は保険
+uint16_t rom::get_sram_size() {
+    static const uint16_t tbl_ram[] = {1, 1, 1, 4, 16, 8}; 
     return 0x2000 * tbl_ram[info.ram_size];
 }
 
-bool rom::load_rom(byte *buf, int size, byte *ram, int ram_size) {
-    int tbl[] = {2, 4, 8, 16, 32, 64, 128, 256, 512};
-    int has_bat[] = {0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1,
-                     1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0}; // 0x20以下
-
-    byte momocol_title[16] = {0x4D, 0x4F, 0x4D, 0x4F, 0x43, 0x4F, 0x4C, 0x00,
-                              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+bool rom::load_rom(uint8_t *buf, size_t size, uint8_t *ram, size_t ram_size) {
+    uint8_t momocol_title[16] = {0x4D, 0x4F, 0x4D, 0x4F, 0x43, 0x4F, 0x4C, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
     if (b_loaded) {
         free(dat);
@@ -69,26 +65,23 @@ bool rom::load_rom(byte *buf, int size, byte *ram, int ram_size) {
     info.ram_size = buf[0x149];
 
     if (memcmp(info.cart_name, momocol_title, 16) == 0) {
-        info.cart_type = 0x100; // mmm01
+        info.cart_type = 0x100;
     }
 
-    word tmp = (buf[0x14E] << 8) | buf[0x14F];
-    byte tmp2 = buf[0x143];
+    info.gb_type = (buf[0x143] & 0x80) ? 3 : 1;
 
-    info.gb_type = (tmp2 & 0x80) ? 3 : 1;
-
-    if (info.rom_size > 8)
+    if (info.rom_size > 8) {
         return false;
+    }
 
-    dat = (byte *)malloc(size);
+    dat = (uint8_t *)malloc(size);
     memcpy(dat, buf, size);
     first_page = dat;
 
-    word sum = 0;
-
-    sram = (byte *)malloc(get_sram_size());
-    if (ram)
+    sram = (uint8_t *)malloc(get_sram_size());
+    if (ram) {
         memcpy(sram, ram, ram_size & 0xffffff00);
+    }
 
     b_loaded = true;
 

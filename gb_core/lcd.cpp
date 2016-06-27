@@ -23,6 +23,7 @@
 
 #include <memory.h>
 #include "gb.h"
+#include "lcd.h"
 
 #define ROL_BYTE(var, bits)                                   \
     (var = ((var) & (-1 << 8)) | (((var) << (bits)) & 0xff) | \
@@ -40,8 +41,6 @@ lcd::lcd(gb *ref) {
 
     reset();
 }
-
-lcd::~lcd() {}
 
 void lcd::set_enable(int layer, bool enable) {
     layer_enable[layer] = enable;
