@@ -178,7 +178,7 @@ bool try_load_goomba(void *ram, int ram_size, gzFile fs, const char *cart_name, 
     }
 }
 
-gb load_rom(char *romFile, sdl_renderer *render, setting *config, bool isServer) {
+gb load_rom(char *romFile, sdl_renderer *render, setting *config, std::function<void()> save_cb, std::function<uint8_t()> link_read_cb, std::function<void(uint8_t)> link_write_cb) {
     int size;
     BYTE *dat;
     char *p = romFile;
@@ -205,7 +205,7 @@ gb load_rom(char *romFile, sdl_renderer *render, setting *config, bool isServer)
     memcpy(dat, first_rom, size);
     free(tmpbuf);
 
-    gb g_gb{render, true, true, isServer ? 1 : 0};
+    gb g_gb{render, true, true, save_cb, link_read_cb, link_write_cb};
 
     g_gb.get_apu()->get_renderer()->set_enable(0, config->sound_enable[0] ? true : false);
     g_gb.get_apu()->get_renderer()->set_enable(1, config->sound_enable[1] ? true : false);

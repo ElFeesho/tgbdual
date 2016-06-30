@@ -28,8 +28,9 @@
 #include <stdexcept>
 #include <string>
 
-gb::gb(renderer *ref, bool b_lcd, bool b_apu, int network_mode)
-    : m_renderer{ref}, m_lcd{this}, m_cheat{this}, m_mbc{this}, m_apu{this}, m_cpu{this} {
+
+gb::gb(renderer *ref, bool b_lcd, bool b_apu, std::function<void()> sram_updated, std::function<uint8_t()> link_read, std::function<void(uint8_t)> link_write)
+    : m_renderer{ref}, m_lcd{this}, m_cheat{this}, m_mbc{this}, m_apu{this}, m_cpu{this}, sram_update_cb{sram_updated}, link_read_cb{link_read}, link_write_cb{link_write} {
 
     m_renderer->reset();
     m_renderer->set_sound_renderer(b_apu ? m_apu.get_renderer() : nullptr);
@@ -37,21 +38,6 @@ gb::gb(renderer *ref, bool b_lcd, bool b_apu, int network_mode)
     reset();
 
     use_gba = false;
-
-    nt_mode = network_mode;
-
-    memset((char *)&theiraddr, 0, sizeof(myaddr));
-    memset((char *)&myaddr, 0, sizeof(myaddr));
-    theiraddr.sin_family = myaddr.sin_family = AF_INET;
-    theiraddr.sin_addr.s_addr = myaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    myaddr.sin_port = htons(network_mode == 0 ? 4301 : 4302);
-    theiraddr.sin_port = htons(network_mode == 0 ? 4302 : 4301);
-
-    net_socket = socket(AF_INET, SOCK_DGRAM, 0);
-
-    if (bind(net_socket, (struct sockaddr *)&myaddr, sizeof(struct sockaddr_in)) != 0) {
-        throw std::domain_error("Failed to bind linkcable port");
-    }
 }
 
 void gb::reset() {
@@ -146,19 +132,11 @@ void gb::refresh_pal() {
 }
 
 void gb::send_linkcable_byte(uint8_t data) {
-    if (sendto(net_socket, &data, 1, 0, (struct sockaddr *)&theiraddr, sizeof(theiraddr)) != 1) {
-        perror("sendto");
-        throw std::domain_error("Failed to call sendto");
-    }
+    link_write_cb(data);
 }
 
 void gb::read_linkcable_byte(uint8_t *buff) {
-    socklen_t len = 0;
-    struct sockaddr_in *incoming_addr = nullptr;
-    if (recvfrom(net_socket, buff, 1, 0, (struct sockaddr *)&incoming_addr, &len) != 1) {
-        perror("recvfrom");
-        throw std::domain_error("Failed to call recvfrom");
-    }
+    *buff = link_read_cb();
 }
 
 void gb::run() {
@@ -256,6 +234,7 @@ void inline gb::hblank_dma() {
         } else if (m_cpu.dma_src < 0x8000) {
             m_cpu.dma_src_bank = m_mbc.get_rom();
         } else if (m_cpu.dma_src >= 0xA000 && m_cpu.dma_src < 0xC000) {
+            printf("SRAM?\n");
             m_cpu.dma_src_bank = m_mbc.get_sram() - 0xA000;
         } else if (m_cpu.dma_src >= 0xC000 && m_cpu.dma_src < 0xD000) {
             m_cpu.dma_src_bank = m_cpu.ram - 0xC000;
@@ -285,4 +264,8 @@ void inline gb::hblank_dma() {
 
     regs.STAT &= 0xfc;
     m_cpu.exec(207);
+}
+
+void gb::notify_sram_written() {
+    sram_update_cb();
 }

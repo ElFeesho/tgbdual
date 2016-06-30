@@ -39,6 +39,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <functional>
 
 #define INT_VBLANK 1
 #define INT_LCDC 2
@@ -60,7 +61,7 @@ class gb {
     friend class cpu;
 
    public:
-    gb(renderer *ref, bool b_lcd, bool b_apu, int network_mode = 0);
+    gb(renderer *ref, bool b_lcd, bool b_apu, std::function<void()> sram_updated, std::function<uint8_t()> link_read, std::function<void(uint8_t)> link_write);
     
     cpu *get_cpu() { return &m_cpu; }
     lcd *get_lcd() { return &m_lcd; }
@@ -94,6 +95,8 @@ class gb {
 
     bool has_battery();
 
+    void notify_sram_written();
+
     void inline render_frame();
     void inline hblank_dma();
 
@@ -123,4 +126,8 @@ class gb {
 
     int net_socket;
     struct sockaddr_in theiraddr, myaddr;
+
+    std::function<void()> sram_update_cb;
+    std::function<uint8_t()> link_read_cb;
+    std::function<void(uint8_t)> link_write_cb;
 };

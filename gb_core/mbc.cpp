@@ -242,10 +242,6 @@ void mbc::ext_write(uint16_t adr, uint8_t dat) {
                         }
                         mbc7_state = 0;
                         mbc7_ret = 1;
-                        ////					fprintf(file,"書き込み受理
-                        ///ステート:なし\n");
-                        //					fprintf(file,"State writing acceptance:
-                        //no\n");
                     } else {
                         mbc7_idle = true; // アイドル状態突入
                         mbc7_state = 0;
@@ -344,6 +340,7 @@ void mbc::ext_write(uint16_t adr, uint8_t dat) {
                                                         *(ref_gb->get_rom()->get_sram() + i * 2) =
                                                             mbc7_buf & 0xff;
                                                     }
+
                                                 }
                                                 ////
                                                 ///fprintf(file,"全アドレス書き込み %04X
@@ -594,6 +591,7 @@ void mbc::mbc2_write(uint16_t adr, uint8_t dat) {
 }
 
 void mbc::mbc3_write(uint16_t adr, uint8_t dat) {
+
     switch (adr >> 13) {
         case 0:
             if (dat == 0x0a)
@@ -612,11 +610,7 @@ void mbc::mbc3_write(uint16_t adr, uint8_t dat) {
             break;
         case 2:
             if (dat < 8) {
-                sram_page =
-                    ref_gb->get_rom()->get_sram() +
-                    0x2000 *
-                        (dat & 7 &
-                         (ram_size_tbl[ref_gb->get_rom()->get_info()->ram_size] - 1));
+                sram_page = ref_gb->get_rom()->get_sram() + 0x2000 * (dat & 7 & (ram_size_tbl[ref_gb->get_rom()->get_info()->ram_size] - 1));
                 ext_is_ram = true;
             } else {
                 ext_is_ram = false;
@@ -676,9 +670,13 @@ void mbc::mbc5_write(uint16_t adr, uint8_t dat) {
                         (dat & 0x07 &
                          (ram_size_tbl[ref_gb->get_rom()->get_info()->ram_size] - 1));
                 if (dat & 0x8)
+                {
                     ref_gb->get_renderer()->set_bibrate(true);
+                }
                 else
+                {
                     ref_gb->get_renderer()->set_bibrate(false);
+                }
             } else
                 sram_page =
                     ref_gb->get_rom()->get_sram() +
@@ -780,7 +778,9 @@ void mbc::huc3_write(uint16_t adr, uint8_t dat) {
     switch (adr >> 13) {
         case 0:
             if (dat == 0xA)
+            {
                 ext_is_ram = true;
+            }
             else if (dat == 0x0B) {
                 ext_is_ram = false;
             } else if (dat == 0x0C) {

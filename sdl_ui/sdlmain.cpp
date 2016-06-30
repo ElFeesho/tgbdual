@@ -31,6 +31,16 @@
 
 #include "dialogs.h"
 
+#include "multicast_transmitter.h"
+
+#include "tcp_server.h"
+#include "tcp_client.h"
+
+class null_link_cable_source : public link_cable_source {
+public:
+    uint8_t readByte() { return 0; }
+    void sendByte(uint8_t data) {}
+};
 
 void in_directory(const char *dir, std::function<void()> dothis) {
     char cur_di[256];
@@ -69,10 +79,27 @@ uint32_t cb_load_state(gb *g_gb, const std::string &file_name, const char *save_
 
 int main(int argc, char *argv[]) {
 
+    link_cable_source *cable_source;
     if (argc == 1)
     {
         std::cerr << "Usage: " << argv[0] << " ROM-FILE [second-player]" << std::endl; 
         return -1;
+    }
+    else if (argc == 2)
+    {
+        cable_source = new null_link_cable_source();
+    }
+    else if (argc == 3)
+    {
+        multicast_transmitter mc_transmitter {"239.0.10.0", 1337};
+        mc_transmitter.transcieve([&](std::string addr) {
+            std::cout << "Should connect to " << addr << std::endl;
+            cable_source = new tcp_client(addr);
+        });
+    }
+    else if (argc == 4)
+    {
+        cable_source = new tcp_server();
     }
 
     setting config;
@@ -99,7 +126,14 @@ int main(int argc, char *argv[]) {
     bool endGame = false;
 
     SetCurrentDirectory(cur_dir);
-    gb g_gb = load_rom(argv[1], &render, &config, argc == 3);
+    gb g_gb = load_rom(argv[1], &render, &config, [&]{
+        printf("Writing SRAM\n");
+        save_sram(&g_gb, &config, render.get_timer_state(), sav_file, g_gb.get_rom()->get_sram(), g_gb.get_rom()->get_info()->ram_size);
+    }, [&](){
+        return cable_source->readByte();
+    }, [&](uint8_t data) {
+        cable_source->sendByte(data);
+    });
     
     SDL_Event e;
 
@@ -134,10 +168,6 @@ int main(int argc, char *argv[]) {
                 elapse_time();
             }
         }
-    }
-
-    if (g_gb.has_battery()) {
-        save_sram(&g_gb, &config, render.get_timer_state(), sav_file, g_gb.get_rom()->get_sram(), g_gb.get_rom()->get_info()->ram_size);
     }
 
     return 0;

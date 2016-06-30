@@ -40,7 +40,7 @@ class cheat {
 
    private:
     std::list<cheat_dat> cheat_list;
-    int cheat_map[0x10000];
+    int cheat_map[0x10000] { 0 };
 
     gb *ref_gb;
 };
