@@ -232,7 +232,6 @@ uint8_t cpu::io_read(uint16_t adr) {
             }
             return 0x00;
         case 0xFF01:
-            ref_gb->read_linkcable_byte(&ref_gb->get_regs()->SB);
             return ref_gb->get_regs()->SB;
         case 0xFF02:
             return (ref_gb->get_regs()->SC & 0x83) | 0x7C;
@@ -345,13 +344,21 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
         case 0xFF01: // SB(シリアルシリアル通信送受信) // SB (sending and receiving
                      // serial communication)
             ref_gb->get_regs()->SB = dat;
-            ref_gb->send_linkcable_byte(ref_gb->get_regs()->SB);
+            //ref_gb->send_linkcable_byte(ref_gb->get_regs()->SB);
             return;
-        case 0xFF02: // SC(コントロール) // SC (control)
-            if (ref_gb->get_rom()->get_info()->gb_type == 1) {
+        case 0xFF02: // SC (control)
+            if (ref_gb->get_rom()->get_info()->gb_type == 1) 
+            {
                 ref_gb->get_regs()->SC = dat & 0x81;
-                if ((dat & 0x80) && (dat & 1)) // Transmission start
+                if ((dat & 0x80) && (dat & 1))
+                {
+                    // Internal clock
                     seri_occer = total_clock + 512;
+                }
+                else if ((dat & 0x80))
+                {
+                    // External clock?
+                }
             } else { // GBCでの拡張 // Enhancements in GBC
                 ref_gb->get_regs()->SC = dat & 0x83;
                 if ((dat & 0x80) && (dat & 1)) //Transmission start
@@ -369,11 +376,11 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
             return;
         case 0xFF05: // TIMA(タイマカウンタ) // TIMA (timer counter)
             ref_gb->get_regs()->TIMA = dat;
-            //			sys_clock=0;
+            //          sys_clock=0;
             return;
         case 0xFF06: // TMA(タイマ調整) // TMA (adjustment timer)
             ref_gb->get_regs()->TMA = dat;
-            //			sys_clock=0;
+            //          sys_clock=0;
             return;
         case 0xFF07: // TAC(タイマコントロール) // TAC (timer control)
             if ((dat & 0x04) && !(ref_gb->get_regs()->TAC & 0x04))
@@ -406,7 +413,7 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
             ref_gb->get_regs()->SCX = dat;
             return;
         case 0xFF44: // LY(LCDC Y座標) // LY (LCDC Y coordinate)
-            //			ref_gb->get_regs()->LY=0;
+            //          ref_gb->get_regs()->LY=0;
             ref_gb->get_lcd()->clear_win_count();
             return;
         case 0xFF45: // LYC(LY比較) // LYC (compare LY)
@@ -462,7 +469,7 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
 
         //以下カラーでの追加 // Add color below
         case 0xFF4D: // KEY1システムクロック変更 // KEY1 change system clock
-            //			speed=dat&1;
+            //          speed=dat&1;
             ref_gb->get_cregs()->KEY1 = dat & 1;
             speed_change = dat & 1;
             return;
@@ -587,7 +594,7 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
                 ref_gb->get_renderer()->map_color(ref_gb->get_lcd()->get_pal(
                     (ref_gb->get_cregs()->BCPS >> 3) &
                     7)[(ref_gb->get_cregs()->BCPS >> 1) & 3]);
-            /*			if (ref_gb->get_cregs()->BCPS&1){
+            /*          if (ref_gb->get_cregs()->BCPS&1){
                                     ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS>>3)&7)[(ref_gb->get_cregs()->BCPS>>1)&3]=
                                             ref_gb->get_renderer()->map_color(((ref_gb->get_renderer()->unmap_color(ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS>>3)&7)[(ref_gb->get_cregs()->BCPS>>1)&3])&0xff)|(dat<<8)));
                             }
@@ -715,17 +722,6 @@ static const uint8_t ZTable[256] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 };
 
-uint8_t cpu::seri_send(uint8_t dat) {
-    if ((ref_gb->get_regs()->SC & 0x81) == 0x80) {
-        uint8_t ret = ref_gb->get_regs()->SB;
-        ref_gb->get_regs()->SB = dat;
-        ref_gb->get_regs()->SC &= 1;
-        irq(INT_SERIAL);
-        return ret;
-    } else
-        return 0xFF;
-}
-
 void cpu::irq(int irq_type) {
     if (!((irq_type == INT_VBLANK || irq_type == INT_LCDC) &&
           (!(ref_gb->get_regs()->LCDC & 0x80))))
@@ -773,7 +769,7 @@ void cpu::irq_process() {
 
         halt = false;
         regs.I = 0;
-        //		ref_gb->get_regs()->IF=0;
+        //      ref_gb->get_regs()->IF=0;
     }
 }
 
@@ -815,8 +811,8 @@ void cpu::exec(int clocks) {
         op_code = op_read();
         tmp_clocks = cycles[op_code];
 
-        //		if (b_trace)
-        //			log();
+        //      if (b_trace)
+        //          log();
 
         switch (op_code) {
 #include "op_normal.h"
@@ -851,10 +847,13 @@ void cpu::exec(int clocks) {
         }
 
         if (total_clock > seri_occer) {
+            ref_gb->send_linkcable_byte(ref_gb->get_regs()->SB);
+            ref_gb->read_linkcable_byte(&ref_gb->get_regs()->SB);
             seri_occer = 0x7fffffff;
-            ref_gb->get_regs()->SB = 0xff;
-            ref_gb->get_regs()->SC &= 3;
+            // ref_gb->get_regs()->SB = 0xff;
+            // ref_gb->get_regs()->SC &= 3;
             irq(INT_SERIAL);
+            // READ?
         }
     }
 }

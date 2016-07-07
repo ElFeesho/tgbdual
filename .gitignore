@@ -19,3 +19,5 @@ Release
 *.vcxproj.user
 *.gbc
 */save/
+*.sv0
+*.sav
