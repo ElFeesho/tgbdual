@@ -33,11 +33,11 @@
 
 #include "multicast_transmitter.h"
 
-#include "tcp_server.h"
 #include "tcp_client.h"
+#include "tcp_server.h"
 
 class null_link_cable_source : public link_cable_source {
-public:
+   public:
     uint8_t readByte() { return 0; }
     void sendByte(uint8_t data) {}
 };
@@ -57,7 +57,7 @@ void cb_save_state(gb *g_gb, const std::string &file_name, const char *save_dir,
     in_directory(save_dir, [&]() {
         FILE *file = fopen(file_name.c_str(), "wb");
         g_gb->save_state(file);
-        
+
         fseek(file, -100, SEEK_CUR);
         fwrite(&timer_state, 4, 1, file);
         fclose(file);
@@ -80,31 +80,24 @@ uint32_t cb_load_state(gb *g_gb, const std::string &file_name, const char *save_
 int main(int argc, char *argv[]) {
 
     link_cable_source *cable_source;
-    if (argc == 1)
-    {
-        std::cerr << "Usage: " << argv[0] << " ROM-FILE [second-player]" << std::endl; 
+    if (argc == 1) {
+        std::cerr << "Usage: " << argv[0] << " ROM-FILE [second-player]" << std::endl;
         return -1;
-    }
-    else if (argc == 2)
-    {
+    } else if (argc == 2) {
         cable_source = new null_link_cable_source();
-    }
-    else if (argc == 3)
-    {
-        multicast_transmitter mc_transmitter {"239.0.10.0", 1337};
+    } else if (argc == 3) {
+        multicast_transmitter mc_transmitter{"239.0.10.0", 1337};
         mc_transmitter.transcieve([&](std::string addr) {
             std::cout << "Should connect to " << addr << std::endl;
             cable_source = new tcp_client(addr);
         });
-    }
-    else if (argc == 4)
-    {
+    } else if (argc == 4) {
         cable_source = new tcp_server();
     }
 
     setting config;
     sdl_renderer render;
-    
+
     std::string rom_file = argv[1];
     std::string sav_file = rom_file.substr(0, rom_file.find_last_of(".")) + ".sav";
     std::string save_state_file = rom_file.substr(0, rom_file.find_last_of(".")) + ".sv0";
@@ -126,15 +119,10 @@ int main(int argc, char *argv[]) {
     bool endGame = false;
 
     SetCurrentDirectory(cur_dir);
-    gb g_gb = load_rom(argv[1], &render, &config, [&]{
+    gb g_gb = load_rom(argv[1], &render, &config, [&] {
         printf("Writing SRAM\n");
-        save_sram(&g_gb, &config, render.get_timer_state(), sav_file, g_gb.get_rom()->get_sram(), g_gb.get_rom()->get_info()->ram_size);
-    }, [&](){
-        return cable_source->readByte();
-    }, [&](uint8_t data) {
-        cable_source->sendByte(data);
-    });
-    
+        save_sram(&g_gb, &config, render.get_timer_state(), sav_file, g_gb.get_rom()->get_sram(), g_gb.get_rom()->get_info()->ram_size); }, [&]() { return cable_source->readByte(); }, [&](uint8_t data) { cable_source->sendByte(data); });
+
     SDL_Event e;
 
     while (!endGame) {
