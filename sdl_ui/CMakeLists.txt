@@ -14,7 +14,6 @@ set(SDL_UI_SOURCES
 	tcp_server.cpp 
 	multicast_transmitter.cpp 
 	multicast_transmitter.h 
-	dialogs.h 
 	sdl_renderer.cpp 
 	sdl_renderer.h 
 	sdlmain.cpp 

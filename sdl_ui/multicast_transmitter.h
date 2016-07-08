@@ -19,4 +19,6 @@ class multicast_transmitter {
     struct sockaddr_in mc_sockaddr_in;
 
     bool shouldBroadcast{true};
+
+    std::string ip;
 };

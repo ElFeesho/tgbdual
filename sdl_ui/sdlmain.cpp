@@ -19,6 +19,7 @@
 
 #include <SDL.h>
 #include <iostream>
+#include <getopt.h>
 
 #include <gb.h>
 
@@ -26,12 +27,49 @@
 
 #include "null_link_source.h"
 
-#include "dialogs.h"
-
 #include "multicast_transmitter.h"
 
 #include "tcp_client.h"
 #include "tcp_server.h"
+
+uint8_t *file_read(const std::string &name, int *size) {
+    uint8_t *dat = 0;
+    FILE *file = fopen(name.c_str(), "rb");
+    if (!file)
+        return nullptr;
+    fseek(file, 0, SEEK_END);
+    *size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    dat = (uint8_t *)malloc(*size);
+    fread(dat, 1, *size, file);
+    fclose(file);
+    return dat;
+}
+
+void save_sram(gb *g_gb, const std::string &file_name, uint8_t *buf, int size) {
+    FILE *fsu = fopen(file_name.c_str(), "w");
+    fwrite((void*)buf, size, 1, fsu);
+    fclose(fsu);
+}
+
+gb load_rom(const std::string &romFile, const std::string &save_file, sdl_renderer *render, std::function<void()> save_cb, std::function<uint8_t()> link_read_cb, std::function<void(uint8_t)> link_write_cb) {
+    
+    int size = 0;
+    uint8_t *dat = file_read(romFile, &size);
+    
+    int ram_size;
+    uint8_t *ram = file_read(save_file, &ram_size);
+    
+    gb g_gb{render, save_cb, link_read_cb, link_write_cb};
+    g_gb.load_rom(dat, size, ram, ram_size);
+
+    free(dat);
+    free(ram);
+
+    SDL_WM_SetCaption(g_gb.get_rom()->get_info()->cart_name, 0);
+
+    return g_gb;
+}
 
 
 static int elapse_wait = 0x10AAAA;
@@ -74,37 +112,72 @@ void cb_load_state(gb *g_gb, const std::string &file_name) {
 
 int main(int argc, char *argv[]) {
 
-    bool fast_forward = false;
-
     link_cable_source *cable_source;
-    if (argc == 1) {
-        std::cerr << "Usage: " << argv[0] << " ROM-FILE [second-player]" << std::endl;
-        return -1;
-    } else if (argc == 2) {
-        cable_source = new null_link_source();
-    } else if (argc == 3) {
-        multicast_transmitter mc_transmitter{"239.0.10.0", 1337};
-        mc_transmitter.transcieve([&](std::string addr) {
-            std::cout << "Should connect to " << addr << std::endl;
-            cable_source = new tcp_client(addr);
-        });
-    } else if (argc == 4) {
-        cable_source = new tcp_server();
+
+    if (argc == 1)
+    {
+        cerr << "Usage: " << argv[0] << " rom [-s|-m|-c client-address]" << endl;
+        return 0;
     }
+
+    int option = 0;
+    while((option = getopt(argc, argv, "smc:")) != -1)
+    {
+        switch(option)
+        {
+            case 's':
+            {
+                cout << "Starting server" << endl;
+                cable_source = new tcp_server();
+            }
+            break;
+            case 'm':
+            {
+                cout << "Broadcasting availability as client" << endl;
+                multicast_transmitter mc_transmitter{"239.0.10.0", 1337};
+                mc_transmitter.transcieve([&](std::string addr) {
+                    std::cout << "Should connect to " << addr << std::endl;
+                    cable_source = new tcp_client(addr);
+                });
+            }
+            break;
+            case 'c':
+                cout << "Connecting to " << optarg << endl;
+                cable_source = new tcp_client(optarg);
+                break;
+            case '?':
+                if (optopt == 'c')
+                {
+                    cerr << "Target address must be passed in with -c" << endl;
+                }
+                else
+                {
+                    cerr << "Unknown option " << optopt << endl;
+                }
+                return -1;
+                break;
+        }
+    }
+
+    argc -= optind;
+    argv += optind;
+
+    for (int i = 0; i < argc; i++)
+    {
+        cout << argv[i] << endl;
+    }
+
+    bool fast_forward = false;
 
     sdl_renderer render;
 
-    std::string rom_file = argv[1];
+    std::string rom_file{argv[0]};
     std::string sav_file = rom_file.substr(0, rom_file.find_last_of(".")) + ".sav";
     std::string save_state_file = rom_file.substr(0, rom_file.find_last_of(".")) + ".sv0";
 
-    std::cout << "ROM File: " << rom_file << std::endl;
-    std::cout << "SAV File: " << sav_file << std::endl;
-    std::cout << "SV0 File: " << save_state_file << std::endl;
-
     bool endGame = false;
 
-    gb g_gb = load_rom(argv[1], sav_file, &render, [&] {
+    gb g_gb = load_rom(rom_file, sav_file, &render, [&] {
         printf("Writing SRAM\n");
         save_sram(&g_gb, sav_file, g_gb.get_rom()->get_sram(), g_gb.get_rom()->get_info()->ram_size); 
     }, 
