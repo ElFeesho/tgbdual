@@ -87,9 +87,8 @@ class sdl_renderer : public renderer {
     void set_timer_state(int timer);
 
     uint16_t get_sensor(bool x_y);
-    void set_bibrate(bool bibrate);
 
-    void set_filter(col_filter *fil) { m_filter = *fil; };
+    void set_filter(col_filter *fil) { };
 
     bool check_press(key_dat *dat);
 
@@ -104,8 +103,9 @@ class sdl_renderer : public renderer {
    private:
     void init_sdlvideo();
     void uninit_sdlvideo();
-    void init_surface();
-    void release_surface();
+
+    void init_sdlaudio();
+    void uninit_sdlaudio();
 
 
     int width;
@@ -114,26 +114,11 @@ class sdl_renderer : public renderer {
     int bpp;
 
     int color_type;
-    bool b_640_480;
 
     int render_pass_type;
 
-    col_filter m_filter;
+    int pad_state { 0 };
 
-    uint32_t map_24[0x10000];
-
-
-    void init_sdlaudio();
-    void init_sdlevent();
-    void uninit_sdlaudio();
-    void uninit_sdlevent();
-
-    int pad_state;
-
-    key_dat key_config[8], koro_key_config[4];
-    bool b_koro_analog;
-    int koro_sence;
-    bool b_bibrating;
     bool b_can_use_ffb;
     bool b_use_ffb;
 

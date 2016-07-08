@@ -61,7 +61,7 @@ class gb {
     friend class cpu;
 
    public:
-    gb(renderer *ref, bool b_lcd, bool b_apu, std::function<void()> sram_updated, std::function<uint8_t()> link_read, std::function<void(uint8_t)> link_write);
+    gb(renderer *ref, std::function<void()> sram_updated, std::function<uint8_t()> link_read, std::function<void(uint8_t)> link_write);
     
     cpu *get_cpu() { return &m_cpu; }
     lcd *get_lcd() { return &m_lcd; }

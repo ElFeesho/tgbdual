@@ -24,8 +24,6 @@
 
 #include "resource.h"
 #include "sdl_renderer.h"
-#include "setting.h"
-#include "w32_posix.h"
 
 #include <SDL.h>
 
@@ -42,42 +40,29 @@ class null_link_cable_source : public link_cable_source {
     void sendByte(uint8_t data) {}
 };
 
-void in_directory(const char *dir, std::function<void()> dothis) {
-    char cur_di[256];
-    GetCurrentDirectory(256, cur_di);
+void cb_save_state(gb *g_gb, const std::string &file_name, int timer_state) {
+    FILE *file = fopen(file_name.c_str(), "wb");
+    g_gb->save_state(file);
 
-    SetCurrentDirectory(dir);
-
-    dothis();
-
-    SetCurrentDirectory(cur_di);
+    fseek(file, -100, SEEK_CUR);
+    fwrite(&timer_state, 4, 1, file);
+    fclose(file);
 }
 
-void cb_save_state(gb *g_gb, const std::string &file_name, const char *save_dir, int timer_state) {
-    in_directory(save_dir, [&]() {
-        FILE *file = fopen(file_name.c_str(), "wb");
-        g_gb->save_state(file);
-
-        fseek(file, -100, SEEK_CUR);
-        fwrite(&timer_state, 4, 1, file);
-        fclose(file);
-    });
-}
-
-uint32_t cb_load_state(gb *g_gb, const std::string &file_name, const char *save_dir) {
+uint32_t cb_load_state(gb *g_gb, const std::string &file_name) {
     uint32_t timer_state = 0;
 
-    in_directory(save_dir, [&]() {
-        FILE *file = fopen(file_name.c_str(), "rb");
-        g_gb->restore_state(file);
-        fseek(file, -100, SEEK_CUR);
-        fread(&timer_state, 4, 1, file);
-        fclose(file);
-    });
+    FILE *file = fopen(file_name.c_str(), "rb");
+    g_gb->restore_state(file);
+    fseek(file, -100, SEEK_CUR);
+    fread(&timer_state, 4, 1, file);
+    fclose(file);
     return timer_state;
 }
 
 int main(int argc, char *argv[]) {
+
+    bool fast_forward = false;
 
     link_cable_source *cable_source;
     if (argc == 1) {
@@ -95,7 +80,6 @@ int main(int argc, char *argv[]) {
         cable_source = new tcp_server();
     }
 
-    setting config;
     sdl_renderer render;
 
     std::string rom_file = argv[1];
@@ -106,22 +90,12 @@ int main(int argc, char *argv[]) {
     std::cout << "SAV File: " << sav_file << std::endl;
     std::cout << "SV0 File: " << save_state_file << std::endl;
 
-    char cur_dir[256];
-    GetCurrentDirectory(256, cur_dir);
-
-    char sv_dir[256];
-    config.get_save_dir(sv_dir);
-
-    load_key_config(&render, &config);
-
-    key_dat fast_forward = {config.fast_forwerd[0], config.fast_forwerd[1]};
-
     bool endGame = false;
 
-    SetCurrentDirectory(cur_dir);
-    gb g_gb = load_rom(argv[1], &render, &config, [&] {
+    gb g_gb = load_rom(argv[1], sav_file, &render, [&] {
         printf("Writing SRAM\n");
-        save_sram(&g_gb, &config, render.get_timer_state(), sav_file, g_gb.get_rom()->get_sram(), g_gb.get_rom()->get_info()->ram_size); }, [&]() { return cable_source->readByte(); }, [&](uint8_t data) { cable_source->sendByte(data); });
+        save_sram(&g_gb, render.get_timer_state(), sav_file, g_gb.get_rom()->get_sram(), g_gb.get_rom()->get_info()->ram_size); }, [&]() { return cable_source->readByte(); }, [&](uint8_t data) { cable_source->sendByte(data); }
+    );
 
     SDL_Event e;
 
@@ -132,29 +106,95 @@ int main(int argc, char *argv[]) {
                 endGame = true;
             } else if (e.type == SDL_KEYDOWN) {
                 auto sym = e.key.keysym.sym;
-                if (sym == config.load_key[1]) {
-                    render.set_timer_state(cb_load_state(&g_gb, save_state_file, sv_dir));
-                } else if (sym == config.save_key[1]) {
-                    cb_save_state(&g_gb, save_state_file, sv_dir, render.get_timer_state());
+                if (sym == SDLK_F7) {
+                    render.set_timer_state(cb_load_state(&g_gb, save_state_file));
+                } else if (sym == SDLK_F5) {
+                    cb_save_state(&g_gb, save_state_file, render.get_timer_state());
+                }
+                else if(sym == SDLK_RIGHT)
+                {
+                    render.set_pad(render.check_pad() | 0x80);
+                }
+                else if(sym == SDLK_UP)
+                {
+                    render.set_pad(render.check_pad() | 0x20);
+                }
+                else if(sym == SDLK_DOWN)
+                {
+                    render.set_pad(render.check_pad() | 0x10);
+                }
+                else if(sym == SDLK_LEFT)
+                {
+                    render.set_pad(render.check_pad() | 0x40);
+                }
+                else if(sym == SDLK_z)
+                {
+                    render.set_pad(render.check_pad() | 0x01);
+                }
+                else if(sym == SDLK_x)
+                {
+                    render.set_pad(render.check_pad() | 0x02);
+                }
+                else if(sym == SDLK_RSHIFT)
+                {
+                    render.set_pad(render.check_pad() | 0x04);
+                }
+                else if(sym == SDLK_RETURN)
+                {
+                    render.set_pad(render.check_pad() | 0x08);
+                }
+                else if(sym == SDLK_TAB)
+                {
+                    fast_forward = !fast_forward;
                 }
             }
+            else if (e.type == SDL_KEYUP){
+                auto sym = e.key.keysym.sym;
+                if(sym == SDLK_RIGHT)
+                {
+                    render.set_pad(render.check_pad() - 0x80);
+                } else if(sym == SDLK_UP)
+                {
+                    render.set_pad(render.check_pad() - 0x20);
+                }
+                else if(sym == SDLK_DOWN)
+                {
+                    render.set_pad(render.check_pad() - 0x10);
+                }
+                else if(sym == SDLK_LEFT)
+                {
+                    render.set_pad(render.check_pad() - 0x40);
+                }
+                else if(sym == SDLK_z)
+                {
+                    render.set_pad(render.check_pad() - 0x01);
+                }
+                else if(sym == SDLK_x)
+                {
+                    render.set_pad(render.check_pad() - 0x02);
+                }
+                else if(sym == SDLK_RSHIFT)
+                {
+                    render.set_pad(render.check_pad() - 0x04);
+                }
+                else if(sym == SDLK_RETURN)
+                {
+                    render.set_pad(render.check_pad() - 0x08);
+                }
+            }
+
         }
 
         g_gb.run();
 
-        if (!render.check_press(&fast_forward)) {
-            g_gb.set_skip(config.frame_skip);
-
-            if (config.speed_limit) {
-                elapse_wait = (1000 << 16) / config.virtual_fps;
-                elapse_time();
-            }
+        if (!fast_forward) {
+            g_gb.set_skip(0);
+            elapse_wait = (1000 << 16) / 60;
+            elapse_time();
         } else {
-            g_gb.set_skip(config.fast_frame_skip);
-            if (config.fast_speed_limit) {
-                elapse_wait = (1000 << 16) / config.fast_virtual_fps;
-                elapse_time();
-            }
+            g_gb.set_skip(9);
+            elapse_wait = (1000 << 16) / 999;
+            elapse_time();        
         }
     }
 

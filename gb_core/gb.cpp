@@ -29,11 +29,11 @@
 #include <string>
 
 
-gb::gb(renderer *ref, bool b_lcd, bool b_apu, std::function<void()> sram_updated, std::function<uint8_t()> link_read, std::function<void(uint8_t)> link_write)
+gb::gb(renderer *ref, std::function<void()> sram_updated, std::function<uint8_t()> link_read, std::function<void(uint8_t)> link_write)
     : m_renderer{ref}, m_lcd{this}, m_cheat{this}, m_mbc{this}, m_apu{this}, m_cpu{this}, sram_update_cb{sram_updated}, link_read_cb{link_read}, link_write_cb{link_write} {
 
     m_renderer->reset();
-    m_renderer->set_sound_renderer(b_apu ? m_apu.get_renderer() : nullptr);
+    m_renderer->set_sound_renderer(m_apu.get_renderer());
 
     reset();
 

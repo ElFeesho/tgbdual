@@ -26,12 +26,7 @@
 #include <stdio.h>
 #include "resource.h"
 
-#include "setting.h"
-#include "w32_posix.h"
-
 #include "../gb_core/gb.h"
-
-static uint8_t *key_state;
 
 #define WIN_MULTIPLIER 2
 
@@ -71,18 +66,14 @@ sdl_renderer::sdl_renderer() {
 
     init_sdlvideo();
     init_sdlaudio();
-    init_sdlevent();
 
     cur_time = 0;
     now_sensor_x = now_sensor_y = 2047;
-
-    b_bibrating = false;
 }
 
 sdl_renderer::~sdl_renderer() {
     uninit_sdlvideo();
     uninit_sdlaudio();
-    uninit_sdlevent();
 }
 
 void sdl_renderer::output_log(const char *mes, ...) {
@@ -121,7 +112,7 @@ uint16_t sdl_renderer::unmap_color(uint16_t gb_col) {
         return gb_col;
 }
 
-static uint32_t convert_to_second(SYSTEMTIME *sys) {
+static uint32_t convert_to_second(struct tm *sys) {
     uint32_t i, ret = 0;
     static int month_days[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
@@ -165,8 +156,9 @@ static uint32_t convert_to_second(SYSTEMTIME *sys) {
 }
 
 uint8_t sdl_renderer::get_time(int type) {
-    SYSTEMTIME sys;
-    GetSystemTime(&sys);
+    struct tm sys;
+    time_t t = time(0);
+    localtime_r(&t, &sys);
 
     uint32_t now = convert_to_second(&sys);
     now -= cur_time;
@@ -187,8 +179,9 @@ uint8_t sdl_renderer::get_time(int type) {
 }
 
 void sdl_renderer::set_time(int type, uint8_t dat) {
-    SYSTEMTIME sys;
-    GetSystemTime(&sys);
+    struct tm sys;
+    time_t t = time(0);
+    localtime_r(&t, &sys);
 
     uint32_t now = convert_to_second(&sys);
     uint32_t adj = now - cur_time;
@@ -226,11 +219,6 @@ uint16_t sdl_renderer::get_sensor(bool x_y) {
 }
 
 void sdl_renderer::init_sdlvideo() {
-    init_surface();
-}
-
-void sdl_renderer::init_surface() {
-
     static const int GB_W = 160;
     static const int GB_H = 144;
     int w = GB_W * WIN_MULTIPLIER;
@@ -249,10 +237,6 @@ void sdl_renderer::init_surface() {
 }
 
 void sdl_renderer::uninit_sdlvideo() {
-    release_surface();
-}
-
-void sdl_renderer::release_surface() {
     if (dpy) {
         SDL_FreeSurface(scr);
     }
@@ -327,21 +311,6 @@ void sdl_renderer::resume_sound() {
     SDL_PauseAudio(0);
 }
 
-void sdl_renderer::init_sdlevent() {
-    pad_state = 0;
-    memset(&key_config, 0, sizeof(key_config));
-}
-
-void sdl_renderer::uninit_sdlevent() {
-}
-
-void sdl_renderer::set_key(key_dat *keys) {
-    memcpy(key_config, keys, sizeof(key_dat) * 8);
-}
-
-void sdl_renderer::set_bibrate(bool bibrate) {
-}
-
 void sdl_renderer::set_use_ffb(bool use) {
     b_use_ffb = use;
 }
@@ -355,14 +324,7 @@ void sdl_renderer::set_pad(int stat) {
 }
 
 void sdl_renderer::update_pad() {
-    SDL_PumpEvents();
-    key_state = SDL_GetKeyState(0);
 
-    pad_state = 0;
-
-    for (int i = 0; i < 8; i++) {
-        pad_state |= check_press(key_config + i) ? (1 << i) : 0;
-    }
 }
 
 uint16_t sdl_renderer::get_any_key() {
@@ -370,9 +332,9 @@ uint16_t sdl_renderer::get_any_key() {
 }
 
 bool sdl_renderer::check_press(key_dat *dat) {
-    return (key_state[dat->key_code]) ? true : false;
+    return false;
 }
 
 void sdl_renderer::refresh() {
-    update_pad();
+    
 }

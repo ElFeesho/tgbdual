@@ -18,285 +18,50 @@
 */
 
 #include <zlib.h>
-#include "../goomba/goombarom.h"
-#include "../goomba/goombasav.h"
-#include "w32_posix.h"
 #include "zlibwrap.h"
 
 static int rom_size_tbl[] = {2, 4, 8, 16, 32, 64, 128, 256, 512};
 
 typedef unsigned char BYTE;
 
-char tmp_sram_name[256];
-
-static uint8_t org_gbtype;
-static bool sys_win2000;
 static int sram_tbl[] = {1, 1, 1, 4, 16, 8};
-static bool goomba_load_error;
 
-bool save_goomba(gb *g_gb, const void *buf, int size, int num, FILE *fs) {
-    if (goomba_load_error) {
-        return true;
-    } else {
-        uint8_t gba_data[GOOMBA_COLOR_SRAM_SIZE];
-        fread(gba_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
-        fseek(fs, 0, SEEK_SET);
-
-        void *cleaned = goomba_cleanup(gba_data);
-        if (cleaned == NULL) {
-            return false;
-        } else if (cleaned != gba_data) {
-            memcpy(gba_data, cleaned, GOOMBA_COLOR_SRAM_SIZE);
-            free(cleaned);
-        }
-
-        stateheader *sh = stateheader_for(gba_data, g_gb->get_rom()->get_info()->cart_name);
-        if (sh == NULL) {
-            return false; // don't try to save sram
-        }
-        void *new_data = goomba_new_sav(gba_data, sh, buf, 0x2000 * sram_tbl[size]);
-        if (new_data == NULL) {
-            return false;
-        }
-        fwrite(new_data, 1, GOOMBA_COLOR_SRAM_SIZE, fs);
-        return true;
-    }
+uint8_t *file_read(const std::string &name, int *size) {
+    uint8_t *dat = 0;
+    FILE *file = fopen(name.c_str(), "rb");
+    if (!file)
+        return nullptr;
+    fseek(file, 0, SEEK_END);
+    *size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    dat = (uint8_t *)malloc(*size);
+    fread(dat, 1, *size, file);
+    fclose(file);
+    return dat;
 }
 
-void save_sram(gb *g_gb, setting *config, int timer_state, const std::string &file_name, uint8_t *buf, int size) {
-    char cur_di[256], sv_dir[256];
-    GetCurrentDirectory(256, cur_di);
-    config->get_save_dir(sv_dir);
-    SetCurrentDirectory(sv_dir);
-
-    FILE *fsu = fopen(file_name.c_str(), "r+b");
-    if (fsu != NULL) {
-        // if file exists, check for goomba
-        uint32_t stateid = 0;
-        fread(&stateid, 1, 4, fsu);
-        fseek(fsu, 0, SEEK_SET);
-        if (stateid == GOOMBA_STATEID) {
-            if (!save_goomba(g_gb, buf, size, 0, fsu)) {
-                fprintf(stderr, "Could not save SRAM (Goomba format).\n(%s)\n", goomba_last_error());
-            }
-            fclose(fsu);
-            SetCurrentDirectory(cur_di);
-            return;
-        } else {
-            fclose(fsu);
-        }
-    }
-
-    gzFile fs = gzopen(file_name.c_str(), "wb");
-    gzwrite(fs, buf, 0x2000 * sram_tbl[size]);
-    if ((g_gb->get_rom()->get_info()->cart_type >= 0x0f) && (g_gb->get_rom()->get_info()->cart_type <= 0x13)) {
-        gzwrite(fs, &timer_state, 4);
-    }
-    gzclose(fs);
-    SetCurrentDirectory(cur_di);
+void save_sram(gb *g_gb, int timer_state, const std::string &file_name, uint8_t *buf, int size) {
+    FILE *fsu = fopen(file_name.c_str(), "w");
+    fwrite((void*)buf, size, 1, fsu);
+    fclose(fsu);
 }
 
-void load_key_config(sdl_renderer *render, setting *config) {
-    int buf[16];
-    key_dat keys[8]; // a,b,select,start,down,up,left,right
+gb load_rom(const std::string &romFile, const std::string &save_file, sdl_renderer *render, std::function<void()> save_cb, std::function<uint8_t()> link_read_cb, std::function<void(uint8_t)> link_write_cb) {
+    
+    int size = 0;
+    uint8_t *dat = file_read(romFile, &size);
+    
+    int ram_size;
+    uint8_t *ram = file_read(save_file, &ram_size);
+    
+    gb g_gb{render, save_cb, link_read_cb, link_write_cb};
 
-    config->get_key_setting(buf, 0);
-
-    keys[0].device_type = buf[0];
-    keys[1].device_type = buf[2];
-    keys[2].device_type = buf[4];
-    keys[3].device_type = buf[6];
-    keys[4].device_type = buf[8];
-    keys[5].device_type = buf[10];
-    keys[6].device_type = buf[12];
-    keys[7].device_type = buf[14];
-    keys[0].key_code = buf[1];
-    keys[1].key_code = buf[3];
-    keys[2].key_code = buf[5];
-    keys[3].key_code = buf[7];
-    keys[4].key_code = buf[9];
-    keys[5].key_code = buf[11];
-    keys[6].key_code = buf[13];
-    keys[7].key_code = buf[15];
-
-    render->set_key(keys);
-
-    render->set_use_ffb(config->use_ffb);
-
-    col_filter cof;
-    cof.r_def = config->r_def;
-    cof.g_def = config->g_def;
-    cof.b_def = config->b_def;
-    cof.r_div = config->r_div;
-    cof.g_div = config->g_div;
-    cof.b_div = config->b_div;
-    cof.r_r = config->r_r;
-    cof.r_g = config->r_g;
-    cof.r_b = config->r_b;
-    cof.g_r = config->g_r;
-    cof.g_g = config->g_g;
-    cof.g_b = config->g_b;
-    cof.b_r = config->b_r;
-    cof.b_g = config->b_g;
-    cof.b_b = config->b_b;
-    render->set_filter(&cof);
-}
-
-bool try_load_goomba(void *ram, int ram_size, gzFile fs, const char *cart_name, int num) {
-    gzseek(fs, 0, SEEK_SET);
-    char gba_data[GOOMBA_COLOR_SRAM_SIZE];
-    gzread(fs, gba_data, GOOMBA_COLOR_SRAM_SIZE);
-    gzclose(fs);
-
-    void *cleaned = goomba_cleanup(gba_data);
-    if (cleaned == NULL) {
-        return false;
-    } else if (cleaned != gba_data) {
-        memcpy(gba_data, cleaned, GOOMBA_COLOR_SRAM_SIZE);
-        free(cleaned);
-    }
-
-    stateheader *sh = stateheader_for(gba_data, cart_name);
-    if (sh == NULL) {
-        return false;
-    }
-
-    goomba_size_t output_size;
-    void *gbc_data = goomba_extract(gba_data, sh, &output_size);
-    if (gbc_data == NULL) {
-        return false;
-    }
-
-    if (output_size > ram_size) {
-        goomba_set_last_error("The extracted SRAM is too big for this ROM.");
-        free(gbc_data);
-        return false;
-    } else {
-        memcpy(ram, gbc_data, output_size);
-        free(gbc_data);
-        return true;
-    }
-}
-
-gb load_rom(char *romFile, sdl_renderer *render, setting *config, std::function<void()> save_cb, std::function<uint8_t()> link_read_cb, std::function<void(uint8_t)> link_write_cb) {
-    int size;
-    BYTE *dat;
-    char *p = romFile;
-
-    p = strstr(romFile, ".");
-    if (!p) {
-        throw std::domain_error("Rom file does not have a suffix (e.g. .gbc)");
-    }
-
-    while (*p != '\0') {
-        *p = tolower(*p);
-        p++;
-    }
-
-    static const char *exts[] = {"gb", "gbc", "sgb", "gba", 0};
-    BYTE *tmpbuf = file_read(romFile, exts, &size);
-    if (!tmpbuf) {
-        throw std::domain_error("Could not open rom file " + std::string(romFile));
-    }
-
-    const void *first_rom = gb_first_rom(tmpbuf, size);
-    size = gb_rom_size(first_rom);
-    dat = (BYTE *)malloc(size);
-    memcpy(dat, first_rom, size);
-    free(tmpbuf);
-
-    gb g_gb{render, true, true, save_cb, link_read_cb, link_write_cb};
-
-    g_gb.get_apu()->get_renderer()->set_enable(0, config->sound_enable[0] ? true : false);
-    g_gb.get_apu()->get_renderer()->set_enable(1, config->sound_enable[1] ? true : false);
-    g_gb.get_apu()->get_renderer()->set_enable(2, config->sound_enable[2] ? true : false);
-    g_gb.get_apu()->get_renderer()->set_enable(3, config->sound_enable[3] ? true : false);
-
-    g_gb.get_apu()->get_renderer()->set_echo(config->b_echo);
-    g_gb.get_apu()->get_renderer()->set_lowpass(config->b_lowpass);
-
-
-    char sram_name[256], cur_di[256], sv_dir[256];
-    BYTE *ram;
-    int ram_size = 0x2000 * sram_tbl[dat[0x149]];
-    char *sram_name_only;
-    strcpy(sram_name, romFile);
-    strcpy(strstr(sram_name, "."), ".sav");
-    sram_name_only = strrchr(sram_name, '/');
-    if (!sram_name_only) {
-        sram_name_only = sram_name;
-    } else {
-        sram_name_only++;
-    }
-
-    GetCurrentDirectory(256, cur_di);
-    config->get_save_dir(sv_dir);
-    SetCurrentDirectory(sv_dir);
-
-    const char *cart_name = (const char *)dat + 0x134;
-    gzFile fs = gzopen(sram_name_only, "rb");
-    if (fs != nullptr) {
-        ram = new BYTE[ram_size];
-        memset(ram, 0, ram_size);
-        gzread(fs, ram, ram_size);
-        if (*(uint32_t *)ram == GOOMBA_STATEID) {
-            goomba_load_error = !try_load_goomba(ram, ram_size, fs, cart_name, 0);
-            if (goomba_load_error) {
-                fprintf(stderr, "Goomba SRAM load error - your progress will not be saved.\n(%s)", goomba_last_error());
-            }
-        } else {
-            gzseek(fs, 0, SEEK_END);
-            if (gztell(fs) & 0xff) { // RTC won't work with gzip save files
-                int tmp;
-                gzseek(fs, -4, SEEK_END);
-                gzread(fs, &tmp, 4);
-                render->set_timer_state(tmp);
-            }
-            gzclose(fs);
-        }
-    } else {
-        strcpy(strstr(sram_name_only, "."), ".ram");
-        fs = gzopen(sram_name_only, "rb");
-        ram = new BYTE[ram_size];
-        memset(ram, 0, ram_size);
-        if (fs != nullptr) {
-            gzread(fs, ram, ram_size);
-            if (*(uint32_t *)ram == GOOMBA_STATEID) {
-                memset(ram, 0, ram_size); // in case try_load_goomba fails
-                goomba_load_error = !try_load_goomba(ram, ram_size, fs, cart_name, 0);
-                if (goomba_load_error) {
-                    fprintf(stderr, "Goomba SRAM load error - your progress will not be saved.\n(%s)", goomba_last_error());
-                }
-            } else {
-                gzseek(fs, 0, SEEK_END);
-                if (gztell(fs) & 0xff) {
-                    int tmp;
-                    gzseek(fs, -4, SEEK_END);
-                    gzread(fs, &tmp, 4);
-                    render->set_timer_state(tmp);
-                }
-                gzclose(fs);
-            }
-        }
-    }
-    strcpy(strstr(sram_name_only, "."), ".sav");
-    strcpy(tmp_sram_name, sram_name_only);
-
-    SetCurrentDirectory(cur_di);
-
-    org_gbtype = dat[0x143] & 0x80;
-
-    if (config->gb_type == 1) {
-        dat[0x143] &= 0x7f;
-    } else if (config->gb_type >= 3) {
-        dat[0x143] |= 0x80;
-    }
-
-    g_gb.set_use_gba(config->gb_type == 0 ? config->use_gba : (config->gb_type == 4 ? true : false));
+    dat[0x143] |= 0x80;
+    
     g_gb.load_rom(dat, size, ram, ram_size);
 
     free(dat);
-    delete[] ram;
+    free(ram);
 
     SDL_WM_SetCaption(g_gb.get_rom()->get_info()->cart_name, 0);
 

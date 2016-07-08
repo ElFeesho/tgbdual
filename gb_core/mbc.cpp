@@ -662,27 +662,11 @@ void mbc::mbc5_write(uint16_t adr, uint8_t dat) {
         case 5:
             if (ref_gb->get_rom()->get_info()->cart_type == 0x1C ||
                 ref_gb->get_rom()->get_info()->cart_type == 0x1D ||
-                ref_gb->get_rom()->get_info()->cart_type ==
-                    0x1E) { // Rumble カートリッジ
-                sram_page =
-                    ref_gb->get_rom()->get_sram() +
-                    0x2000 *
-                        (dat & 0x07 &
-                         (ram_size_tbl[ref_gb->get_rom()->get_info()->ram_size] - 1));
-                if (dat & 0x8)
-                {
-                    ref_gb->get_renderer()->set_bibrate(true);
-                }
-                else
-                {
-                    ref_gb->get_renderer()->set_bibrate(false);
-                }
+                ref_gb->get_rom()->get_info()->cart_type == 0x1E) { // Rumble カートリッジ
+                sram_page = ref_gb->get_rom()->get_sram() + 0x2000 * (dat & 0x07 & (ram_size_tbl[ref_gb->get_rom()->get_info()->ram_size] - 1));
+                //ref_gb->get_renderer()->set_bibrate(dat & 0x8);
             } else
-                sram_page =
-                    ref_gb->get_rom()->get_sram() +
-                    0x2000 *
-                        (dat & 0x0f &
-                         (ram_size_tbl[ref_gb->get_rom()->get_info()->ram_size] - 1));
+                sram_page = ref_gb->get_rom()->get_sram() + 0x2000 * (dat & 0x0f & (ram_size_tbl[ref_gb->get_rom()->get_info()->ram_size] - 1));
             break;
     }
 }

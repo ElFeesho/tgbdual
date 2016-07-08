@@ -42,10 +42,6 @@ class renderer {
 
     virtual uint16_t get_sensor(bool x_y) = 0;
 
-    virtual void set_bibrate(bool bibrate) = 0;
-
-    virtual void output_log(const char *mes, ...) = 0;
-
    protected:
     sound_renderer *snd_render;
 };
