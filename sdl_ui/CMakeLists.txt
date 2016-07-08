@@ -4,7 +4,21 @@ project(tgbdual C CXX)
 
 set(CMAKE_CXX_FLAGS "-O3 -Wall")
 
-set(SDL_UI_SOURCES null_link_source.h null_link_source.cpp tcp_client.h tcp_client.cpp link_cable_source.h tcp_server.h tcp_server.cpp multicast_transmitter.cpp multicast_transmitter.h dialogs.h sdl_renderer.cpp sdl_renderer.h sdlmain.cpp unzip.c unzip.h zlibwrap.cpp zlibwrap.h json.hpp)
+set(SDL_UI_SOURCES 
+	null_link_source.h 
+	null_link_source.cpp 
+	tcp_client.h 
+	tcp_client.cpp 
+	link_cable_source.h 
+	tcp_server.h 
+	tcp_server.cpp 
+	multicast_transmitter.cpp 
+	multicast_transmitter.h 
+	dialogs.h 
+	sdl_renderer.cpp 
+	sdl_renderer.h 
+	sdlmain.cpp 
+	json.hpp)
 
 find_package(SDL)
 

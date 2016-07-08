@@ -24,41 +24,6 @@
 
 using namespace std;
 
-///#define DIRECTDRAW_VERSION 0x0300
-///#define DIRECTSOUND_VERSION 0x0300
-///#define DIRECTINPUT_VERSION 0x0500
-
-///#include "wavwrite.h"
-
-///#include "sock.h"
-
-#define DI_KEYBOARD 1
-#define DI_MOUSE_X 2
-#define DI_MOUSE_Y 3
-#define DI_MOUSE 4
-#define DI_PAD_X 5
-#define DI_PAD_Y 6
-#define DI_PAD 7
-#define NEXT_PAD 3
-
-struct key_dat {
-    int device_type;
-    int key_code;
-};
-
-struct mov_key {
-    int frame;
-    int key_code;
-};
-
-struct col_filter {
-    int r_def, g_def, b_def;
-    int r_div, g_div, b_div;
-    int r_r, r_g, r_b;
-    int g_r, g_g, g_b;
-    int b_r, b_g, b_b;
-};
-
 class sdl_renderer : public renderer {
    public:
     sdl_renderer();
@@ -69,12 +34,11 @@ class sdl_renderer : public renderer {
     void set_pad(int stat);
     void refresh();
     void reset() {}
+
     uint16_t map_color(uint16_t gb_col);
     uint16_t unmap_color(uint16_t gb_col);
     uint8_t get_time(int type);
     void set_time(int type, uint8_t dat);
-
-    void set_key(key_dat *keys);
 
     void flip();
     void on_move();
@@ -86,15 +50,8 @@ class sdl_renderer : public renderer {
 
     uint16_t get_sensor(bool x_y);
 
-    void set_filter(col_filter *fil) { };
-
-    bool check_press(key_dat *dat);
-
     void pause_sound();
     void resume_sound();
-
-    void update_pad();
-    void set_use_ffb(bool use);
 
     sound_renderer *get_sound_renderer() { return snd_render; }
 
@@ -116,9 +73,6 @@ class sdl_renderer : public renderer {
     int render_pass_type;
 
     int pad_state { 0 };
-
-    bool b_can_use_ffb;
-    bool b_use_ffb;
 
     int now_sensor_x, now_sensor_y;
 

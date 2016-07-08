@@ -105,36 +105,60 @@ static uint32_t convert_to_second(struct tm *sys) {
     static int month_days[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
     for (i = 1; i + 1950 < sys->tm_year; i++)
-        if ((i & 3) == 0)           // 閏年 // Leap year
-            if ((i % 100) == 0)     // 閏年例外 // Leap year exception
-                if ((i % 400) == 0) // やっぱ閏年 // Leap year after all
-                    ret += 366;
-                else
-                    ret += 365;
+    {
+        if ((i & 3) == 0) 
+        {    
+            if ((i % 100) == 0) 
+            {
+                ret += 365 + ((i % 400) == 0 ? 1 : 0);
+            }
             else
+            {
                 ret += 366;
-        else
+            }
+        }
+        else 
+        {
             ret += 365;
+        }
+    }
 
     for (i = 1; i < sys->tm_mon; i++)
-        if (i == 2)
-            if ((sys->tm_year & 3) == 0)
-                if ((sys->tm_year % 100) == 0)
-                    if ((sys->tm_year % 400) == 0)
+    {
+        if (i == 2) 
+        {
+            if ((sys->tm_year & 3) == 0) 
+            {
+                if ((sys->tm_year % 100) == 0) 
+                {
+                    if ((sys->tm_year % 400) == 0) 
+                    {
                         ret += 29;
-                    else
+                    }
+                    else 
+                    {
                         ret += 28;
-                else
+                    }
+                }
+                else 
+                {
                     ret += 29;
-            else
+                }
+            }
+            else 
+            {
                 ret += 28;
-        else
+            }
+        }
+        else 
+        {
             ret += month_days[i];
+        }    
+    }
 
-    /// is it ok?
     ret += sys->tm_mday - 1;
 
-    ret *= 24 * 60 * 60; // 秒に変換 // Converted to seconds
+    ret *= 24 * 60 * 60;
 
     ret += sys->tm_hour * 60 * 60;
     ret += sys->tm_min * 60;
@@ -152,15 +176,15 @@ uint8_t sdl_renderer::get_time(int type) {
     now -= cur_time;
 
     switch (type) {
-        case 8: // 秒 // Second
+        case 8: 
             return (uint8_t)(now % 60);
-        case 9: // 分 // Minute
+        case 9: 
             return (uint8_t)((now / 60) % 60);
-        case 10: // 時 // Hour
+        case 10:
             return (uint8_t)((now / (60 * 60)) % 24);
-        case 11: // 日(L) // Day (L)
+        case 11:
             return (uint8_t)((now / (24 * 60 * 60)) & 0xff);
-        case 12: // 日(H) // Day (H)
+        case 12:
             return (uint8_t)((now / (256 * 24 * 60 * 60)) & 1);
     }
     return 0;
@@ -175,19 +199,19 @@ void sdl_renderer::set_time(int type, uint8_t dat) {
     uint32_t adj = now - cur_time;
 
     switch (type) {
-        case 8: // 秒 // Second
+        case 8:
             adj = (adj / 60) * 60 + (dat % 60);
             break;
-        case 9: // 分 // Minute
+        case 9:
             adj = (adj / (60 * 60)) * 60 * 60 + (dat % 60) * 60 + (adj % 60);
             break;
-        case 10: // 時 // Hour
+        case 10: 
             adj = (adj / (24 * 60 * 60)) * 24 * 60 * 60 + (dat % 24) * 60 * 60 + (adj % (60 * 60));
             break;
-        case 11: // 日(L) // Day (L)
+        case 11: 
             adj = (adj / (256 * 24 * 60 * 60)) * 256 * 24 * 60 * 60 + (dat * 24 * 60 * 60) + (adj % (24 * 60 * 60));
             break;
-        case 12: // 日(H) // Day (H)
+        case 12: 
             adj = (dat & 1) * 256 * 24 * 60 * 60 + (adj % (256 * 24 * 60 * 60));
             break;
     }
@@ -263,11 +287,11 @@ void sdl_renderer::flip() {
 }
 
 namespace {
-void fill_audio(void *userData, uint8_t *stream, int len) {
-    sdl_renderer *renderer = static_cast<sdl_renderer *>(userData);
-    sound_renderer *snd_render = renderer->get_sound_renderer();
-    snd_render->render((short *)stream, len / 4);
-}
+    void fill_audio(void *userData, uint8_t *stream, int len) {
+        sdl_renderer *renderer = static_cast<sdl_renderer *>(userData);
+        sound_renderer *snd_render = renderer->get_sound_renderer();
+        snd_render->render((short *)stream, len / 4);
+    }
 }
 
 void sdl_renderer::init_sdlaudio() {
@@ -275,8 +299,8 @@ void sdl_renderer::init_sdlaudio() {
 
     wanted.freq = 44100;
     wanted.format = AUDIO_S16;
-    wanted.channels = 2; /* 1 = モノラル, 2 = ステレオ */ /* 1 = mono, 2 = stereo */
-    wanted.samples = 4096; /* 遅延も少なく推奨の値です */ /* Recommended value less delay */
+    wanted.channels = 2; 
+    wanted.samples = 4096;
     wanted.callback = fill_audio;
     wanted.userdata = (void *)this;
 
@@ -299,10 +323,6 @@ void sdl_renderer::resume_sound() {
     SDL_PauseAudio(0);
 }
 
-void sdl_renderer::set_use_ffb(bool use) {
-    b_use_ffb = use;
-}
-
 int sdl_renderer::check_pad() {
     return pad_state;
 }
@@ -311,16 +331,8 @@ void sdl_renderer::set_pad(int stat) {
     pad_state = stat;
 }
 
-void sdl_renderer::update_pad() {
-
-}
-
 uint16_t sdl_renderer::get_any_key() {
     return 0;
-}
-
-bool sdl_renderer::check_press(key_dat *dat) {
-    return false;
 }
 
 void sdl_renderer::refresh() {
