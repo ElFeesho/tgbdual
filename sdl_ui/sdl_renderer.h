@@ -18,8 +18,7 @@
 */
 
 #include <stdio.h>
-#include <vector>
-#include "../gb_core/renderer.h"
+#include <renderer.h>
 
 #include <SDL.h>
 
@@ -69,7 +68,6 @@ class sdl_renderer : public renderer {
     int check_pad();
     void set_pad(int stat);
     void refresh();
-    void output_log(const char *mes, ...);
     void reset() {}
     uint16_t map_color(uint16_t gb_col);
     uint16_t unmap_color(uint16_t gb_col);

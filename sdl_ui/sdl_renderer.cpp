@@ -22,11 +22,11 @@
 // Using SDL implementation of interface renderer
 
 #include "sdl_renderer.h"
+
 #include <stdarg.h>
 #include <stdio.h>
-#include "resource.h"
 
-#include "../gb_core/gb.h"
+#include <gb.h>
 
 #define WIN_MULTIPLIER 2
 
@@ -74,18 +74,6 @@ sdl_renderer::sdl_renderer() {
 sdl_renderer::~sdl_renderer() {
     uninit_sdlvideo();
     uninit_sdlaudio();
-}
-
-void sdl_renderer::output_log(const char *mes, ...) {
-    va_list vl;
-    char buf[256];
-
-    va_start(vl, mes);
-    vsprintf(buf, mes, vl);
-
-    printf("%s\n", buf);
-
-    va_end(vl);
 }
 
 uint16_t sdl_renderer::map_color(uint16_t gb_col) {

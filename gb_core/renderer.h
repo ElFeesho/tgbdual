@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 class sound_renderer;
 
 class renderer {

@@ -17,15 +17,14 @@
    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
+#include <SDL.h>
 #include <iostream>
 
-#include <list>
-#include "../gb_core/gb.h"
+#include <gb.h>
 
-#include "resource.h"
 #include "sdl_renderer.h"
 
-#include <SDL.h>
+#include "null_link_source.h"
 
 #include "dialogs.h"
 
@@ -34,30 +33,43 @@
 #include "tcp_client.h"
 #include "tcp_server.h"
 
-class null_link_cable_source : public link_cable_source {
-   public:
-    uint8_t readByte() { return 0; }
-    void sendByte(uint8_t data) {}
-};
 
-void cb_save_state(gb *g_gb, const std::string &file_name, int timer_state) {
+static int elapse_wait = 0x10AAAA;
+
+static void elapse_time(void) {
+    static uint32_t lastdraw = 0, rest = 0;
+    uint32_t t = SDL_GetTicks();
+
+    rest = (rest & 0xffff) + elapse_wait;
+
+    uint32_t wait = rest >> 16;
+    uint32_t elp = (uint32_t)(t - lastdraw);
+
+    if (elp >= wait) {
+        lastdraw = t;
+        return;
+    }
+
+    if (wait - elp >= 4) {
+        SDL_Delay(wait - elp - 3);
+    }
+
+    while ((SDL_GetTicks() - lastdraw) < wait);
+
+    lastdraw += wait;
+}
+
+
+void cb_save_state(gb *g_gb, const std::string &file_name) {
     FILE *file = fopen(file_name.c_str(), "wb");
     g_gb->save_state(file);
-
-    fseek(file, -100, SEEK_CUR);
-    fwrite(&timer_state, 4, 1, file);
     fclose(file);
 }
 
-uint32_t cb_load_state(gb *g_gb, const std::string &file_name) {
-    uint32_t timer_state = 0;
-
+void cb_load_state(gb *g_gb, const std::string &file_name) {
     FILE *file = fopen(file_name.c_str(), "rb");
     g_gb->restore_state(file);
-    fseek(file, -100, SEEK_CUR);
-    fread(&timer_state, 4, 1, file);
     fclose(file);
-    return timer_state;
 }
 
 int main(int argc, char *argv[]) {
@@ -69,7 +81,7 @@ int main(int argc, char *argv[]) {
         std::cerr << "Usage: " << argv[0] << " ROM-FILE [second-player]" << std::endl;
         return -1;
     } else if (argc == 2) {
-        cable_source = new null_link_cable_source();
+        cable_source = new null_link_source();
     } else if (argc == 3) {
         multicast_transmitter mc_transmitter{"239.0.10.0", 1337};
         mc_transmitter.transcieve([&](std::string addr) {
@@ -94,7 +106,14 @@ int main(int argc, char *argv[]) {
 
     gb g_gb = load_rom(argv[1], sav_file, &render, [&] {
         printf("Writing SRAM\n");
-        save_sram(&g_gb, render.get_timer_state(), sav_file, g_gb.get_rom()->get_sram(), g_gb.get_rom()->get_info()->ram_size); }, [&]() { return cable_source->readByte(); }, [&](uint8_t data) { cable_source->sendByte(data); }
+        save_sram(&g_gb, sav_file, g_gb.get_rom()->get_sram(), g_gb.get_rom()->get_info()->ram_size); 
+    }, 
+    [&]() { 
+        return cable_source->readByte(); 
+    }, 
+    [&](uint8_t data) { 
+        cable_source->sendByte(data); 
+    }
     );
 
     SDL_Event e;
@@ -107,9 +126,11 @@ int main(int argc, char *argv[]) {
             } else if (e.type == SDL_KEYDOWN) {
                 auto sym = e.key.keysym.sym;
                 if (sym == SDLK_F7) {
-                    render.set_timer_state(cb_load_state(&g_gb, save_state_file));
+                    cb_load_state(&g_gb, save_state_file);
                 } else if (sym == SDLK_F5) {
-                    cb_save_state(&g_gb, save_state_file, render.get_timer_state());
+                    cb_save_state(&g_gb, save_state_file);
+                } else if (sym == SDLK_ESCAPE) {
+                    endGame = true;
                 }
                 else if(sym == SDLK_RIGHT)
                 {
