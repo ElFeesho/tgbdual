@@ -2,29 +2,30 @@
 
 #include <SDL.h>
 
+#include <fstream>
+
 #include "gameboy.h"
 
 static uint8_t *file_read(const std::string &name, int *size) {
     uint8_t *dat = 0;
-    FILE *file = fopen(name.c_str(), "rb");
-    if (!file)
+
+    std::ifstream file{name, std::ios::binary | std::ios::in};
+    if (!file.good())
     {
-        throw std::domain_error("Failed to load "+name+" rom file");
+        throw std::domain_error("Failed to load "+name);
     }
     
-    fseek(file, 0, SEEK_END);
-    *size = ftell(file);
-    fseek(file, 0, SEEK_SET);
+    file.seekg(0, file.end);
+    *size = file.tellg();
+    file.seekg(0, file.beg);
     dat = new uint8_t[*size];
-    
-    fread(dat, 1, *size, file);
-    
-    fclose(file);
+    file.read((char*)dat, *size);
+    file.close();
     return dat;
 }
 
 gameboy::gameboy(renderer *render, link_cable_source *link_cable_source) : 
-	_gb{render,[this]{save_sram();}, [&]{return link_cable_source->readByte();}, [&](uint8_t data) { link_cable_source->sendByte(data); }}, 
+	_gb{render,[this]{}, [&]{return link_cable_source->readByte();}, [&](uint8_t data) { link_cable_source->sendByte(data); }}, 
 	_renderer{render}
 {
 }
@@ -32,14 +33,12 @@ gameboy::gameboy(renderer *render, link_cable_source *link_cable_source) :
 void gameboy::load_rom(const std::string &romFilename)
 {
 	_romFile = romFilename;
-	_saveFile = romFilename.substr(0, romFilename.find_last_of(".")) + ".sav";
-	_stateFile = romFilename.substr(0, romFilename.find_last_of(".")) + ".sv0";
 	
 	int size = 0;
     uint8_t *dat = file_read(_romFile, &size);
     
     int ram_size;
-    uint8_t *ram = file_read(_saveFile, &ram_size);
+    uint8_t *ram = file_read(romFilename.substr(0, romFilename.find_last_of(".")) + ".sav", &ram_size);
     
     _gb.load_rom(dat, size, ram, ram_size);
 
@@ -47,22 +46,21 @@ void gameboy::load_rom(const std::string &romFilename)
     delete[] ram;
 }
 
-void gameboy::save_state() {
-	FILE *file = fopen(_stateFile.c_str(), "wb");
-    _gb.save_state(file);
-    fclose(file);
+void gameboy::load_rom(uint8_t *romData, uint32_t romLength, uint8_t *ram, uint32_t ramLength)
+{
+    _gb.load_rom(romData, romLength, ram, ramLength);
 }
 
-void gameboy::load_state() {
-	FILE *file = fopen(_stateFile.c_str(), "rb");
-    _gb.restore_state(file);
-    fclose(file);
+void gameboy::save_state(std::function<uint8_t*(uint32_t)> functor) {
+    _gb.save_state_mem(functor(_gb.get_state_size()));
 }
 
-void gameboy::save_sram() {
-	FILE *fsu = fopen(_saveFile.c_str(), "w");
-    fwrite((void*)_gb.get_rom()->get_sram(), _gb.get_rom()->get_sram_size(), 1, fsu);
-    fclose(fsu);
+void gameboy::load_state(uint8_t *state) {
+    _gb.restore_state_mem(state);
+}
+
+void gameboy::save_sram(std::function<void(uint8_t*,uint32_t)> functor) {
+    functor(_gb.get_rom()->get_sram(), _gb.get_rom()->get_sram_size());
 }
 
 void gameboy::tick()

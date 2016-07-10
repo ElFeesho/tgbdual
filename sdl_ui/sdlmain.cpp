@@ -41,6 +41,8 @@
 #include "keyboard_input_source.h"
 #include "joystick_input_source.h"
 
+#include <fstream>
+
 link_cable_source *processArguments(int *argc, char ***argv)
 {
     int option = 0;
@@ -102,6 +104,82 @@ void limit(uint32_t targetTime, std::function<void()> operation)
     }
 }
 
+class buffer
+{
+public:
+    virtual operator const char*() = 0;
+    virtual operator uint8_t*() = 0;
+    virtual uint32_t length() = 0;
+};
+
+class file_buffer : buffer 
+{
+public:
+    file_buffer(const std::string &name)
+    {
+        ifstream _file{name, std::ios::binary | std::ios::in};
+        _file.seekg(0, _file.end);
+        _length = _file.tellg();
+        _file.seekg(0, _file.beg);
+        _buffer = new uint8_t[_length];
+
+        _file.read((char*)_buffer, _length);
+        _file.close();
+    }
+
+    ~file_buffer() 
+    {
+        delete[] _buffer;
+    }
+
+    uint32_t length()
+    {
+        return _length;
+    }
+
+    operator const char*() {
+        return (const char *)_buffer;
+    }
+
+    operator uint8_t*() {
+        return _buffer;
+    }
+    
+private:
+    uint32_t _length;
+    uint8_t *_buffer;
+};
+
+class memory_buffer : buffer
+{
+public:
+    void alloc(uint32_t length)
+    {
+        _length = length;
+        _buffer = new uint8_t[length];
+    }
+
+    void dealloc()
+    {
+        delete[] _buffer;
+    }
+
+    uint32_t length() override {
+        return _length;
+    }
+
+    operator const char*() override {
+        return (const char *)_buffer;
+    }
+
+    operator uint8_t*() override {
+        return _buffer;
+    }
+private:
+    uint32_t _length;
+    uint8_t *_buffer { nullptr };
+};
+
 int main(int argc, char *argv[]) {
 
     if (argc == 1)
@@ -132,19 +210,24 @@ int main(int argc, char *argv[]) {
 
     sdl_renderer render;
 
-    std::string rom_file{argv[0]};
+    std::string romFilename{argv[0]};
+    std::string saveFile = romFilename.substr(0, romFilename.find_last_of(".")) + ".sav";
+    std::string stateFile = romFilename.substr(0, romFilename.find_last_of(".")) + ".sv0";
 
     struct stat buffer;   
-    if (stat (rom_file.c_str(), &buffer) != 0)
+    if (stat (romFilename.c_str(), &buffer) != 0)
     {
-        cerr << "Rom file " << rom_file << " is not accessible" << endl;
+        cerr << "Rom file " << romFilename << " is not accessible" << endl;
         return -1;
     }
 
     bool endGame = false;
 
     gameboy gbInst{&render, cable_source};
-    gbInst.load_rom(rom_file);
+
+    file_buffer romBuffer{romFilename};
+    file_buffer saveBuffer{saveFile};
+    gbInst.load_rom(romBuffer, romBuffer.length(), saveBuffer, saveBuffer.length());
 
     SDL_Event e;
 
@@ -176,9 +259,18 @@ int main(int argc, char *argv[]) {
             } else if (e.type == SDL_KEYDOWN) {
                 auto sym = e.key.keysym.sym;
                 if (sym == SDLK_F7) {
-                    gbInst.load_state();
+                    file_buffer state{stateFile};
+                    gbInst.load_state(state);
                 } else if (sym == SDLK_F5) {
-                    gbInst.save_state();
+                    memory_buffer buffer;
+                    gbInst.save_state([&](uint32_t length) {
+                        buffer.alloc(length);
+                        return buffer; 
+                    });
+                    std::ofstream fout(stateFile, std::ios::binary | std::ios::out);
+                    fout.write(buffer, buffer.length());
+                    fout.close();
+                    buffer.dealloc();
                 } else if (sym == SDLK_ESCAPE) {
                     endGame = true;
                 }
