@@ -136,7 +136,7 @@ uint8_t mbc::ext_read(uint16_t adr) {
                         return mbc3_dayh;
                 }
             }
-            return ref_gb->get_renderer()->get_time(mbc3_timer);
+            return ref_gb->get_time(mbc3_timer);
         case 0x19:
         case 0x1A:
         case 0x1B:
@@ -151,13 +151,13 @@ uint8_t mbc::ext_read(uint16_t adr) {
                 case 0xA010:
                     return 0;
                 case 0xA020:
-                    return ref_gb->get_renderer()->get_sensor(true) & 0xff;
+                    return ref_gb->get_sensor(true) & 0xff;
                 case 0xA030:
-                    return (ref_gb->get_renderer()->get_sensor(true) >> 8) & 0xf;
+                    return (ref_gb->get_sensor(true) >> 8) & 0xf;
                 case 0xA040:
-                    return ref_gb->get_renderer()->get_sensor(false) & 0xff;
+                    return ref_gb->get_sensor(false) & 0xff;
                 case 0xA050:
-                    return (ref_gb->get_renderer()->get_sensor(false) >> 8) & 0xf;
+                    return (ref_gb->get_sensor(false) >> 8) & 0xf;
                 case 0xA060:
                     return 0;
                 case 0xA070:
@@ -210,7 +210,7 @@ void mbc::ext_write(uint16_t adr, uint8_t dat) {
         case 0x11:
         case 0x12:
         case 0x13:
-            ref_gb->get_renderer()->set_time(mbc3_timer, dat);
+            ref_gb->set_time(mbc3_timer, dat);
             break;
         case 0xFE: // HuC-3
             //		extern FILE *file;
@@ -621,11 +621,11 @@ void mbc::mbc3_write(uint16_t adr, uint8_t dat) {
                 mbc3_latch = 0;
             } else if (dat == 1) { // データをLatchする // Latch the data to
                 if (!mbc3_latch) {
-                    mbc3_sec = ref_gb->get_renderer()->get_time(8);
-                    mbc3_min = ref_gb->get_renderer()->get_time(9);
-                    mbc3_hour = ref_gb->get_renderer()->get_time(10);
-                    mbc3_dayl = ref_gb->get_renderer()->get_time(11);
-                    mbc3_dayh = ref_gb->get_renderer()->get_time(12);
+                    mbc3_sec = ref_gb->get_time(8);
+                    mbc3_min = ref_gb->get_time(9);
+                    mbc3_hour = ref_gb->get_time(10);
+                    mbc3_dayl = ref_gb->get_time(11);
+                    mbc3_dayh = ref_gb->get_time(12);
                 }
                 mbc3_latch = 1;
             }

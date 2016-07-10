@@ -99,6 +99,11 @@ class gb {
 
     uint16_t map_color(uint16_t gb_col);
 
+    uint16_t get_sensor(bool x_y);
+
+    uint8_t get_time(int type);
+    void set_time(int type, uint8_t dat);
+
     void inline render_frame();
     void inline hblank_dma();
 
@@ -123,13 +128,10 @@ class gb {
     int re_render;
 
     bool use_gba;
-
-    int nt_mode;
-
-    int net_socket;
-    struct sockaddr_in theiraddr, myaddr;
-
+    
     std::function<void()> sram_update_cb;
     std::function<uint8_t()> link_read_cb;
     std::function<void(uint8_t)> link_write_cb;
+
+    uint32_t cur_time;
 };

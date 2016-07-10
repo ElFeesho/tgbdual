@@ -35,14 +35,6 @@ class sdl_renderer : public renderer {
     void refresh();
     void reset() {}
 
-    uint8_t get_time(int type);
-    void set_time(int type, uint8_t dat);
-
-    int get_timer_state();
-    void set_timer_state(int timer);
-
-    uint16_t get_sensor(bool x_y);
-
     sound_renderer *get_sound_renderer() { return snd_render; }
 
    private:
@@ -54,8 +46,6 @@ class sdl_renderer : public renderer {
     uint8_t pad_state { 0 };
 
     int now_sensor_x, now_sensor_y;
-
-    int cur_time;
 
    private:
     SDL_Surface *dpy;

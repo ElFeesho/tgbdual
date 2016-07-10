@@ -38,11 +38,6 @@ public:
     
     virtual void set_pad(uint8_t pad_state) = 0;
     virtual uint8_t check_pad() = 0;
-    
-    virtual uint8_t get_time(int type) = 0;
-    virtual void set_time(int type, uint8_t dat) = 0;
-
-    virtual uint16_t get_sensor(bool x_y) = 0;
 
 protected:
     sound_renderer *snd_render;
