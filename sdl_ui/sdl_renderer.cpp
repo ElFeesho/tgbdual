@@ -32,7 +32,6 @@
 
 static inline Uint32 getpixel(SDL_Surface *surface, int x, int y) {
     int bpp = surface->format->BytesPerPixel;
-    /* Here p is the address to the pixel we want to retrieve */
     uint8_t *p = (uint8_t *)surface->pixels + y * surface->pitch + x * bpp;
 
     switch (bpp) {
@@ -56,7 +55,7 @@ static inline Uint32 getpixel(SDL_Surface *surface, int x, int y) {
             break;
 
         default:
-            return 0; /* shouldn't happen, but avoids warnings */
+            return 0;
     }
 }
 
@@ -73,31 +72,6 @@ sdl_renderer::sdl_renderer() {
 
 sdl_renderer::~sdl_renderer() {
     uninit_sdlvideo();
-    uninit_sdlaudio();
-}
-
-uint16_t sdl_renderer::map_color(uint16_t gb_col) {
-
-    if (color_type == 0) // ->RRRRRGGG GGxBBBBB に変換 (565) // converted to
-        return ((gb_col & 0x1F) << 11) | ((gb_col & 0x3e0) << 1) | ((gb_col & 0x7c00) >> 10) | ((gb_col & 0x8000) >> 10);
-    if (color_type == 1) // ->xRRRRRGG GGGBBBBB に変換 (1555) // converted to
-        return ((gb_col & 0x1F) << 10) | (gb_col & 0x3e0) | ((gb_col & 0x7c00) >> 10) | (gb_col & 0x8000);
-    if (color_type == 2) // ->RRRRRGGG GGBBBBBx に変換 (5551) // converted to
-        return ((gb_col & 0x1F) << 11) | ((gb_col & 0x3e0) << 1) | ((gb_col & 0x7c00) >> 9) | (gb_col >> 15);
-    else
-        return gb_col;
-}
-
-uint16_t sdl_renderer::unmap_color(uint16_t gb_col) {
-    // xBBBBBGG GGGRRRRR へ変換 // converted to xBBBBBGG GGGRRRRR
-    if (color_type == 0) // ->RRRRRGGG GGxBBBBB から変換 (565) // convert from
-        return (gb_col >> 11) | ((gb_col & 0x7c0) >> 1) | (gb_col << 10) | ((gb_col & 0x40) << 10);
-    if (color_type == 1) // ->xRRRRRGG GGGBBBBB から変換 (1555) // convert from
-        return ((gb_col & 0x7c00) >> 10) | (gb_col & 0x3e0) | ((gb_col & 0x1f) << 10) | (gb_col & 0x8000);
-    if (color_type == 2) // ->RRRRRGGG GGBBBBBx から変換 (5551) // convert from
-        return (gb_col >> 11) | ((gb_col & 0x7c0) >> 1) | ((gb_col & 0x3e) << 9) | (gb_col << 15);
-    else
-        return gb_col;
 }
 
 static uint32_t convert_to_second(struct tm *sys) {
@@ -265,11 +239,6 @@ void sdl_renderer::render_screen(uint8_t *buf, int width, int height, int depth)
         }
     }
 
-    flip();
-}
-
-void sdl_renderer::flip() {
-
     SDL_Rect loc = {0, 0, WIN_MULTIPLIER, WIN_MULTIPLIER};
     if (dpy) {
         for (int y = 0; y < 144; y++) {
@@ -311,28 +280,12 @@ void sdl_renderer::init_sdlaudio() {
     SDL_PauseAudio(0);
 }
 
-void sdl_renderer::uninit_sdlaudio() {
-    SDL_PauseAudio(1);
-}
-
-void sdl_renderer::pause_sound() {
-    SDL_PauseAudio(1);
-}
-
-void sdl_renderer::resume_sound() {
-    SDL_PauseAudio(0);
-}
-
-int sdl_renderer::check_pad() {
+uint8_t sdl_renderer::check_pad() {
     return pad_state;
 }
 
 void sdl_renderer::set_pad(uint8_t stat) {
     pad_state = stat;
-}
-
-uint16_t sdl_renderer::get_any_key() {
-    return 0;
 }
 
 void sdl_renderer::refresh() {

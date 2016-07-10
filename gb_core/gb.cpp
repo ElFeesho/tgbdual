@@ -127,7 +127,7 @@ void gb::restore_state(FILE *file) {
 
 void gb::refresh_pal() {
     for (int i = 0; i < 64; i++) {
-        m_lcd.get_mapped_pal(i >> 2)[i & 3] = m_renderer->map_color(m_lcd.get_pal(i >> 2)[i & 3]);
+        m_lcd.get_mapped_pal(i >> 2)[i & 3] = map_color(m_lcd.get_pal(i >> 2)[i & 3]);
     }
 }
 
@@ -264,6 +264,20 @@ void inline gb::hblank_dma() {
 
     regs.STAT &= 0xfc;
     m_cpu.exec(207);
+}
+
+uint16_t gb::map_color(uint16_t gb_col) {
+
+    return ((gb_col & 0x1F) << 11) | ((gb_col & 0x3e0) << 1) | ((gb_col & 0x7c00) >> 10) | ((gb_col & 0x8000) >> 10);
+    // if (color_type == 1)
+    // {
+    //     return ((gb_col & 0x1F) << 10) | (gb_col & 0x3e0) | ((gb_col & 0x7c00) >> 10) | (gb_col & 0x8000);
+    // }
+
+    // if (color_type == 2)
+    // {
+    //     return ((gb_col & 0x1F) << 11) | ((gb_col & 0x3e0) << 1) | ((gb_col & 0x7c00) >> 9) | (gb_col >> 15);
+    // }
 }
 
 void gb::notify_sram_written() {

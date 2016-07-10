@@ -26,7 +26,7 @@
 #include "gb.h"
 
 #define ROL_BYTE(var, bits)                                   \
-    (var = ((var) & (-1 << 8)) | (((var) << (bits)) & 0xff) | \
+    (var = ((var) & (-(1 << 8))) | (((var) << (bits)) & 0xff) | \
            ((var) >> (8 - (bits))))
 
 lcd::lcd(gb *ref) {
@@ -35,7 +35,7 @@ lcd::lcd(gb *ref) {
     uint8_t dat[] = {31, 21, 11, 0};
 
     for (int i = 0; i < 4; i++) {
-        m_pal16[i] = ref_gb->get_renderer()->map_color(dat[i] | (dat[i] << 5) | (dat[i] << 10));
+        m_pal16[i] = ref_gb->map_color(dat[i] | (dat[i] << 5) | (dat[i] << 10));
         m_pal32[i] = ((dat[i] << 16) | (dat[i] << 8) | dat[i]);
     }
 
@@ -60,7 +60,7 @@ void lcd::bg_render(void *buf, int scanline) {
     if (!(ref_gb->get_regs()->LCDC & 0x80) || !(ref_gb->get_regs()->LCDC & 0x01) || (ref_gb->get_regs()->WY <= (uint32_t)scanline && ref_gb->get_regs()->WX < 8 && (ref_gb->get_regs()->LCDC & 0x20))) {
         if (!(ref_gb->get_regs()->LCDC & 0x80) || !(ref_gb->get_regs()->LCDC & 0x01)) {
             uint16_t *tmp_w = (uint16_t *)buf + 160 * scanline;
-            uint16_t tmp_dat = ref_gb->get_renderer()->map_color(0x7fff);
+            uint16_t tmp_dat = ref_gb->map_color(0x7fff);
             for (int t = 0; t < 160; t++) {
                 *(tmp_w++) = tmp_dat;
             }
@@ -139,7 +139,8 @@ void lcd::bg_render(void *buf, int scanline) {
     trans -= 8;
 
     for (i = 0; i < 8 - (x & 7); i++) { // スクロール補正
-        *(dat++) = *(dat + (x & 7));
+        *(dat) = *(dat + (x & 7));
+        dat++;
         *(trans++) = *(dat + (x & 7));
     }
 
@@ -443,7 +444,7 @@ void lcd::bg_render_color(void *buf, int scanline) {
         if (!(ref_gb->get_regs()->LCDC &
               0x80) /*||!(ref_gb->get_regs()->LCDC&0x01)*/) {
             uint16_t *tmp_w = (uint16_t *)buf + 160 * scanline;
-            uint16_t tmp_dat = ref_gb->get_renderer()->map_color(0x7fff);
+            uint16_t tmp_dat = ref_gb->map_color(0x7fff);
             for (int t = 0; t < 160; t++)
                 *(tmp_w++) = tmp_dat;
             //			memset(()+160*scanline,0xff,160*2);
@@ -539,9 +540,12 @@ void lcd::bg_render_color(void *buf, int scanline) {
     priority -= 8;
 
     for (i = 0; i < 8 - (x & 7); i++) { // スクロール補正
-        *(dat++) = *(dat + (x & 7));
-        *(trans++) = *(trans + (x & 7));
-        *(priority++) = *(priority + (x & 7));
+        *(dat) = *(dat + (x & 7));
+        dat++;
+        *(trans) = *(trans + (x & 7));
+        trans++;
+        *(priority) = *(priority + (x & 7));
+        priority++;
     }
 
     for (i = 0; i < 20; i++) {
@@ -580,23 +584,39 @@ void lcd::bg_render_color(void *buf, int scanline) {
             ROL_BYTE(calc1, 4);
         }
 
-        *(dat++) = pal[calc2 >> 6];
-        *(dat++) = pal[calc1 >> 6];
-        *(dat++) = pal[(calc2 >> 4) & 3];
-        *(dat++) = pal[(calc1 >> 4) & 3];
-        *(dat++) = pal[(calc2 >> 2) & 3];
-        *(dat++) = pal[(calc1 >> 2) & 3];
-        *(dat++) = pal[calc2 & 3];
-        *(dat++) = pal[calc1 & 3];
+        *(dat) = pal[calc2 >> 6];
+        dat++;
+        *(dat) = pal[calc1 >> 6];
+        dat++;
+        *(dat) = pal[(calc2 >> 4) & 3];
+        dat++;
+        *(dat) = pal[(calc1 >> 4) & 3];
+        dat++;
+        *(dat) = pal[(calc2 >> 2) & 3];
+        dat++;
+        *(dat) = pal[(calc1 >> 2) & 3];
+        dat++;
+        *(dat) = pal[calc2 & 3];
+        dat++;
+        *(dat) = pal[calc1 & 3];
+        dat++;
 
-        *(trans++) = (calc2 >> 6);
-        *(trans++) = (calc1 >> 6);
-        *(trans++) = (calc2 >> 4) & 3;
-        *(trans++) = (calc1 >> 4) & 3;
-        *(trans++) = (calc2 >> 2) & 3;
-        *(trans++) = (calc1 >> 2) & 3;
-        *(trans++) = calc2 & 3;
-        *(trans++) = calc1 & 3;
+        *(trans) = (calc2 >> 6);
+        trans++;
+        *(trans) = (calc1 >> 6);
+        trans++;
+        *(trans) = (calc2 >> 4) & 3;
+        trans++;
+        *(trans) = (calc1 >> 4) & 3;
+        trans++;
+        *(trans) = (calc2 >> 2) & 3;
+        trans++;
+        *(trans) = (calc1 >> 2) & 3;
+        trans++;
+        *(trans) = calc2 & 3;
+        trans++;
+        *(trans) = calc1 & 3;
+        trans++;
 
         memset(priority, (atr & 0x80), 8);
         priority += 8;

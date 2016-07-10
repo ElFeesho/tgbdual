@@ -570,11 +570,10 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
             rp_que[que_cur] = 0x00000000;
             ref_gb->get_cregs()->RP = dat;
             return;
-        case 0xFF68: // BCPS(BGパレット書き込み指定) // BCPS (write BG palette)
+        case 0xFF68: 
             ref_gb->get_cregs()->BCPS = dat;
             return;
-        case 0xFF69: // BCPD(BGパレット書きこみデータ xBBBBBGG GGGRRRRR) // (write BG
-                     // palette data xBBBBBGG GGGRRRR)
+        case 0xFF69: 
             if (ref_gb->get_cregs()->BCPS & 1) {
                 ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) &
                                            7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] =
@@ -590,30 +589,19 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
                      0xff00) |
                     dat;
             }
-            ref_gb->get_lcd()->get_mapped_pal((ref_gb->get_cregs()->BCPS >> 3) &
-                                              7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] =
-                ref_gb->get_renderer()->map_color(ref_gb->get_lcd()->get_pal(
-                    (ref_gb->get_cregs()->BCPS >> 3) &
-                    7)[(ref_gb->get_cregs()->BCPS >> 1) & 3]);
-            /*          if (ref_gb->get_cregs()->BCPS&1){
-                                    ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS>>3)&7)[(ref_gb->get_cregs()->BCPS>>1)&3]=
-                                            ref_gb->get_renderer()->map_color(((ref_gb->get_renderer()->unmap_color(ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS>>3)&7)[(ref_gb->get_cregs()->BCPS>>1)&3])&0xff)|(dat<<8)));
-                            }
-                            else{
-                                    ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS>>3)&7)[(ref_gb->get_cregs()->BCPS>>1)&3]=
-                                            ref_gb->get_renderer()->map_color(((ref_gb->get_renderer()->unmap_color(ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS>>3)&7)[(ref_gb->get_cregs()->BCPS>>1)&3])&0xff00)|(dat)));
-                            }*/
+            ref_gb->get_lcd()->get_mapped_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] =
+                ref_gb->map_color(ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[(ref_gb->get_cregs()->BCPS >> 1) & 3]);
+    
             ref_gb->get_cregs()->BCPD = dat;
             if (ref_gb->get_cregs()->BCPS & 0x80)
-                ref_gb->get_cregs()->BCPS =
-                    0x80 | ((ref_gb->get_cregs()->BCPS + 1) & 0x3f);
+            {
+                ref_gb->get_cregs()->BCPS = 0x80 | ((ref_gb->get_cregs()->BCPS + 1) & 0x3f);
+            }
             return;
-        case 0xFF6A: // OCPS(OBJパレット書きこみ指定) // OCPS (Specify write OBJ
-                     // palette)
+        case 0xFF6A: 
             ref_gb->get_cregs()->OCPS = dat;
             return;
-        case 0xFF6B: // OCPD(OBJパレット書きこみデータ) // OCPD (Write data OBJ
-                     // palette)
+        case 0xFF6B: 
             if (ref_gb->get_cregs()->OCPS & 1) {
                 ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) +
                                            8)[(ref_gb->get_cregs()->OCPS >> 1) & 3] =
@@ -631,7 +619,7 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
             }
             ref_gb->get_lcd()->get_mapped_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) +
                                               8)[(ref_gb->get_cregs()->OCPS >> 1) & 3] =
-                ref_gb->get_renderer()->map_color(ref_gb->get_lcd()->get_pal(
+                ref_gb->map_color(ref_gb->get_lcd()->get_pal(
                     ((ref_gb->get_cregs()->OCPS >> 3) & 7) +
                     8)[(ref_gb->get_cregs()->OCPS >> 1) & 3]);
             ref_gb->get_cregs()->OCPD = dat;

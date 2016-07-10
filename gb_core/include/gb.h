@@ -97,6 +97,8 @@ class gb {
 
     void notify_sram_written();
 
+    uint16_t map_color(uint16_t gb_col);
+
     void inline render_frame();
     void inline hblank_dma();
 
