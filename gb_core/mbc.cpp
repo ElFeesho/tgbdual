@@ -340,7 +340,6 @@ void mbc::ext_write(uint16_t adr, uint8_t dat) {
                                                         *(ref_gb->get_rom()->get_sram() + i * 2) =
                                                             mbc7_buf & 0xff;
                                                     }
-
                                                 }
                                                 ////
                                                 ///fprintf(file,"全アドレス書き込み %04X

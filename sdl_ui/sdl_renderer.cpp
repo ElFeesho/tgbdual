@@ -327,7 +327,7 @@ int sdl_renderer::check_pad() {
     return pad_state;
 }
 
-void sdl_renderer::set_pad(int stat) {
+void sdl_renderer::set_pad(uint8_t stat) {
     pad_state = stat;
 }
 

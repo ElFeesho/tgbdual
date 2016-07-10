@@ -21,7 +21,13 @@
 #include <iostream>
 #include <getopt.h>
 
+#include <sys/stat.h>
+
 #include <gb.h>
+
+#include <map>
+
+#include "gameboy.h"
 
 #include "sdl_renderer.h"
 
@@ -32,53 +38,64 @@
 #include "tcp_client.h"
 #include "tcp_server.h"
 
-uint8_t *file_read(const std::string &name, int *size) {
-    uint8_t *dat = 0;
-    FILE *file = fopen(name.c_str(), "rb");
-    if (!file)
-        return nullptr;
-    fseek(file, 0, SEEK_END);
-    *size = ftell(file);
-    fseek(file, 0, SEEK_SET);
-    dat = (uint8_t *)malloc(*size);
-    fread(dat, 1, *size, file);
-    fclose(file);
-    return dat;
+#include "keyboard_input_source.h"
+#include "joystick_input_source.h"
+
+link_cable_source *processArguments(int *argc, char ***argv)
+{
+    int option = 0;
+    link_cable_source *selected_cable_source = new null_link_source();
+    while((option = getopt(*argc, *argv, "smc:")) != -1)
+    {
+        switch(option)
+        {
+            case 's':
+            {
+                cout << "Starting server" << endl;
+                selected_cable_source = new tcp_server();
+            }
+            break;
+            case 'm':
+            {
+                cout << "Broadcasting availability as client" << endl;
+                multicast_transmitter mc_transmitter{"239.0.10.0", 1337};
+                mc_transmitter.transcieve([&](std::string addr) {
+                    std::cout << "Should connect to " << addr << std::endl;
+                    selected_cable_source = new tcp_client(addr);
+                });
+            }
+            break;
+            case 'c':
+                cout << "Connecting to " << optarg << endl;
+                selected_cable_source = new tcp_client(optarg);
+                break;
+            case '?':
+                if (optopt == 'c')
+                {
+                    cerr << "Target address must be passed in with -c" << endl;
+                }
+                else
+                {
+                    cerr << "Unknown option " << optopt << endl;
+                }
+                break;
+        }
+    }
+
+    (*argc) -= optind;
+    (*argv) += optind;
+
+    return selected_cable_source;
 }
 
-void save_sram(gb *g_gb, const std::string &file_name, uint8_t *buf, int size) {
-    FILE *fsu = fopen(file_name.c_str(), "w");
-    fwrite((void*)buf, size, 1, fsu);
-    fclose(fsu);
-}
-
-gb load_rom(const std::string &romFile, const std::string &save_file, sdl_renderer *render, std::function<void()> save_cb, std::function<uint8_t()> link_read_cb, std::function<void(uint8_t)> link_write_cb) {
-    
-    int size = 0;
-    uint8_t *dat = file_read(romFile, &size);
-    
-    int ram_size;
-    uint8_t *ram = file_read(save_file, &ram_size);
-    
-    gb g_gb{render, save_cb, link_read_cb, link_write_cb};
-    g_gb.load_rom(dat, size, ram, ram_size);
-
-    free(dat);
-    free(ram);
-
-    SDL_WM_SetCaption(g_gb.get_rom()->get_info()->cart_name, 0);
-
-    return g_gb;
-}
-
-
-static int elapse_wait = 0x10AAAA;
-
-static void elapse_time(void) {
+uint32_t _elapsedWait{0x10AAAA};
+void rateLimit()
+{
+    // Shouldn't be here
     static uint32_t lastdraw = 0, rest = 0;
     uint32_t t = SDL_GetTicks();
 
-    rest = (rest & 0xffff) + elapse_wait;
+    rest = (rest & 0xffff) + _elapsedWait;
 
     uint32_t wait = rest >> 16;
     uint32_t elp = (uint32_t)(t - lastdraw);
@@ -97,22 +114,7 @@ static void elapse_time(void) {
     lastdraw += wait;
 }
 
-
-void cb_save_state(gb *g_gb, const std::string &file_name) {
-    FILE *file = fopen(file_name.c_str(), "wb");
-    g_gb->save_state(file);
-    fclose(file);
-}
-
-void cb_load_state(gb *g_gb, const std::string &file_name) {
-    FILE *file = fopen(file_name.c_str(), "rb");
-    g_gb->restore_state(file);
-    fclose(file);
-}
-
 int main(int argc, char *argv[]) {
-
-    link_cable_source *cable_source;
 
     if (argc == 1)
     {
@@ -120,51 +122,22 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    int option = 0;
-    while((option = getopt(argc, argv, "smc:")) != -1)
-    {
-        switch(option)
-        {
-            case 's':
-            {
-                cout << "Starting server" << endl;
-                cable_source = new tcp_server();
-            }
-            break;
-            case 'm':
-            {
-                cout << "Broadcasting availability as client" << endl;
-                multicast_transmitter mc_transmitter{"239.0.10.0", 1337};
-                mc_transmitter.transcieve([&](std::string addr) {
-                    std::cout << "Should connect to " << addr << std::endl;
-                    cable_source = new tcp_client(addr);
-                });
-            }
-            break;
-            case 'c':
-                cout << "Connecting to " << optarg << endl;
-                cable_source = new tcp_client(optarg);
-                break;
-            case '?':
-                if (optopt == 'c')
-                {
-                    cerr << "Target address must be passed in with -c" << endl;
-                }
-                else
-                {
-                    cerr << "Unknown option " << optopt << endl;
-                }
-                return -1;
-                break;
+    link_cable_source *cable_source = processArguments(&argc, &argv);
+
+    SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+
+    if (SDL_NumJoysticks() > 0) {
+        // Open joystick
+        auto joy = SDL_JoystickOpen(0);
+
+        if (joy) {
+            printf("Opened Joystick 0\n");
+            printf("Number of Axes: %d\n", SDL_JoystickNumAxes(joy));
+            printf("Number of Buttons: %d\n", SDL_JoystickNumButtons(joy));
+            printf("Number of Balls: %d\n", SDL_JoystickNumBalls(joy));
+        } else {
+            printf("Couldn't open Joystick 0\n");
         }
-    }
-
-    argc -= optind;
-    argv += optind;
-
-    for (int i = 0; i < argc; i++)
-    {
-        cout << argv[i] << endl;
     }
 
     bool fast_forward = false;
@@ -172,124 +145,72 @@ int main(int argc, char *argv[]) {
     sdl_renderer render;
 
     std::string rom_file{argv[0]};
-    std::string sav_file = rom_file.substr(0, rom_file.find_last_of(".")) + ".sav";
-    std::string save_state_file = rom_file.substr(0, rom_file.find_last_of(".")) + ".sv0";
+
+    struct stat buffer;   
+    if (stat (rom_file.c_str(), &buffer) != 0)
+    {
+        cerr << "Rom file " << rom_file << " is not accessible" << endl;
+        return -1;
+    }
 
     bool endGame = false;
 
-    gb g_gb = load_rom(rom_file, sav_file, &render, [&] {
-        printf("Writing SRAM\n");
-        save_sram(&g_gb, sav_file, g_gb.get_rom()->get_sram(), g_gb.get_rom()->get_info()->ram_size); 
-    }, 
-    [&]() { 
-        return cable_source->readByte(); 
-    }, 
-    [&](uint8_t data) { 
-        cable_source->sendByte(data); 
-    }
-    );
+    gameboy gbInst{&render, cable_source};
+    gbInst.load_rom(rom_file);
 
     SDL_Event e;
 
+    keyboard_input_source keyboardSource;
+    joystick_input_source joystickSource;
+
+    std::map<int, input_source*> input_sources;
+    input_sources[SDL_KEYDOWN] = &keyboardSource;
+    input_sources[SDL_KEYUP] = &keyboardSource;
+    input_sources[SDL_JOYBUTTONDOWN] = &joystickSource;
+    input_sources[SDL_JOYBUTTONUP] = &joystickSource;
+    input_sources[SDL_JOYAXISMOTION] = &joystickSource;
+    
     while (!endGame) {
 
         while (SDL_PollEvent(&e)) {
+
+            if (input_sources.find(e.type) != input_sources.end())
+            {
+                gbInst.provideInput([&](uint8_t initialState) -> uint8_t {
+                    return input_sources[e.type]->provide_input(initialState, e);
+                });
+            }
+
             if (e.type == SDL_QUIT) {
                 endGame = true;
             } else if (e.type == SDL_KEYDOWN) {
                 auto sym = e.key.keysym.sym;
                 if (sym == SDLK_F7) {
-                    cb_load_state(&g_gb, save_state_file);
+                    gbInst.load_state();
                 } else if (sym == SDLK_F5) {
-                    cb_save_state(&g_gb, save_state_file);
+                    gbInst.save_state();
                 } else if (sym == SDLK_ESCAPE) {
                     endGame = true;
-                }
-                else if(sym == SDLK_RIGHT)
-                {
-                    render.set_pad(render.check_pad() | 0x80);
-                }
-                else if(sym == SDLK_UP)
-                {
-                    render.set_pad(render.check_pad() | 0x20);
-                }
-                else if(sym == SDLK_DOWN)
-                {
-                    render.set_pad(render.check_pad() | 0x10);
-                }
-                else if(sym == SDLK_LEFT)
-                {
-                    render.set_pad(render.check_pad() | 0x40);
-                }
-                else if(sym == SDLK_z)
-                {
-                    render.set_pad(render.check_pad() | 0x01);
-                }
-                else if(sym == SDLK_x)
-                {
-                    render.set_pad(render.check_pad() | 0x02);
-                }
-                else if(sym == SDLK_RSHIFT)
-                {
-                    render.set_pad(render.check_pad() | 0x04);
-                }
-                else if(sym == SDLK_RETURN)
-                {
-                    render.set_pad(render.check_pad() | 0x08);
                 }
                 else if(sym == SDLK_TAB)
                 {
                     fast_forward = !fast_forward;
+                    if (fast_forward)
+                    {
+                        gbInst.fastForward();
+                        _elapsedWait = (1000 << 16) / 999;
+                    }
+                    else
+                    {
+                        gbInst.normalForward();
+                        _elapsedWait = (1000 << 16) / 60;
+                    }
                 }
             }
-            else if (e.type == SDL_KEYUP){
-                auto sym = e.key.keysym.sym;
-                if(sym == SDLK_RIGHT)
-                {
-                    render.set_pad(render.check_pad() - 0x80);
-                } else if(sym == SDLK_UP)
-                {
-                    render.set_pad(render.check_pad() - 0x20);
-                }
-                else if(sym == SDLK_DOWN)
-                {
-                    render.set_pad(render.check_pad() - 0x10);
-                }
-                else if(sym == SDLK_LEFT)
-                {
-                    render.set_pad(render.check_pad() - 0x40);
-                }
-                else if(sym == SDLK_z)
-                {
-                    render.set_pad(render.check_pad() - 0x01);
-                }
-                else if(sym == SDLK_x)
-                {
-                    render.set_pad(render.check_pad() - 0x02);
-                }
-                else if(sym == SDLK_RSHIFT)
-                {
-                    render.set_pad(render.check_pad() - 0x04);
-                }
-                else if(sym == SDLK_RETURN)
-                {
-                    render.set_pad(render.check_pad() - 0x08);
-                }
-            }
-
         }
 
-        g_gb.run();
-
-        if (!fast_forward) {
-            g_gb.set_skip(0);
-            elapse_wait = (1000 << 16) / 60;
-            elapse_time();
-        } else {
-            g_gb.set_skip(9);
-            elapse_wait = (1000 << 16) / 999;
-            elapse_time();        
-        }
+        gbInst.tick();
+        rateLimit();
     }
 
     return 0;

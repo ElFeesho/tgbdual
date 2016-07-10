@@ -35,6 +35,7 @@ class renderer {
     virtual void reset() = 0;
     virtual void refresh() = 0;
     virtual void render_screen(uint8_t *buf, int width, int height, int depth) = 0;
+    virtual void set_pad(uint8_t pad_state) = 0;
     virtual int check_pad() = 0;
     virtual uint16_t map_color(uint16_t gb_col) = 0;
     virtual uint16_t unmap_color(uint16_t gb_col) = 0;

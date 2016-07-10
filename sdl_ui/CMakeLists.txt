@@ -5,8 +5,15 @@ project(tgbdual C CXX)
 set(CMAKE_CXX_FLAGS "-O3 -Wall")
 
 set(SDL_UI_SOURCES 
+	gameboy.cpp
+	gameboy.h
 	null_link_source.h 
 	null_link_source.cpp 
+	input_source.h
+	keyboard_input_source.h
+	keyboard_input_source.cpp
+	joystick_input_source.h
+	joystick_input_source.cpp
 	tcp_client.h 
 	tcp_client.cpp 
 	link_cable_source.h 

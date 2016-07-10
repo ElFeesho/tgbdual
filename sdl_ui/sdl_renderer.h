@@ -31,7 +31,7 @@ class sdl_renderer : public renderer {
 
     void render_screen(uint8_t *buf, int width, int height, int depth);
     int check_pad();
-    void set_pad(int stat);
+    void set_pad(uint8_t stat);
     void refresh();
     void reset() {}
 
@@ -72,7 +72,7 @@ class sdl_renderer : public renderer {
 
     int render_pass_type;
 
-    int pad_state { 0 };
+    uint8_t pad_state { 0 };
 
     int now_sensor_x, now_sensor_y;
 

@@ -177,11 +177,14 @@ void cpu::write(uint16_t adr, uint8_t dat) {
             vram_bank[adr & 0x1FFF] = dat;
             break;
         case 5:
-            if (ref_gb->get_mbc()->is_ext_ram())
-                ref_gb->get_mbc()->get_sram()[adr & 0x1FFF] =
-                    dat; //カートリッジRAM // cartridge RAM
-            else
+            if (ref_gb->get_mbc()->is_ext_ram()) {
+                ref_gb->get_mbc()->get_sram()[adr & 0x1FFF] = dat; //カートリッジRAM // cartridge RAM
+                printf("WRITING TO  %04X\n", adr);
+                ref_gb->notify_sram_written();
+            } else {
+                printf("WRITING TO EXT %04X\n", adr);
                 ref_gb->get_mbc()->ext_write(adr, dat);
+            }
             break;
         case 6:
             if (adr & 0x1000)
