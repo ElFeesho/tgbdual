@@ -23,8 +23,7 @@ public:
 
 	void tick();
 
-	void fastForward();
-	void normalForward();
+	void setSpeed(uint32_t speed);
 
 	void provideInput(std::function<uint8_t(uint8_t)> provideInputFunctor);
 

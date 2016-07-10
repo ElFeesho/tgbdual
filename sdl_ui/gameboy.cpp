@@ -30,12 +30,8 @@ void gameboy::tick()
 	_gb.run();
 }
 
-void gameboy::fastForward() {
-	_gb.set_skip(9);
-}
-
-void gameboy::normalForward() {
-	_gb.set_skip(0);
+void gameboy::setSpeed(uint32_t speed) {
+	_gb.set_skip(speed);
 }
 
 void gameboy::provideInput(std::function<uint8_t(uint8_t)> provideInputFunctor)

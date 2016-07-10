@@ -277,12 +277,12 @@ int main(int argc, char *argv[]) {
                     fast_forward = !fast_forward;
                     if (fast_forward)
                     {
-                        gbInst.fastForward();
+                        gbInst.setSpeed(9);
                         limitFunc = std::bind(limit, 1, std::placeholders::_1);
                     }
                     else
                     {
-                        gbInst.normalForward();
+                        gbInst.setSpeed(0);
                         limitFunc = std::bind(limit, 16, std::placeholders::_1);
                     }
                 }
