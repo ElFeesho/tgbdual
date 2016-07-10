@@ -88,30 +88,18 @@ link_cable_source *processArguments(int *argc, char ***argv)
     return selected_cable_source;
 }
 
-uint32_t _elapsedWait{0x10AAAA};
-void rateLimit()
+void limit(uint32_t targetTime, std::function<void()> operation)
 {
-    // Shouldn't be here
-    static uint32_t lastdraw = 0, rest = 0;
-    uint32_t t = SDL_GetTicks();
+    uint32_t startTime = SDL_GetTicks();
 
-    rest = (rest & 0xffff) + _elapsedWait;
+    operation();
 
-    uint32_t wait = rest >> 16;
-    uint32_t elp = (uint32_t)(t - lastdraw);
+    uint32_t operationTime = SDL_GetTicks()-startTime;
 
-    if (elp >= wait) {
-        lastdraw = t;
-        return;
+    if (operationTime < targetTime)
+    {
+        SDL_Delay(targetTime - operationTime);
     }
-
-    if (wait - elp >= 4) {
-        SDL_Delay(wait - elp - 3);
-    }
-
-    while ((SDL_GetTicks() - lastdraw) < wait);
-
-    lastdraw += wait;
 }
 
 int main(int argc, char *argv[]) {
@@ -170,6 +158,8 @@ int main(int argc, char *argv[]) {
     input_sources[SDL_JOYBUTTONUP] = &joystickSource;
     input_sources[SDL_JOYAXISMOTION] = &joystickSource;
     
+    auto limitFunc = std::bind(limit, 16, std::placeholders::_1);
+
     while (!endGame) {
 
         while (SDL_PollEvent(&e)) {
@@ -198,19 +188,20 @@ int main(int argc, char *argv[]) {
                     if (fast_forward)
                     {
                         gbInst.fastForward();
-                        _elapsedWait = (1000 << 16) / 999;
+                        limitFunc = std::bind(limit, 1, std::placeholders::_1);
                     }
                     else
                     {
                         gbInst.normalForward();
-                        _elapsedWait = (1000 << 16) / 60;
+                        limitFunc = std::bind(limit, 16, std::placeholders::_1);
                     }
                 }
             }
         }
 
-        gbInst.tick();
-        rateLimit();
+        limitFunc([&]{
+            gbInst.tick();
+        });
     }
 
     return 0;
