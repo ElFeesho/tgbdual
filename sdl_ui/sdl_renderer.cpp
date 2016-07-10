@@ -149,14 +149,6 @@ void sdl_renderer::init_sdlaudio() {
     SDL_PauseAudio(0);
 }
 
-uint8_t sdl_renderer::check_pad() {
-    return pad_state;
-}
-
-void sdl_renderer::set_pad(uint8_t stat) {
-    pad_state = stat;
-}
-
 void sdl_renderer::refresh() {
     
 }

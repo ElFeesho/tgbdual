@@ -31,13 +31,7 @@ class renderer {
 public:
     virtual ~renderer() {}
     void set_sound_renderer(sound_renderer *ref) { snd_render = ref; };
-
-    virtual void reset() = 0;
-    virtual void refresh() = 0;
     virtual void render_screen(uint8_t *buf, int width, int height, int depth) = 0;
-    
-    virtual void set_pad(uint8_t pad_state) = 0;
-    virtual uint8_t check_pad() = 0;
 
 protected:
     sound_renderer *snd_render;

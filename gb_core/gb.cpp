@@ -28,12 +28,13 @@
 #include <stdexcept>
 #include <string>
 
+#include "gamepad_source.h"
+   
 static uint32_t convert_to_second(struct tm *sys);
 
-gb::gb(renderer *ref, std::function<void()> sram_updated, std::function<uint8_t()> link_read, std::function<void(uint8_t)> link_write)
-    : m_renderer{ref}, m_lcd{this}, m_cheat{this}, m_mbc{this}, m_apu{this}, m_cpu{this}, sram_update_cb{sram_updated}, link_read_cb{link_read}, link_write_cb{link_write} {
+gb::gb(renderer *ref, gamepad_source *gamepad_source_ref, std::function<void()> sram_updated, std::function<uint8_t()> link_read, std::function<void(uint8_t)> link_write)
+    : m_renderer{ref}, m_gamepad{gamepad_source_ref}, m_lcd{this}, m_cheat{this}, m_mbc{this}, m_apu{this}, m_cpu{this}, sram_update_cb{sram_updated}, link_read_cb{link_read}, link_write_cb{link_write} {
 
-    m_renderer->reset();
     m_renderer->set_sound_renderer(m_apu.get_renderer());
 
     reset();
@@ -218,7 +219,6 @@ bool gb::has_battery() {
 }
 
 void inline gb::render_frame() {
-    m_renderer->refresh();
     if (now_frame >= skip) {
         m_renderer->render_screen((uint8_t *)vframe, 160, 144, 16);
         now_frame = 0;
@@ -343,6 +343,10 @@ uint16_t gb::map_color(uint16_t gb_col) {
 
 void gb::notify_sram_written() {
     sram_update_cb();
+}
+
+uint8_t gb::check_pad() {
+    return m_gamepad->check_pad();
 }
 
 uint32_t convert_to_second(struct tm *sys) {

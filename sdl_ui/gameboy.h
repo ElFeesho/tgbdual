@@ -13,7 +13,7 @@
 class gameboy
 {
 public:
-	gameboy(renderer *render, link_cable_source *link_cable_source);
+	gameboy(renderer *render, gamepad_source *gp_source, link_cable_source *link_cable_source);
 
 	void load_rom(uint8_t *romData, uint32_t romLength, uint8_t *ram, uint32_t ramLength);
 
@@ -24,13 +24,8 @@ public:
 	void tick();
 
 	void setSpeed(uint32_t speed);
-
-	void provideInput(std::function<uint8_t(uint8_t)> provideInputFunctor);
-
 private:
-
 	gb _gb;
-	renderer *_renderer{nullptr};
 
 	std::string _romFile;
 };

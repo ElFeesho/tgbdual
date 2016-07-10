@@ -56,12 +56,13 @@ struct gbc_regs {
     uint8_t KEY1, VBK, HDMA1, HDMA2, HDMA3, HDMA4, HDMA5, RP, BCPS, BCPD, OCPS, OCPD, SVBK;
 };
 
+class gamepad_source;
 
 class gb {
-    friend class cpu;
+  friend class cpu;
 
    public:
-    gb(renderer *ref, std::function<void()> sram_updated, std::function<uint8_t()> link_read, std::function<void(uint8_t)> link_write);
+    gb(renderer *ref, gamepad_source *gamepad_source_ref, std::function<void()> sram_updated, std::function<uint8_t()> link_read, std::function<void(uint8_t)> link_write);
     
     cpu *get_cpu() { return &m_cpu; }
     lcd *get_lcd() { return &m_lcd; }
@@ -104,11 +105,14 @@ class gb {
     uint8_t get_time(int type);
     void set_time(int type, uint8_t dat);
 
+    uint8_t check_pad();
+
     void inline render_frame();
     void inline hblank_dma();
 
    private:
     renderer *m_renderer;
+    gamepad_source *m_gamepad;
     lcd m_lcd;
     cpu m_cpu;
     apu m_apu;

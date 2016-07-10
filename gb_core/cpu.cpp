@@ -215,7 +215,7 @@ uint8_t cpu::io_read(uint16_t adr) {
     switch (adr) {
         case 0xFF00: // P1(パッド制御) //P1 (control pad)
             int tmp;
-            tmp = ref_gb->get_renderer()->check_pad();
+            tmp = ref_gb->check_pad();
             if (ref_gb->get_regs()->P1 == 0x03)
                 return 0xff;
             switch ((ref_gb->get_regs()->P1 >> 4) & 0x3) {

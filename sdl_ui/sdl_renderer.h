@@ -30,8 +30,7 @@ class sdl_renderer : public renderer {
     ~sdl_renderer();
 
     void render_screen(uint8_t *buf, int width, int height, int depth);
-    uint8_t check_pad();
-    void set_pad(uint8_t stat);
+
     void refresh();
     void reset() {}
 
@@ -42,9 +41,7 @@ class sdl_renderer : public renderer {
     void uninit_sdlvideo();
 
     void init_sdlaudio();
-
-    uint8_t pad_state { 0 };
-
+    
     int now_sensor_x, now_sensor_y;
 
    private:

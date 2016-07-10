@@ -2,9 +2,8 @@
 
 #include "gameboy.h"
 
-gameboy::gameboy(renderer *render, link_cable_source *link_cable_source) : 
-	_gb{render,[this]{}, [&]{return link_cable_source->readByte();}, [&](uint8_t data) { link_cable_source->sendByte(data); }}, 
-	_renderer{render}
+gameboy::gameboy(renderer *render, gamepad_source *gp_source, link_cable_source *link_cable_source) : 
+	_gb{render, gp_source, [this]{}, [&]{return link_cable_source->readByte();}, [&](uint8_t data) { link_cable_source->sendByte(data); }}
 {
 }
 
@@ -32,9 +31,4 @@ void gameboy::tick()
 
 void gameboy::setSpeed(uint32_t speed) {
 	_gb.set_skip(speed);
-}
-
-void gameboy::provideInput(std::function<uint8_t(uint8_t)> provideInputFunctor)
-{
-	_renderer->set_pad(provideInputFunctor(_renderer->check_pad()));
 }

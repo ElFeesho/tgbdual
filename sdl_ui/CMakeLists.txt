@@ -14,6 +14,8 @@ set(SDL_UI_SOURCES
 	keyboard_input_source.cpp
 	joystick_input_source.h
 	joystick_input_source.cpp
+	sdl_gamepad_source.cpp
+	sdl_gamepad_source.h
 	tcp_client.h 
 	tcp_client.cpp 
 	link_cable_source.h 

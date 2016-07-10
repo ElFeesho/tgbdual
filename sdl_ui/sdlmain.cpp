@@ -40,6 +40,7 @@
 
 #include "keyboard_input_source.h"
 #include "joystick_input_source.h"
+#include "sdl_gamepad_source.h"
 
 #include <fstream>
 
@@ -190,25 +191,12 @@ int main(int argc, char *argv[]) {
 
     link_cable_source *cable_source = processArguments(&argc, &argv);
 
-    SDL_InitSubSystem(SDL_INIT_JOYSTICK);
-
-    if (SDL_NumJoysticks() > 0) {
-        // Open joystick
-        auto joy = SDL_JoystickOpen(0);
-
-        if (joy) {
-            printf("Opened Joystick 0\n");
-            printf("Number of Axes: %d\n", SDL_JoystickNumAxes(joy));
-            printf("Number of Buttons: %d\n", SDL_JoystickNumButtons(joy));
-            printf("Number of Balls: %d\n", SDL_JoystickNumBalls(joy));
-        } else {
-            printf("Couldn't open Joystick 0\n");
-        }
-    }
+    
 
     bool fast_forward = false;
 
     sdl_renderer render;
+    sdl_gamepad_source gp_source;
 
     std::string romFilename{argv[0]};
     std::string saveFile = romFilename.substr(0, romFilename.find_last_of(".")) + ".sav";
@@ -223,34 +211,19 @@ int main(int argc, char *argv[]) {
 
     bool endGame = false;
 
-    gameboy gbInst{&render, cable_source};
-
+    gameboy gbInst{&render, &gp_source, cable_source};
+    
     file_buffer romBuffer{romFilename};
     file_buffer saveBuffer{saveFile};
     gbInst.load_rom(romBuffer, romBuffer.length(), saveBuffer, saveBuffer.length());
 
     SDL_Event e;
-
-    keyboard_input_source keyboardSource;
-    joystick_input_source joystickSource;
-
-    std::map<int, input_source*> input_sources;
-    input_sources[SDL_KEYDOWN] = &keyboardSource;
-    input_sources[SDL_KEYUP] = &keyboardSource;
-    input_sources[SDL_JOYBUTTONDOWN] = &joystickSource;
-    input_sources[SDL_JOYBUTTONUP] = &joystickSource;
-    input_sources[SDL_JOYAXISMOTION] = &joystickSource;
     
     auto limitFunc = std::bind(limit, 16, std::placeholders::_1);
 
     while (!endGame) {
         while (SDL_PollEvent(&e)) {
-            if (input_sources.find(e.type) != input_sources.end())
-            {
-                gbInst.provideInput([&](uint8_t initialState) -> uint8_t {
-                    return input_sources[e.type]->provide_input(initialState, e);
-                });
-            }
+            gp_source.update_pad_state(e);
 
             if (e.type == SDL_QUIT) {
                 endGame = true;
