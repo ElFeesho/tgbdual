@@ -15,7 +15,6 @@ class gameboy
 public:
 	gameboy(renderer *render, link_cable_source *link_cable_source);
 
-	void load_rom(const std::string &romFilename);
 	void load_rom(uint8_t *romData, uint32_t romLength, uint8_t *ram, uint32_t ramLength);
 
 	void save_state(std::function<uint8_t*(uint32_t)> functor);

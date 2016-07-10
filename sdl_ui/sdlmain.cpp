@@ -244,9 +244,7 @@ int main(int argc, char *argv[]) {
     auto limitFunc = std::bind(limit, 16, std::placeholders::_1);
 
     while (!endGame) {
-
         while (SDL_PollEvent(&e)) {
-
             if (input_sources.find(e.type) != input_sources.end())
             {
                 gbInst.provideInput([&](uint8_t initialState) -> uint8_t {
@@ -295,6 +293,8 @@ int main(int argc, char *argv[]) {
             gbInst.tick();
         });
     }
+
+    SDL_Quit();
 
     return 0;
 }
