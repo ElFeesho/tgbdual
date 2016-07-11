@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 #include <list>
 class gb;
 
@@ -34,9 +36,6 @@ class cheat {
     std::list<cheat_dat>::iterator get_end() { return cheat_list.end(); }
 
     int *get_cheat_map() { return cheat_map; }
-
-    void save(FILE *file);
-    void load(FILE *file);
 
    private:
     std::list<cheat_dat> cheat_list;

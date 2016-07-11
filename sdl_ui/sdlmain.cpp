@@ -215,11 +215,18 @@ int main(int argc, char *argv[]) {
     
     file_buffer romBuffer{romFilename};
     file_buffer saveBuffer{saveFile};
-    gbInst.load_rom(romBuffer, romBuffer.length(), saveBuffer, saveBuffer.length());
+    if (stat (saveFile.c_str(), &buffer) != 0)
+    {
+        gbInst.load_rom(romBuffer, romBuffer.length(), nullptr, 0);    
+    }
+    else
+    {
+        gbInst.load_rom(romBuffer, romBuffer.length(), saveBuffer, saveBuffer.length());
+    }
 
     SDL_Event e;
     
-    auto limitFunc = std::bind(limit, 16, std::placeholders::_1);
+    std::function<void(std::function<void()>)> limitFunc = std::bind(limit, 16, std::placeholders::_1);
 
     while (!endGame) {
         while (SDL_PollEvent(&e)) {
@@ -251,7 +258,7 @@ int main(int argc, char *argv[]) {
                     if (fast_forward)
                     {
                         gbInst.setSpeed(9);
-                        limitFunc = std::bind(limit, 1, std::placeholders::_1);
+                        limitFunc = std::move(std::bind(limit, 1, std::placeholders::_1));
                     }
                     else
                     {

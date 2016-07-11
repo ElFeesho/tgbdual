@@ -98,14 +98,10 @@ void sdl_renderer::uninit_sdlvideo() {
 }
 
 void sdl_renderer::render_screen(uint8_t *buf, int width, int height, int depth) {
-    Uint64 *sp = (Uint64 *)buf;
-    Uint64 *dp = (Uint64 *)scr->pixels;
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < (width >> 2); j++) {
-            *dp = *sp;
-            dp++;
-            sp++;
-        }
+    
+    for(int i = 0; i < height; i++)
+    {
+        memcpy(scr->pixels+(scr->pitch*i), buf+(i*width*depth/8), width*depth/8);
     }
 
     SDL_Rect loc = {0, 0, WIN_MULTIPLIER, WIN_MULTIPLIER};
@@ -128,7 +124,10 @@ namespace {
     void fill_audio(void *userData, uint8_t *stream, int len) {
         sdl_renderer *renderer = static_cast<sdl_renderer *>(userData);
         sound_renderer *snd_render = renderer->get_sound_renderer();
-        snd_render->render((short *)stream, len / 4);
+        if (snd_render != nullptr)
+        {
+            snd_render->render((short *)stream, len / 4);
+        }
     }
 }
 
