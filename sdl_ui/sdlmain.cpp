@@ -119,6 +119,11 @@ public:
     file_buffer(const std::string &name)
     {
         ifstream _file{name, std::ios::binary | std::ios::in};
+
+        if (!_file.good()) {
+            throw std::domain_error("Could not open "+name);
+        }
+
         _file.seekg(0, _file.end);
         _length = _file.tellg();
         _file.seekg(0, _file.beg);
@@ -147,7 +152,7 @@ public:
     }
     
 private:
-    uint32_t _length;
+    uint32_t _length { 0 };
     uint8_t *_buffer;
 };
 

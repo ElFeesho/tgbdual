@@ -136,11 +136,13 @@ void gb::refresh_pal() {
 }
 
 void gb::send_linkcable_byte(uint8_t data) {
+    printf("> %02X\n", data);
     link_write_cb(data);
 }
 
 void gb::read_linkcable_byte(uint8_t *buff) {
     *buff = link_read_cb();
+    printf("< %02X\n", *buff);
 }
 
 void gb::run() {

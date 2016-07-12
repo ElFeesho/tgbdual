@@ -30,8 +30,45 @@
 #define N_FLAG 0x02
 #define C_FLAG 0x01
 
+class link_cable_byte {
+public:
+    link_cable_byte(gb *gb_ref) : _gb{gb_ref} {}
+
+    void send_receive(std::function<void(uint8_t)> completion)
+    {
+        uint8_t cbyte = (_gb->get_regs()->SB & (1 << (7-bitNumber))) ? 1 : 0;
+        _gb->send_linkcable_byte(cbyte);
+        _gb->read_linkcable_byte(&cbyte);
+
+        if(cbyte == 0)
+        {
+            _gb->get_regs()->SB &= ~((1 << 7-bitNumber));
+        }
+        else
+        {
+            _gb->get_regs()->SB |= ((1 << 7-bitNumber));   
+        }
+
+        if (bitNumber == 7)
+        {
+            completion(cbyte);
+            bitNumber = 0;
+        }
+        else
+        {
+            bitNumber++;
+        }
+    }
+private:
+    uint32_t bitNumber {0};
+    gb *_gb;
+};
+
+static link_cable_byte *lcb = nullptr;
+
 cpu::cpu(gb *ref) {
     ref_gb = ref;
+    lcb = new link_cable_byte(ref_gb);
     b_trace = false;
 
     for (int i = 0; i < 256; i++) {
@@ -233,6 +270,7 @@ uint8_t cpu::io_read(uint16_t adr) {
             }
             return 0x00;
         case 0xFF01:
+            ref_gb->read_linkcable_byte(&ref_gb->get_regs()->SB);
             return ref_gb->get_regs()->SB;
         case 0xFF02:
             return (ref_gb->get_regs()->SC & 0x83) | 0x7C;
@@ -345,7 +383,7 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
         case 0xFF01: // SB(シリアルシリアル通信送受信) // SB (sending and receiving
                      // serial communication)
             ref_gb->get_regs()->SB = dat;
-            //ref_gb->send_linkcable_byte(ref_gb->get_regs()->SB);
+            ref_gb->send_linkcable_byte(ref_gb->get_regs()->SB);
             return;
         case 0xFF02: // SC (control)
             if (ref_gb->get_rom()->get_info()->gb_type == 1) 
@@ -748,6 +786,7 @@ void cpu::irq_process() {
             regs.PC = 0x58;
             ref_gb->get_regs()->IF &= 0xF7;
             last_int = INT_SERIAL;
+            //ref_gb->get_regs()->SC |= (ref_gb->get_regs()->SB &0x1) << 7;
         } else if (ref_gb->get_regs()->IF & ref_gb->get_regs()->IE &
                    INT_PAD) { // Pad
             regs.PC = 0x60;
@@ -836,13 +875,10 @@ void cpu::exec(int clocks) {
         }
 
         if (total_clock > seri_occer) {
-            ref_gb->send_linkcable_byte(ref_gb->get_regs()->SB);
-            ref_gb->read_linkcable_byte(&ref_gb->get_regs()->SB);
             seri_occer = 0x7fffffff;
-            // ref_gb->get_regs()->SB = 0xff;
-            // ref_gb->get_regs()->SC &= 3;
+            ref_gb->get_regs()->SB = 0xff;
+            ref_gb->get_regs()->SC &= 3;
             irq(INT_SERIAL);
-            // READ?
         }
     }
 }

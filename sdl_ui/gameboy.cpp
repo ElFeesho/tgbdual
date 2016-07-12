@@ -3,7 +3,7 @@
 #include "gameboy.h"
 
 gameboy::gameboy(renderer *render, gamepad_source *gp_source, link_cable_source *link_cable_source) : 
-	_gb{render, gp_source, [this]{}, [&]{return link_cable_source->readByte();}, [&](uint8_t data) { link_cable_source->sendByte(data); }}
+	_gb{render, gp_source, [this]{}, [link_cable_source]{return link_cable_source->readByte();}, [link_cable_source](uint8_t data) { link_cable_source->sendByte(data); }}
 {
 }
 
