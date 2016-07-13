@@ -30,40 +30,8 @@
 #define N_FLAG 0x02
 #define C_FLAG 0x01
 
-class link_cable_byte {
-   public:
-    link_cable_byte(gb *gb_ref)
-        : _gb{gb_ref} {}
-
-    void send_receive(std::function<void(uint8_t)> completion) {
-        uint8_t cbyte = (_gb->get_regs()->SB & (1 << (7 - bitNumber))) ? 1 : 0;
-        _gb->send_linkcable_byte(cbyte);
-        _gb->read_linkcable_byte(&cbyte);
-
-        if (cbyte == 0) {
-            _gb->get_regs()->SB &= ~((1 << 7 - bitNumber));
-        } else {
-            _gb->get_regs()->SB |= ((1 << 7 - bitNumber));
-        }
-
-        if (bitNumber == 7) {
-            completion(cbyte);
-            bitNumber = 0;
-        } else {
-            bitNumber++;
-        }
-    }
-
-   private:
-    uint32_t bitNumber{0};
-    gb *_gb;
-};
-
-static link_cable_byte *lcb = nullptr;
-
 cpu::cpu(gb *ref) {
     ref_gb = ref;
-    lcb = new link_cable_byte(ref_gb);
     b_trace = false;
 
     for (int i = 0; i < 256; i++) {
@@ -77,7 +45,7 @@ cpu::cpu(gb *ref) {
 }
 
 uint8_t cpu::read(uint16_t adr) {
-    return ref_gb->get_cheat()->cheat_read(adr);
+    return ref_gb->get_cheat()->cheat_read(get_ram_bank_number(), adr, read_direct(adr));
 }
 
 void cpu::reset() {

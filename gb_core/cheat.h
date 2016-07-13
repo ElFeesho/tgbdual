@@ -7,6 +7,7 @@
 #include <sstream>
 #include <string>
 #include <map>
+#include <functional>
 
 static unsigned int fromHexToInt(const std::string &hexString) {
     unsigned int val;
@@ -49,19 +50,15 @@ class cheat_dat {
 };
 
 class cheat {
+    using cpu_writecb = std::function<void(uint16_t, uint8_t)>;
    public:
-    cheat(gb *ref);
 
-    uint8_t cheat_read(uint16_t adr);
+    uint8_t cheat_read(uint8_t ram_bank_num, uint16_t adr, uint16_t or_value);
 
-    void add_cheat(const std::string &code);
-    void delete_cheat(char *name);
-    std::list<cheat_dat>::iterator find_cheat(char *name);
-    void create_unique_name(char *buf);
-
+    void add_cheat(const std::string &code, cpu_writecb writecb);
+    
     void clear();
 
    private:
     std::map<uint16_t, cheat_dat> cheat_map;
-    gb *ref_gb;
 };

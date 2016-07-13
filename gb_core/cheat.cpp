@@ -22,48 +22,36 @@
 #include <string.h>
 #include "gb.h"
 
-cheat::cheat(gb *ref) {
-    ref_gb = ref;   
-}
-
-void cheat::add_cheat(const std::string &code) {
+void cheat::add_cheat(const std::string &code, cpu_writecb writecb) {
     cheat_map.emplace(extractAddress(code), code);
     if (extractCode(code) == 0) {
-        ref_gb->get_cpu()->write(extractAddress(code), extractData(code));
+        writecb(extractAddress(code), extractData(code));
     }
 }
 
-uint8_t cheat::cheat_read(uint16_t adr) {
+uint8_t cheat::cheat_read(uint8_t ram_bank_num, uint16_t adr, uint16_t or_value) {
     if (cheat_map.find(adr) == cheat_map.end())
     {
-        return ref_gb->get_cpu()->read_direct(adr);
+        return or_value;
     }
     else
     {
         const auto &tmp = cheat_map.at(adr);
-        
-        switch (tmp.code) {
-            case 0x01:
-                return tmp.dat;
-            case 0x90:
-            case 0x91:
-            case 0x92:
-            case 0x93:
-            case 0x94:
-            case 0x95:
-            case 0x96:
-            case 0x97:
-                if ((adr >= 0xD000) && (adr < 0xE000)) {
-                    if (((ref_gb->get_cpu()->get_ram_bank() - ref_gb->get_cpu()->get_ram()) / 0x1000) == (tmp.code - 0x90)) {
-                        return tmp.dat;
-                    }
-                } else {
+        if (tmp.code == 0x01)
+        {
+            return tmp.dat;
+        }
+        else if (tmp.code >= 0x90 && tmp.code <= 0x97)
+        {
+            if ((adr >= 0xD000) && (adr < 0xE000)) {
+                if (ram_bank_num == (tmp.code - 0x90)) {
                     return tmp.dat;
                 }
-            default:
-                break;
+            } else {
+                return tmp.dat;
+            }
         }
     }
 
-    return ref_gb->get_cpu()->read_direct(adr);
+    return or_value;
 }

@@ -74,6 +74,8 @@ class gb {
     void reset();
     void set_skip(int frame);
 
+    void add_cheat(const std::string &cheat_code);
+
     bool load_rom(uint8_t *buf, int size, uint8_t *ram, int ram_size);
 
     void serialize(serializer &s);

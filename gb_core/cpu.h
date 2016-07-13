@@ -50,6 +50,7 @@ class cpu {
 
     uint8_t *get_ram_bank() { return ram_bank; }
     void set_ram_bank(int bank) { ram_bank = ram + bank * 0x1000; }
+    uint8_t get_ram_bank_number() { return (ram - ram_bank) / 0x1000; }
 
     cpu_regs *get_regs() { return &regs; }
 

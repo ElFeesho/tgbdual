@@ -33,7 +33,7 @@
 static uint32_t convert_to_second(struct tm *sys);
 
 gb::gb(renderer *ref, gamepad_source *gamepad_source_ref, std::function<void()> sram_updated, std::function<uint8_t()> link_read, std::function<void(uint8_t)> link_write)
-    : m_renderer{ref}, m_gamepad{gamepad_source_ref}, m_lcd{this}, m_cheat{this}, m_mbc{this}, m_apu{this}, m_cpu{this}, sram_update_cb{sram_updated}, link_read_cb{link_read}, link_write_cb{link_write} {
+    : m_renderer{ref}, m_gamepad{gamepad_source_ref}, m_lcd{this}, m_cheat{}, m_mbc{this}, m_apu{this}, m_cpu{this}, sram_update_cb{sram_updated}, link_read_cb{link_read}, link_write_cb{link_write} {
 
     m_renderer->set_sound_renderer(m_apu.get_renderer());
 
@@ -81,6 +81,13 @@ void gb::set_skip(int frame) {
     skip_buf = frame;
 }
 
+void gb::add_cheat(const std::string &cheat_code)
+{
+    m_cheat.add_cheat(cheat_code, [&](uint16_t adr, uint8_t data) {
+        m_cpu.write(adr, data);
+    });
+}
+
 bool gb::load_rom(uint8_t *buf, int size, uint8_t *ram, int ram_size) {
     bool loadedSuccessfully = m_rom.load_rom(buf, size, ram, ram_size);
     if (loadedSuccessfully) {
@@ -118,13 +125,11 @@ void gb::restore_state_mem(void *buf) {
 }
 
 void gb::send_linkcable_byte(uint8_t data) {
-    //printf("%c", data);
     link_write_cb(data);
 }
 
 void gb::read_linkcable_byte(uint8_t *buff) {
     *buff = link_read_cb();
-    printf("%c", *buff);
 }
 
 void gb::run() {
@@ -215,7 +220,6 @@ void inline gb::hblank_dma() {
         } else if (m_cpu.dma_src < 0x8000) {
             m_cpu.dma_src_bank = m_mbc.get_rom();
         } else if (m_cpu.dma_src >= 0xA000 && m_cpu.dma_src < 0xC000) {
-            printf("SRAM?\n");
             m_cpu.dma_src_bank = m_mbc.get_sram() - 0xA000;
         } else if (m_cpu.dma_src >= 0xC000 && m_cpu.dma_src < 0xD000) {
             m_cpu.dma_src_bank = m_cpu.ram - 0xC000;
@@ -303,17 +307,7 @@ void gb::set_time(int type, uint8_t dat) {
 }
 
 uint16_t gb::map_color(uint16_t gb_col) {
-
     return ((gb_col & 0x1F) << 11) | ((gb_col & 0x3e0) << 1) | ((gb_col & 0x7c00) >> 10) | ((gb_col & 0x8000) >> 10);
-    // if (color_type == 1)
-    // {
-    //     return ((gb_col & 0x1F) << 10) | (gb_col & 0x3e0) | ((gb_col & 0x7c00) >> 10) | (gb_col & 0x8000);
-    // }
-
-    // if (color_type == 2)
-    // {
-    //     return ((gb_col & 0x1F) << 11) | ((gb_col & 0x3e0) << 1) | ((gb_col & 0x7c00) >> 9) | (gb_col >> 15);
-    // }
 }
 
 void gb::notify_sram_written() {
