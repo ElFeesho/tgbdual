@@ -39,8 +39,6 @@ gb::gb(renderer *ref, gamepad_source *gamepad_source_ref, std::function<void()> 
 
     reset();
 
-    use_gba = false;
-
     cur_time = 0;
 }
 
@@ -67,7 +65,7 @@ void gb::reset() {
     memset(&c_regs, 0, sizeof(c_regs));
 
     if (m_rom.get_loaded()) {
-        m_rom.get_info()->gb_type = (m_rom.get_rom()[0x143] & 0x80) ? (use_gba ? 4 : 3) : 1;
+        m_rom.get_info()->gb_type = (m_rom.get_rom()[0x143] & 0x80) ? 3 : 1;
     }
     m_cpu.reset();
     m_lcd.reset();
@@ -119,30 +117,14 @@ void gb::restore_state_mem(void *buf) {
     serialize(s);
 }
 
-void gb::save_state(FILE *file) {
-    serializer s(file, serializer::SAVE_FILE);
-    serialize(s);
-}
-
-void gb::restore_state(FILE *file) {
-    serializer s(file, serializer::LOAD_FILE);
-    serialize(s);
-}
-
-void gb::refresh_pal() {
-    for (int i = 0; i < 64; i++) {
-        m_lcd.get_mapped_pal(i >> 2)[i & 3] = map_color(m_lcd.get_pal(i >> 2)[i & 3]);
-    }
-}
-
 void gb::send_linkcable_byte(uint8_t data) {
-    printf("> %02X\n", data);
+    //printf("%c", data);
     link_write_cb(data);
 }
 
 void gb::read_linkcable_byte(uint8_t *buff) {
     *buff = link_read_cb();
-    printf("< %02X\n", *buff);
+    printf("%c", *buff);
 }
 
 void gb::run() {
@@ -212,12 +194,6 @@ void gb::run() {
             m_cpu.exec(456);
         }
     }
-}
-
-bool gb::has_battery() {
-    auto cart_type = m_rom.get_info()->cart_type;
-    int has_bat[] = {0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    return has_bat[(cart_type > 0x20) ? 3 : cart_type];
 }
 
 void inline gb::render_frame() {

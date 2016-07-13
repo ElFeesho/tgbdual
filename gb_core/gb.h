@@ -34,11 +34,6 @@
 #include "rom.h"
 #include "serializer.h"
 
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/types.h>
 #include <functional>
 
 #define INT_VBLANK 1
@@ -69,7 +64,7 @@ class gb {
     apu *get_apu() { return &m_apu; }
     rom *get_rom() { return &m_rom; }
     mbc *get_mbc() { return &m_mbc; }
-    renderer *get_renderer() { return m_renderer; }
+
     cheat *get_cheat() { return &m_cheat; }
 
     gb_regs *get_regs() { return &regs; }
@@ -78,7 +73,7 @@ class gb {
     void run();
     void reset();
     void set_skip(int frame);
-    void set_use_gba(bool use) { use_gba = use; }
+
     bool load_rom(uint8_t *buf, int size, uint8_t *ram, int ram_size);
 
     void serialize(serializer &s);
@@ -86,15 +81,9 @@ class gb {
     size_t get_state_size(void);
     void save_state_mem(void *buf);
     void restore_state_mem(void *buf);
-    void save_state(FILE *file);
-    void restore_state(FILE *file);
-
-    void refresh_pal();
 
     void send_linkcable_byte(uint8_t data);
     void read_linkcable_byte(uint8_t *buff);
-
-    bool has_battery();
 
     void notify_sram_written();
 
@@ -124,15 +113,12 @@ class gb {
     gb_regs regs;
     gbc_regs c_regs;
 
-    uint16_t dmy[160 * 5]; 
     uint16_t vframe[160 * (144 + 100)];
 
     int skip, skip_buf;
     int now_frame;
     int re_render;
 
-    bool use_gba;
-    
     std::function<void()> sram_update_cb;
     std::function<uint8_t()> link_read_cb;
     std::function<void(uint8_t)> link_write_cb;

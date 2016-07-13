@@ -1,11 +1,28 @@
 #pragma once
 
 #include <cstdint>
-
+#include <string>
+#include <sstream>
 #include <list>
+#include <cstring>
+
 class gb;
 
-struct cheat_dat {
+class cheat_dat {
+public:
+    cheat_dat(const std::string &cheat_name, const std::string &cheat_code)
+    {
+        std::stringstream stream;
+        stream << std::hex << cheat_code.substr(0, 2);
+        stream >> code;
+        stream << std::hex << cheat_code.substr(2,4);
+        stream >> dat;
+        stream << std::hex << cheat_code.substr(4);
+        stream >> adr;
+        strcpy(name, cheat_name.c_str());
+        enable = true;
+        next = nullptr;
+    }
     bool enable;
     uint8_t code;
     uint16_t adr;
