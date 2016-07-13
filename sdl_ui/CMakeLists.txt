@@ -5,11 +5,14 @@ project(tgbdual C CXX)
 set(CMAKE_CXX_FLAGS "-O3 -Wall")
 
 set(SDL_UI_SOURCES 
-	gameboy.cpp
-	gameboy.h
 	null_link_source.h 
 	null_link_source.cpp 
 	input_source.h
+	file_buffer.cpp
+	file_buffer.h
+	memory_buffer.cpp
+	memory_buffer.h
+	buffer.h
 	keyboard_input_source.h
 	keyboard_input_source.cpp
 	joystick_input_source.h
@@ -18,7 +21,6 @@ set(SDL_UI_SOURCES
 	sdl_gamepad_source.h
 	tcp_client.h 
 	tcp_client.cpp 
-	link_cable_source.h 
 	tcp_server.h 
 	tcp_server.cpp 
 	multicast_transmitter.cpp 

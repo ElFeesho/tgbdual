@@ -23,12 +23,13 @@
 
 #include <sys/stat.h>
 
-#include <gb.h>
+#include <gameboy.h>
 
-#include <map>
+#include "file_buffer.h"
+#include "memory_buffer.h"
 
-#include "gameboy.h"
-
+#include <fstream>
+   
 #include "sdl_renderer.h"
 
 #include "null_link_source.h"
@@ -42,7 +43,6 @@
 #include "joystick_input_source.h"
 #include "sdl_gamepad_source.h"
 
-#include <fstream>
 
 link_cable_source *processArguments(int *argc, char ***argv)
 {
@@ -105,81 +105,6 @@ void limit(uint32_t targetTime, std::function<void()> operation)
     }
 }
 
-class buffer
-{
-public:
-    virtual operator const char*() = 0;
-    virtual operator uint8_t*() = 0;
-    virtual uint32_t length() = 0;
-};
-
-class file_buffer : buffer 
-{
-public:
-    file_buffer(const std::string &name)
-    {
-        ifstream _file{name, std::ios::binary | std::ios::in};
-        _file.seekg(0, _file.end);
-        _length = _file.tellg();
-        _file.seekg(0, _file.beg);
-        _buffer = new uint8_t[_length];
-
-        _file.read((char*)_buffer, _length);
-        _file.close();
-    }
-
-    ~file_buffer() 
-    {
-        delete[] _buffer;
-    }
-
-    uint32_t length()
-    {
-        return _length;
-    }
-
-    operator const char*() {
-        return (const char *)_buffer;
-    }
-
-    operator uint8_t*() {
-        return _buffer;
-    }
-    
-private:
-    uint32_t _length;
-    uint8_t *_buffer;
-};
-
-class memory_buffer : buffer
-{
-public:
-    void alloc(uint32_t length)
-    {
-        _length = length;
-        _buffer = new uint8_t[length];
-    }
-
-    void dealloc()
-    {
-        delete[] _buffer;
-    }
-
-    uint32_t length() override {
-        return _length;
-    }
-
-    operator const char*() override {
-        return (const char *)_buffer;
-    }
-
-    operator uint8_t*() override {
-        return _buffer;
-    }
-private:
-    uint32_t _length;
-    uint8_t *_buffer { nullptr };
-};
 
 int main(int argc, char *argv[]) {
 
@@ -189,14 +114,9 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    link_cable_source *cable_source = processArguments(&argc, &argv);
-
-    
-
-    bool fast_forward = false;
-
     sdl_renderer render;
     sdl_gamepad_source gp_source;
+    link_cable_source *cable_source = processArguments(&argc, &argv);
 
     std::string romFilename{argv[0]};
     std::string saveFile = romFilename.substr(0, romFilename.find_last_of(".")) + ".sav";
@@ -209,18 +129,17 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    bool endGame = false;
-
-    gameboy gbInst{&render, &gp_source, cable_source};
-    
     file_buffer romBuffer{romFilename};
     file_buffer saveBuffer{saveFile};
+    gameboy gbInst{&render, &gp_source, cable_source};
     gbInst.load_rom(romBuffer, romBuffer.length(), saveBuffer, saveBuffer.length());
 
-    SDL_Event e;
-    
     auto limitFunc = std::bind(limit, 16, std::placeholders::_1);
 
+    SDL_Event e;
+    bool endGame = false;    
+    bool fast_forward = false;
+    
     while (!endGame) {
         while (SDL_PollEvent(&e)) {
             gp_source.update_pad_state(e);
