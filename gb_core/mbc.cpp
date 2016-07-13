@@ -760,11 +760,9 @@ void mbc::huc3_write(uint16_t adr, uint8_t dat) {
     //%02X\n",ref_gb->get_cpu()->get_regs()->PC,adr,dat);
     switch (adr >> 13) {
         case 0:
-            if (dat == 0xA)
-            {
+            if (dat == 0xA) {
                 ext_is_ram = true;
-            }
-            else if (dat == 0x0B) {
+            } else if (dat == 0x0B) {
                 ext_is_ram = false;
             } else if (dat == 0x0C) {
                 ext_is_ram = false;

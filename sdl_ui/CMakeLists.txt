@@ -7,18 +7,6 @@ set(CMAKE_CXX_FLAGS "-O3 -Wall")
 set(SDL_UI_SOURCES 
 	null_link_source.h 
 	null_link_source.cpp 
-	input_source.h
-	file_buffer.cpp
-	file_buffer.h
-	memory_buffer.cpp
-	memory_buffer.h
-	buffer.h
-	keyboard_input_source.h
-	keyboard_input_source.cpp
-	joystick_input_source.h
-	joystick_input_source.cpp
-	sdl_gamepad_source.cpp
-	sdl_gamepad_source.h
 	tcp_client.h 
 	tcp_client.cpp 
 	tcp_server.h 
@@ -27,6 +15,17 @@ set(SDL_UI_SOURCES
 	multicast_transmitter.h 
 	sdl_renderer.cpp 
 	sdl_renderer.h 
+	sdl_gamepad_source.cpp
+	sdl_gamepad_source.h
+	file_buffer.cpp
+	file_buffer.h
+	memory_buffer.cpp
+	memory_buffer.h
+	joystick_input_source.cpp
+	joystick_input_source.h
+	keyboard_input_source.cpp
+	keyboard_input_source.h
+	buffer.h
 	sdlmain.cpp 
 	json.hpp)
 

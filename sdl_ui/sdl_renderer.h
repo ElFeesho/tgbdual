@@ -38,7 +38,6 @@ class sdl_renderer : public renderer {
 
    private:
     void init_sdlvideo();
-    void uninit_sdlvideo();
 
     void init_sdlaudio();
     

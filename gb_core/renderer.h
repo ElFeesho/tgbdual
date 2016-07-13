@@ -28,11 +28,11 @@
 class sound_renderer;
 
 class renderer {
-public:
+   public:
     virtual ~renderer() {}
     void set_sound_renderer(sound_renderer *ref) { snd_render = ref; };
     virtual void render_screen(uint8_t *buf, int width, int height, int depth) = 0;
 
-protected:
+   protected:
     sound_renderer *snd_render;
 };

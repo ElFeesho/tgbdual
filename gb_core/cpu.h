@@ -25,7 +25,7 @@ class cpu {
 
    public:
     cpu(gb *ref);
-    
+
     uint8_t read(uint16_t adr);
 
     uint8_t read_direct(uint16_t adr);

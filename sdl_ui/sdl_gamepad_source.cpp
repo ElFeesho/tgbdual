@@ -8,20 +8,15 @@ sdl_gamepad_source::sdl_gamepad_source()
 	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
 
     if (SDL_NumJoysticks() > 0) {
-        // Open joystick
         auto joy = SDL_JoystickOpen(0);
 
         if (joy) {
-            printf("Opened Joystick 0\n");
-            printf("Number of Axes: %d\n", SDL_JoystickNumAxes(joy));
-            printf("Number of Buttons: %d\n", SDL_JoystickNumButtons(joy));
-            printf("Number of Balls: %d\n", SDL_JoystickNumBalls(joy));
+            input_sources[SDL_JOYBUTTONDOWN] = &joystickSource;
+            input_sources[SDL_JOYBUTTONUP] = &joystickSource;
+            input_sources[SDL_JOYAXISMOTION] = &joystickSource;
         } else {
             printf("Couldn't open Joystick 0\n");
         }
-        input_sources[SDL_JOYBUTTONDOWN] = &joystickSource;
-	    input_sources[SDL_JOYBUTTONUP] = &joystickSource;
-	    input_sources[SDL_JOYAXISMOTION] = &joystickSource;
     }
 }
 

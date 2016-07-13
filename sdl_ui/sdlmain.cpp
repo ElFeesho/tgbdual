@@ -39,27 +39,19 @@
 #include "tcp_client.h"
 #include "tcp_server.h"
 
-#include "keyboard_input_source.h"
-#include "joystick_input_source.h"
 #include "sdl_gamepad_source.h"
 
 
-link_cable_source *processArguments(int *argc, char ***argv)
-{
+link_cable_source *processArguments(int *argc, char ***argv) {
     int option = 0;
     link_cable_source *selected_cable_source = new null_link_source();
-    while((option = getopt(*argc, *argv, "smc:")) != -1)
-    {
-        switch(option)
-        {
-            case 's':
-            {
-                cout << "Starting server" << endl;
+    while ((option = getopt(*argc, *argv, "smc:")) != -1) {
+        switch (option) {
+            case 's': {
                 selected_cable_source = new tcp_server();
             }
-            break;
-            case 'm':
-            {
+                break;
+            case 'm': {
                 cout << "Broadcasting availability as client" << endl;
                 multicast_transmitter mc_transmitter{"239.0.10.0", 1337};
                 mc_transmitter.transcieve([&](std::string addr) {
@@ -67,18 +59,16 @@ link_cable_source *processArguments(int *argc, char ***argv)
                     selected_cable_source = new tcp_client(addr);
                 });
             }
-            break;
+                break;
             case 'c':
-                cout << "Connecting to " << optarg << endl;
                 selected_cable_source = new tcp_client(optarg);
                 break;
+            default:
             case '?':
-                if (optopt == 'c')
-                {
+                if (optopt == 'c') {
                     cerr << "Target address must be passed in with -c" << endl;
                 }
-                else
-                {
+                else {
                     cerr << "Unknown option " << optopt << endl;
                 }
                 break;
@@ -91,25 +81,21 @@ link_cable_source *processArguments(int *argc, char ***argv)
     return selected_cable_source;
 }
 
-void limit(uint32_t targetTime, std::function<void()> operation)
-{
+void limit(uint32_t targetTime, std::function<void()> operation) {
     uint32_t startTime = SDL_GetTicks();
 
     operation();
 
-    uint32_t operationTime = SDL_GetTicks()-startTime;
+    uint32_t operationTime = SDL_GetTicks() - startTime;
 
-    if (operationTime < targetTime)
-    {
+    if (operationTime < targetTime) {
         SDL_Delay(targetTime - operationTime);
     }
 }
 
-
 int main(int argc, char *argv[]) {
 
-    if (argc == 1)
-    {
+    if (argc == 1) {
         cerr << "Usage: " << argv[0] << " rom [-s|-m|-c client-address]" << endl;
         return 0;
     }
@@ -122,19 +108,24 @@ int main(int argc, char *argv[]) {
     std::string saveFile = romFilename.substr(0, romFilename.find_last_of(".")) + ".sav";
     std::string stateFile = romFilename.substr(0, romFilename.find_last_of(".")) + ".sv0";
 
-    struct stat buffer;   
-    if (stat (romFilename.c_str(), &buffer) != 0)
-    {
+    struct stat statBuffer;
+    if (stat(romFilename.c_str(), &statBuffer) != 0) {
         cerr << "Rom file " << romFilename << " is not accessible" << endl;
         return -1;
     }
 
+    gameboy gbInst{&render, &gp_source, cable_source};
+
     file_buffer romBuffer{romFilename};
     file_buffer saveBuffer{saveFile};
-    gameboy gbInst{&render, &gp_source, cable_source};
-    gbInst.load_rom(romBuffer, romBuffer.length(), saveBuffer, saveBuffer.length());
+    if (stat(saveFile.c_str(), &statBuffer) != 0) {
+        gbInst.load_rom(romBuffer, romBuffer.length(), nullptr, 0);
+    }
+    else {
+        gbInst.load_rom(romBuffer, romBuffer.length(), saveBuffer, saveBuffer.length());
+    }
 
-    auto limitFunc = std::bind(limit, 16, std::placeholders::_1);
+    std::function<void(std::function<void()>)> limitFunc = std::bind(limit, 16, std::placeholders::_1);
 
     SDL_Event e;
     bool endGame = false;    
@@ -155,7 +146,7 @@ int main(int argc, char *argv[]) {
                     memory_buffer buffer;
                     gbInst.save_state([&](uint32_t length) {
                         buffer.alloc(length);
-                        return buffer; 
+                        return buffer;
                     });
                     std::ofstream fout(stateFile, std::ios::binary | std::ios::out);
                     fout.write(buffer, buffer.length());
@@ -164,16 +155,13 @@ int main(int argc, char *argv[]) {
                 } else if (sym == SDLK_ESCAPE) {
                     endGame = true;
                 }
-                else if(sym == SDLK_TAB)
-                {
+                else if (sym == SDLK_TAB) {
                     fast_forward = !fast_forward;
-                    if (fast_forward)
-                    {
+                    if (fast_forward) {
                         gbInst.setSpeed(9);
                         limitFunc = std::bind(limit, 1, std::placeholders::_1);
                     }
-                    else
-                    {
+                    else {
                         gbInst.setSpeed(0);
                         limitFunc = std::bind(limit, 16, std::placeholders::_1);
                     }
@@ -181,7 +169,7 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        limitFunc([&]{
+        limitFunc([&] {
             gbInst.tick();
         });
     }

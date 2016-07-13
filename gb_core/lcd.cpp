@@ -25,7 +25,7 @@
 #include <memory.h>
 #include "gb.h"
 
-#define ROL_BYTE(var, bits)                                   \
+#define ROL_BYTE(var, bits)                                     \
     (var = ((var) & (-(1 << 8))) | (((var) << (bits)) & 0xff) | \
            ((var) >> (8 - (bits))))
 
@@ -75,7 +75,7 @@ void lcd::bg_render(void *buf, int scanline) {
     uint8_t tile;
     int i, x, y;
     uint8_t *vrams[2] = {ref_gb->get_cpu()->get_vram(),
-                      ref_gb->get_cpu()->get_vram() + 0x2000};
+                         ref_gb->get_cpu()->get_vram() + 0x2000};
 
     pal[0] = m_pal16[ref_gb->get_regs()->BGP & 0x3];
     pal[1] = m_pal16[(ref_gb->get_regs()->BGP >> 2) & 0x3];
@@ -264,7 +264,7 @@ void lcd::sprite_render(void *buf, int scanline) {
     uint16_t l1, l2, tmp_dat;
     uint16_t pal[2][4], *cur_p;
     uint8_t *oam = ref_gb->get_cpu()->get_oam(),
-         *vram = ref_gb->get_cpu()->get_vram();
+            *vram = ref_gb->get_cpu()->get_vram();
 
     bool sp_size = (ref_gb->get_regs()->LCDC & 0x04) ? true : false;
     int palnum;
@@ -294,11 +294,11 @@ void lcd::sprite_render(void *buf, int scanline) {
             if (scanline - y + 15 < 8) {
                 now = (atr & 0x40) ? ((y - scanline) & 7) : (7 - (y - scanline) & 7);
                 tmp_dat = *(uint16_t *)(vram + (tile & 0xfe) * 16 + now * 2 +
-                                    ((atr & 0x40) ? 16 : 0));
+                                        ((atr & 0x40) ? 16 : 0));
             } else {
                 now = (atr & 0x40) ? ((y - scanline) & 7) : (7 - (y - scanline) & 7);
                 tmp_dat = *(uint16_t *)(vram + (tile & 0xfe) * 16 + now * 2 +
-                                    ((atr & 0x40) ? 0 : 16));
+                                        ((atr & 0x40) ? 0 : 16));
             }
         } else {
             y = oam[i * 4] - 9;
@@ -459,7 +459,7 @@ void lcd::bg_render_color(void *buf, int scanline) {
     uint8_t tile;
     int i, x, y;
     uint8_t *vrams[2] = {ref_gb->get_cpu()->get_vram(),
-                      ref_gb->get_cpu()->get_vram() + 0x2000};
+                         ref_gb->get_cpu()->get_vram() + 0x2000};
 
     y = scanline + ref_gb->get_regs()->SCY;
     if (y >= 256)
@@ -642,7 +642,7 @@ void lcd::win_render_color(void *buf, int scanline) {
     now_win_line++;
 
     uint8_t *vrams[2] = {ref_gb->get_cpu()->get_vram(),
-                      ref_gb->get_cpu()->get_vram() + 0x2000};
+                         ref_gb->get_cpu()->get_vram() + 0x2000};
 
     uint16_t back = (ref_gb->get_regs()->LCDC & 0x40) ? 0x1C00 : 0x1800;
     uint16_t pat = (ref_gb->get_regs()->LCDC & 0x10) ? 0x0000 : 0x1000;
@@ -731,7 +731,7 @@ void lcd::sprite_render_color(void *buf, int scanline) {
     uint16_t l1, l2, tmp_dat;
     uint16_t *cur_p;
     uint8_t *oam = ref_gb->get_cpu()->get_oam(),
-         *vram = ref_gb->get_cpu()->get_vram();
+            *vram = ref_gb->get_cpu()->get_vram();
 
     bool sp_size = (ref_gb->get_regs()->LCDC & 0x04) ? true : false;
 
@@ -753,11 +753,11 @@ void lcd::sprite_render_color(void *buf, int scanline) {
             if (scanline - y + 15 < 8) { //上半分
                 now = (atr & 0x40) ? ((y - scanline) & 7) : (7 - (y - scanline) & 7);
                 tmp_dat = *(uint16_t *)(vram + bank + (tile & 0xfe) * 16 + now * 2 +
-                                    ((atr & 0x40) ? 16 : 0));
+                                        ((atr & 0x40) ? 16 : 0));
             } else { // 下半分
                 now = (atr & 0x40) ? ((y - scanline) & 7) : (7 - (y - scanline) & 7);
                 tmp_dat = *(uint16_t *)(vram + bank + (tile & 0xfe) * 16 + now * 2 +
-                                    ((atr & 0x40) ? 0 : 16));
+                                        ((atr & 0x40) ? 0 : 16));
             }
         } else { // 8*8
             y = oam[i * 4] - 9;

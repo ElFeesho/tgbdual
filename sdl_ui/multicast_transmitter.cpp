@@ -19,6 +19,8 @@ just one host and as a receiver on all the other hosts
 #include <ifaddrs.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <memory.h>
+
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>

@@ -30,8 +30,40 @@
 #define N_FLAG 0x02
 #define C_FLAG 0x01
 
+class link_cable_byte {
+   public:
+    link_cable_byte(gb *gb_ref)
+        : _gb{gb_ref} {}
+
+    void send_receive(std::function<void(uint8_t)> completion) {
+        uint8_t cbyte = (_gb->get_regs()->SB & (1 << (7 - bitNumber))) ? 1 : 0;
+        _gb->send_linkcable_byte(cbyte);
+        _gb->read_linkcable_byte(&cbyte);
+
+        if (cbyte == 0) {
+            _gb->get_regs()->SB &= ~((1 << 7 - bitNumber));
+        } else {
+            _gb->get_regs()->SB |= ((1 << 7 - bitNumber));
+        }
+
+        if (bitNumber == 7) {
+            completion(cbyte);
+            bitNumber = 0;
+        } else {
+            bitNumber++;
+        }
+    }
+
+   private:
+    uint32_t bitNumber{0};
+    gb *_gb;
+};
+
+static link_cable_byte *lcb = nullptr;
+
 cpu::cpu(gb *ref) {
     ref_gb = ref;
+    lcb = new link_cable_byte(ref_gb);
     b_trace = false;
 
     for (int i = 0; i < 256; i++) {
@@ -45,9 +77,7 @@ cpu::cpu(gb *ref) {
 }
 
 uint8_t cpu::read(uint16_t adr) {
-    return (ref_gb->get_cheat()->get_cheat_map()[adr])
-               ? ref_gb->get_cheat()->cheat_read(adr)
-               : read_direct(adr);
+    return ref_gb->get_cheat()->cheat_read(adr);
 }
 
 void cpu::reset() {
@@ -233,6 +263,7 @@ uint8_t cpu::io_read(uint16_t adr) {
             }
             return 0x00;
         case 0xFF01:
+            ref_gb->read_linkcable_byte(&ref_gb->get_regs()->SB);
             return ref_gb->get_regs()->SB;
         case 0xFF02:
             return (ref_gb->get_regs()->SC & 0x83) | 0x7C;
@@ -345,19 +376,15 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
         case 0xFF01: // SB(シリアルシリアル通信送受信) // SB (sending and receiving
                      // serial communication)
             ref_gb->get_regs()->SB = dat;
-            //ref_gb->send_linkcable_byte(ref_gb->get_regs()->SB);
+            ref_gb->send_linkcable_byte(ref_gb->get_regs()->SB);
             return;
         case 0xFF02: // SC (control)
-            if (ref_gb->get_rom()->get_info()->gb_type == 1) 
-            {
+            if (ref_gb->get_rom()->get_info()->gb_type == 1) {
                 ref_gb->get_regs()->SC = dat & 0x81;
-                if ((dat & 0x80) && (dat & 1))
-                {
+                if ((dat & 0x80) && (dat & 1)) {
                     // Internal clock
                     seri_occer = total_clock + 512;
-                }
-                else if ((dat & 0x80))
-                {
+                } else if ((dat & 0x80)) {
                     // External clock?
                 }
             } else { // GBCでの拡張 // Enhancements in GBC
@@ -565,15 +592,15 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
                                 (speed ? 2 : 1); // CPU パワーを占領 // Occupied the CPU power
             }
             return;
-        case 0xFF56: 
+        case 0xFF56:
             rp_que[que_cur++] = (((uint32_t)dat) << 16) | ((uint16_t)rest_clock);
             rp_que[que_cur] = 0x00000000;
             ref_gb->get_cregs()->RP = dat;
             return;
-        case 0xFF68: 
+        case 0xFF68:
             ref_gb->get_cregs()->BCPS = dat;
             return;
-        case 0xFF69: 
+        case 0xFF69:
             if (ref_gb->get_cregs()->BCPS & 1) {
                 ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) &
                                            7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] =
@@ -591,17 +618,16 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
             }
             ref_gb->get_lcd()->get_mapped_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] =
                 ref_gb->map_color(ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[(ref_gb->get_cregs()->BCPS >> 1) & 3]);
-    
+
             ref_gb->get_cregs()->BCPD = dat;
-            if (ref_gb->get_cregs()->BCPS & 0x80)
-            {
+            if (ref_gb->get_cregs()->BCPS & 0x80) {
                 ref_gb->get_cregs()->BCPS = 0x80 | ((ref_gb->get_cregs()->BCPS + 1) & 0x3f);
             }
             return;
-        case 0xFF6A: 
+        case 0xFF6A:
             ref_gb->get_cregs()->OCPS = dat;
             return;
-        case 0xFF6B: 
+        case 0xFF6B:
             if (ref_gb->get_cregs()->OCPS & 1) {
                 ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) +
                                            8)[(ref_gb->get_cregs()->OCPS >> 1) & 3] =
@@ -748,6 +774,7 @@ void cpu::irq_process() {
             regs.PC = 0x58;
             ref_gb->get_regs()->IF &= 0xF7;
             last_int = INT_SERIAL;
+            //ref_gb->get_regs()->SC |= (ref_gb->get_regs()->SB &0x1) << 7;
         } else if (ref_gb->get_regs()->IF & ref_gb->get_regs()->IE &
                    INT_PAD) { // Pad
             regs.PC = 0x60;
@@ -836,13 +863,10 @@ void cpu::exec(int clocks) {
         }
 
         if (total_clock > seri_occer) {
-            ref_gb->send_linkcable_byte(ref_gb->get_regs()->SB);
-            ref_gb->read_linkcable_byte(&ref_gb->get_regs()->SB);
             seri_occer = 0x7fffffff;
-            // ref_gb->get_regs()->SB = 0xff;
-            // ref_gb->get_regs()->SC &= 3;
+            ref_gb->get_regs()->SB = 0xff;
+            ref_gb->get_regs()->SC &= 3;
             irq(INT_SERIAL);
-            // READ?
         }
     }
 }

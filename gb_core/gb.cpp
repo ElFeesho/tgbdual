@@ -29,7 +29,7 @@
 #include <string>
 
 #include "gamepad_source.h"
-   
+
 static uint32_t convert_to_second(struct tm *sys);
 
 gb::gb(renderer *ref, gamepad_source *gamepad_source_ref, std::function<void()> sram_updated, std::function<uint8_t()> link_read, std::function<void(uint8_t)> link_write)
@@ -38,8 +38,6 @@ gb::gb(renderer *ref, gamepad_source *gamepad_source_ref, std::function<void()> 
     m_renderer->set_sound_renderer(m_apu.get_renderer());
 
     reset();
-
-    use_gba = false;
 
     cur_time = 0;
 }
@@ -67,7 +65,7 @@ void gb::reset() {
     memset(&c_regs, 0, sizeof(c_regs));
 
     if (m_rom.get_loaded()) {
-        m_rom.get_info()->gb_type = (m_rom.get_rom()[0x143] & 0x80) ? (use_gba ? 4 : 3) : 1;
+        m_rom.get_info()->gb_type = (m_rom.get_rom()[0x143] & 0x80) ? 3 : 1;
     }
     m_cpu.reset();
     m_lcd.reset();
@@ -119,28 +117,14 @@ void gb::restore_state_mem(void *buf) {
     serialize(s);
 }
 
-void gb::save_state(FILE *file) {
-    serializer s(file, serializer::SAVE_FILE);
-    serialize(s);
-}
-
-void gb::restore_state(FILE *file) {
-    serializer s(file, serializer::LOAD_FILE);
-    serialize(s);
-}
-
-void gb::refresh_pal() {
-    for (int i = 0; i < 64; i++) {
-        m_lcd.get_mapped_pal(i >> 2)[i & 3] = map_color(m_lcd.get_pal(i >> 2)[i & 3]);
-    }
-}
-
 void gb::send_linkcable_byte(uint8_t data) {
+    //printf("%c", data);
     link_write_cb(data);
 }
 
 void gb::read_linkcable_byte(uint8_t *buff) {
     *buff = link_read_cb();
+    printf("%c", *buff);
 }
 
 void gb::run() {
@@ -212,12 +196,6 @@ void gb::run() {
     }
 }
 
-bool gb::has_battery() {
-    auto cart_type = m_rom.get_info()->cart_type;
-    int has_bat[] = {0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    return has_bat[(cart_type > 0x20) ? 3 : cart_type];
-}
-
 void inline gb::render_frame() {
     if (now_frame >= skip) {
         m_renderer->render_screen((uint8_t *)vframe, 160, 144, 16);
@@ -269,13 +247,11 @@ void inline gb::hblank_dma() {
     m_cpu.exec(207);
 }
 
-uint16_t gb::get_sensor(bool x_y)
-{
+uint16_t gb::get_sensor(bool x_y) {
     return 0;
 }
 
-uint8_t gb::get_time(int type)
-{
+uint8_t gb::get_time(int type) {
     struct tm sys;
     time_t t = time(0);
     localtime_r(&t, &sys);
@@ -284,9 +260,9 @@ uint8_t gb::get_time(int type)
     now -= cur_time;
 
     switch (type) {
-        case 8: 
+        case 8:
             return (uint8_t)(now % 60);
-        case 9: 
+        case 9:
             return (uint8_t)((now / 60) % 60);
         case 10:
             return (uint8_t)((now / (60 * 60)) % 24);
@@ -298,8 +274,7 @@ uint8_t gb::get_time(int type)
     return 0;
 }
 
-void gb::set_time(int type, uint8_t dat)
-{
+void gb::set_time(int type, uint8_t dat) {
     struct tm sys;
     time_t t = time(0);
     localtime_r(&t, &sys);
@@ -314,13 +289,13 @@ void gb::set_time(int type, uint8_t dat)
         case 9:
             adj = (adj / (60 * 60)) * 60 * 60 + (dat % 60) * 60 + (adj % 60);
             break;
-        case 10: 
+        case 10:
             adj = (adj / (24 * 60 * 60)) * 24 * 60 * 60 + (dat % 24) * 60 * 60 + (adj % (60 * 60));
             break;
-        case 11: 
+        case 11:
             adj = (adj / (256 * 24 * 60 * 60)) * 256 * 24 * 60 * 60 + (dat * 24 * 60 * 60) + (adj % (24 * 60 * 60));
             break;
-        case 12: 
+        case 12:
             adj = (dat & 1) * 256 * 24 * 60 * 60 + (adj % (256 * 24 * 60 * 60));
             break;
     }
@@ -353,56 +328,36 @@ uint32_t convert_to_second(struct tm *sys) {
     uint32_t i, ret = 0;
     static int month_days[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-    for (i = 1; i + 1950 < sys->tm_year; i++)
-    {
-        if ((i & 3) == 0) 
-        {    
-            if ((i % 100) == 0) 
-            {
+    for (i = 1; i + 1950 < sys->tm_year; i++) {
+        if ((i & 3) == 0) {
+            if ((i % 100) == 0) {
                 ret += 365 + ((i % 400) == 0 ? 1 : 0);
-            }
-            else
-            {
+            } else {
                 ret += 366;
             }
-        }
-        else 
-        {
+        } else {
             ret += 365;
         }
     }
 
-    for (i = 1; i < sys->tm_mon; i++)
-    {
-        if (i == 2) 
-        {
-            if ((sys->tm_year & 3) == 0) 
-            {
-                if ((sys->tm_year % 100) == 0) 
-                {
-                    if ((sys->tm_year % 400) == 0) 
-                    {
+    for (i = 1; i < sys->tm_mon; i++) {
+        if (i == 2) {
+            if ((sys->tm_year & 3) == 0) {
+                if ((sys->tm_year % 100) == 0) {
+                    if ((sys->tm_year % 400) == 0) {
                         ret += 29;
-                    }
-                    else 
-                    {
+                    } else {
                         ret += 28;
                     }
-                }
-                else 
-                {
+                } else {
                     ret += 29;
                 }
-            }
-            else 
-            {
+            } else {
                 ret += 28;
             }
-        }
-        else 
-        {
+        } else {
             ret += month_days[i];
-        }    
+        }
     }
 
     ret += sys->tm_mday - 1;

@@ -1,46 +1,67 @@
 #pragma once
 
+#include <cstdint>
+#include <cstring>
+#include <iostream>
 #include <list>
+#include <sstream>
+#include <string>
+#include <map>
+
+static unsigned int fromHexToInt(const std::string &hexString) {
+    unsigned int val;
+    std::stringstream ss;
+    ss << std::hex << hexString;
+    ss >> val;
+    return val;
+}
+
+static uint16_t extractAddress(const std::string &cheatString)
+{
+    uint16_t adr = fromHexToInt(cheatString.substr(4));
+    adr = ((adr << 8) & 0xff00) | ((adr >> 8) & 0x00ff);
+    return adr;
+}
+
+static uint8_t extractData(const std::string &cheatString)
+{
+    return fromHexToInt(cheatString.substr(2, 2));   
+}
+
+static uint8_t extractCode(const std::string &cheatString)
+{
+    return fromHexToInt(cheatString.substr(0, 2));   
+}
+
 class gb;
 
-struct cheat_dat {
-    bool enable;
+class cheat_dat {
+   public:
+    cheat_dat(const std::string &cheat_code) {
+        code = extractCode(cheat_code);
+        dat = extractData(cheat_code);
+        adr = extractAddress(cheat_code);
+    }
+
     uint8_t code;
     uint16_t adr;
     uint8_t dat;
-    char name[255];
-    cheat_dat *next;
 };
 
 class cheat {
    public:
     cheat(gb *ref);
-    ~cheat();
 
     uint8_t cheat_read(uint16_t adr);
-    void cheat_write(uint16_t adr, uint8_t dat);
 
-    bool cheak_cheat(uint16_t adr);
-    void create_cheat_map();
-
-    void add_cheat(cheat_dat *dat);
+    void add_cheat(const std::string &code);
     void delete_cheat(char *name);
     std::list<cheat_dat>::iterator find_cheat(char *name);
     void create_unique_name(char *buf);
 
     void clear();
 
-    std::list<cheat_dat>::iterator get_first() { return cheat_list.begin(); }
-    std::list<cheat_dat>::iterator get_end() { return cheat_list.end(); }
-
-    int *get_cheat_map() { return cheat_map; }
-
-    void save(FILE *file);
-    void load(FILE *file);
-
    private:
-    std::list<cheat_dat> cheat_list;
-    int cheat_map[0x10000] { 0 };
-
+    std::map<uint16_t, cheat_dat> cheat_map;
     gb *ref_gb;
 };

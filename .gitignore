@@ -21,3 +21,5 @@ Release
 */save/
 *.sv?
 *.sav
+CTestTest*
+Testing
