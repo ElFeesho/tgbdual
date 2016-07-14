@@ -83,7 +83,7 @@ class apu;
 class apu_snd : public sound_renderer {
     friend class apu;
 
-   public:
+public:
     apu_snd(apu *papu);
 
     void set_enable(int ch, bool enable);
@@ -98,7 +98,7 @@ class apu_snd : public sound_renderer {
 
     void serialize(serializer &s);
 
-   private:
+private:
     void process(uint16_t adr, uint8_t dat);
     void update();
     short sq1_produce(int freq);
@@ -123,7 +123,7 @@ class apu_snd : public sound_renderer {
 class apu {
     friend class apu_snd;
 
-   public:
+public:
     apu(gb *ref);
 
     apu_snd *get_renderer() { return &snd; }
@@ -139,7 +139,7 @@ class apu {
 
     void serialize(serializer &s);
 
-   private:
+private:
     gb *ref_gb;
     apu_snd snd;
 };

@@ -98,6 +98,8 @@ class gb {
 
     uint8_t check_pad();
 
+    uint8_t gb_type() { return m_rom.get_info()->gb_type; }
+
     void inline render_frame();
     void inline hblank_dma();
 

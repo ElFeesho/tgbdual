@@ -14,13 +14,12 @@ class serializer {
    public:
     enum mode_t { COUNT,
                   SAVE_BUF,
-                  LOAD_BUF,
-                  SAVE_FILE,
-                  LOAD_FILE };
+                  LOAD_BUF };
     serializer(void *target, mode_t mode) {
         my_mode = mode;
         my_target.ptr = target;
     }
+    
     inline size_t process(void *data, size_t size) {
         switch (my_mode) {
             case COUNT:
@@ -34,10 +33,6 @@ class serializer {
                 memcpy(data, my_target.buf, size);
                 my_target.buf += size;
                 return size;
-            case SAVE_FILE:
-                return fwrite(data, 1, size, my_target.file);
-            case LOAD_FILE:
-                return fread(data, 1, size, my_target.file);
             default:
                 puts("ERROR: invalid serializer!");
                 break;
@@ -51,7 +46,6 @@ class serializer {
         void *ptr;
         size_t *counter;
         unsigned char *buf;
-        FILE *file;
     } my_target;
 };
 

@@ -23,7 +23,7 @@
 
 #define UPDATE_INTERVAL \
     172 // 1/256秒あたりのサンプル数 // Number of samples per second / 256
-#define CLOKS_PER_INTERVAL \
+#define CLOCKS_PER_INTERVAL \
     16384 // 1/256秒あたりのクロック数 (4MHz時) // Number of clock ticks per
           // second / 256 (at 4MHz)
 
@@ -51,19 +51,21 @@ void apu::reset() {
 }
 
 uint8_t apu::read(uint16_t adr) {
-    if (adr == 0xff26)
-        return (!snd.stat.master_enable)
-                   ? 0x00
-                   : (0x80 |
-                      (((snd.stat.sq1_playing && snd.stat.wav_vol) ? 1 : 0) |
-                       ((snd.stat.sq2_playing && snd.stat.wav_vol) ? 2 : 0) |
-                       ((snd.stat.wav_enable && snd.stat.wav_playing &&
-                         snd.stat.wav_vol)
-                            ? 4
-                            : 0) |
-                       ((snd.stat.noi_playing && snd.stat.noi_vol) ? 8 : 0)));
-    else
+    if (adr == 0xff26) 
+    {
+        return (!snd.stat.master_enable) ? 0x00 : (0x80 |
+                          (((snd.stat.sq1_playing && snd.stat.wav_vol) ? 1 : 0) |
+                           ((snd.stat.sq2_playing && snd.stat.wav_vol) ? 2 : 0) |
+                           ((snd.stat.wav_enable && snd.stat.wav_playing &&
+                             snd.stat.wav_vol)
+                                ? 4
+                                : 0) |
+                           ((snd.stat.noi_playing && snd.stat.noi_vol) ? 8 : 0)));
+    }
+    else 
+    {
         return snd.mem[adr - 0xff10];
+    }
 }
 
 void apu::write(uint16_t adr, uint8_t dat, int clock) {
@@ -86,10 +88,9 @@ void apu::write(uint16_t adr, uint8_t dat, int clock) {
 
     clocks += clock - bef_clock;
 
-    while (clocks >
-           CLOKS_PER_INTERVAL * (ref_gb->get_cpu()->get_speed() ? 2 : 1)) {
+    while (clocks > CLOCKS_PER_INTERVAL * (ref_gb->get_cpu()->get_speed() ? 2 : 1)) {
         snd.update();
-        clocks -= CLOKS_PER_INTERVAL * (ref_gb->get_cpu()->get_speed() ? 2 : 1);
+        clocks -= CLOCKS_PER_INTERVAL * (ref_gb->get_cpu()->get_speed() ? 2 : 1);
     }
 
     bef_clock = clock;
@@ -153,7 +154,6 @@ void apu_snd::set_enable(int ch, bool enable) {
 bool apu_snd::get_enable(int ch) {
     return b_enable[ch];
 }
-extern FILE *file;
 
 void apu_snd::process(uint16_t adr, uint8_t dat) {
     int tb[] = {0, 4, 2, 1};
@@ -320,15 +320,6 @@ void apu_snd::process(uint16_t adr, uint8_t dat) {
             stat.ch_on[3] = (dat >> 3) & 1;
             break;
     }
-
-    //	voice_buffer[voice_count].time=clock;
-    //	voice_buffer[voice_count].adr=ptr;
-    //	voice_buffer[voice_count++].dat=dat;
-    //	if (voice_count>0xfff)
-    //		voice_count=0xfff;
-
-    //	if ((adr>=0xff1a)&&(adr<=0xff26))
-    //		fprintf(file,"[%04X] %02X\n",adr,dat);
 }
 
 static int sq_wav_dat[4][8] = {{0, 1, 0, 0, 0, 0, 0, 0},
@@ -678,7 +669,7 @@ void apu_snd::render(short *buf, int sample) {
 
         tmp_sample++;
 
-        while (update_count * CLOKS_PER_INTERVAL *
+        while (update_count * CLOCKS_PER_INTERVAL *
                    (ref_apu->ref_gb->get_cpu()->get_speed() ? 2 : 1) <
                now_time - bef_clock) {
             update();

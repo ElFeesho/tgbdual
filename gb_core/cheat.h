@@ -53,7 +53,7 @@ class cheat {
     using cpu_writecb = std::function<void(uint16_t, uint8_t)>;
    public:
 
-    uint8_t cheat_read(uint8_t ram_bank_num, uint16_t adr, uint16_t or_value);
+    uint8_t cheat_read(uint8_t ram_bank_num, uint16_t adr, uint8_t or_value);
 
     void add_cheat(const std::string &code, cpu_writecb writecb);
     

@@ -30,15 +30,23 @@
 #define N_FLAG 0x02
 #define C_FLAG 0x01
 
+constexpr uint8_t initialiseZ802GBTable(int i)
+{
+    return ((i & 0x40) ? 0x80 : 0) | ((i & 0x10) ? 0x20 : 0) | ((i & 0x02) ? 0x40 : 0) | ((i & 0x01) ? 0x10 : 0);
+}
+
+constexpr uint8_t initialiseGB2Z80Table(int i)
+{
+    return ((i & 0x80) ? 0x40 : 0) | ((i & 0x40) ? 0x02 : 0) | ((i & 0x20) ? 0x10 : 0) | ((i & 0x10) ? 0x01 : 0);
+}
+
 cpu::cpu(gb *ref) {
     ref_gb = ref;
     b_trace = false;
 
     for (int i = 0; i < 256; i++) {
-        z802gb[i] = ((i & 0x40) ? 0x80 : 0) | ((i & 0x10) ? 0x20 : 0) |
-                    ((i & 0x02) ? 0x40 : 0) | ((i & 0x01) ? 0x10 : 0);
-        gb2z80[i] = ((i & 0x80) ? 0x40 : 0) | ((i & 0x40) ? 0x02 : 0) |
-                    ((i & 0x20) ? 0x10 : 0) | ((i & 0x10) ? 0x01 : 0);
+        z802gb[i] = initialiseZ802GBTable(i);
+        gb2z80[i] = initialiseGB2Z80Table(i);
     }
 
     reset();
@@ -49,8 +57,8 @@ uint8_t cpu::read(uint16_t adr) {
 }
 
 void cpu::reset() {
-    regs.AF.w = (ref_gb->get_rom()->get_info()->gb_type >= 3) ? 0x11b0 : 0x01b0;
-    regs.BC.w = (ref_gb->get_rom()->get_info()->gb_type >= 4) ? 0x0113 : 0x0013;
+    regs.AF.w = (ref_gb->gb_type() >= 3) ? 0x11b0 : 0x01b0;
+    regs.BC.w = (ref_gb->gb_type() >= 4) ? 0x0113 : 0x0013;
     regs.DE.w = 0x00D8;
     regs.HL.w = 0x014D;
     regs.I = 0;
@@ -134,8 +142,7 @@ uint8_t cpu::read_direct(uint16_t adr) {
             return vram_bank[adr & 0x1FFF]; // 8KBVRAM
         case 5:
             if (ref_gb->get_mbc()->is_ext_ram())
-                return ref_gb->get_mbc()
-                    ->get_sram()[adr & 0x1FFF]; //カートリッジRAM // cartridge RAM
+                return ref_gb->get_mbc()->get_sram()[adr & 0x1FFF]; //カートリッジRAM // cartridge RAM
             else
                 return ref_gb->get_mbc()->ext_read(adr);
         case 6:
@@ -347,7 +354,7 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
             ref_gb->send_linkcable_byte(ref_gb->get_regs()->SB);
             return;
         case 0xFF02: // SC (control)
-            if (ref_gb->get_rom()->get_info()->gb_type == 1) {
+            if (ref_gb->gb_type() == 1) {
                 ref_gb->get_regs()->SC = dat & 0x81;
                 if ((dat & 0x80) && (dat & 1)) {
                     // Internal clock
@@ -394,7 +401,7 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
             ref_gb->get_regs()->LCDC = dat;
             return;
         case 0xFF41: // STAT(LCDステータス) // STAT (LCD status)
-            if (ref_gb->get_rom()->get_info()->gb_type == 1)
+            if (ref_gb->gb_type() == 1)
                 // オリジナルGBにおいてこのような現象が起こるらしい
                 // This phenomenon seems to occur in the original GB
                 if (!(ref_gb->get_regs()->STAT & 0x02))
@@ -851,7 +858,7 @@ void cpu::serialize(serializer &s) {
 
     s_VAR(regs);
 
-    if (ref_gb->get_rom()->get_info()->gb_type >= 3) { // GB: 1, SGB: 2, GBC: 3...
+    if (ref_gb->gb_type() >= 3) { // GB: 1, SGB: 2, GBC: 3...
         s_ARRAY(ram);
         s_ARRAY(vram);
     } else {
