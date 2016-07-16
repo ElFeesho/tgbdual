@@ -36,7 +36,7 @@ void macro_runner::activate() {
 	int function = lua_getglobal(state, "activate");
 	if (function == LUA_TFUNCTION)
 	{
-		lua_callk(state, 0, 0, 0, [](lua_State *L, int status, lua_KContext ctx) -> int {
+		lua_callk(state, 0, 0, 0, [](lua_State *state, int status, lua_KContext ctx) -> int {
 			contexts[state]->print_string("Failed to execute macro");
 			return 0;
 		});

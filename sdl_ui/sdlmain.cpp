@@ -136,6 +136,7 @@ int main(int argc, char *argv[]) {
     SDL_Event e;
     bool endGame = false;    
     bool fast_forward = false;
+    uint32_t search_value = 0;
     
     while (!endGame) {
         while (SDL_PollEvent(&e)) {
@@ -166,6 +167,12 @@ int main(int argc, char *argv[]) {
 				else if (sym == SDLK_SPACE) {
 					runner.activate();
 				}
+                else if(sym >= SDLK_0 && sym <= SDLK_9)
+                {
+                    search_value *= 10;
+                    search_value += (sym-SDLK_0);
+                    std::cout << "Search value: " << search_value << std::endl;
+                }
                 else if (sym == SDLK_TAB) {
                     fast_forward = !fast_forward;
                     if (fast_forward) {
