@@ -36,6 +36,8 @@
 
 #include <functional>
 
+#include "address_scanner.h"
+
 #define INT_VBLANK 1
 #define INT_LCDC 2
 #define INT_TIMER 4
@@ -102,6 +104,8 @@ class gb {
 
     void inline render_frame();
     void inline hblank_dma();
+
+	address_scanner create_address_scanner();
 
    private:
     renderer *m_renderer;

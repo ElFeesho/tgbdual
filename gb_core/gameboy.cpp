@@ -11,7 +11,7 @@ void gameboy::load_rom(uint8_t *romData, uint32_t romLength, uint8_t *ram, uint3
     _gb.load_rom(romData, romLength, ram, ramLength);
 }
 
-void gameboy::save_state(std::function<uint8_t *(uint32_t)> functor) {
+void gameboy::save_state(std::function<uint8_t *(size_t)> functor) {
     _gb.save_state_mem(functor(_gb.get_state_size()));
 }
 

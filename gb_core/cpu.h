@@ -1,5 +1,7 @@
 #pragma once
 
+static const int RAM_SIZE = 0x2000 * 4;
+
 class gb;
 class serializer;
 
@@ -81,7 +83,7 @@ class cpu {
     gb *ref_gb;
     cpu_regs regs;
 
-    uint8_t ram[0x2000 * 4];
+    uint8_t ram[RAM_SIZE];
     uint8_t vram[0x2000 * 2];
     uint8_t stack[0x80];
     uint8_t oam[0xA0];

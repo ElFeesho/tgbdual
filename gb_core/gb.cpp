@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <stdexcept>
 #include <string>
+#include <cpu.h>
 
 #include "gamepad_source.h"
 
@@ -316,6 +317,10 @@ void gb::notify_sram_written() {
 
 uint8_t gb::check_pad() {
     return m_gamepad->check_pad();
+}
+
+address_scanner gb::create_address_scanner() {
+	return address_scanner(m_cpu.ram, 0x2000 * 4);
 }
 
 uint32_t convert_to_second(struct tm *sys) {
