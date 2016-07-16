@@ -21,29 +21,35 @@
 #include <renderer.h>
 
 #include <SDL.h>
+#include "osd_renderer.h"
+#include <vector>
+#include <tuple>
 
 using namespace std;
 
-class sdl_renderer : public renderer {
-   public:
-    sdl_renderer();
-    ~sdl_renderer();
+class sdl_renderer : public renderer, public osd_renderer {
+public:
+	sdl_renderer();
 
-    void render_screen(uint8_t *buf, int width, int height, int depth);
+	~sdl_renderer();
 
-    void refresh();
-    void reset() {}
+	void render_screen(uint8_t *buf, int width, int height, int depth) override;
 
-    sound_renderer *get_sound_renderer() { return snd_render; }
+	void refresh() {};
 
-   private:
-    void init_sdlvideo();
+	void reset() {}
 
-    void init_sdlaudio();
-    
-    int now_sensor_x, now_sensor_y;
+	sound_renderer *get_sound_renderer() { return snd_render; }
 
-   private:
-    SDL_Surface *dpy;
-    SDL_Surface *scr;
+	virtual void display_message(const std::string &msg, uint64_t duration) override;
+
+private:
+	void init_sdlvideo();
+
+	void init_sdlaudio();
+
+	SDL_Surface *dpy;
+	SDL_Surface *scr;
+
+	std::vector<std::tuple<uint64_t, std::string>> osd_messages;
 };

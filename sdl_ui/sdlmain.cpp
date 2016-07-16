@@ -40,6 +40,7 @@
 #include "tcp_server.h"
 
 #include "sdl_gamepad_source.h"
+#include "macro_runner.h"
 
 
 link_cable_source *processArguments(int *argc, char ***argv) {
@@ -101,6 +102,7 @@ int main(int argc, char *argv[]) {
     }
 
     sdl_renderer render;
+	macro_runner runner{&render};
     sdl_gamepad_source gp_source;
     link_cable_source *cable_source = processArguments(&argc, &argv);
 
@@ -115,6 +117,10 @@ int main(int argc, char *argv[]) {
     }
 
     gameboy gbInst{&render, &gp_source, cable_source};
+
+	file_buffer scriptBuffer{"script.lua"};
+
+	runner.loadScript(scriptBuffer);
 
     file_buffer romBuffer{romFilename};
     file_buffer saveBuffer{saveFile};
@@ -142,6 +148,7 @@ int main(int argc, char *argv[]) {
                 if (sym == SDLK_F7) {
                     file_buffer state{stateFile};
                     gbInst.load_state(state);
+					render.display_message("State loaded", 2000);
                 } else if (sym == SDLK_F5) {
                     memory_buffer buffer;
                     gbInst.save_state([&](uint32_t length) {
@@ -152,18 +159,24 @@ int main(int argc, char *argv[]) {
                     fout.write(buffer, buffer.length());
                     fout.close();
                     buffer.dealloc();
+					render.display_message("State saved", 2000);
                 } else if (sym == SDLK_ESCAPE) {
                     endGame = true;
                 }
+				else if (sym == SDLK_SPACE) {
+					runner.activate();
+				}
                 else if (sym == SDLK_TAB) {
                     fast_forward = !fast_forward;
                     if (fast_forward) {
                         gbInst.setSpeed(9);
                         limitFunc = std::bind(limit, 1, std::placeholders::_1);
+						render.display_message("Fast forward enabled", 2000);
                     }
                     else {
                         gbInst.setSpeed(0);
                         limitFunc = std::bind(limit, 16, std::placeholders::_1);
+						render.display_message("Fast forward disabled", 2000);
                     }
                 }
             }
