@@ -18,6 +18,10 @@ public:
     operator uint8_t*() {
         return _buffer;
     }
+
+    operator std::string() {
+        return std::string((const char*)_buffer, _length);
+    }
     
 private:
     uint32_t _length;

@@ -102,7 +102,6 @@ int main(int argc, char *argv[]) {
     }
 
     sdl_renderer render;
-	macro_runner runner{&render};
     sdl_gamepad_source gp_source;
     link_cable_source *cable_source = processArguments(&argc, &argv);
 
@@ -117,6 +116,8 @@ int main(int argc, char *argv[]) {
     }
 
     gameboy gbInst{&render, &gp_source, cable_source};
+
+	macro_runner runner{&render, &gbInst};
 
 	file_buffer scriptBuffer{"script.lua"};
 
@@ -137,7 +138,7 @@ int main(int argc, char *argv[]) {
     bool endGame = false;    
     bool fast_forward = false;
     uint32_t search_value = 0;
-    
+	address_scan_result last_result{{}};
     while (!endGame) {
         while (SDL_PollEvent(&e)) {
             gp_source.update_pad_state(e);
@@ -173,15 +174,53 @@ int main(int argc, char *argv[]) {
                     search_value += (sym-SDLK_0);
                     std::cout << "Search value: " << search_value << std::endl;
                 }
+                else if(sym == SDLK_BACKSPACE)
+                {
+                    if (search_value > 0)
+                    {
+                        search_value /= 10;
+                    }
+                    std::cout << "Search value: " << search_value << std::endl;
+                }
+				else if(sym == SDLK_F1)
+				{
+					address_scan_result result = gbInst.scan_for_address((uint8_t)search_value);
+					if (last_result.size() > 0) {
+						result = last_result.mutual_set(result);
+					}
+					last_result = result;
+					if (result.size() <= 10)
+					{
+						for(int i = 0; i < result.size(); i++) {
+							std::cout << "FOUND ADDRESS: " << std::hex << result[i] << std::dec << std::endl;
+						}
+					}
+					render.display_message("Found results: "+std::to_string(result.size()), 5000);
+				}
+				else if(sym == SDLK_F2)
+				{
+					address_scan_result result = gbInst.scan_for_address((uint16_t)search_value);
+					if (last_result.size() > 0) {
+						result = last_result.mutual_set(result);
+					}
+					last_result = result;
+					if (result.size() <= 10)
+					{
+						for(int i = 0; i < result.size(); i++) {
+							std::cout << "FOUND ADDRESS: " << std::hex << result[i] << std::dec << std::endl;
+						}
+					}
+					render.display_message("Found results: "+std::to_string(result.size()), 5000);
+				}
                 else if (sym == SDLK_TAB) {
                     fast_forward = !fast_forward;
                     if (fast_forward) {
-                        gbInst.setSpeed(9);
+						gbInst.set_speed(9);
                         limitFunc = std::bind(limit, 1, std::placeholders::_1);
 						render.display_message("Fast forward enabled", 2000);
                     }
                     else {
-                        gbInst.setSpeed(0);
+						gbInst.set_speed(0);
                         limitFunc = std::bind(limit, 16, std::placeholders::_1);
 						render.display_message("Fast forward disabled", 2000);
                     }

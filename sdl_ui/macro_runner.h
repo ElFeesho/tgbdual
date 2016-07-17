@@ -10,10 +10,10 @@
 
 class macro_runner {
 public:
-	macro_runner(osd_renderer *osd);
+	macro_runner(osd_renderer *osd, gameboy *gb);
 	~macro_runner();
 
-	void loadScript(uint8_t *script);
+	void loadScript(const std::string &script);
 	void activate();
 
 private:

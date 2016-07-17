@@ -121,5 +121,6 @@ void sdl_renderer::init_sdlaudio() {
 }
 
 void sdl_renderer::display_message(const std::string &msg, uint64_t duration) {
+	std::cout << "MSG: " << msg << std::endl;
 	osd_messages.emplace_back(std::tuple<uint64_t, std::string>{SDL_GetTicks() + duration, msg});
 }
