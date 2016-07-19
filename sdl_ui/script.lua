@@ -8,6 +8,7 @@
 
 pokename = {}
 
+pokename[0] = "Unknown"
 pokename[1] = "Bulbasaur"
 pokename[2] = "Ivysaur"
 pokename[3] = "Venusaur"
@@ -291,41 +292,25 @@ function create_pokemon_actor(number)
     }
 end
 
+function create_poke_hud(actor, number)
+    local x = number * 54
+    local y = 288 - 50
+
+    print(actor:to_string())
+    bridge.add_rect(x, y, 50, 50, 0xffff0000, 0x88ffffff)
+
+    bridge.add_rect(x+2, y+2, 46, 8, 0xff000000, 0xff000000)
+    bridge.add_rect(x+4, y+4, 42, 4, 0xff000000, 0xff444444)
+    bridge.add_rect(x+4, y+4, math.floor(42.0*(actor:hp()/actor:hp_max())), 4, 0xff000000, 0xff00ff00)
+    bridge.add_image("imgs/"..actor:pokemon_number()..".png", x+4, y+10)
+
+end
+
 function activate()
 
---    bridge.set_16bit_value(0x1d02, 128)
-    local poke1 = create_pokemon_actor(1)
-    print(poke1:to_string())
-    local poke2 = create_pokemon_actor(2)
-    print(poke2:to_string())
-    local poke3 = create_pokemon_actor(3)
-    print(poke3:to_string())
-    local poke4 = create_pokemon_actor(4)
-    print(poke4:to_string())
-    local poke5 = create_pokemon_actor(5)
-    print(poke5:to_string())
-    local poke6 = create_pokemon_actor(6)
-    print(poke6:to_string())
-
---    bridge.set_16bit_value(0x1d02, 256)
---    bridge.set_16bit_value(0x1d04, 255)
---
---    bridge.print("Pokémon 2 exp: " .. bridge.read_16bit_value(0x1d19))
---    bridge.set_16bit_value(0x1d19, bridge.read_16bit_value(0x1d19))
---    bridge.set_8bit_value(0x1d32, 255)
---    bridge.set_8bit_value(0x1d34, 255)
---
---    bridge.set_8bit_value(0x1d62, 255)
---    bridge.set_8bit_value(0x1d64, 255)
---
---    bridge.set_8bit_value(0x1d92, 255)
---    bridge.set_8bit_value(0x1d94, 255)
---
---    bridge.set_8bit_value(0x1dc2, 255)
---    bridge.set_8bit_value(0x1dc4, 255)
---
---    bridge.set_8bit_value(0x1df2, 255)
---    bridge.set_8bit_value(0x1df4, 255)
---    bridge.print("Updated Pokémon Values")
+    bridge.clear_canvas()
+    for i = 0, 5 do
+        create_poke_hud(create_pokemon_actor(i+1), i)
+    end
 end
 

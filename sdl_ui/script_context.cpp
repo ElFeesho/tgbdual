@@ -35,3 +35,16 @@ uint8_t script_context::read_8bit_value(uint32_t address)
 uint16_t script_context::read_16bit_value(uint32_t address) {
 	return (((uint16_t)_gameboy->read_ram<uint8_t>(address))<<8) | (_gameboy->read_ram<uint8_t>(address-1));
 }
+
+void script_context::clear_canvas() {
+	_osd->clear_canvas();
+}
+
+void script_context::add_image(const std::string &name, int16_t x, int16_t y)
+{
+	_osd->add_image({name, x, y});
+}
+
+void script_context::add_rect(int16_t x, int16_t y, int16_t w, int16_t h, uint32_t stroke, uint32_t fill) {
+	_osd->add_rect({x, y, w, h, stroke, fill});
+}

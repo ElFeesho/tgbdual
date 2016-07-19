@@ -60,6 +60,40 @@ macro_runner::macro_runner(osd_renderer *osd, gameboy *gb) : _osd{osd}, context{
 	});
 
 	lua_setfield(state, -2, "read_16bit_value");
+
+	lua_pushcfunction(state, [](lua_State *state) -> int {
+		script_context *ctx = contexts[state];
+		int x = lua_tointeger(state, 1);
+		int y = lua_tointeger(state, 2);
+		int w = lua_tointeger(state, 3);
+		int h = lua_tointeger(state, 4);
+		int s = lua_tointeger(state, 5);
+		int f = lua_tointeger(state, 6);
+		ctx->add_rect(x, y, w, h, s, f);
+		return 0;
+	});
+
+	lua_setfield(state, -2, "add_rect");
+
+	lua_pushcfunction(state, [](lua_State *state) -> int {
+		script_context *ctx = contexts[state];
+		const char *name = lua_tostring(state, 1);
+		int x = lua_tointeger(state, 2);
+		int y = lua_tointeger(state, 3);
+
+		ctx->add_image(name, x, y);
+		return 0;
+	});
+
+	lua_setfield(state, -2, "add_image");
+
+	lua_pushcfunction(state, [](lua_State *state) -> int {
+		script_context *ctx = contexts[state];
+		ctx->clear_canvas();
+		return 0;
+	});
+
+	lua_setfield(state, -2, "clear_canvas");
 }
 
 macro_runner::~macro_runner() {

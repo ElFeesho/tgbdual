@@ -37,5 +37,5 @@ message(${PROJECT_SOURCE_DIR}/../extlibs/lua-5.3.3/include)
 
 add_executable(tgbdual ${SDL_UI_SOURCES})
 
-target_link_libraries(tgbdual gb_core ${SDL_LIBRARY} z -L${PROJECT_SOURCE_DIR}/../extlibs/lua-5.3.3/bin lua -L/usr/local/lib SDL_gfx)
+target_link_libraries(tgbdual gb_core ${SDL_LIBRARY} z -L${PROJECT_SOURCE_DIR}/../extlibs/lua-5.3.3/bin lua -L/usr/local/lib SDL_gfx SDL_image)
 target_compile_features(tgbdual PRIVATE cxx_lambdas)

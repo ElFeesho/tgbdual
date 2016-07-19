@@ -24,6 +24,7 @@
 #include "osd_renderer.h"
 #include <vector>
 #include <tuple>
+#include <map>
 
 using namespace std;
 
@@ -43,13 +44,25 @@ public:
 
 	virtual void display_message(const std::string &msg, uint64_t duration) override;
 
+	virtual void add_rect(const osd_rect &rect) override;
+
+	virtual void clear_canvas() override;
+
+	virtual void add_image(const osd_image &image) override;
+
 private:
 	void init_sdlvideo();
 
 	void init_sdlaudio();
 
+	SDL_Surface *lookupImage(const std::string &image_name);
+
 	SDL_Surface *dpy;
 	SDL_Surface *scr;
 
 	std::vector<std::tuple<uint64_t, std::string>> osd_messages;
+	std::vector<osd_rect> rects;
+	std::vector<osd_image> images;
+
+	std::map<std::string, SDL_Surface*> image_cache;
 };

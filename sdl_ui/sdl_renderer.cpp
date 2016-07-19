@@ -25,6 +25,7 @@
 
 #include <gb.h>
 #include <SDL_gfxPrimitives.h>
+#include <SDL_image.h>
 
 const uint16_t WIN_MULTIPLIER = 2;
 
@@ -90,6 +91,46 @@ void sdl_renderer::render_screen(uint8_t *buf, int width, int height, int depth)
 				return SDL_GetTicks() > get<0>(msg);
 			}), osd_messages.end());
 
+
+	for (auto rect : rects)
+	{
+		uint32_t colour = rect.stroke();
+		uint8_t a = (uint8_t) ((colour & 0xff000000) >> 24);
+		uint8_t b = (uint8_t) ((colour & 0x00ff0000) >> 16);
+		uint8_t g = (uint8_t) ((colour & 0x0000ff00) >> 8);
+		uint8_t r = (uint8_t) (colour & 0x000000ff);
+
+		uint32_t fillColour = rect.fill();
+		uint8_t fillAlpha = (uint8_t) ((fillColour & 0xff000000) >> 24);
+		uint8_t fillBlue = (uint8_t) ((fillColour & 0x00ff0000) >> 16);
+		uint8_t fillGreen = (uint8_t) ((fillColour & 0x0000ff00) >> 8);
+		uint8_t fillRed = (uint8_t) (fillColour & 0x000000ff);
+
+		int16_t x1 = rect.x();
+		int16_t x2 = x1 + rect.w();
+		int16_t y1 = rect.y();
+		int16_t y2 = y1 + rect.h();
+
+		int16_t xpoints[] =  {x1, x2, x2, x1};
+		int16_t ypoints[] =  {y1, y1, y2, y2};
+		filledPolygonRGBA(dpy, xpoints, ypoints, 4, fillRed, fillGreen, fillBlue, fillAlpha);
+
+		aalineRGBA(dpy, x1, y1, x2, y1, r, g, b, a);
+		aalineRGBA(dpy, x1, y2, x2, y2, r, g, b, a);
+		aalineRGBA(dpy, x1, y1, x1, y2, r, g, b, a);
+		aalineRGBA(dpy, x2, y1, x2, y2, r, g, b, a);
+	}
+
+	for(auto image : images)
+	{
+		SDL_Surface *src = lookupImage(image.name());
+		if (src)
+		{
+			SDL_Rect pos = { image.x(), image.y(), (uint16_t)src->w, (uint16_t)src->h };
+			SDL_BlitSurface(src, nullptr, dpy, &pos);
+		}
+	}
+
 	SDL_UpdateRect(dpy, 0, 0, 0, 0);
 }
 
@@ -123,4 +164,29 @@ void sdl_renderer::init_sdlaudio() {
 void sdl_renderer::display_message(const std::string &msg, uint64_t duration) {
 	std::cout << "MSG: " << msg << std::endl;
 	osd_messages.emplace_back(std::tuple<uint64_t, std::string>{SDL_GetTicks() + duration, msg});
+}
+
+void sdl_renderer::add_rect(const osd_rect &rect) {
+	rects.emplace_back(rect);
+}
+
+void sdl_renderer::clear_canvas() {
+	rects.clear();
+	images.clear();
+}
+
+void sdl_renderer::add_image(const osd_image &image) {
+	images.emplace_back(image);
+}
+
+SDL_Surface *sdl_renderer::lookupImage(const string &name) {
+	if (image_cache.find(name) == image_cache.end())
+	{
+		SDL_Surface *icon = IMG_Load(name.c_str());
+		if (icon != nullptr)
+		{
+			image_cache[name] = icon;
+		}
+	}
+	return image_cache[name];
 }
