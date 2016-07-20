@@ -4,13 +4,9 @@
 
 #include <gameboy.h>
 #include "script_context.h"
+#include "input_queue.h"
 
-static inline uint16_t swap_endianness(uint16_t value)
-{
-	return (uint16_t) (((value & 0xff) << 8) | ((value & 0xff00) >> 16));
-}
-
-script_context::script_context(osd_renderer *osd, gameboy *gb) : _osd{osd}, _gameboy{gb} {
+script_context::script_context(osd_renderer *osd, input_queue *queue, gameboy *gb) : _osd{osd}, _queue{queue}, _gameboy{gb} {
 
 }
 
@@ -47,4 +43,8 @@ void script_context::add_image(const std::string &name, int16_t x, int16_t y)
 
 void script_context::add_rect(int16_t x, int16_t y, int16_t w, int16_t h, uint32_t stroke, uint32_t fill) {
 	_osd->add_rect({x, y, w, h, stroke, fill});
+}
+
+void script_context::queue_key(uint8_t key, uint32_t when, uint32_t duration) {
+	_queue->queue_key({key, when, duration});
 }

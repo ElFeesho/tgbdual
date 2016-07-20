@@ -27,7 +27,7 @@ set(SDL_UI_SOURCES
 	keyboard_input_source.h
 	buffer.h
 	sdlmain.cpp 
-	json.hpp macro_runner.cpp macro_runner.h osd_renderer.h script_context.cpp script_context.h)
+	json.hpp macro_runner.cpp macro_runner.h osd_renderer.h script_context.cpp script_context.h input_queue.h)
 
 find_package(SDL)
 

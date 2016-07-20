@@ -312,5 +312,11 @@ function activate()
     for i = 0, 5 do
         create_poke_hud(create_pokemon_actor(i+1), i)
     end
+
+    print("Pause menu position "..bridge.read_8bit_value(0xf74))
+    bridge.set_8bit_value(0xf74, 0)
+
+
+    bridge.queue_key(0x01, 2000, 500)
 end
 

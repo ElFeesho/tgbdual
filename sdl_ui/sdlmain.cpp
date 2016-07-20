@@ -117,7 +117,7 @@ int main(int argc, char *argv[]) {
 
     gameboy gbInst{&render, &gp_source, cable_source};
 
-	macro_runner runner{&render, &gbInst};
+	macro_runner runner{&render, &gp_source, &gbInst};
 
 	file_buffer scriptBuffer{"script.lua"};
 

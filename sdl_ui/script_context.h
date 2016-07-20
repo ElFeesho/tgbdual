@@ -6,10 +6,11 @@
 
 #include "osd_renderer.h"
 #include "gameboy.h"
+#include "input_queue.h"
 
 class script_context {
 public:
-	script_context(osd_renderer *osd, gameboy *gb);
+	script_context(osd_renderer *osd, input_queue *queue, gameboy *gb);
 
 	void print_string(const std::string&);
 	void set_16bit_value(uint32_t address, uint16_t value);
@@ -19,9 +20,11 @@ public:
 	void add_image(const std::string &name, int16_t x, int16_t y);
 	void add_rect(int16_t x, int16_t y, int16_t w, int16_t h, uint32_t stroke, uint32_t fill);
 	void clear_canvas();
+	void queue_key(uint8_t key, uint32_t when, uint32_t duration);
 
 private:
 	osd_renderer *_osd;
+	input_queue *_queue;
 	gameboy *_gameboy;
 
 };

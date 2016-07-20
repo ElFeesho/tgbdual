@@ -9,7 +9,7 @@
 
 static std::map<lua_State *, script_context *> contexts;
 
-macro_runner::macro_runner(osd_renderer *osd, gameboy *gb) : _osd{osd}, context{osd, gb} {
+macro_runner::macro_runner(osd_renderer *osd, input_queue *queue, gameboy *gb) : context{osd, queue, gb} {
 
 	state = luaL_newstate();
 	luaL_openlibs(state);
@@ -36,7 +36,10 @@ macro_runner::macro_runner(osd_renderer *osd, gameboy *gb) : _osd{osd}, context{
 
 	lua_pushcfunction(state, [](lua_State *state) -> int {
 		script_context *ctx = contexts[state];
-		ctx->set_8bit_value((uint32_t) lua_tointeger(state, 1), (uint8_t) lua_tointeger(state, 2));
+		uint32_t address = (uint32_t) lua_tointeger(state, 1);
+		uint8_t value = (uint8_t) lua_tointeger(state, 2);
+
+		ctx->set_8bit_value(address, value);
 		return 0;
 	});
 	lua_setfield(state, -2, "set_8bit_value");
@@ -84,7 +87,6 @@ macro_runner::macro_runner(osd_renderer *osd, gameboy *gb) : _osd{osd}, context{
 		ctx->add_image(name, x, y);
 		return 0;
 	});
-
 	lua_setfield(state, -2, "add_image");
 
 	lua_pushcfunction(state, [](lua_State *state) -> int {
@@ -94,6 +96,18 @@ macro_runner::macro_runner(osd_renderer *osd, gameboy *gb) : _osd{osd}, context{
 	});
 
 	lua_setfield(state, -2, "clear_canvas");
+
+
+	lua_pushcfunction(state, [](lua_State *state) -> int {
+		script_context *ctx = contexts[state];
+		uint8_t key = lua_tointeger(state, 1);
+		uint32_t when = lua_tointeger(state, 2);
+		uint32_t duration = lua_tointeger(state, 3);
+
+		ctx->queue_key(key, when, duration);
+		return 0;
+	});
+	lua_setfield(state, -2, "queue_key");
 }
 
 macro_runner::~macro_runner() {
@@ -113,7 +127,7 @@ void macro_runner::activate() {
 
 void macro_runner::loadScript(const std::string &script) {
 	if (luaL_loadstring(state, script.c_str()) == LUA_OK) {
-		_osd->display_message("Loaded script successfully", 2000);
+		context.print_string("Loaded script successfully");
 		lua_pcall(state, 0, 0, 0);
 	}
 }
