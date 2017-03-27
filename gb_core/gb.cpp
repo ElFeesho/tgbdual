@@ -323,6 +323,24 @@ address_scanner gb::create_address_scanner() {
 	return address_scanner(m_cpu.ram, 0x2000 * 4);
 }
 
+gbc_regs *gb::get_cregs() { return &c_regs; }
+
+gb_regs *gb::get_regs() { return &regs; }
+
+cheat *gb::get_cheat() { return &m_cheat; }
+
+mbc *gb::get_mbc() { return &m_mbc; }
+
+rom *gb::get_rom() { return &m_rom; }
+
+apu *gb::get_apu() { return &m_apu; }
+
+cpu *gb::get_cpu() { return &m_cpu; }
+
+lcd *gb::get_lcd() { return &m_lcd; }
+
+uint8_t gb::gb_type() { return m_rom.get_info()->gb_type; }
+
 uint32_t convert_to_second(struct tm *sys) {
     uint32_t i, ret = 0;
     static int month_days[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};

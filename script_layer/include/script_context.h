@@ -5,7 +5,7 @@
 #pragma once
 
 #include "osd_renderer.h"
-#include "gameboy.h"
+#include <gameboy.h>
 #include "input_queue.h"
 
 class script_context {

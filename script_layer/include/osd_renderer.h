@@ -10,7 +10,7 @@
 class osd_rect
 {
 public:
-	osd_rect(int16_t x, int16_t y, int16_t w, int16_t h, uint32_t strokeColour, uint32_t fillColour) : _x{x}, _y{y}, _w{w}, _h{h}, _strokeColour{strokeColour}, _fillColour{fillColour} {}
+	osd_rect(int16_t x, int16_t y, int16_t w, int16_t h, uint32_t strokeColour, uint32_t fillColour) : _x(x), _y{y}, _w{w}, _h{h}, _strokeColour{strokeColour}, _fillColour{fillColour} {}
 
 	int16_t x() { return _x; }
 	int16_t y() { return _y; }

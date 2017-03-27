@@ -1,30 +1,29 @@
 #pragma once
 
 #include <string>
-
+#include <memory>
 #include "buffer.h"
 
 class file_buffer : buffer 
 {
 public:
     file_buffer(const std::string &name);
-    ~file_buffer();
     uint32_t length();
 
     operator const char*() {
-        return (const char *)_buffer;
+        return (const char *)_buffer.get();
     }
 
     operator uint8_t*() {
-        return _buffer;
+        return _buffer.get();
     }
 
     operator std::string() {
-        return std::string((const char*)_buffer, _length);
+        return std::string((const char*)_buffer.get(), _length);
     }
     
 private:
     uint32_t _length;
-    uint8_t *_buffer;
+    std::unique_ptr<uint8_t> _buffer;
 };
 

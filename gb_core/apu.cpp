@@ -21,19 +21,14 @@
 // APU(PSG?)エミュレーション部 (レジスタ/波形生成)
 // APU unit (PSG?) Emulation (waveform generation register)
 
-#define UPDATE_INTERVAL \
-    172 // 1/256秒あたりのサンプル数 // Number of samples per second / 256
 #define CLOCKS_PER_INTERVAL \
     16384 // 1/256秒あたりのクロック数 (4MHz時) // Number of clock ticks per
           // second / 256 (at 4MHz)
 
 #include "apu.h"
 #include <memory.h>
-#include <stdlib.h>
 
 #include "gb.h"
-#include "serializer.h"
-#include "sound_renderer.h"
 
 static uint32_t sq1_cur_pos = 0;
 static uint32_t sq2_cur_pos = 0;
@@ -96,20 +91,6 @@ void apu::write(uint16_t adr, uint8_t dat, int clock) {
     bef_clock = clock;
 }
 
-void apu::update() {}
-
-apu_stat *apu::get_stat() {
-    return &snd.stat;
-}
-
-apu_stat *apu::get_stat_cpy() {
-    return &snd.stat_cpy;
-}
-
-uint8_t *apu::get_mem() {
-    return snd.mem;
-}
-
 //---------------------------------------------------------------------
 
 apu_snd::apu_snd(apu *papu) {
@@ -145,14 +126,6 @@ void apu_snd::reset() {
         memcpy(mem + 20, gb_init_wav, 16);
     else if (ref_apu->ref_gb->get_rom()->get_info()->gb_type >= 3) // GBC
         memcpy(mem + 20, gbc_init_wav, 16);
-}
-
-void apu_snd::set_enable(int ch, bool enable) {
-    b_enable[ch] = enable;
-}
-
-bool apu_snd::get_enable(int ch) {
-    return b_enable[ch];
 }
 
 void apu_snd::process(uint16_t adr, uint8_t dat) {

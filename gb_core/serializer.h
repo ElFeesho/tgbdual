@@ -1,5 +1,4 @@
-#ifndef __SERIALIZER_H__
-#define __SERIALIZER_H__
+#pragma once
 
 #include <stdio.h>
 #include <string.h>
@@ -11,15 +10,18 @@
 // short and simple serializing to buffer / file / thin air.
 // inspired by the much nicer one found in bsnes.
 class serializer {
-   public:
-    enum mode_t { COUNT,
-                  SAVE_BUF,
-                  LOAD_BUF };
+public:
+    enum mode_t {
+        COUNT,
+        SAVE_BUF,
+        LOAD_BUF
+    };
+
     serializer(void *target, mode_t mode) {
         my_mode = mode;
         my_target.ptr = target;
     }
-    
+
     inline size_t process(void *data, size_t size) {
         switch (my_mode) {
             case COUNT:
@@ -40,7 +42,7 @@ class serializer {
         return 0;
     }
 
-   private:
+private:
     mode_t my_mode;
     union {
         void *ptr;
@@ -48,5 +50,3 @@ class serializer {
         unsigned char *buf;
     } my_target;
 };
-
-#endif //__SERIALIZER_H__

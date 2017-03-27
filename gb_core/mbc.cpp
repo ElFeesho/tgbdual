@@ -234,7 +234,7 @@ void mbc::ext_write(uint16_t adr, uint8_t dat) {
                         if (mbc7_write_enable) {
                             *(ref_gb->get_rom()->get_sram() + mbc7_adr * 2) = mbc7_buf >> 8;
                             *(ref_gb->get_rom()->get_sram() + mbc7_adr * 2 + 1) =
-                                mbc7_buf & 0xff;
+                                    mbc7_buf & 0xff;
                             ////
                             ///fprintf(file,"書き込み完了\n");
                             //						fprintf(file,"Write
@@ -338,7 +338,7 @@ void mbc::ext_write(uint16_t adr, uint8_t dat) {
                                                     for (i = 0; i < 256; i++) {
                                                         *(ref_gb->get_rom()->get_sram() + i * 2) = mbc7_buf >> 8;
                                                         *(ref_gb->get_rom()->get_sram() + i * 2) =
-                                                            mbc7_buf & 0xff;
+                                                                mbc7_buf & 0xff;
                                                     }
                                                 }
                                                 ////
@@ -350,7 +350,7 @@ void mbc::ext_write(uint16_t adr, uint8_t dat) {
                                             } else if ((mbc7_adr >> 6) == 2) {
                                                 if (mbc7_write_enable) {
                                                     for (i = 0; i < 256; i++)
-                                                        *(uint16_t *)(ref_gb->get_rom()->get_sram() + i * 2) = 0xffff;
+                                                        *(uint16_t *) (ref_gb->get_rom()->get_sram() + i * 2) = 0xffff;
                                                 }
                                                 ////									fprintf(file,"全アドレス消去
                                                 ///ステート:なし\n");
@@ -534,20 +534,20 @@ void mbc::mbc1_write(uint16_t adr, uint8_t dat) {
             case 1:
                 mbc1_dat = (mbc1_dat & 0x60) + (dat & 0x1F);
                 rom_page =
-                    ref_gb->get_rom()->get_rom() +
-                    0x4000 *
+                        ref_gb->get_rom()->get_rom() +
+                        0x4000 *
                         ((mbc1_dat == 0 ? 1 : mbc1_dat) &
                          (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
-                    0x4000;
+                        0x4000;
                 break;
             case 2:
                 mbc1_dat = ((dat << 5) & 0x60) + (mbc1_dat & 0x1F);
                 rom_page =
-                    ref_gb->get_rom()->get_rom() +
-                    0x4000 *
+                        ref_gb->get_rom()->get_rom() +
+                        0x4000 *
                         ((mbc1_dat == 0 ? 1 : mbc1_dat) &
                          (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
-                    0x4000;
+                        0x4000;
                 break;
             case 3:
                 if (dat & 1)
@@ -563,11 +563,11 @@ void mbc::mbc1_write(uint16_t adr, uint8_t dat) {
                 break;
             case 1:
                 rom_page =
-                    ref_gb->get_rom()->get_rom() +
-                    0x4000 *
+                        ref_gb->get_rom()->get_rom() +
+                        0x4000 *
                         ((dat == 0 ? 1 : dat) & 0x1F &
                          (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
-                    0x4000;
+                        0x4000;
                 break;
             case 2:
                 sram_page = ref_gb->get_rom()->get_sram() + 0x2000 * (dat & 3);
@@ -602,14 +602,15 @@ void mbc::mbc3_write(uint16_t adr, uint8_t dat) {
             break;
         case 1:
             rom_page =
-                ref_gb->get_rom()->get_rom() +
-                0x4000 * ((dat == 0 ? 1 : dat) & 0x7F &
-                          (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
-                0x4000;
+                    ref_gb->get_rom()->get_rom() +
+                    0x4000 * ((dat == 0 ? 1 : dat) & 0x7F &
+                              (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
+                    0x4000;
             break;
         case 2:
             if (dat < 8) {
-                sram_page = ref_gb->get_rom()->get_sram() + 0x2000 * (dat & 7 & (ram_size_tbl[ref_gb->get_rom()->get_info()->ram_size] - 1));
+                sram_page = ref_gb->get_rom()->get_sram() +
+                            0x2000 * (dat & 7 & (ram_size_tbl[ref_gb->get_rom()->get_info()->ram_size] - 1));
                 ext_is_ram = true;
             } else {
                 ext_is_ram = false;
@@ -643,29 +644,31 @@ void mbc::mbc5_write(uint16_t adr, uint8_t dat) {
             mbc5_dat &= 0x0100;
             mbc5_dat |= dat;
             rom_page =
-                ref_gb->get_rom()->get_rom() +
-                0x4000 * (mbc5_dat &
-                          (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
-                0x4000;
+                    ref_gb->get_rom()->get_rom() +
+                    0x4000 * (mbc5_dat &
+                              (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
+                    0x4000;
             break;
         case 3:
             mbc5_dat &= 0x00FF;
             mbc5_dat |= (dat & 1) << 8;
             rom_page =
-                ref_gb->get_rom()->get_rom() +
-                0x4000 * (mbc5_dat &
-                          (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
-                0x4000;
+                    ref_gb->get_rom()->get_rom() +
+                    0x4000 * (mbc5_dat &
+                              (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
+                    0x4000;
             break;
         case 4:
         case 5:
             if (ref_gb->get_rom()->get_info()->cart_type == 0x1C ||
                 ref_gb->get_rom()->get_info()->cart_type == 0x1D ||
                 ref_gb->get_rom()->get_info()->cart_type == 0x1E) { // Rumble カートリッジ
-                sram_page = ref_gb->get_rom()->get_sram() + 0x2000 * (dat & 0x07 & (ram_size_tbl[ref_gb->get_rom()->get_info()->ram_size] - 1));
+                sram_page = ref_gb->get_rom()->get_sram() +
+                            0x2000 * (dat & 0x07 & (ram_size_tbl[ref_gb->get_rom()->get_info()->ram_size] - 1));
                 //ref_gb->get_renderer()->set_bibrate(dat & 0x8);
             } else
-                sram_page = ref_gb->get_rom()->get_sram() + 0x2000 * (dat & 0x0f & (ram_size_tbl[ref_gb->get_rom()->get_info()->ram_size] - 1));
+                sram_page = ref_gb->get_rom()->get_sram() +
+                            0x2000 * (dat & 0x0f & (ram_size_tbl[ref_gb->get_rom()->get_info()->ram_size] - 1));
             break;
     }
 }
@@ -676,10 +679,10 @@ void mbc::mbc7_write(uint16_t adr, uint8_t dat) {
             break;
         case 1:
             rom_page =
-                ref_gb->get_rom()->get_rom() +
-                0x4000 * ((dat == 0 ? 1 : dat) & 0x7F &
-                          (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
-                0x4000;
+                    ref_gb->get_rom()->get_rom() +
+                    0x4000 * ((dat == 0 ? 1 : dat) & 0x7F &
+                              (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
+                    0x4000;
             //		rom_page=ref_gb->get_rom()->get_rom()+0x4000*(dat&0x3f)-0x4000;
             break;
         case 2:
@@ -705,20 +708,20 @@ void mbc::huc1_write(uint16_t adr, uint8_t dat) {
             case 1:
                 huc1_dat = (huc1_dat & 0x60) + (dat & 0x3F);
                 rom_page =
-                    ref_gb->get_rom()->get_rom() +
-                    0x4000 *
+                        ref_gb->get_rom()->get_rom() +
+                        0x4000 *
                         ((huc1_dat == 0 ? 1 : huc1_dat) &
                          (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
-                    0x4000;
+                        0x4000;
                 break;
             case 2:
                 huc1_dat = ((dat << 5) & 0x60) + (huc1_dat & 0x3F);
                 rom_page =
-                    ref_gb->get_rom()->get_rom() +
-                    0x4000 *
+                        ref_gb->get_rom()->get_rom() +
+                        0x4000 *
                         ((huc1_dat == 0 ? 1 : huc1_dat) &
                          (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
-                    0x4000;
+                        0x4000;
                 break;
             case 3:
                 if (dat & 1)
@@ -734,11 +737,11 @@ void mbc::huc1_write(uint16_t adr, uint8_t dat) {
                 break;
             case 1:
                 rom_page =
-                    ref_gb->get_rom()->get_rom() +
-                    0x4000 *
+                        ref_gb->get_rom()->get_rom() +
+                        0x4000 *
                         ((dat == 0 ? 1 : dat) & 0x3F &
                          (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
-                    0x4000;
+                        0x4000;
                 break;
             case 2:
                 sram_page = ref_gb->get_rom()->get_sram() + 0x2000 * (dat & 3);
@@ -774,10 +777,10 @@ void mbc::huc3_write(uint16_t adr, uint8_t dat) {
             break;
         case 1:
             rom_page =
-                ref_gb->get_rom()->get_rom() +
-                0x4000 * ((dat == 0 ? 1 : dat) & 0x7F &
-                          (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
-                0x4000;
+                    ref_gb->get_rom()->get_rom() +
+                    0x4000 * ((dat == 0 ? 1 : dat) & 0x7F &
+                              (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
+                    0x4000;
             break;
         case 2:
             if (dat < 8) {
@@ -820,20 +823,20 @@ void mbc::mmm01_write(uint16_t adr, uint8_t dat) {
             case 1:
                 mbc1_dat = (mbc1_dat & 0x60) + (dat & 0x1F);
                 rom_page =
-                    ref_gb->get_rom()->get_rom() +
-                    0x4000 *
+                        ref_gb->get_rom()->get_rom() +
+                        0x4000 *
                         ((mbc1_dat == 0 ? 1 : mbc1_dat) &
                          (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
-                    0x4000;
+                        0x4000;
                 break;
             case 2:
                 mbc1_dat = ((dat << 5) & 0x60) + (mbc1_dat & 0x1F);
                 rom_page =
-                    ref_gb->get_rom()->get_rom() +
-                    0x4000 *
+                        ref_gb->get_rom()->get_rom() +
+                        0x4000 *
                         ((mbc1_dat == 0 ? 1 : mbc1_dat) &
                          (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
-                    0x4000;
+                        0x4000;
                 break;
             case 3:
                 if (dat & 1)
@@ -849,11 +852,11 @@ void mbc::mmm01_write(uint16_t adr, uint8_t dat) {
                 break;
             case 1:
                 rom_page =
-                    ref_gb->get_rom()->get_rom() +
-                    0x4000 *
+                        ref_gb->get_rom()->get_rom() +
+                        0x4000 *
                         ((dat & 3) * 0x10 + (dat == 0 ? 1 : dat) & 0x0f &
                          (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
-                    0x4000;
+                        0x4000;
                 break;
             case 2:
                 ref_gb->get_rom()->set_first((dat & 3) * 0x10);

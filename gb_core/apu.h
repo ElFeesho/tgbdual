@@ -86,13 +86,6 @@ class apu_snd : public sound_renderer {
 public:
     apu_snd(apu *papu);
 
-    void set_enable(int ch, bool enable);
-    bool get_enable(int ch);
-    void set_echo(bool echo) { b_echo = echo; };
-    void set_lowpass(bool lowpass) { b_lowpass = lowpass; };
-    bool get_echo() { return b_echo; };
-    bool get_lowpass() { return b_lowpass; };
-
     void render(short *buf, int sample);
     void reset();
 
@@ -127,14 +120,10 @@ public:
     apu(gb *ref);
 
     apu_snd *get_renderer() { return &snd; }
-    apu_stat *get_stat();
-    apu_stat *get_stat_cpy();
-    uint8_t *get_mem();
 
     uint8_t read(uint16_t adr);
     void write(uint16_t adr, uint8_t dat, int clock);
 
-    void update();
     void reset();
 
     void serialize(serializer &s);

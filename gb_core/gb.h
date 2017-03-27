@@ -58,22 +58,30 @@ class gamepad_source;
 class gb {
     friend class cpu;
 
-   public:
-    gb(renderer *ref, gamepad_source *gamepad_source_ref, std::function<void()> sram_updated, std::function<uint8_t()> link_read, std::function<void(uint8_t)> link_write);
+public:
+    gb(renderer *ref, gamepad_source *gamepad_source_ref, std::function<void()> sram_updated,
+       std::function<uint8_t()> link_read, std::function<void(uint8_t)> link_write);
 
-    cpu *get_cpu() { return &m_cpu; }
-    lcd *get_lcd() { return &m_lcd; }
-    apu *get_apu() { return &m_apu; }
-    rom *get_rom() { return &m_rom; }
-    mbc *get_mbc() { return &m_mbc; }
+    cpu *get_cpu();
 
-    cheat *get_cheat() { return &m_cheat; }
+    lcd *get_lcd();
 
-    gb_regs *get_regs() { return &regs; }
-    gbc_regs *get_cregs() { return &c_regs; }
+    apu *get_apu();
+
+    rom *get_rom();
+
+    mbc *get_mbc();
+
+    cheat *get_cheat();
+
+    gb_regs *get_regs();
+
+    gbc_regs *get_cregs();
 
     void run();
+
     void reset();
+
     void set_skip(int frame);
 
     void add_cheat(const std::string &cheat_code);
@@ -83,10 +91,13 @@ class gb {
     void serialize(serializer &s);
 
     size_t get_state_size(void);
+
     void save_state_mem(void *buf);
+
     void restore_state_mem(void *buf);
 
     void send_linkcable_byte(uint8_t data);
+
     void read_linkcable_byte(uint8_t *buff);
 
     void notify_sram_written();
@@ -96,18 +107,20 @@ class gb {
     uint16_t get_sensor(bool x_y);
 
     uint8_t get_time(int type);
+
     void set_time(int type, uint8_t dat);
 
     uint8_t check_pad();
 
-    uint8_t gb_type() { return m_rom.get_info()->gb_type; }
+    uint8_t gb_type();
 
     void inline render_frame();
+
     void inline hblank_dma();
 
-	address_scanner create_address_scanner();
+    address_scanner create_address_scanner();
 
-   private:
+private:
     renderer *m_renderer;
     gamepad_source *m_gamepad;
     lcd m_lcd;

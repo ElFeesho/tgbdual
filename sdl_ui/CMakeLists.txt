@@ -27,7 +27,7 @@ set(SDL_UI_SOURCES
 	keyboard_input_source.h
 	buffer.h
 	sdlmain.cpp 
-	json.hpp macro_runner.cpp macro_runner.h osd_renderer.h script_context.cpp script_context.h input_queue.h)
+	json.hpp macro_runner.cpp macro_runner.h)
 
 find_package(SDL)
 
@@ -37,5 +37,5 @@ message(${PROJECT_SOURCE_DIR}/../extlibs/lua-5.3.3/include)
 
 add_executable(tgbdual ${SDL_UI_SOURCES})
 
-target_link_libraries(tgbdual gb_core ${SDL_LIBRARY} z -L${PROJECT_SOURCE_DIR}/../extlibs/lua-5.3.3/bin lua -L/usr/local/lib SDL_gfx SDL_image)
-target_compile_features(tgbdual PRIVATE cxx_lambdas)
+target_link_libraries(tgbdual gb_core script_layer ${SDL_LIBRARY} z -L${PROJECT_SOURCE_DIR}/../extlibs/lua-5.3.3/bin lua -L/usr/local/lib SDL_gfx SDL_image)
+target_compile_features(tgbdual PRIVATE cxx_lambdas cxx_aggregate_default_initializers)

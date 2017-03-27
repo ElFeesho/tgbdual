@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 class gb;
+
 class serializer;
 
 struct rom_info {
@@ -17,26 +18,28 @@ struct rom_info {
 };
 
 class rom {
-   public:
+public:
     rom();
+
     ~rom();
 
-    rom_info *get_info() { return &info; }
-    uint8_t *get_rom() { return first_page; }
-    uint8_t *get_sram() { return sram; }
-    bool get_loaded() { return b_loaded; }
+    rom_info *get_info();
 
-    bool has_battery();
+    uint8_t *get_rom();
+
+    uint8_t *get_sram();
+
+    bool get_loaded();
+
     uint16_t get_sram_size();
 
-    void set_first(int32_t page) { first_page = dat + 0x4000 * page; }
+    void set_first(int32_t page);
 
     bool load_rom(uint8_t *buf, size_t size, uint8_t *ram, size_t ram_size);
 
     void serialize(serializer &s);
 
-   private:
-    gb *ref_gb;
+private:
     rom_info info;
 
     uint8_t *dat;

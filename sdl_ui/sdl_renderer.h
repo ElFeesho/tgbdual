@@ -21,7 +21,7 @@
 #include <renderer.h>
 
 #include <SDL.h>
-#include "osd_renderer.h"
+#include "../script_layer/include/osd_renderer.h"
 #include <vector>
 #include <tuple>
 #include <map>

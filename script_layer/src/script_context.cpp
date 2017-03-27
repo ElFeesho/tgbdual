@@ -2,9 +2,8 @@
 // Created by Christopher Sawczuk on 16/07/2016.
 //
 
-#include <gameboy.h>
-#include "script_context.h"
-#include "input_queue.h"
+#include <osd_renderer.h>
+#include <script_context.h>
 
 script_context::script_context(osd_renderer *osd, input_queue *queue, gameboy *gb) : _osd{osd}, _queue{queue}, _gameboy{gb} {
 

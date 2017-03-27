@@ -5,20 +5,11 @@
 class memory_buffer : buffer
 {
 public:
-    void alloc(uint32_t length)
-    {
-        _length = length;
-        _buffer = new uint8_t[length];
-    }
+    void alloc(uint32_t length);
 
-    void dealloc()
-    {
-        delete[] _buffer;
-    }
+    void dealloc();
 
-    uint32_t length() override {
-        return _length;
-    }
+    uint32_t length() override;
 
     operator const char*() override {
         return (const char *)_buffer;

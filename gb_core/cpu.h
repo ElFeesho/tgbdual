@@ -77,9 +77,6 @@ class cpu {
         return readw(regs.PC - 2);
     }
 
-    int dasm(char *S, uint8_t *A);
-    void log();
-
     gb *ref_gb;
     cpu_regs regs;
 

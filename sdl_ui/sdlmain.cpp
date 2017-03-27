@@ -229,6 +229,7 @@ int main(int argc, char *argv[]) {
         }
 
         limitFunc([&] {
+			runner.tick();
             gbInst.tick();
         });
     }

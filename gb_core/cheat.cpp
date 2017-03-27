@@ -18,9 +18,39 @@
 */
 
 #include "cheat.h"
-#include <ctype.h>
-#include <string.h>
 #include "gb.h"
+
+
+static unsigned int fromHexToInt(const std::string &hexString) {
+    unsigned int val;
+    std::stringstream ss;
+    ss << std::hex << hexString;
+    ss >> val;
+    return val;
+}
+
+static uint16_t extractAddress(const std::string &cheatString)
+{
+    uint16_t adr = fromHexToInt(cheatString.substr(4));
+    adr = ((adr << 8) & 0xff00) | ((adr >> 8) & 0x00ff);
+    return adr;
+}
+
+static uint8_t extractData(const std::string &cheatString)
+{
+    return fromHexToInt(cheatString.substr(2, 2));
+}
+
+static uint8_t extractCode(const std::string &cheatString)
+{
+    return fromHexToInt(cheatString.substr(0, 2));
+}
+
+cheat_dat::cheat_dat(const std::string &cheat_code) {
+    code = extractCode(cheat_code);
+    dat = extractData(cheat_code);
+    adr = extractAddress(cheat_code);
+}
 
 void cheat::add_cheat(const std::string &code, cpu_writecb writecb) {
     cheat_map.emplace(extractAddress(code), code);

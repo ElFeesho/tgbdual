@@ -4,22 +4,26 @@
 
 #pragma once
 
-#include "osd_renderer.h"
-#include "script_context.h"
-#include "input_queue.h"
+#include <osd_renderer.h>
+#include <script_context.h>
+#include <input_queue.h>
+
 #include <lua.hpp>
+#include <memory>
 
 class macro_runner {
 public:
-	macro_runner(osd_renderer *osd, input_queue *queue, gameboy *gb);
-	~macro_runner();
+    macro_runner(osd_renderer *osd, input_queue *queue, gameboy *gb);
 
-	void loadScript(const std::string &script);
-	void activate();
+    void loadScript(const std::string &script);
+
+    void activate();
+
+    void tick();
 
 private:
-	lua_State *state;
+    std::unique_ptr<lua_State,  void(*)(lua_State*)> state;
 
-	script_context context;
+    script_context context;
 };
 

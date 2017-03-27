@@ -8,7 +8,6 @@
 
 pokename = {}
 
-pokename[0] = "Unknown"
 pokename[1] = "Bulbasaur"
 pokename[2] = "Ivysaur"
 pokename[3] = "Venusaur"
@@ -276,27 +275,44 @@ function numberstring(number, base)
 end
 
 function create_pokemon_actor(number)
-    return {
+    local pokemon = {
         hp = function(self)
             return bridge.read_8bit_value(0x1d02 + (0x30*(number-1)));
         end,
         hp_max = function(self)
             return bridge.read_8bit_value(0x1d04 + (0x30*(number-1)));
         end,
+        roster_position = function(self)
+            return number
+        end,
         pokemon_number = function(self)
             return bridge.read_8bit_value(0x1cd8+(number-1))
         end,
+        is_present = function(self)
+            return self:pokemon_number() > 0 and self:pokemon_number() < 252
+        end,
         to_string = function(self)
-            return number.."#: "..pokename[self:pokemon_number()].." ("..self:pokemon_number()..") "..self:hp().."/"..self:hp_max()
+            if (self:is_present()) then
+                local pokemon_num = self:pokemon_number()
+                local pokemon_name = pokename[pokemon_num]
+                return string.format("%d#: %-16s (%3d)\t %3d/%-3d", number, pokemon_name, pokemon_num, self:hp(), self:hp_max())
+            else
+                return number.."#: Not in roster"
+            end
         end
     }
+    setmetatable(pokemon, {
+        __tostring = function(self)
+            return self:to_string()
+        end
+    })
+
+    return pokemon
 end
 
-function create_poke_hud(actor, number)
-    local x = number * 54
+function create_poke_hud(actor, x)
     local y = 288 - 50
 
-    print(actor:to_string())
     bridge.add_rect(x, y, 50, 50, 0xffff0000, 0x88ffffff)
 
     bridge.add_rect(x+2, y+2, 46, 8, 0xff000000, 0xff000000)
@@ -306,17 +322,55 @@ function create_poke_hud(actor, number)
 
 end
 
+local team = {create_pokemon_actor(1), create_pokemon_actor(2), create_pokemon_actor(3), create_pokemon_actor(4), create_pokemon_actor(5), create_pokemon_actor(6)}
+
+function tap_keys(keys, duration, interval)
+    for i = 0, #keys do
+        bridge.queue_key(keys[i], interval*i, duration)
+    end
+end
+
 function activate()
 
-    bridge.clear_canvas()
-    for i = 0, 5 do
-        create_poke_hud(create_pokemon_actor(i+1), i)
+    print("Selected pokemon is "..bridge.read_8bit_value(0xfa9))
+    bridge.set_8bit_value(0xfa9, 4)
+
+    for _, v in pairs(team) do
+        print(v)
     end
 
-    print("Pause menu position "..bridge.read_8bit_value(0xf74))
-    bridge.set_8bit_value(0xf74, 0)
 
+    --bridge.set_8bit_value(0xf74, 0)
+    --tap_keys({GameBoy.KEY_START, GameBoy.KEY_DOWN, GameBoy.KEY_A, GameBoy.KEY_DOWN, GameBoy.KEY_A, GameBoy.KEY_A}, 100, 700)
 
-    bridge.queue_key(0x01, 2000, 500)
+    bridge.set_8bit_value(0x1894, 60)
+
+    --bridge.set_8bit_value(0x0f74, 5)
+
+end
+
+function render_hud(active_team)
+    local start_x = (320 - (#active_team * 52))/2
+    for k, v in pairs(active_team) do
+        create_poke_hud(v, math.floor(start_x + (k-1)*52))
+    end
+end
+
+function filter()
+    local result = {}
+    local start = 1
+    for k, v in pairs(team) do
+        if (v:is_present()) then
+            result[start] = v
+            start = start + 1
+        end
+    end
+    return result
+end
+
+function tick()
+    bridge.clear_canvas()
+
+    render_hud(filter(team))
 end
 

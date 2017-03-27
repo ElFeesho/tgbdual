@@ -22,7 +22,6 @@
 
 #include "rom.h"
 #include <memory.h>
-#include <stdlib.h>
 #include "serializer.h"
 
 rom::rom() {
@@ -37,20 +36,14 @@ rom::~rom() {
     free(sram);
 }
 
-bool rom::has_battery() {
-    static const int32_t has_bat[] = {0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1,
-                                      0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-                                      0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    return has_bat[(info.cart_type > 0x20) ? 3 : info.cart_type] == 1;
-}
-
 uint16_t rom::get_sram_size() {
     static const uint16_t tbl_ram[] = {1, 1, 1, 4, 16, 8};
     return 0x2000 * tbl_ram[info.ram_size];
 }
 
 bool rom::load_rom(uint8_t *buf, size_t size, uint8_t *ram, size_t ram_size) {
-    uint8_t momocol_title[16] = {0x4D, 0x4F, 0x4D, 0x4F, 0x43, 0x4F, 0x4C, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+    uint8_t momocol_title[16] = {0x4D, 0x4F, 0x4D, 0x4F, 0x43, 0x4F, 0x4C, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                 0x00, 0x00};
 
     if (b_loaded) {
         free(dat);
@@ -74,11 +67,11 @@ bool rom::load_rom(uint8_t *buf, size_t size, uint8_t *ram, size_t ram_size) {
         return false;
     }
 
-    dat = (uint8_t *)malloc(size);
+    dat = (uint8_t *) malloc(size);
     memcpy(dat, buf, size);
     first_page = dat;
 
-    sram = (uint8_t *)malloc(get_sram_size());
+    sram = (uint8_t *) malloc(get_sram_size());
     if (ram) {
         memcpy(sram, ram, ram_size & 0xffffff00);
     }
@@ -92,3 +85,13 @@ void rom::serialize(serializer &s) {
     s_VAR(info);
     s.process(sram, get_sram_size());
 }
+
+void rom::set_first(int32_t page) { first_page = dat + 0x4000 * page; }
+
+bool rom::get_loaded() { return b_loaded; }
+
+uint8_t *rom::get_sram() { return sram; }
+
+uint8_t *rom::get_rom() { return first_page; }
+
+rom_info *rom::get_info() { return &info; }

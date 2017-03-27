@@ -3,38 +3,56 @@
 #include <stdint.h>
 
 class serializer;
+
 class gb;
 
 class mbc {
-   public:
+public:
     mbc(gb *ref);
 
     uint8_t *get_rom() { return rom_page; }
+
     uint8_t *get_sram() { return sram_page; }
+
     bool is_ext_ram() { return ext_is_ram; }
+
     void set_ext_is(bool ext) { ext_is_ram = ext; }
 
     int get_state();
+
     void set_state(int dat);
+
     void set_page(int rom, int sram);
 
     uint8_t read(uint16_t adr);
+
     void write(uint16_t adr, uint8_t dat);
+
     uint8_t ext_read(uint16_t adr);
+
     void ext_write(uint16_t adr, uint8_t dat);
+
     void reset();
 
     void serialize(serializer &s);
 
-   private:
+private:
     void mbc1_write(uint16_t adr, uint8_t dat);
+
     void mbc2_write(uint16_t adr, uint8_t dat);
+
     void mbc3_write(uint16_t adr, uint8_t dat);
+
     void mbc5_write(uint16_t adr, uint8_t dat);
+
     void mbc7_write(uint16_t adr, uint8_t dat);
+
     void huc1_write(uint16_t adr, uint8_t dat);
+
     void huc3_write(uint16_t adr, uint8_t dat);
+
     void tama5_write(uint16_t adr, uint8_t dat);
+
     void mmm01_write(uint16_t adr, uint8_t dat);
 
     uint8_t *rom_page;
