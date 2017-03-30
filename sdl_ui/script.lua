@@ -338,7 +338,6 @@ function activate()
 --    for _, v in pairs(team) do
 --        print(v)
 --    end
-
     bridge.set_8bit_value(0xfa9, 0)
     bridge.set_8bit_value(0xf74, 0)
     tap_keys({GameBoy.KEY_START, GameBoy.KEY_DOWN, GameBoy.KEY_A, GameBoy.KEY_DOWN, GameBoy.KEY_A, GameBoy.KEY_A}, 100, 500)

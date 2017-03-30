@@ -180,7 +180,7 @@ int main(int argc, char *argv[]) {
                     }
                     last_result = result;
                     if (result.size() <= 10) {
-                        for (int i = 0; i < result.size(); i++) {
+                        for (size_t i = 0; i < result.size(); i++) {
                             std::cout << "FOUND ADDRESS: " << std::hex << result[i] << std::dec << std::endl;
                         }
                     }
@@ -192,7 +192,7 @@ int main(int argc, char *argv[]) {
                     }
                     last_result = result;
                     if (result.size() <= 10) {
-                        for (int i = 0; i < result.size(); i++) {
+                        for (size_t i = 0; i < result.size(); i++) {
                             std::cout << "FOUND ADDRESS: " << std::hex << result[i] << std::dec << std::endl;
                         }
                     }

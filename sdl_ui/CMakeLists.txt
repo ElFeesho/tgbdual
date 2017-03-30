@@ -34,9 +34,10 @@ find_package(SDL)
 
 include_directories(${SDL_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/../extlibs/lua-5.3.3/include)
+include_directories(${PROJECT_SOURCE_DIR}/../extlibs/wren/src/include)
 message(${PROJECT_SOURCE_DIR}/../extlibs/lua-5.3.3/include)
 
 add_executable(tgbdual ${SDL_UI_SOURCES})
 target_include_directories(tgbdual PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-target_link_libraries(tgbdual gb_core script_layer ${SDL_LIBRARY} z lua5.3 -L/usr/local/lib SDL_gfx SDL_image)
+target_link_libraries(tgbdual gb_core script_layer ${SDL_LIBRARY} -L${PROJECT_SOURCE_DIR}}../extlibs/wren/lib wren z lua5.3 -L/usr/local/lib SDL_gfx SDL_image)
 target_compile_features(tgbdual PRIVATE cxx_lambdas cxx_aggregate_default_initializers)

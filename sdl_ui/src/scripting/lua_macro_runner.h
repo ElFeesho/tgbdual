@@ -23,5 +23,9 @@ public:
 
 private:
     std::unique_ptr<lua_State,  void(*)(lua_State*)> state;
+
+    void invokeLuaFunction(const char *functionName) const;
+
+    void bindFunction(const char *fnName, int (*fn)(lua_State *)) const;
 };
 
