@@ -13,7 +13,7 @@
 
 class macro_runner {
 public:
-    macro_runner(osd_renderer *osd, input_queue *queue, gameboy *gb);
+    macro_runner(script_context &scriptContext);
 
     void loadScript(const std::string &script);
 
@@ -23,7 +23,5 @@ public:
 
 private:
     std::unique_ptr<lua_State,  void(*)(lua_State*)> state;
-
-    script_context context;
 };
 

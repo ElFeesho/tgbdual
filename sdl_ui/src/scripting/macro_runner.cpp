@@ -9,11 +9,10 @@
 
 static std::map<lua_State *, script_context *> contexts;
 
-macro_runner::macro_runner(osd_renderer *osd, input_queue *queue, gameboy *gb) : state{luaL_newstate(), lua_close}, context{osd, queue, gb} {
-
+macro_runner::macro_runner(script_context &scriptContext) : state{luaL_newstate(), lua_close} {
 	luaL_openlibs(state.get());
 
-	contexts[state.get()] = &context;
+	contexts[state.get()] = &scriptContext;
 
 	lua_createtable(state.get(), 0, 0);
 	lua_setglobal(state.get(), "bridge");
@@ -154,7 +153,7 @@ void macro_runner::tick() {
 
 void macro_runner::loadScript(const std::string &script) {
 	if (luaL_loadstring(state.get(), script.c_str()) == LUA_OK) {
-		context.print_string("Loaded script successfully");
+		contexts[state.get()]->print_string("Loaded script successfully");
 		lua_pcallk(state.get(), 0, 0, 0, 0, nullptr);
 	}
 }
