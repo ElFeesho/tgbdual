@@ -34,11 +34,9 @@ public:
 	using surf_ptr = std::unique_ptr<SDL_Surface, void(*)(SDL_Surface*)>;
 	sdl_renderer();
 
-	void render_screen(uint8_t *buf, int width, int height, int depth) override;;
+	void render_screen(uint8_t *buf, int width, int height, int depth) override;
 
-	void reset() {}
-
-	sound_renderer *get_sound_renderer() { return snd_render; }
+	sound_renderer *get_sound_renderer();
 
 	virtual void display_message(const std::string &msg, uint64_t duration) override;
 

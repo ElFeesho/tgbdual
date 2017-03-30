@@ -17,15 +17,15 @@ set(SDL_UI_SOURCES
         src/sdl_renderer.h
         src/input/sdl_gamepad_source.cpp
         src/input/sdl_gamepad_source.h
-        src/file_buffer.cpp
-        src/file_buffer.h
-        src/memory_buffer.cpp
-        src/memory_buffer.h
+        src/io/file_buffer.cpp
+        src/io/file_buffer.h
+        src/io/memory_buffer.cpp
+        src/io/memory_buffer.h
         src/input/joystick_input_source.cpp
         src/input/joystick_input_source.h
         src/input/keyboard_input_source.cpp
         src/input/keyboard_input_source.h
-        src/buffer.h
+        src/io/buffer.h
         src/sdlmain.cpp
         src/input/input_source.h
         src/json.hpp src/scripting/macro_runner.cpp src/scripting/macro_runner.h)
@@ -38,5 +38,5 @@ message(${PROJECT_SOURCE_DIR}/../extlibs/lua-5.3.3/include)
 
 add_executable(tgbdual ${SDL_UI_SOURCES})
 target_include_directories(tgbdual PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-target_link_libraries(tgbdual gb_core script_layer ${SDL_LIBRARY} z -L${PROJECT_SOURCE_DIR}/../extlibs/lua-5.3.3/bin lua -L/usr/local/lib SDL_gfx SDL_image)
+target_link_libraries(tgbdual gb_core script_layer ${SDL_LIBRARY} z lua5.3 -L/usr/local/lib SDL_gfx SDL_image)
 target_compile_features(tgbdual PRIVATE cxx_lambdas cxx_aggregate_default_initializers)

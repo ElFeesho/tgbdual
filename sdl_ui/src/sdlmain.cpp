@@ -25,8 +25,8 @@
 
 #include <gameboy.h>
 
-#include "file_buffer.h"
-#include "memory_buffer.h"
+#include "io/file_buffer.h"
+#include "io/memory_buffer.h"
 
 #include <fstream>
 

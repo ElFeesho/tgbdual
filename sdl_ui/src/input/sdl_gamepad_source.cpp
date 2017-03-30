@@ -1,4 +1,5 @@
 #include <chrono>
+#include <algorithm>
 #include "sdl_gamepad_source.h"
 
 sdl_gamepad_source::sdl_gamepad_source() {

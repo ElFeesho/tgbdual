@@ -27,6 +27,8 @@
 #include <SDL_gfxPrimitives.h>
 #include <SDL_image.h>
 
+#include <algorithm>
+
 const uint16_t WIN_MULTIPLIER = 2;
 
 static inline Uint32 getpixel(SDL_Surface *surface, int x, int y) {
@@ -71,7 +73,7 @@ void sdl_renderer::render_screen(uint8_t *buf, int width, int height, int depth)
     }
 
     int16_t msg_number = 0;
-    for (auto osd_msg : osd_messages) {
+    for (auto &osd_msg : osd_messages) {
         std::string message = get<1>(osd_msg);
 
         stringRGBA(dpy.get(), 11, (Sint16) (11 + msg_number * 20), message.c_str(), 0, 0, 0, 128);
@@ -114,7 +116,7 @@ void sdl_renderer::render_screen(uint8_t *buf, int width, int height, int depth)
         aalineRGBA(dpy.get(), x2, y1, x2, y2, r, g, b, a);
     }
 
-    for (auto image : images) {
+    for (auto &image : images) {
         SDL_Surface *src = lookupImage(image.name());
         if (src) {
             SDL_Rect pos = {image.x(), image.y(), (uint16_t) src->w, (uint16_t) src->h};
@@ -136,7 +138,7 @@ namespace {
 }
 
 void sdl_renderer::init_sdlaudio() {
-    SDL_AudioSpec wanted;
+    SDL_AudioSpec wanted = { 0 };
 
     wanted.freq = 44100;
     wanted.format = AUDIO_S16;
@@ -179,3 +181,5 @@ SDL_Surface *sdl_renderer::lookupImage(const string &name) {
     }
     return image_cache[name];
 }
+
+sound_renderer *sdl_renderer::get_sound_renderer() { return snd_render; }

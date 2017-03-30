@@ -4,6 +4,8 @@
 
 #include "address_scanner.h"
 
+#include <algorithm>
+
 address_scanner::address_scanner(uint8_t *memory, size_t size) : _memory{memory}, _size{size} {
 
 }
