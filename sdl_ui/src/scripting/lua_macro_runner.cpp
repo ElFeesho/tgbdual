@@ -4,12 +4,12 @@
 
 #include <iostream>
 #include <map>
-#include "macro_runner.h"
+#include "lua_macro_runner.h"
 
 
 static std::map<lua_State *, script_context *> contexts;
 
-macro_runner::macro_runner(script_context &scriptContext) : state{luaL_newstate(), lua_close} {
+lua_macro_runner::lua_macro_runner(script_context &scriptContext) : state{luaL_newstate(), lua_close} {
 	luaL_openlibs(state.get());
 
 	contexts[state.get()] = &scriptContext;
@@ -131,17 +131,18 @@ macro_runner::macro_runner(script_context &scriptContext) : state{luaL_newstate(
 
 }
 
-void macro_runner::activate() {
+void lua_macro_runner::activate() {
 	int function = lua_getglobal(state.get(), "activate");
 	if (function == LUA_TFUNCTION) {
-		lua_callk(state.get(), 0, 0, 0, [](lua_State *state, int status, lua_KContext ctx) -> int {
-			contexts[state]->print_string("Failed to execute macro");
+		lua_callk(state.get(), 0, 0, 0, [](lua_State *L, int status, lua_KContext ctx) -> int {
+			// TODO FIXME THIS IS NOT CALLED IN THE CASE OF AN ERROR!
+			contexts[L]->print_string("Failed to execute macro");
 			return 0;
 		});
 	}
 }
 
-void macro_runner::tick() {
+void lua_macro_runner::tick() {
 	int function = lua_getglobal(state.get(), "tick");
 	if (function == LUA_TFUNCTION) {
 		lua_callk(state.get(), 0, 0, 0, [](lua_State *state, int status, lua_KContext ctx) -> int {
@@ -151,7 +152,7 @@ void macro_runner::tick() {
 	}
 }
 
-void macro_runner::loadScript(const std::string &script) {
+void lua_macro_runner::loadScript(const std::string &script) {
 	if (luaL_loadstring(state.get(), script.c_str()) == LUA_OK) {
 		contexts[state.get()]->print_string("Loaded script successfully");
 		lua_pcallk(state.get(), 0, 0, 0, 0, nullptr);

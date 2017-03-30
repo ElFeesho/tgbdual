@@ -11,9 +11,9 @@
 #include <lua.hpp>
 #include <memory>
 
-class macro_runner {
+class lua_macro_runner {
 public:
-    macro_runner(script_context &scriptContext);
+    lua_macro_runner(script_context &scriptContext);
 
     void loadScript(const std::string &script);
 

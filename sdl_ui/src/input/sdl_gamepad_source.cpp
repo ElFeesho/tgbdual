@@ -1,5 +1,6 @@
 #include <chrono>
 #include <algorithm>
+#include <iostream>
 #include "sdl_gamepad_source.h"
 
 sdl_gamepad_source::sdl_gamepad_source() {
@@ -30,24 +31,25 @@ void sdl_gamepad_source::update_pad_state(const SDL_Event &e) {
 uint8_t sdl_gamepad_source::check_pad() {
 
 	uint32_t epoch = SDL_GetTicks();
-	for (auto event : pending_events) {
+	for (auto &event : pending_events) {
 
 		if (event.when > epoch) {
-			break;
+			continue;
 		}
 
-		if (epoch > event.when && epoch < event.when + event.duration) {
+		if (epoch > event.when && epoch < event.end) {
 			padState |= event.key;
-		}
-		else {
-			padState &= ~(event.key);
 		}
 	}
 
 	if (pending_events.size() > 0) {
 		pending_events.erase(
-				std::remove_if(pending_events.begin(), pending_events.end(), [](const input_event &event) -> bool {
-					return event.when + event.duration < SDL_GetTicks();
+				std::remove_if(pending_events.begin(), pending_events.end(), [&](const input_event &event) -> bool {
+					if (event.end <= epoch) {
+						padState &= ~(event.key);
+						return true;
+					}
+					return false;
 				}), pending_events.end());
 	}
 

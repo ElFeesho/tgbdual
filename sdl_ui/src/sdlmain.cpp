@@ -40,7 +40,7 @@
 #include <network/tcp_server.h>
 
 #include "input/sdl_gamepad_source.h"
-#include "scripting/macro_runner.h"
+#include "scripting/lua_macro_runner.h"
 
 
 link_cable_source *processArguments(int *argc, char ***argv) {
@@ -117,7 +117,7 @@ int main(int argc, char *argv[]) {
     gameboy gbInst{&render, &gp_source, cable_source};
 
     script_context context{&render, &gp_source, &gbInst};
-    macro_runner runner{context};
+    lua_macro_runner runner{context};
 
     runner.loadScript(file_buffer{"script.lua"});
 

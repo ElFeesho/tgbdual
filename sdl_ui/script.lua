@@ -332,18 +332,16 @@ end
 
 function activate()
 
-    print("Selected pokemon is "..bridge.read_8bit_value(0xfa9))
-    bridge.set_8bit_value(0xfa9, 4)
+--    print("Selected pokemon is "..bridge.read_8bit_value(0xfa9))
+--    bridge.set_8bit_value(0xfa9, 4)
 
-    for _, v in pairs(team) do
-        print(v)
-    end
+--    for _, v in pairs(team) do
+--        print(v)
+--    end
 
-
-    --bridge.set_8bit_value(0xf74, 0)
-    --tap_keys({GameBoy.KEY_START, GameBoy.KEY_DOWN, GameBoy.KEY_A, GameBoy.KEY_DOWN, GameBoy.KEY_A, GameBoy.KEY_A}, 100, 700)
-
-    bridge.set_8bit_value(0x1894, 60)
+    bridge.set_8bit_value(0xfa9, 0)
+    bridge.set_8bit_value(0xf74, 0)
+    tap_keys({GameBoy.KEY_START, GameBoy.KEY_DOWN, GameBoy.KEY_A, GameBoy.KEY_DOWN, GameBoy.KEY_A, GameBoy.KEY_A}, 100, 500)
 
     --bridge.set_8bit_value(0x0f74, 5)
 

@@ -28,7 +28,7 @@ set(SDL_UI_SOURCES
         src/io/buffer.h
         src/sdlmain.cpp
         src/input/input_source.h
-        src/json.hpp src/scripting/macro_runner.cpp src/scripting/macro_runner.h)
+        src/json.hpp src/scripting/lua_macro_runner.cpp src/scripting/lua_macro_runner.h)
 
 find_package(SDL)
 
