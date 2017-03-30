@@ -16,7 +16,7 @@ class gameboy {
 public:
 	gameboy(renderer *render, gamepad_source *gp_source, link_cable_source *link_cable_source);
 
-	void load_rom(uint8_t *romData, uint32_t romLength, uint8_t *ram, uint32_t ramLength);
+	void load_rom(uint8_t *romData, uint32_t romLength, uint8_t *ram = nullptr, uint32_t ramLength = 0);
 
 	void save_state(std::function<uint8_t *(size_t)> functor);
 

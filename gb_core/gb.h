@@ -86,7 +86,7 @@ public:
 
     void add_cheat(const std::string &cheat_code);
 
-    bool load_rom(uint8_t *buf, int size, uint8_t *ram, int ram_size);
+    bool load_rom(uint8_t *buf, size_t size, uint8_t *ram, size_t ram_size);
 
     void serialize(serializer &s);
 
@@ -112,7 +112,7 @@ public:
 
     uint8_t check_pad();
 
-    uint8_t gb_type();
+    int32_t gb_type();
 
     void inline render_frame();
 

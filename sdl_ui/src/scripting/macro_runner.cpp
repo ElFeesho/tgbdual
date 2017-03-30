@@ -9,107 +9,107 @@
 
 static std::map<lua_State *, script_context *> contexts;
 
-macro_runner::macro_runner(osd_renderer *osd, input_queue *queue, gameboy *gb) : context{osd, queue, gb}, state{luaL_newstate(), lua_close} {
+macro_runner::macro_runner(osd_renderer *osd, input_queue *queue, gameboy *gb) : state{luaL_newstate(), lua_close}, context{osd, queue, gb} {
 
 	luaL_openlibs(state.get());
 
 	contexts[state.get()] = &context;
 
-	lua_newtable(state.get());
+	lua_createtable(state.get(), 0, 0);
 	lua_setglobal(state.get(), "bridge");
 
 	lua_getglobal(state.get(), "bridge");
-	lua_pushcfunction(state.get(), [](lua_State *state) -> int {
+	lua_pushcclosure(state.get(), [](lua_State *state) -> int {
 		script_context *ctx = contexts[state];
-		ctx->print_string(lua_tostring(state, 1));
+		ctx->print_string(lua_tolstring(state, 1, nullptr));
 		return 0;
-	});
+	}, 0);
 	lua_setfield(state.get(), -2, "print");
 
-	lua_pushcfunction(state.get(), [](lua_State *state) -> int {
+	lua_pushcclosure(state.get(), [](lua_State *state) -> int {
 		script_context *ctx = contexts[state];
-		ctx->set_16bit_value((uint32_t) lua_tointeger(state, 1), (uint16_t) lua_tointeger(state, 2));
+		ctx->set_16bit_value((uint32_t) lua_tointegerx(state, 1, nullptr), (uint16_t) lua_tointegerx(state, 2, nullptr));
 		return 0;
-	});
+	}, 0);
 	lua_setfield(state.get(), -2, "set_16bit_value");
 
-	lua_pushcfunction(state.get(), [](lua_State *state) -> int {
+	lua_pushcclosure(state.get(), [](lua_State *state) -> int {
 		script_context *ctx = contexts[state];
-		uint32_t address = (uint32_t) lua_tointeger(state, 1);
-		uint8_t value = (uint8_t) lua_tointeger(state, 2);
+		uint32_t address = (uint32_t) lua_tointegerx(state, 1, nullptr);
+		uint8_t value = (uint8_t) lua_tointegerx(state, 2, nullptr);
 
 		ctx->set_8bit_value(address, value);
 		return 0;
-	});
+	}, 0);
 	lua_setfield(state.get(), -2, "set_8bit_value");
 
 
-	lua_pushcfunction(state.get(), [](lua_State *state) -> int {
+	lua_pushcclosure(state.get(), [](lua_State *state) -> int {
 		script_context *ctx = contexts[state];
-		uint8_t value = ctx->read_8bit_value((uint32_t) lua_tointeger(state, 1));
+		uint8_t value = ctx->read_8bit_value((uint32_t) lua_tointegerx(state, 1, nullptr));
 		lua_pushinteger(state, value);
 		return 1;
-	});
+	}, 0);
 
 	lua_setfield(state.get(), -2, "read_8bit_value");
 
 
-	lua_pushcfunction(state.get(), [](lua_State *state) -> int {
+	lua_pushcclosure(state.get(), [](lua_State *state) -> int {
 		script_context *ctx = contexts[state];
-		uint16_t value = ctx->read_16bit_value((uint32_t) lua_tointeger(state, 1));
+		uint16_t value = ctx->read_16bit_value((uint32_t) lua_tointegerx(state, 1, nullptr));
 		lua_pushinteger(state, value);
 		return 1;
-	});
+	}, 0);
 
 	lua_setfield(state.get(), -2, "read_16bit_value");
 
-	lua_pushcfunction(state.get(), [](lua_State *state) -> int {
+	lua_pushcclosure(state.get(), [](lua_State *state) -> int {
 		script_context *ctx = contexts[state];
-		int x = (int)lua_tointeger(state, 1);
-		int y = (int)lua_tointeger(state, 2);
-		int w = (int)lua_tointeger(state, 3);
-		int h = (int)lua_tointeger(state, 4);
-		int s = (int)lua_tointeger(state, 5);
-		int f = (int)lua_tointeger(state, 6);
+		int x = (int)lua_tointegerx(state, 1, nullptr);
+		int y = (int)lua_tointegerx(state, 2, nullptr);
+		int w = (int)lua_tointegerx(state, 3, nullptr);
+		int h = (int)lua_tointegerx(state, 4, nullptr);
+		int s = (int)lua_tointegerx(state, 5, nullptr);
+		int f = (int)lua_tointegerx(state, 6, nullptr);
 		ctx->add_rect(x, y, w, h, s, f);
 		return 0;
-	});
+	}, 0);
 
 	lua_setfield(state.get(), -2, "add_rect");
 
-	lua_pushcfunction(state.get(), [](lua_State *state) -> int {
+	lua_pushcclosure(state.get(), [](lua_State *state) -> int {
 		script_context *ctx = contexts[state];
-		const char *name = lua_tostring(state, 1);
-		int x = lua_tointeger(state, 2);
-		int y = lua_tointeger(state, 3);
+		const char *name = lua_tolstring(state, 1, nullptr);
+		int x = (int)lua_tointegerx(state, 2, nullptr);
+		int y = (int)lua_tointegerx(state, 3, nullptr);
 
 		ctx->add_image(name, x, y);
 		return 0;
-	});
+	}, 0);
 	lua_setfield(state.get(), -2, "add_image");
 
-	lua_pushcfunction(state.get(), [](lua_State *state) -> int {
+	lua_pushcclosure(state.get(), [](lua_State *state) -> int {
 		script_context *ctx = contexts[state];
 		ctx->clear_canvas();
 		return 0;
-	});
+	}, 0);
 
 	lua_setfield(state.get(), -2, "clear_canvas");
 
 
-	lua_pushcfunction(state.get(), [](lua_State *state) -> int {
+	lua_pushcclosure(state.get(), [](lua_State *state) -> int {
 		script_context *ctx = contexts[state];
-		uint8_t key = (uint8_t)lua_tointeger(state, 1);
-		uint32_t when = (uint32_t)lua_tointeger(state, 2);
-		uint32_t duration = (uint32_t)lua_tointeger(state, 3);
+		uint8_t key = (uint8_t)lua_tointegerx(state, 1, nullptr);
+		uint32_t when = (uint32_t)lua_tointegerx(state, 2, nullptr);
+		uint32_t duration = (uint32_t)lua_tointegerx(state, 3, nullptr);
 
 		ctx->queue_key(key, when, duration);
 		return 0;
-	});
+	}, 0);
 
 	lua_setfield(state.get(), -2, "queue_key");
 
-	lua_newtable(state.get());
+	lua_createtable(state.get(), 0, 0);
 	lua_setglobal(state.get(), "GameBoy");
 
 	lua_getglobal(state.get(), "GameBoy");
@@ -155,6 +155,6 @@ void macro_runner::tick() {
 void macro_runner::loadScript(const std::string &script) {
 	if (luaL_loadstring(state.get(), script.c_str()) == LUA_OK) {
 		context.print_string("Loaded script successfully");
-		lua_pcall(state.get(), 0, 0, 0);
+		lua_pcallk(state.get(), 0, 0, 0, 0, nullptr);
 	}
 }

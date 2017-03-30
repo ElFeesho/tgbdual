@@ -5,9 +5,9 @@
 #include <map>
 #include <vector>
 
-#include "keyboard_input_source.h"
-#include "joystick_input_source.h"
-#include "../script_layer/include/input_queue.h"
+#include "input/keyboard_input_source.h"
+#include "input/joystick_input_source.h"
+#include "input_queue.h"
 
 
 class sdl_gamepad_source : public gamepad_source, public input_queue

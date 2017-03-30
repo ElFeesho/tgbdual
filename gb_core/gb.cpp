@@ -22,11 +22,6 @@
 // Interface with external / other unit emulation GB
 
 #include "gb.h"
-#include <assert.h>
-#include <memory.h>
-#include <stdlib.h>
-#include <stdexcept>
-#include <string>
 #include <cpu.h>
 
 #include "gamepad_source.h"
@@ -89,7 +84,7 @@ void gb::add_cheat(const std::string &cheat_code)
     });
 }
 
-bool gb::load_rom(uint8_t *buf, int size, uint8_t *ram, int ram_size) {
+bool gb::load_rom(uint8_t *buf, size_t size, uint8_t *ram, size_t ram_size) {
     bool loadedSuccessfully = m_rom.load_rom(buf, size, ram, ram_size);
     if (loadedSuccessfully) {
         reset();
@@ -136,7 +131,7 @@ void gb::read_linkcable_byte(uint8_t *buff) {
 void gb::run() {
     for (int i = 0; i < 154; i++) {
         if (regs.LCDC & 0x80) {
-            regs.LY = (regs.LY + 1) % 154;
+            regs.LY = (uint8_t) ((regs.LY + 1) % 154);
 
             regs.STAT &= 0xF8;
             if (regs.LYC == regs.LY) {
@@ -252,7 +247,7 @@ void inline gb::hblank_dma() {
     m_cpu.exec(207);
 }
 
-uint16_t gb::get_sensor(bool x_y) {
+uint16_t gb::get_sensor(bool) {
     return 0;
 }
 
@@ -275,8 +270,9 @@ uint8_t gb::get_time(int type) {
             return (uint8_t)((now / (24 * 60 * 60)) & 0xff);
         case 12:
             return (uint8_t)((now / (256 * 24 * 60 * 60)) & 1);
+        default:
+            return 0;
     }
-    return 0;
 }
 
 void gb::set_time(int type, uint8_t dat) {
@@ -303,12 +299,14 @@ void gb::set_time(int type, uint8_t dat) {
         case 12:
             adj = (dat & 1) * 256 * 24 * 60 * 60 + (adj % (256 * 24 * 60 * 60));
             break;
+        default:
+            break;
     }
     cur_time = now - adj;
 }
 
 uint16_t gb::map_color(uint16_t gb_col) {
-    return ((gb_col & 0x1F) << 11) | ((gb_col & 0x3e0) << 1) | ((gb_col & 0x7c00) >> 10) | ((gb_col & 0x8000) >> 10);
+    return (uint16_t) (((gb_col & 0x1F) << 11) | ((gb_col & 0x3e0) << 1) | ((gb_col & 0x7c00) >> 10) | ((gb_col & 0x8000) >> 10));
 }
 
 void gb::notify_sram_written() {
@@ -339,7 +337,7 @@ cpu *gb::get_cpu() { return &m_cpu; }
 
 lcd *gb::get_lcd() { return &m_lcd; }
 
-uint8_t gb::gb_type() { return m_rom.get_info()->gb_type; }
+int32_t gb::gb_type() { return m_rom.get_info()->gb_type; }
 
 uint32_t convert_to_second(struct tm *sys) {
     uint32_t i, ret = 0;

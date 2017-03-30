@@ -16,7 +16,7 @@ just one host and as a receiver on all the other hosts
 #include <netdb.h>
 #include <ifaddrs.h>
 
-#include "json.hpp"
+#include "../json.hpp"
 #include "multicast_transmitter.h"
 
 using nlohmann::json;
@@ -51,7 +51,7 @@ std::string getLocalIp() {
 }
 
 multicast_transmitter::multicast_transmitter(const std::string &group, uint16_t port) :
-        mc_socket_in{socket(AF_INET, SOCK_DGRAM, 0)}, mc_socket_out{socket(AF_INET, SOCK_DGRAM, 0)} {
+        mc_socket_out{socket(AF_INET, SOCK_DGRAM, 0)}, mc_socket_in{socket(AF_INET, SOCK_DGRAM, 0)} {
 
     mc_sockaddr_in.sin_family = mc_sockaddr_out.sin_family = AF_INET;
     mc_sockaddr_in.sin_port = mc_sockaddr_out.sin_port = htons(port);
