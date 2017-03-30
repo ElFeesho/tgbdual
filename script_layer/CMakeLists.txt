@@ -1,5 +1,5 @@
 set(SOURCES src/script_context.cpp)
-set(INCLUDES include/osd_renderer.h include/script_context.h include/input_queue.h)
+set(INCLUDES include/osd_renderer.h include/script_context.h include/input_queue.h include/macro_runner.h)
 add_library(script_layer ${SOURCES} ${INCLUDES})
 target_include_directories(script_layer PUBLIC include)
 target_link_libraries(script_layer gb_core)

@@ -28,7 +28,12 @@ set(SDL_UI_SOURCES
         src/io/buffer.h
         src/sdlmain.cpp
         src/input/input_source.h
-        src/json.hpp src/scripting/lua_macro_runner.cpp src/scripting/lua_macro_runner.h)
+        src/json.hpp
+        src/scripting/lua_macro_runner.cpp
+        src/scripting/lua_macro_runner.h
+        src/scripting/wren_macro_runner.cpp
+        src/scripting/wren_macro_runner.h
+        )
 
 find_package(SDL)
 
@@ -39,5 +44,5 @@ message(${PROJECT_SOURCE_DIR}/../extlibs/lua-5.3.3/include)
 
 add_executable(tgbdual ${SDL_UI_SOURCES})
 target_include_directories(tgbdual PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-target_link_libraries(tgbdual gb_core script_layer ${SDL_LIBRARY} -L${PROJECT_SOURCE_DIR}}../extlibs/wren/lib wren z lua5.3 -L/usr/local/lib SDL_gfx SDL_image)
+target_link_libraries(tgbdual gb_core script_layer ${SDL_LIBRARY} -L${PROJECT_SOURCE_DIR}/../extlibs/wren/lib wren z lua5.3 -L/usr/local/lib SDL_gfx SDL_image)
 target_compile_features(tgbdual PRIVATE cxx_lambdas cxx_aggregate_default_initializers)

@@ -38,6 +38,7 @@
 
 #include <network/tcp_client.h>
 #include <network/tcp_server.h>
+#include <scripting/wren_macro_runner.h>
 
 #include "input/sdl_gamepad_source.h"
 #include "scripting/lua_macro_runner.h"
@@ -117,9 +118,9 @@ int main(int argc, char *argv[]) {
     gameboy gbInst{&render, &gp_source, cable_source};
 
     script_context context{&render, &gp_source, &gbInst};
-    lua_macro_runner runner{context};
+    macro_runner *runner = new wren_macro_runner{context};
 
-    runner.loadScript(file_buffer{"script.lua"});
+    runner->loadScript(file_buffer{"script.wren"});
 
     file_buffer romBuffer{romFilename};
     file_buffer saveBuffer{saveFile};
@@ -163,7 +164,7 @@ int main(int argc, char *argv[]) {
                 } else if (sym == SDLK_ESCAPE) {
                     endGame = true;
                 } else if (sym == SDLK_SPACE) {
-                    runner.activate();
+                    runner->activate();
                 } else if (sym >= SDLK_0 && sym <= SDLK_9) {
                     search_value *= 10;
                     search_value += (sym - SDLK_0);
@@ -213,7 +214,7 @@ int main(int argc, char *argv[]) {
         }
 
         limitFunc([&] {
-            runner.tick();
+            runner->tick();
             gbInst.tick();
         });
     }
