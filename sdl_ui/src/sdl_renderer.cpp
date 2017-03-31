@@ -72,59 +72,62 @@ void sdl_renderer::render_screen(uint8_t *buf, int width, int height, int depth)
         }
     }
 
+    for (auto &op : pending_operations)
+    {
+        op();
+    }
+
+    pending_operations.clear();
+
+    renderOSDMessages();
+
+    SDL_UpdateRect(dpy.get(), 0, 0, 0, 0);
+}
+
+void sdl_renderer::renderOSDMessages() {
     int16_t msg_number = 0;
     for (auto &osd_msg : osd_messages) {
-        std::string message = get<1>(osd_msg);
+        string message = get<1>(osd_msg);
 
-        stringRGBA(dpy.get(), 11, (Sint16) (11 + msg_number * 20), message.c_str(), 0, 0, 0, 128);
-        stringRGBA(dpy.get(), 10, (Sint16) (10 + msg_number * 20), message.c_str(), 255, 255, 255, 255);
+        Sint16 y = (Sint16) (11 + msg_number * 20);
+        Sint16 x = 11;
+        drawText(message, x, y);
 
         msg_number++;
     }
 
     osd_messages.erase(
-            std::remove_if(osd_messages.begin(), osd_messages.end(), [](std::tuple<uint64_t, std::string> msg) -> bool {
+            remove_if(osd_messages.begin(), osd_messages.end(), [](tuple<uint64_t, string> msg) -> bool {
                 return SDL_GetTicks() > get<0>(msg);
             }), osd_messages.end());
+}
 
+void
+sdl_renderer::drawRect(uint32_t colour, uint32_t fillColour, int16_t x, int16_t y, uint16_t width, uint16_t height) const {
+    uint8_t a = (uint8_t) ((colour & 0xff000000) >> 24);
+    uint8_t b = (uint8_t) ((colour & 0x00ff0000) >> 16);
+    uint8_t g = (uint8_t) ((colour & 0x0000ff00) >> 8);
+    uint8_t r = (uint8_t) (colour & 0x000000ff);
 
-    for (auto rect : rects) {
-        uint32_t colour = rect.stroke();
-        uint8_t a = (uint8_t) ((colour & 0xff000000) >> 24);
-        uint8_t b = (uint8_t) ((colour & 0x00ff0000) >> 16);
-        uint8_t g = (uint8_t) ((colour & 0x0000ff00) >> 8);
-        uint8_t r = (uint8_t) (colour & 0x000000ff);
+    uint8_t fillAlpha = (uint8_t) ((fillColour & 0xff000000) >> 24);
+    uint8_t fillBlue = (uint8_t) ((fillColour & 0x00ff0000) >> 16);
+    uint8_t fillGreen = (uint8_t) ((fillColour & 0x0000ff00) >> 8);
+    uint8_t fillRed = (uint8_t) (fillColour & 0x000000ff);
 
-        uint32_t fillColour = rect.fill();
-        uint8_t fillAlpha = (uint8_t) ((fillColour & 0xff000000) >> 24);
-        uint8_t fillBlue = (uint8_t) ((fillColour & 0x00ff0000) >> 16);
-        uint8_t fillGreen = (uint8_t) ((fillColour & 0x0000ff00) >> 8);
-        uint8_t fillRed = (uint8_t) (fillColour & 0x000000ff);
+    int16_t x1 = x;
+    int16_t x2 = x1 + width;
+    int16_t y1 = y;
+    int16_t y2 = y1 + height;
 
-        int16_t x1 = rect.x();
-        int16_t x2 = x1 + rect.w();
-        int16_t y1 = rect.y();
-        int16_t y2 = y1 + rect.h();
+    int16_t xpoints[] = {x1, x2, x2, x1};
+    int16_t ypoints[] = {y1, y1, y2, y2};
+    filledPolygonRGBA(dpy.get(), xpoints, ypoints, 4, fillRed, fillGreen, fillBlue, fillAlpha);
+    aapolygonRGBA(dpy.get(), xpoints, ypoints, 4, r, g, b, a);
+}
 
-        int16_t xpoints[] = {x1, x2, x2, x1};
-        int16_t ypoints[] = {y1, y1, y2, y2};
-        filledPolygonRGBA(dpy.get(), xpoints, ypoints, 4, fillRed, fillGreen, fillBlue, fillAlpha);
-
-        aalineRGBA(dpy.get(), x1, y1, x2, y1, r, g, b, a);
-        aalineRGBA(dpy.get(), x1, y2, x2, y2, r, g, b, a);
-        aalineRGBA(dpy.get(), x1, y1, x1, y2, r, g, b, a);
-        aalineRGBA(dpy.get(), x2, y1, x2, y2, r, g, b, a);
-    }
-
-    for (auto &image : images) {
-        SDL_Surface *src = lookupImage(image.name());
-        if (src) {
-            SDL_Rect pos = {image.x(), image.y(), (uint16_t) src->w, (uint16_t) src->h};
-            SDL_BlitSurface(src, nullptr, dpy.get(), &pos);
-        }
-    }
-
-    SDL_UpdateRect(dpy.get(), 0, 0, 0, 0);
+void sdl_renderer::drawText(const string &message, Sint16 x, Sint16 y) const {
+    stringRGBA(dpy.get(), x, y, message.c_str(), 0, 0, 0, 128);
+    stringRGBA(dpy.get(), (Sint16) (x - 1), (Sint16) (y - 1), message.c_str(), 255, 255, 255, 255);
 }
 
 namespace {
@@ -160,16 +163,29 @@ void sdl_renderer::display_message(const std::string &msg, uint64_t duration) {
 }
 
 void sdl_renderer::add_rect(const osd_rect &rect) {
-    rects.emplace_back(rect);
+    pending_operations.push_back([=]{
+        uint32_t colour = rect.stroke();
+        uint32_t fillColour = rect.fill();
+        int16_t x = rect.x();
+        int16_t y = rect.y();
+        uint16_t width = rect.w();
+        uint16_t height = rect.h();
+
+        drawRect(colour, fillColour, x, y, width, height);
+    });
 }
 
 void sdl_renderer::clear_canvas() {
-    rects.clear();
-    images.clear();
 }
 
 void sdl_renderer::add_image(const osd_image &image) {
-    images.emplace_back(image);
+    pending_operations.push_back([=]{
+        SDL_Surface *src = lookupImage(image.name());
+        if (src) {
+            SDL_Rect pos = {image.x(), image.y(), (uint16_t) src->w, (uint16_t) src->h};
+            SDL_BlitSurface(src, nullptr, dpy.get(), &pos);
+        }
+    });
 }
 
 SDL_Surface *sdl_renderer::lookupImage(const string &name) {
@@ -183,3 +199,9 @@ SDL_Surface *sdl_renderer::lookupImage(const string &name) {
 }
 
 sound_renderer *sdl_renderer::get_sound_renderer() { return snd_render; }
+
+void sdl_renderer::add_text(const string &text, int16_t x, int16_t y) {
+    pending_operations.push_back([=]{
+        drawText(text, x, y);
+    });
+}

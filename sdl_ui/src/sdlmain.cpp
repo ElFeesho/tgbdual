@@ -42,7 +42,21 @@
 
 #include "input/sdl_gamepad_source.h"
 #include "scripting/lua_macro_runner.h"
+#include "limitter.h"
 
+void loadState(sdl_renderer &render, gameboy &gbInst, const string &stateFile);
+
+void saveState(sdl_renderer &render, gameboy &gbInst, const string &stateFile);
+
+void searchAddress8bit(sdl_renderer &render, gameboy &gbInst, uint32_t search_value, address_scan_result &last_result);
+
+void searchAddress16bit(sdl_renderer &render, gameboy &gbInst, uint32_t search_value, address_scan_result &last_result);
+
+void fastForwardSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimitter);
+
+void normalSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimitter);
+
+void displaySearchResults(sdl_renderer &render, address_scan_result &last_result, address_scan_result &result);
 
 link_cable_source *processArguments(int *argc, char ***argv) {
     int option = 0;
@@ -82,18 +96,6 @@ link_cable_source *processArguments(int *argc, char ***argv) {
     return selected_cable_source;
 }
 
-void limit(uint32_t targetTime, std::function<void()> operation) {
-    uint32_t startTime = SDL_GetTicks();
-
-    operation();
-
-    uint32_t operationTime = SDL_GetTicks() - startTime;
-
-    if (operationTime < targetTime) {
-        SDL_Delay(targetTime - operationTime);
-    }
-}
-
 int main(int argc, char *argv[]) {
 
     if (argc == 1) {
@@ -105,6 +107,12 @@ int main(int argc, char *argv[]) {
     sdl_gamepad_source gp_source;
     link_cable_source *cable_source = processArguments(&argc, &argv);
 
+    gameboy gbInst{&render, &gp_source, cable_source};
+
+    script_context context{&render, &gp_source, &gbInst};
+    macro_runner *runner = new wren_macro_runner{context};
+    runner->loadScript(file_buffer{"script.wren"});
+
     std::string romFilename{argv[0]};
     std::string saveFile = romFilename.substr(0, romFilename.find_last_of(".")) + ".sav";
     std::string stateFile = romFilename.substr(0, romFilename.find_last_of(".")) + ".sv0";
@@ -115,29 +123,25 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    gameboy gbInst{&render, &gp_source, cable_source};
-
-    script_context context{&render, &gp_source, &gbInst};
-    macro_runner *runner = new wren_macro_runner{context};
-
-    runner->loadScript(file_buffer{"script.wren"});
-
     file_buffer romBuffer{romFilename};
-    file_buffer saveBuffer{saveFile};
 
     if (stat(saveFile.c_str(), &statBuffer) != 0) {
         gbInst.load_rom(romBuffer, romBuffer.length());
     } else {
+        file_buffer saveBuffer{saveFile};
         gbInst.load_rom(romBuffer, romBuffer.length(), saveBuffer, saveBuffer.length());
     }
-
-    std::function<void(std::function<void()>)> limitFunc = std::bind(limit, 16, std::placeholders::_1);
 
     SDL_Event e;
     bool endGame = false;
     bool fast_forward = false;
     uint32_t search_value = 0;
     address_scan_result last_result{{}};
+    limitter frameLimitter{[&] {
+        runner->tick();
+        gbInst.tick();
+    }};
+
     while (!endGame) {
         while (SDL_PollEvent(&e)) {
             gp_source.update_pad_state(e);
@@ -146,21 +150,14 @@ int main(int argc, char *argv[]) {
                 endGame = true;
             } else if (e.type == SDL_KEYDOWN) {
                 auto sym = e.key.keysym.sym;
-                if (sym == SDLK_F7) {
-                    file_buffer state{stateFile};
-                    gbInst.load_state(state);
-                    render.display_message("State loaded", 2000);
+                if (sym == SDLK_F1) {
+                    searchAddress8bit(render, gbInst, search_value, last_result);
+                } else if (sym == SDLK_F2) {
+                    searchAddress16bit(render, gbInst, search_value, last_result);
                 } else if (sym == SDLK_F5) {
-                    memory_buffer buffer;
-                    gbInst.save_state([&](uint32_t length) {
-                        buffer.alloc(length);
-                        return buffer;
-                    });
-                    std::ofstream fout(stateFile, std::ios::binary | std::ios::out);
-                    fout.write(buffer, buffer.length());
-                    fout.close();
-                    buffer.dealloc();
-                    render.display_message("State saved", 2000);
+                    saveState(render, gbInst, stateFile);
+                } else if (sym == SDLK_F7) {
+                    loadState(render, gbInst, stateFile);
                 } else if (sym == SDLK_ESCAPE) {
                     endGame = true;
                 } else if (sym == SDLK_SPACE) {
@@ -170,56 +167,82 @@ int main(int argc, char *argv[]) {
                     search_value += (sym - SDLK_0);
                     std::cout << "Search value: " << search_value << std::endl;
                 } else if (sym == SDLK_BACKSPACE) {
-                    if (search_value > 0) {
-                        search_value /= 10;
-                    }
+                    search_value /= 10;
                     std::cout << "Search value: " << search_value << std::endl;
-                } else if (sym == SDLK_F1) {
-                    address_scan_result result = gbInst.scan_for_address((uint8_t) search_value);
-                    if (last_result.size() > 0) {
-                        result = last_result.mutual_set(result);
-                    }
-                    last_result = result;
-                    if (result.size() <= 10) {
-                        for (size_t i = 0; i < result.size(); i++) {
-                            std::cout << "FOUND ADDRESS: " << std::hex << result[i] << std::dec << std::endl;
-                        }
-                    }
-                    render.display_message("Found results: " + std::to_string(result.size()), 5000);
-                } else if (sym == SDLK_F2) {
-                    address_scan_result result = gbInst.scan_for_address((uint16_t) search_value);
-                    if (last_result.size() > 0) {
-                        result = last_result.mutual_set(result);
-                    }
-                    last_result = result;
-                    if (result.size() <= 10) {
-                        for (size_t i = 0; i < result.size(); i++) {
-                            std::cout << "FOUND ADDRESS: " << std::hex << result[i] << std::dec << std::endl;
-                        }
-                    }
-                    render.display_message("Found results: " + std::to_string(result.size()), 5000);
                 } else if (sym == SDLK_TAB) {
                     fast_forward = !fast_forward;
                     if (fast_forward) {
-                        gbInst.set_speed(9);
-                        limitFunc = std::bind(limit, 1, std::placeholders::_1);
-                        render.display_message("Fast forward enabled", 2000);
+                        fastForwardSpeed(render, gbInst, frameLimitter);
                     } else {
-                        gbInst.set_speed(0);
-                        limitFunc = std::bind(limit, 16, std::placeholders::_1);
-                        render.display_message("Fast forward disabled", 2000);
+                        normalSpeed(render, gbInst, frameLimitter);
                     }
                 }
             }
         }
 
-        limitFunc([&] {
-            runner->tick();
-            gbInst.tick();
-        });
+        frameLimitter.limit();
     }
 
     SDL_Quit();
 
     return 0;
+}
+
+void normalSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimitter) {
+    gbInst.set_speed(0);
+    render.display_message("Fast forward disabled", 2000);
+    frameLimitter.normal();
+}
+
+void fastForwardSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimitter) {
+    gbInst.set_speed(9);
+    render.display_message("Fast forward enabled", 2000);
+    frameLimitter.fast();
+}
+
+void searchAddress16bit(sdl_renderer &render, gameboy &gbInst, uint32_t search_value, address_scan_result &last_result) {
+    address_scan_result result = gbInst.scan_for_address((uint16_t) search_value);
+
+    displaySearchResults(render, last_result, result);
+}
+
+void searchAddress8bit(sdl_renderer &render, gameboy &gbInst, uint32_t search_value, address_scan_result &last_result) {
+    address_scan_result result = gbInst.scan_for_address((uint8_t) search_value);
+
+    displaySearchResults(render, last_result, result);
+}
+
+void displaySearchResults(sdl_renderer &render, address_scan_result &last_result, address_scan_result &result) {
+    if (last_result.size() > 1) {
+        result = last_result.mutual_set(result);
+    }
+
+    last_result = result;
+
+    render.display_message("Found results: " + to_string(result.size()), 5000);
+    if (result.size() == 1)
+    {
+        std::stringstream s;
+        s << "Result: " << std::hex << result[0];
+        render.display_message(s.str(), 10000);
+    }
+}
+
+void saveState(sdl_renderer &render, gameboy &gbInst, const string &stateFile) {
+    memory_buffer buffer;
+    gbInst.save_state([&](uint32_t length) {
+                        buffer.alloc(length);
+                        return buffer;
+                    });
+    ofstream fout(stateFile, ios_base::binary | ios_base::out);
+    fout.write(buffer, buffer.length());
+    fout.close();
+    buffer.dealloc();
+    render.display_message("State saved", 2000);
+}
+
+void loadState(sdl_renderer &render, gameboy &gbInst, const string &stateFile) {
+    file_buffer state{stateFile};
+    gbInst.load_state(state);
+    render.display_message("State loaded", 2000);
 }

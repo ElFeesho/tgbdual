@@ -51,7 +51,7 @@ wren_macro_runner::wren_macro_runner(script_context &context) : _wrenVm{nullptr,
     config.errorFn = errorHandler;
 
     WrenVM *vm = wrenNewVM(&config);
-    _wrenVm = std::unique_ptr<WrenVM, void (*)(WrenVM*)>(vm, wrenFreeVM);
+    _wrenVm = wrenvm_holder(vm, wrenFreeVM);
 
     contexts[_wrenVm.get()] = &context;
 }
@@ -74,13 +74,11 @@ void wren_macro_runner::loadScript(const std::string &scriptFile) {
     {
         std::cerr << "Failed to compile wren script" << std::endl;
         contexts[_wrenVm.get()]->print_string("Failed to compile wren script");
-
     }
     else if(result == WREN_RESULT_RUNTIME_ERROR) {
         std::cerr << "Failed to execute wren script" << std::endl;
         contexts[_wrenVm.get()]->print_string("Failed to execute wren script");
     }
-
 }
 
 WrenForeignMethodFn boundFunction(std::string name, std::string signature) {
@@ -120,6 +118,13 @@ WrenForeignMethodFn boundFunction(std::string name, std::string signature) {
         {
             return [](WrenVM *wrenVm) {
                 contexts[wrenVm]->add_image(wrenGetSlotString(wrenVm, 1), (int16_t) wrenGetSlotDouble(wrenVm, 2),
+                                            (int16_t) wrenGetSlotDouble(wrenVm, 3));
+            };
+        }
+        else if(signature == "addText(_,_,_)")
+        {
+            return [](WrenVM *wrenVm) {
+                contexts[wrenVm]->add_text(wrenGetSlotString(wrenVm, 1), (int16_t) wrenGetSlotDouble(wrenVm, 2),
                                             (int16_t) wrenGetSlotDouble(wrenVm, 3));
             };
         }

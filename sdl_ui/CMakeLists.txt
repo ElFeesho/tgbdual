@@ -15,6 +15,8 @@ set(SDL_UI_SOURCES
         src/network/multicast_transmitter.h
         src/sdl_renderer.cpp
         src/sdl_renderer.h
+        src/limitter.cpp
+        src/limitter.h
         src/input/sdl_gamepad_source.cpp
         src/input/sdl_gamepad_source.h
         src/io/file_buffer.cpp

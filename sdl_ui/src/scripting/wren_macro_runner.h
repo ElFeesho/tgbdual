@@ -12,6 +12,8 @@
 
 class wren_macro_runner : public macro_runner {
 public:
+    using wrenvm_holder = std::unique_ptr<WrenVM, void(*)(WrenVM*)>;
+
     wren_macro_runner(script_context &context);
 
     void tick() override;
@@ -19,6 +21,6 @@ public:
     void loadScript(const std::string &scriptFile) override;
 
 private:
-    std::unique_ptr<WrenVM, void(*)(WrenVM*)> _wrenVm;
+    wrenvm_holder _wrenVm;
 };
 

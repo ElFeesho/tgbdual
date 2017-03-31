@@ -47,3 +47,7 @@ void script_context::add_rect(int16_t x, int16_t y, int16_t w, int16_t h, uint32
 void script_context::queue_key(uint8_t key, uint32_t when, uint32_t duration) {
 	_queue->queue_key({key, when, duration});
 }
+
+void script_context::add_text(const std::string &message, int16_t x, int16_t y) {
+	_osd->add_text(message, x, y);
+}
