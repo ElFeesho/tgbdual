@@ -31,11 +31,12 @@ set(SDL_UI_SOURCES
         src/sdlmain.cpp
         src/input/input_source.h
         src/json.hpp
+        src/console/Console.cpp
+        src/console/Console.h
         src/scripting/lua_macro_runner.cpp
         src/scripting/lua_macro_runner.h
         src/scripting/wren_macro_runner.cpp
-        src/scripting/wren_macro_runner.h
-        )
+        src/scripting/wren_macro_runner.h)
 
 find_package(SDL)
 

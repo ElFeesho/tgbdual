@@ -39,6 +39,7 @@
 #include <network/tcp_client.h>
 #include <network/tcp_server.h>
 #include <scripting/wren_macro_runner.h>
+#include <console/Console.h>
 
 #include "input/sdl_gamepad_source.h"
 #include "scripting/lua_macro_runner.h"
@@ -184,54 +185,78 @@ int main(int argc, char *argv[]) {
     bool fast_forward = false;
     uint32_t search_value = 0;
     address_scan_result last_result{{}};
+    Console console;
+    SDL_Surface *screen = SDL_GetVideoSurface();
     limitter frameLimitter{[&] {
         runner->tick();
         gbInst.tick();
+        console.draw(screen);
+        SDL_Flip(SDL_GetVideoSurface());
     }};
+
 
     while (!endGame) {
         while (SDL_PollEvent(&e)) {
-            gp_source.update_pad_state(e);
+            if (!console.isOpen())
+            {
+                gp_source.update_pad_state(e);
+            }
 
             if (e.type == SDL_QUIT) {
                 endGame = true;
             } else if (e.type == SDL_KEYDOWN) {
                 auto sym = e.key.keysym.sym;
-                if (sym == SDLK_F1) {
-                    searchAddress8bit(render, gbInst, search_value, last_result);
-                } else if (sym == SDLK_F2) {
-                    searchAddress16bit(render, gbInst, search_value, last_result);
-                } else if (sym == SDLK_F3) {
-                    searchAddress32bit(render, gbInst, search_value, last_result);
-                } else if (sym == SDLK_F5) {
-                    saveState(render, gbInst, romFile);
-                } else if (sym == SDLK_F7) {
-                    loadState(render, gbInst, romFile);
-                } else if(sym == SDLK_F10) {
-                    runner = new wren_macro_runner{context};
-                    runner->loadScript(file_buffer{"script.wren"});
-                } else if (sym == SDLK_ESCAPE) {
-                    endGame = true;
-                } else if (sym == SDLK_SPACE) {
-                    runner->activate();
-                } else if (sym >= SDLK_0 && sym <= SDLK_9) {
-                    search_value *= 10;
-                    search_value += (sym - SDLK_0);
-                    std::cout << "Search value: " << search_value << std::endl;
-                } else if (sym == SDLK_BACKSPACE) {
-                    search_value /= 10;
-                    std::cout << "Search value: " << search_value << std::endl;
-                } else if (sym == SDLK_TAB) {
-                    fast_forward = !fast_forward;
-                    if (fast_forward) {
-                        fastForwardSpeed(render, gbInst, frameLimitter);
-                    } else {
-                        normalSpeed(render, gbInst, frameLimitter);
+                if (console.isOpen())
+                {
+                    if (sym == SDLK_BACKQUOTE)
+                    {
+                        console.close();
+                    }
+                    else {
+                        console.update(sym);
+                    }
+                }
+                else {
+                    if (sym == SDLK_BACKQUOTE)
+                    {
+                        console.open();
+                        gp_source.reset_pad();
+                    }
+                    else if (sym == SDLK_F1) {
+                        searchAddress8bit(render, gbInst, search_value, last_result);
+                    } else if (sym == SDLK_F2) {
+                        searchAddress16bit(render, gbInst, search_value, last_result);
+                    } else if (sym == SDLK_F3) {
+                        searchAddress32bit(render, gbInst, search_value, last_result);
+                    } else if (sym == SDLK_F5) {
+                        saveState(render, gbInst, romFile);
+                    } else if (sym == SDLK_F7) {
+                        loadState(render, gbInst, romFile);
+                    } else if (sym == SDLK_F10) {
+                        runner = new wren_macro_runner{context};
+                        runner->loadScript(file_buffer{"script.wren"});
+                    } else if (sym == SDLK_ESCAPE) {
+                        endGame = true;
+                    } else if (sym == SDLK_SPACE) {
+                        runner->activate();
+                    } else if (sym >= SDLK_0 && sym <= SDLK_9) {
+                        search_value *= 10;
+                        search_value += (sym - SDLK_0);
+                        std::cout << "Search value: " << search_value << std::endl;
+                    } else if (sym == SDLK_BACKSPACE) {
+                        search_value /= 10;
+                        std::cout << "Search value: " << search_value << std::endl;
+                    } else if (sym == SDLK_TAB) {
+                        fast_forward = !fast_forward;
+                        if (fast_forward) {
+                            fastForwardSpeed(render, gbInst, frameLimitter);
+                        } else {
+                            normalSpeed(render, gbInst, frameLimitter);
+                        }
                     }
                 }
             }
         }
-
         frameLimitter.limit();
     }
 

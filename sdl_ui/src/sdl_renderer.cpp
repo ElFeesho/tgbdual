@@ -83,7 +83,7 @@ void sdl_renderer::render_screen(uint8_t *buf, int width, int height, int depth)
 
     renderOSDMessages();
 
-    SDL_UpdateRect(dpy.get(), 0, 0, 0, 0);
+    //SDL_UpdateRect(dpy.get(), 0, 0, 0, 0);
 }
 
 void sdl_renderer::renderOSDMessages() {

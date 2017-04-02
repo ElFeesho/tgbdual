@@ -60,4 +60,8 @@ void sdl_gamepad_source::queue_key(const input_event &event) {
 	pending_events.emplace_back(input_event{event.key, event.when + SDL_GetTicks(), event.duration});
 }
 
+void sdl_gamepad_source::reset_pad() {
+	padState = 0;
+}
+
 

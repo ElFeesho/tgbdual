@@ -16,7 +16,7 @@ public:
 	sdl_gamepad_source();
 	void update_pad_state(const SDL_Event &ev);
 	virtual uint8_t check_pad() override;
-
+	virtual void reset_pad() override;
 	virtual void queue_key(const input_event &event) override;
 
 private:
