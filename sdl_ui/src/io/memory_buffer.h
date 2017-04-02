@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "buffer.h"
 
 class memory_buffer : buffer
@@ -7,18 +9,16 @@ class memory_buffer : buffer
 public:
     void alloc(uint32_t length);
 
-    void dealloc();
-
     uint32_t length() override;
 
     operator const char*() override {
-        return (const char *)_buffer;
+        return (const char *)_buffer.get();
     }
 
     operator uint8_t*() override {
-        return _buffer;
+        return _buffer.get();
     }
 private:
     uint32_t _length;
-    uint8_t *_buffer { nullptr };
+    std::unique_ptr<uint8_t> _buffer { nullptr };
 };

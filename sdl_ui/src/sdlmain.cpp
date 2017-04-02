@@ -44,20 +44,6 @@
 #include "scripting/lua_macro_runner.h"
 #include "limitter.h"
 
-void loadState(sdl_renderer &render, gameboy &gbInst, const string &stateFile);
-
-void saveState(sdl_renderer &render, gameboy &gbInst, const string &stateFile);
-
-void searchAddress8bit(sdl_renderer &render, gameboy &gbInst, uint32_t search_value, address_scan_result &last_result);
-
-void searchAddress16bit(sdl_renderer &render, gameboy &gbInst, uint32_t search_value, address_scan_result &last_result);
-
-void fastForwardSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimitter);
-
-void normalSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimitter);
-
-void displaySearchResults(sdl_renderer &render, address_scan_result &last_result, address_scan_result &result);
-
 link_cable_source *processArguments(int *argc, char ***argv) {
     int option = 0;
     link_cable_source *selected_cable_source = new null_link_source();
@@ -96,6 +82,79 @@ link_cable_source *processArguments(int *argc, char ***argv) {
     return selected_cable_source;
 }
 
+class RomFile {
+public:
+    RomFile(const std::string &romPath);
+
+    file_buffer &rom();
+    file_buffer &sram();
+    file_buffer &state();
+
+    void writeSram(uint8_t *sramData, uint32_t length);
+    void writeState(uint8_t *stateData, uint32_t length);
+
+private:
+    std::string _romPath;
+    std::string _sramPath;
+    std::string _statePath;
+
+    file_buffer _romBuffer;
+    file_buffer _sramBuffer;
+    file_buffer _stateBuffer;
+};
+
+RomFile::RomFile(const std::string &romPath) :
+        _romPath{romPath},
+        _sramPath{romPath.substr(0, romPath.find_last_of(".")) + ".sav"},
+        _statePath{romPath.substr(0, romPath.find_last_of(".")) + ".sv0"},
+        _romBuffer{_romPath},
+        _sramBuffer{_sramPath},
+        _stateBuffer{_statePath} {
+    struct stat st;
+    if (stat(_romPath.c_str(), &st) != 0)
+    {
+        throw std::domain_error("Failed to open rom: "+_romPath);
+    }
+}
+
+file_buffer &RomFile::rom() {
+    return _romBuffer;
+}
+
+file_buffer &RomFile::sram() {
+    return _sramBuffer;
+}
+
+file_buffer &RomFile::state() {
+    return _stateBuffer;
+}
+
+void RomFile::writeSram(uint8_t *sramData, uint32_t length) {
+    std::fstream sram{_sramPath, std::ios::out};
+    sram.write((const char*)sramData, length);
+    sram.close();
+
+    _sramBuffer = file_buffer{_sramPath};
+}
+
+void RomFile::writeState(uint8_t *stateData, uint32_t length) {
+    std::fstream state{_statePath, std::ios::out};
+    state.write((const char*)stateData, length);
+    state.close();
+
+    _stateBuffer = file_buffer{_statePath};
+}
+
+void loadState(sdl_renderer &render, gameboy &gbInst, RomFile &stateFile);
+void saveState(sdl_renderer &render, gameboy &gbInst, RomFile &rom);
+void searchAddress8bit(sdl_renderer &render, gameboy &gbInst, uint32_t search_value, address_scan_result &last_result);
+void searchAddress16bit(sdl_renderer &render, gameboy &gbInst, uint32_t search_value, address_scan_result &last_result);
+void searchAddress32bit(sdl_renderer &render, gameboy &gbInst, uint32_t search_value, address_scan_result &last_result);
+void fastForwardSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimitter);
+void normalSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimitter);
+void displaySearchResults(sdl_renderer &render, address_scan_result &last_result, address_scan_result &result);
+
+
 int main(int argc, char *argv[]) {
 
     if (argc == 1) {
@@ -113,24 +172,12 @@ int main(int argc, char *argv[]) {
     macro_runner *runner = new wren_macro_runner{context};
     runner->loadScript(file_buffer{"script.wren"});
 
-    std::string romFilename{argv[0]};
-    std::string saveFile = romFilename.substr(0, romFilename.find_last_of(".")) + ".sav";
-    std::string stateFile = romFilename.substr(0, romFilename.find_last_of(".")) + ".sv0";
+    RomFile romFile{argv[0]};
 
-    struct stat statBuffer;
-    if (stat(romFilename.c_str(), &statBuffer) != 0) {
-        cerr << "Rom file " << romFilename << " is not accessible" << endl;
-        return -1;
-    }
+    file_buffer &romBuffer = romFile.rom();
+    file_buffer &saveBuffer = romFile.sram();
 
-    file_buffer romBuffer{romFilename};
-
-    if (stat(saveFile.c_str(), &statBuffer) != 0) {
-        gbInst.load_rom(romBuffer, romBuffer.length());
-    } else {
-        file_buffer saveBuffer{saveFile};
-        gbInst.load_rom(romBuffer, romBuffer.length(), saveBuffer, saveBuffer.length());
-    }
+    gbInst.load_rom(romBuffer, romBuffer.length(), saveBuffer, saveBuffer.length());
 
     SDL_Event e;
     bool endGame = false;
@@ -154,10 +201,15 @@ int main(int argc, char *argv[]) {
                     searchAddress8bit(render, gbInst, search_value, last_result);
                 } else if (sym == SDLK_F2) {
                     searchAddress16bit(render, gbInst, search_value, last_result);
+                } else if (sym == SDLK_F3) {
+                    searchAddress32bit(render, gbInst, search_value, last_result);
                 } else if (sym == SDLK_F5) {
-                    saveState(render, gbInst, stateFile);
+                    saveState(render, gbInst, romFile);
                 } else if (sym == SDLK_F7) {
-                    loadState(render, gbInst, stateFile);
+                    loadState(render, gbInst, romFile);
+                } else if(sym == SDLK_F10) {
+                    runner = new wren_macro_runner{context};
+                    runner->loadScript(file_buffer{"script.wren"});
                 } else if (sym == SDLK_ESCAPE) {
                     endGame = true;
                 } else if (sym == SDLK_SPACE) {
@@ -183,6 +235,10 @@ int main(int argc, char *argv[]) {
         frameLimitter.limit();
     }
 
+    gbInst.save_sram([&](uint8_t *sramData, uint32_t len){
+        romFile.writeSram(sramData, len);
+    });
+
     SDL_Quit();
 
     return 0;
@@ -198,6 +254,12 @@ void fastForwardSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimi
     gbInst.set_speed(9);
     render.display_message("Fast forward enabled", 2000);
     frameLimitter.fast();
+}
+
+void searchAddress32bit(sdl_renderer &render, gameboy &gbInst, uint32_t search_value, address_scan_result &last_result) {
+    address_scan_result result = gbInst.scan_for_address(search_value);
+
+    displaySearchResults(render, last_result, result);
 }
 
 void searchAddress16bit(sdl_renderer &render, gameboy &gbInst, uint32_t search_value, address_scan_result &last_result) {
@@ -220,29 +282,28 @@ void displaySearchResults(sdl_renderer &render, address_scan_result &last_result
     last_result = result;
 
     render.display_message("Found results: " + to_string(result.size()), 5000);
-    if (result.size() == 1)
+    if (result.size() <= 3)
     {
         std::stringstream s;
-        s << "Result: " << std::hex << result[0];
+        for(int i = 0; i < result.size(); i++) {
+            s << "Result: " << std::hex << result[i] << std::endl;
+        }
         render.display_message(s.str(), 10000);
     }
 }
 
-void saveState(sdl_renderer &render, gameboy &gbInst, const string &stateFile) {
+void saveState(sdl_renderer &render, gameboy &gbInst, RomFile &romFile) {
     memory_buffer buffer;
     gbInst.save_state([&](uint32_t length) {
                         buffer.alloc(length);
-                        return buffer;
+                        return (uint8_t*)buffer;
                     });
-    ofstream fout(stateFile, ios_base::binary | ios_base::out);
-    fout.write(buffer, buffer.length());
-    fout.close();
-    buffer.dealloc();
+    romFile.writeState(buffer, buffer.length());
+
     render.display_message("State saved", 2000);
 }
 
-void loadState(sdl_renderer &render, gameboy &gbInst, const string &stateFile) {
-    file_buffer state{stateFile};
-    gbInst.load_state(state);
+void loadState(sdl_renderer &render, gameboy &gbInst, RomFile &romFile) {
+    gbInst.load_state(romFile.state());
     render.display_message("State loaded", 2000);
 }

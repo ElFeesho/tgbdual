@@ -51,11 +51,13 @@ void sdl_renderer::init_sdlvideo() {
     int h = GB_H * WIN_MULTIPLIER;
     uint32_t flags = SDL_SWSURFACE;
 
-    dpy = surf_ptr(SDL_SetVideoMode(w, h, 16, flags), [](SDL_Surface *) {});
+    dpy = surf_ptr(SDL_SetVideoMode(w+200, h+200, 16, flags), [](SDL_Surface *) {});
     scr = surf_ptr(SDL_CreateRGBSurface(SDL_SWSURFACE, GB_W, GB_H, 16, 0, 0, 0, 0), SDL_FreeSurface);
+    SDL_FillRect(dpy.get(), nullptr, 0x00000000);
 }
 
 void sdl_renderer::render_screen(uint8_t *buf, int width, int height, int depth) {
+    SDL_FillRect(dpy.get(), nullptr, 0x0000000000);
 
     for (int i = 0; i < height; i++) {
         memcpy((void *) (((uint8_t *) scr->pixels) + (scr->pitch * i)), buf + (i * width * depth / 8),
@@ -66,7 +68,7 @@ void sdl_renderer::render_screen(uint8_t *buf, int width, int height, int depth)
     for (int y = 0; y < 144; y++) {
         for (int x = 0; x < 160; x++) {
             Uint32 colour = getpixel(scr.get(), x, y);
-            loc.x = (Sint16) (x * WIN_MULTIPLIER);
+            loc.x = (Sint16) (100 + (x * WIN_MULTIPLIER));
             loc.y = (Sint16) (y * WIN_MULTIPLIER);
             SDL_FillRect(dpy.get(), &loc, colour);
         }
