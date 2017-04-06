@@ -23,3 +23,5 @@ Release
 *.sav
 CTestTest*
 Testing
+cmake-build-debug
+sdl_ui/imgs

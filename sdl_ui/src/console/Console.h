@@ -7,25 +7,33 @@
 #include <string>
 #include <vector>
 #include <SDL/SDL.h>
+#include <map>
+#include "ConsoleCmd.h"
 
 class Console {
 public:
     Console();
 
     void open();
-    void update(SDLKey param);
+    void update(SDLKey param, SDLMod mod);
     void close();
 
     void draw(SDL_Surface *screen);
 
-    void addhOutput(std::string output);
+    void addOutput(std::string output);
+    void addHistory(std::string output);
     void addError(std::string error);
 
     bool isOpen();
+
+    void addCommand(ConsoleCmd *consoleCmd);
+
+    void processLine();
 private:
     enum class OutputType {
         stdout,
-        stderr
+        stderr,
+        command
     };
     class HistoryLine {
     public:
@@ -38,6 +46,9 @@ private:
     };
     bool _open { false };
     std::string _currentLine { "" };
-    int _cursorPos { 0 };
+    unsigned long _cursorPos {0 };
     std::vector<HistoryLine> _history;
+    int _historyIndex{0};
+
+    std::map<std::string, std::unique_ptr<ConsoleCmd>> _cmds;
 };

@@ -22,6 +22,7 @@
 #include <getopt.h>
 
 #include <sys/stat.h>
+#include <vector>
 
 #include <gameboy.h>
 
@@ -88,10 +89,13 @@ public:
     RomFile(const std::string &romPath);
 
     file_buffer &rom();
+
     file_buffer &sram();
+
     file_buffer &state();
 
     void writeSram(uint8_t *sramData, uint32_t length);
+
     void writeState(uint8_t *stateData, uint32_t length);
 
 private:
@@ -112,9 +116,8 @@ RomFile::RomFile(const std::string &romPath) :
         _sramBuffer{_sramPath},
         _stateBuffer{_statePath} {
     struct stat st;
-    if (stat(_romPath.c_str(), &st) != 0)
-    {
-        throw std::domain_error("Failed to open rom: "+_romPath);
+    if (stat(_romPath.c_str(), &st) != 0) {
+        throw std::domain_error("Failed to open rom: " + _romPath);
     }
 }
 
@@ -132,7 +135,7 @@ file_buffer &RomFile::state() {
 
 void RomFile::writeSram(uint8_t *sramData, uint32_t length) {
     std::fstream sram{_sramPath, std::ios::out};
-    sram.write((const char*)sramData, length);
+    sram.write((const char *) sramData, length);
     sram.close();
 
     _sramBuffer = file_buffer{_sramPath};
@@ -140,19 +143,26 @@ void RomFile::writeSram(uint8_t *sramData, uint32_t length) {
 
 void RomFile::writeState(uint8_t *stateData, uint32_t length) {
     std::fstream state{_statePath, std::ios::out};
-    state.write((const char*)stateData, length);
+    state.write((const char *) stateData, length);
     state.close();
 
     _stateBuffer = file_buffer{_statePath};
 }
 
 void loadState(sdl_renderer &render, gameboy &gbInst, RomFile &stateFile);
+
 void saveState(sdl_renderer &render, gameboy &gbInst, RomFile &rom);
+
 void searchAddress8bit(sdl_renderer &render, gameboy &gbInst, uint32_t search_value, address_scan_result &last_result);
+
 void searchAddress16bit(sdl_renderer &render, gameboy &gbInst, uint32_t search_value, address_scan_result &last_result);
+
 void searchAddress32bit(sdl_renderer &render, gameboy &gbInst, uint32_t search_value, address_scan_result &last_result);
+
 void fastForwardSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimitter);
+
 void normalSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimitter);
+
 void displaySearchResults(sdl_renderer &render, address_scan_result &last_result, address_scan_result &result);
 
 
@@ -170,8 +180,6 @@ int main(int argc, char *argv[]) {
     gameboy gbInst{&render, &gp_source, cable_source};
 
     script_context context{&render, &gp_source, &gbInst};
-    macro_runner *runner = new wren_macro_runner{context};
-    runner->loadScript(file_buffer{"script.wren"});
 
     RomFile romFile{argv[0]};
 
@@ -183,22 +191,158 @@ int main(int argc, char *argv[]) {
     SDL_Event e;
     bool endGame = false;
     bool fast_forward = false;
-    uint32_t search_value = 0;
-    address_scan_result last_result{{}};
     Console console;
+
+    console.addCommand(new ConsoleCmd{"poke", [&](std::vector<std::string> args) {
+        uint32_t address = 0;
+        uint8_t value = 0;
+        address = ConsoleCmd::toInt(args[0]);
+        value = ConsoleCmd::toInt(args[1]);
+
+        gbInst.override_ram(address, (uint8_t) value);
+    }});
+
+    address_scan_result last_result{{}};
+    int scanThreshold = 3;
+    console.addCommand(new ConsoleCmd{"scan", [&](std::vector<std::string> args) {
+
+        if (args.size() != 1) {
+            console.addError("Usage: scan [value]");
+            return;
+        }
+
+        int value = ConsoleCmd::toInt(args[0]);
+
+        if (value <= 255) {
+            address_scan_result result = gbInst.scan_for_address((uint8_t) value);
+            if (last_result.size() > 1) {
+                result = last_result.mutual_set(result);
+            }
+            last_result = result;
+            console.addOutput("Found " + std::to_string((int) result.size()) + " results");
+            if (result.size() <= scanThreshold) {
+                for (int i = 0; i < result.size(); i++) {
+                    std::stringstream s;
+                    s << std::hex << result[i];
+                    console.addOutput(std::to_string(i + 1) + ": 0x" + s.str());
+                }
+            }
+        } else if (value <= (0x1 << 16)) {
+            address_scan_result result = gbInst.scan_for_address((uint16_t) value);
+            if (last_result.size() > 1) {
+                result = last_result.mutual_set(result);
+            }
+            last_result = result;
+            console.addOutput("Found " + std::to_string((int) result.size()) + " results");
+            if (result.size() <= scanThreshold) {
+                for (int i = 0; i < result.size(); i++) {
+                    std::stringstream s;
+                    s << std::hex << result[i];
+                    console.addOutput(std::to_string(i + 1) + ": 0x" + s.str());
+                }
+            }
+        } else if (value <= (0x1 << 31)) {
+            address_scan_result result = gbInst.scan_for_address((uint32_t) value);
+            if (last_result.size() > 1) {
+                result = last_result.mutual_set(result);
+            }
+            last_result = result;
+            console.addOutput("Found " + std::to_string((int) result.size()) + " results");
+            if (result.size() <= scanThreshold) {
+                for (int i = 0; i < result.size(); i++) {
+                    std::stringstream s;
+                    s << std::hex << result[i];
+                    console.addOutput(std::to_string(i + 1) + ": 0x" + s.str());
+                }
+            }
+        }
+    }});
+
+    console.addCommand(new ConsoleCmd{"scan_threshold", [&](std::vector<std::string> args) {
+
+        if (args.size() == 0) {
+            console.addOutput("Scan threshold: " + std::to_string(scanThreshold));
+        } else {
+            scanThreshold = ConsoleCmd::toInt(args[0]);
+            console.addOutput("Scan threshold now: " + std::to_string(scanThreshold));
+        }
+    }});
+
+    std::map<std::string, std::unique_ptr<macro_runner>> scriptVms;
+
+    console.addCommand(new ConsoleCmd{"clear_scan", [&](std::vector<std::string> args) {
+        last_result = address_scan_result{{}};
+        console.addOutput("Cleared previous search results");
+    }});
+
+    console.addCommand(new ConsoleCmd{"quit", [&](std::vector<std::string> args) {
+        endGame = true;
+    }});
+
+    console.addCommand(new ConsoleCmd{"save", [&](std::vector<std::string> args) {
+        saveState(render, gbInst, romFile);
+    }});
+
+    console.addCommand(new ConsoleCmd{"load", [&](std::vector<std::string> args) {
+        loadState(render, gbInst, romFile);
+    }});
+
+    console.addCommand(new ConsoleCmd{"load_script", [&](std::vector<std::string> args) {
+        if (args.size() == 1) {
+            std::string &file = args[0];
+            if (file.find(".wren") != std::string::npos) {
+                wren_macro_runner *wrenVm = new wren_macro_runner(context);
+                wrenVm->loadScript(file_buffer{file});
+                if (scriptVms.find(file) != scriptVms.end()) {
+                    scriptVms.erase(scriptVms.find(file));
+                }
+                scriptVms.emplace(file, std::unique_ptr<macro_runner>(wrenVm));
+                console.addOutput("Loaded " + file + " wren script");
+            } else if (file.find(".lua") != std::string::npos) {
+                lua_macro_runner *luaVm = new lua_macro_runner(context);
+                luaVm->loadScript((file_buffer{file}));
+                if (scriptVms.find(file) != scriptVms.end()) {
+                    scriptVms.erase(scriptVms.find(file));
+                }
+                scriptVms.emplace(file, std::unique_ptr<macro_runner>(luaVm));
+                console.addOutput("Loaded " + file + " lua script");
+            } else {
+                console.addError("Cannot load " + file);
+            }
+        } else {
+            console.addError("Usage: load_script [file]");
+        }
+    }});
+
+    console.addCommand(new ConsoleCmd{"unload_script", [&](std::vector<std::string> args) {
+        if (args.size() == 1) {
+            std::string &file = args[0];
+
+            if (scriptVms.find(file) != scriptVms.end()) {
+                scriptVms.erase(scriptVms.find(file));
+            } else {
+                console.addError(file +" is not loaded");
+            }
+        } else {
+            console.addError("Usage: unload_script [loaded script file]");
+        }
+    }});
+
+
     SDL_Surface *screen = SDL_GetVideoSurface();
     limitter frameLimitter{[&] {
-        runner->tick();
+        for (auto &vm : scriptVms) {
+            vm.second->tick();
+        }
         gbInst.tick();
         console.draw(screen);
-        SDL_Flip(SDL_GetVideoSurface());
+        SDL_Flip(screen);
     }};
 
 
     while (!endGame) {
         while (SDL_PollEvent(&e)) {
-            if (!console.isOpen())
-            {
+            if (!console.isOpen()) {
                 gp_source.update_pad_state(e);
             }
 
@@ -206,46 +350,26 @@ int main(int argc, char *argv[]) {
                 endGame = true;
             } else if (e.type == SDL_KEYDOWN) {
                 auto sym = e.key.keysym.sym;
-                if (console.isOpen())
-                {
-                    if (sym == SDLK_BACKQUOTE)
-                    {
+                if (console.isOpen()) {
+                    if (sym == SDLK_BACKQUOTE) {
                         console.close();
+                    } else {
+                        console.update(sym, e.key.keysym.mod);
                     }
-                    else {
-                        console.update(sym);
-                    }
-                }
-                else {
-                    if (sym == SDLK_BACKQUOTE)
-                    {
+                } else {
+                    if (sym == SDLK_BACKQUOTE) {
                         console.open();
                         gp_source.reset_pad();
-                    }
-                    else if (sym == SDLK_F1) {
-                        searchAddress8bit(render, gbInst, search_value, last_result);
-                    } else if (sym == SDLK_F2) {
-                        searchAddress16bit(render, gbInst, search_value, last_result);
-                    } else if (sym == SDLK_F3) {
-                        searchAddress32bit(render, gbInst, search_value, last_result);
                     } else if (sym == SDLK_F5) {
                         saveState(render, gbInst, romFile);
                     } else if (sym == SDLK_F7) {
                         loadState(render, gbInst, romFile);
-                    } else if (sym == SDLK_F10) {
-                        runner = new wren_macro_runner{context};
-                        runner->loadScript(file_buffer{"script.wren"});
                     } else if (sym == SDLK_ESCAPE) {
                         endGame = true;
                     } else if (sym == SDLK_SPACE) {
-                        runner->activate();
-                    } else if (sym >= SDLK_0 && sym <= SDLK_9) {
-                        search_value *= 10;
-                        search_value += (sym - SDLK_0);
-                        std::cout << "Search value: " << search_value << std::endl;
-                    } else if (sym == SDLK_BACKSPACE) {
-                        search_value /= 10;
-                        std::cout << "Search value: " << search_value << std::endl;
+                        for (auto &vm : scriptVms) {
+                            vm.second->activate();
+                        }
                     } else if (sym == SDLK_TAB) {
                         fast_forward = !fast_forward;
                         if (fast_forward) {
@@ -260,7 +384,7 @@ int main(int argc, char *argv[]) {
         frameLimitter.limit();
     }
 
-    gbInst.save_sram([&](uint8_t *sramData, uint32_t len){
+    gbInst.save_sram([&](uint8_t *sramData, uint32_t len) {
         romFile.writeSram(sramData, len);
     });
 
@@ -281,48 +405,12 @@ void fastForwardSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimi
     frameLimitter.fast();
 }
 
-void searchAddress32bit(sdl_renderer &render, gameboy &gbInst, uint32_t search_value, address_scan_result &last_result) {
-    address_scan_result result = gbInst.scan_for_address(search_value);
-
-    displaySearchResults(render, last_result, result);
-}
-
-void searchAddress16bit(sdl_renderer &render, gameboy &gbInst, uint32_t search_value, address_scan_result &last_result) {
-    address_scan_result result = gbInst.scan_for_address((uint16_t) search_value);
-
-    displaySearchResults(render, last_result, result);
-}
-
-void searchAddress8bit(sdl_renderer &render, gameboy &gbInst, uint32_t search_value, address_scan_result &last_result) {
-    address_scan_result result = gbInst.scan_for_address((uint8_t) search_value);
-
-    displaySearchResults(render, last_result, result);
-}
-
-void displaySearchResults(sdl_renderer &render, address_scan_result &last_result, address_scan_result &result) {
-    if (last_result.size() > 1) {
-        result = last_result.mutual_set(result);
-    }
-
-    last_result = result;
-
-    render.display_message("Found results: " + to_string(result.size()), 5000);
-    if (result.size() <= 3)
-    {
-        std::stringstream s;
-        for(int i = 0; i < result.size(); i++) {
-            s << "Result: " << std::hex << result[i] << std::endl;
-        }
-        render.display_message(s.str(), 10000);
-    }
-}
-
 void saveState(sdl_renderer &render, gameboy &gbInst, RomFile &romFile) {
     memory_buffer buffer;
     gbInst.save_state([&](uint32_t length) {
-                        buffer.alloc(length);
-                        return (uint8_t*)buffer;
-                    });
+        buffer.alloc(length);
+        return (uint8_t *) buffer;
+    });
     romFile.writeState(buffer, buffer.length());
 
     render.display_message("State saved", 2000);
