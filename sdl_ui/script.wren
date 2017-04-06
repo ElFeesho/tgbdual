@@ -19,6 +19,7 @@ class Pokemon {
         _addressShift = (0x30*(_rosterPosition-1))
         _x = x
         _y = y
+        _itemList = [ "(none)", "Master Ball", "Ultra Ball", "BrightPowder", "Great Ball", "Poké Ball", "Teru-sama", "Bicycle", "Moon Stone", "Antidote", "Burn Heal", "Ice Heal", "Awakening", "Parlyz Heal", "Full Restore", "Max Potion", "Hyper Potion", "Super Potion", "Potion", "Escape Rope", "Repel", "Max Elixer", "Fire Stone", "Thunder Stone", "Water Stone", "Teru-sama", "HP Up", "Protein", "Iron", "Carbos", "Lucky Punch", "Calcium", "Rare Candy", "X Accuracy", "Leaf Stone", "Metal Powder", "Nugget", "Poké Doll", "Full Heal", "Revive", "Max Revive", "Guard Spec.", "Super Repel", "Max Repel", "Dire Hit", "Teru-sama", "Fresh Water", "Soda Pop", "Lemonade", "X Attack", "Teru-sama", "X Defend", "X Speed", "X Special", "Coin Case", "Itemfinder", "Teru-sama", "Exp Share", "Old Rod", "Good Rod", "Silver Leaf", "Super Rod", "PP Up", "Ether", "Max Ether", "Elixer", "Red Scale", "SecretPotion", "S.S. Ticket", "Mystery Egg", "Clear Bell*", "Silver Wing", "Moomoo Milk", "Quick Claw", "PSNCureBerry", "Gold Leaf", "Soft Sand", "Sharp Beak", "PRZCureBerry", "Burnt Berry", "Ice Berry", "Poison Barb", "King's Rock", "Bitter Berry", "Mint Berry", "Red Apricorn", "TinyMushroom", "Big Mushroom", "SilverPowder", "Blu Apricorn", "Teru-sama", "Amulet Coin", "Ylw Apricorn", "Grn Apricorn", "Cleanse Tag", "Mystic Water", "TwistedSpoon", "Wht Apricorn", "Black Belt", "Blk Apricorn", "Teru-sama", "Pnk Apricorn", "BlackGlasses", "SlowpokeTail", "Pink Bow", "Stick", "Smoke Ball", "NeverMeltIce", "Magnet", "MiracleBerry", "Pearl", "Big Pearl", "Everstone", "Spell Tag", "RageCandyBar", "GS Ball*", "Blue Card*", "Miracle Seed", "Thick Club", "Focus Band", "Teru-sama", "EnergyPowder", "Energy Root", "Heal Powder", "Revival Herb", "Hard Stone", "Lucky Egg", "Card Key", "Machine Part", "Egg Ticket*", "Lost Item", "Stardust", "Star Piece", "Basement Key", "Pass", "3Teru-sama", "Charcoal", "Berry Juice", "Scope Lens", "2Teru-sama", "Metal Coat", "Dragon Fang", "Teru-sama", "Leftovers", "3Teru-sama", "MysteryBerry", "Dragon Scale", "Berserk Gene", "3Teru-sama", "Sacred Ash", "Heavy Ball", "Flower Mail", "Level Ball", "Lure Ball", "Fast Ball", "Teru-sama", "Light Ball", "Friend Ball", "Moon Ball", "Love Ball", "Normal Box", "Gorgeous Box", "Sun Stone", "Polkadot Bow", "Teru-sama", "Up-Grade", "Berry", "Gold Berry", "SquirtBottle", "Teru-sama", "Park Ball", "Rainbow Wing", "Teru-sama", "Brick Piece", "Surf Mail", "Litebluemail", "Portraitmail", "Lovely Mail", "Eon Mail", "Morph Mail", "Bluesky Mail", "Music Mail", "Mirage Mail", "Teru-sama", "TM01", "TM02", "TM03", "TM04", "TM05", "TM06", "TM07", "TM08", "TM09", "TM10", "TM11", "TM12", "TM13", "TM14", "TM15", "TM16", "TM17", "TM18", "TM19", "TM20", "TM21", "TM22", "TM23", "TM24", "TM25", "TM26", "TM27", "TM28", "TM29", "TM30", "TM31", "TM32", "TM33", "TM34", "TM35", "TM36", "TM37", "TM38", "TM39", "TM40", "TM41", "TM42", "TM43", "TM44", "TM45", "TM46", "TM47", "TM48", "TM49", "TM50", "HM01", "HM02", "HM03", "HM04", "HM05", "HM06", "HM07", "HM08", "HM09", "HM10", "HM11", "HM12" ]
     }
 
     read16bit(address) {
@@ -44,6 +45,7 @@ class Pokemon {
     rosterPosition { _rosterPosition }
 
     item { GameBoy.get8bit(0x1ce0 + _addressShift) }
+    item=(num) { GameBoy.set8bit(0x1ce0 + _addressShift, num) }
 
     pokemonNumber { GameBoy.get8bit(0x1cd8+(_rosterPosition-1)) }
 
@@ -60,19 +62,13 @@ class Pokemon {
         if (isPresent) {
             GameBoy.addRect(_x, _y, 100, 100, 0xffffffff, 0xff666666)
             GameBoy.addText("Lv %(level)", _x + 50, _y + 20)
-            GameBoy.addText("Exp. %(experience)", _x + 10, _y + 35)
+            GameBoy.addText("XP %(experience)", _x + 10, _y + 75)
             GameBoy.addRect(_x + 10, _y + 40, 80, 10, 0xff000000, 0xff333333)
             GameBoy.addRect(_x + 12, _y + 42, 76 * (hp/hpMax), 6, 0x00000000, 0xff00ff00)
 
             GameBoy.addImage("imgs/%(pokemonNumber).png", _x+5, _y+5)
 
-            GameBoy.addText("%(move(0)): %(pp(0))", _x + 5, _y + 55)
-            GameBoy.addText("%(move(1)): %(pp(1))", _x + 5, _y + 65)
-            GameBoy.addText("%(move(2)): %(pp(2))", _x + 5, _y + 75)
-            GameBoy.addText("%(move(3)): %(pp(3))", _x + 5, _y + 85)
-            GameBoy.addText("OT: %(originalTrainer)", _x + 5, _y + 95)
-
-            GameBoy.addText("%(item)", _x + 75, _y + 55)
+            GameBoy.addText("Item: %(_itemList[item])", _x + 10, _y + 60)
         }
     }
 }
@@ -144,10 +140,10 @@ var activate = Fn.new {
 //    GameBoy.set8bit(0x110e, poke)
 //    GameBoy.set8bit(0x1cd8, poke)
 //    GameBoy.set8bit(0x1cdf, poke)
-    var offset = 0
-    GameBoy.print("Begin Dump")
-    (0..0x36).each { |num| GameBoy.print("%(dec2hex.call(0x1cd8+num)): %(GameBoy.get8bit(0x1cd8+num)) 0x%(dec2hex.call(GameBoy.get8bit(0x1cd8+num)))") }
-    GameBoy.print("Dump Complete")
+    //var offset = 0
+    //GameBoy.print("Begin Dump")
+    //(0..0x36).each { |num| GameBoy.print("%(dec2hex.call(0x1cd8+num)): %(GameBoy.get8bit(0x1cd8+num)) 0x%(dec2hex.call(GameBoy.get8bit(0x1cd8+num)))") }
+    //GameBoy.print("Dump Complete")
 
-    GameBoy.set8bit(0x1cec, 0xff)
+    pokemon.item = 1
 }

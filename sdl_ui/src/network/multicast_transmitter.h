@@ -1,3 +1,6 @@
+#include <string>
+#include <functional>
+
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <stdio.h>

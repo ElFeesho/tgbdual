@@ -38,7 +38,7 @@ set(SDL_UI_SOURCES
         src/scripting/lua_macro_runner.cpp
         src/scripting/lua_macro_runner.h
         src/scripting/wren_macro_runner.cpp
-        src/scripting/wren_macro_runner.h src/console/ConsoleCmd.cpp src/console/ConsoleCmd.h)
+        src/scripting/wren_macro_runner.h src/console/ConsoleCmd.cpp src/console/ConsoleCmd.h src/link_cable_source_provider.cpp src/link_cable_source_provider.h)
 
 find_package(SDL)
 

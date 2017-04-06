@@ -27,8 +27,6 @@
 #include <map>
 #include <memory>
 
-using namespace std;
-
 class sdl_renderer : public renderer, public osd_renderer {
 public:
 	using surf_ptr = std::unique_ptr<SDL_Surface, void(*)(SDL_Surface*)>;
@@ -45,13 +43,10 @@ public:
 
 	virtual void add_text(const std::string &text, int16_t x, int16_t y) override;
 
-	virtual void clear_canvas() override;
-
 	virtual void add_image(const osd_image &image) override;
 
 private:
 	void init_sdlvideo();
-
 	void init_sdlaudio();
 
 	SDL_Surface *lookupImage(const std::string &image_name);
@@ -64,7 +59,7 @@ private:
 
 	std::map<std::string, SDL_Surface*> image_cache;
 
-    void drawText(const string &message, Sint16 x, Sint16 y) const;
+    void drawText(const std::string &message, Sint16 x, Sint16 y) const;
 
 	void drawRect(uint32_t colour, uint32_t fillColour, int16_t x, int16_t y, uint16_t width, uint16_t height) const;
 

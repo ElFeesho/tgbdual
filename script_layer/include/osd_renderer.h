@@ -47,6 +47,5 @@ public:
 	virtual void display_message(const std::string &msg, uint64_t duration) = 0;
 	virtual void add_rect(const osd_rect &rect) = 0;
 	virtual void add_image(const osd_image &image) = 0;
-	virtual void clear_canvas() = 0;
 	virtual void add_text(const std::string &text, int16_t x, int16_t y) = 0;
 };

@@ -17,95 +17,62 @@
    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#include <SDL.h>
-#include <iostream>
-#include <getopt.h>
+#include <SDL/SDL.h>
 
-#include <sys/stat.h>
+#include <iostream>
+#include <fstream>
 #include <vector>
 
+#include <getopt.h>
+
 #include <gameboy.h>
+
+#include "network/tcp_client.h"
+#include "network/tcp_server.h"
+#include "network/null_link_source.h"
+#include "network/multicast_transmitter.h"
+
+#include "scripting/wren_macro_runner.h"
+#include "scripting/lua_macro_runner.h"
+
+#include "console/Console.h"
 
 #include "io/file_buffer.h"
 #include "io/memory_buffer.h"
 
-#include <fstream>
-
 #include "sdl_renderer.h"
 
-#include "network/null_link_source.h"
-
-#include "network/multicast_transmitter.h"
-
-#include <network/tcp_client.h>
-#include <network/tcp_server.h>
-#include <scripting/wren_macro_runner.h>
-#include <console/Console.h>
-
 #include "input/sdl_gamepad_source.h"
-#include "scripting/lua_macro_runner.h"
 #include "limitter.h"
 
 #include "RomFile.h"
 
-link_cable_source *processArguments(int *argc, char ***argv) {
-    int option = 0;
-    link_cable_source *selected_cable_source = new null_link_source();
-    while ((option = getopt(*argc, *argv, "smc:")) != -1) {
-        switch (option) {
-            case 's': {
-                selected_cable_source = new tcp_server();
-                break;
-            }
-            case 'm': {
-                cout << "Broadcasting availability as client" << endl;
-                multicast_transmitter mc_transmitter{"239.0.10.0", 1337};
-                mc_transmitter.transcieve([&](std::string addr) {
-                    std::cout << "Should connect to " << addr << std::endl;
-                    selected_cable_source = new tcp_client(addr);
-                });
-                break;
-            }
-            case 'c': {
-                selected_cable_source = new tcp_client(optarg);
-                break;
-            }
-            default:
-            case '?': {
-                if (optopt == 'c') {
-                    cerr << "Target address must be passed in with -c" << endl;
-                } else {
-                    cerr << "Unknown option " << optopt << endl;
-                }
-                break;
-            }
-        }
-    }
+#include "link_cable_source_provider.h"
 
-    (*argc) -= optind;
-    (*argv) += optind;
-
-    return selected_cable_source;
-}
 
 void loadState(sdl_renderer &render, gameboy &gbInst, RomFile &stateFile);
+
 void saveState(sdl_renderer &render, gameboy &gbInst, RomFile &rom);
 
 void fastForwardSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimitter);
+
 void normalSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimitter);
+
+void printScanResults(address_scan_result result, Console &console, address_scan_result &last_result, int scanThreshold)
+;
 
 int main(int argc, char *argv[]) {
 
     if (argc == 1) {
-        cerr << "Usage: " << argv[0] << " rom [-s|-m|-c client-address]" << endl;
+        std::cerr << "Usage: " << argv[0] << " rom [-s|-m|-c client-address]" << std::endl;
         return 0;
     }
 
     sdl_renderer render;
     sdl_gamepad_source gp_source;
-    link_cable_source *cable_source = processArguments(&argc, &argv);
+    std::unique_ptr<link_cable_source> cable_source{provideLinkCableSource(&argc, &argv)};
 
-    gameboy gbInst{&render, &gp_source, cable_source};
+    gameboy gbInst{&render, &gp_source, cable_source.get()};
 
     script_context context{&render, &gp_source, &gbInst};
 
@@ -116,7 +83,6 @@ int main(int argc, char *argv[]) {
 
     gbInst.load_rom(romBuffer, romBuffer.length(), saveBuffer, saveBuffer.length());
 
-    SDL_Event e;
     bool endGame = false;
     bool fast_forward = false;
     Console console;
@@ -124,8 +90,7 @@ int main(int argc, char *argv[]) {
     console.addCommand(new ConsoleCmd{"poke", [&](std::vector<std::string> args) {
         if (args.size() == 2) {
             gbInst.override_ram(ConsoleCmd::toInt<uint32_t>(args[0]), (uint8_t) ConsoleCmd::toInt<uint8_t>(args[1]));
-        }
-        else {
+        } else {
             console.addError("Usage: poke [address] [value]");
         }
     }});
@@ -142,52 +107,15 @@ int main(int argc, char *argv[]) {
         int value = ConsoleCmd::toInt<int>(args[0]);
 
         if (value <= 255) {
-            address_scan_result result = gbInst.scan_for_address((uint8_t) value);
-            if (last_result.size() > 1) {
-                result = last_result.mutual_set(result);
-            }
-            last_result = result;
-            console.addOutput("Found " + std::to_string((int) result.size()) + " results");
-            if (result.size() <= scanThreshold) {
-                for (int i = 0; i < result.size(); i++) {
-                    std::stringstream s;
-                    s << std::hex << result[i];
-                    console.addOutput(std::to_string(i + 1) + ": 0x" + s.str());
-                }
-            }
+            printScanResults(gbInst.scan_for_address((uint8_t) value), console, last_result, scanThreshold);
         } else if (value <= (0x1 << 16)) {
-            address_scan_result result = gbInst.scan_for_address((uint16_t) value);
-            if (last_result.size() > 1) {
-                result = last_result.mutual_set(result);
-            }
-            last_result = result;
-            console.addOutput("Found " + std::to_string((int) result.size()) + " results");
-            if (result.size() <= scanThreshold) {
-                for (int i = 0; i < result.size(); i++) {
-                    std::stringstream s;
-                    s << std::hex << result[i];
-                    console.addOutput(std::to_string(i + 1) + ": 0x" + s.str());
-                }
-            }
+            printScanResults(gbInst.scan_for_address((uint16_t) value), console, last_result, scanThreshold);
         } else if (value <= (0x1 << 31)) {
-            address_scan_result result = gbInst.scan_for_address((uint32_t) value);
-            if (last_result.size() > 1) {
-                result = last_result.mutual_set(result);
-            }
-            last_result = result;
-            console.addOutput("Found " + std::to_string((int) result.size()) + " results");
-            if (result.size() <= scanThreshold) {
-                for (int i = 0; i < result.size(); i++) {
-                    std::stringstream s;
-                    s << std::hex << result[i];
-                    console.addOutput(std::to_string(i + 1) + ": 0x" + s.str());
-                }
-            }
+            printScanResults(gbInst.scan_for_address((uint32_t) value), console, last_result, scanThreshold);
         }
     }});
 
     console.addCommand(new ConsoleCmd{"scan_threshold", [&](std::vector<std::string> args) {
-
         if (args.size() == 0) {
             console.addOutput("Scan threshold: " + std::to_string(scanThreshold));
         } else {
@@ -267,21 +195,22 @@ int main(int argc, char *argv[]) {
         SDL_Flip(screen);
     }};
 
+    SDL_Event event;
     while (!endGame) {
-        while (SDL_PollEvent(&e)) {
+        while (SDL_PollEvent(&event)) {
             if (!console.isOpen()) {
-                gp_source.update_pad_state(e);
+                gp_source.update_pad_state(event);
             }
 
-            if (e.type == SDL_QUIT) {
+            if (event.type == SDL_QUIT) {
                 endGame = true;
-            } else if (e.type == SDL_KEYDOWN) {
-                auto sym = e.key.keysym.sym;
+            } else if (event.type == SDL_KEYDOWN) {
+                auto sym = event.key.keysym.sym;
                 if (console.isOpen()) {
                     if (sym == SDLK_BACKQUOTE) {
                         console.close();
                     } else {
-                        console.update(sym, e.key.keysym.mod);
+                        console.update(sym, event.key.keysym.mod);
                     }
                 } else {
                     if (sym == SDLK_BACKQUOTE) {
@@ -346,4 +275,20 @@ void saveState(sdl_renderer &render, gameboy &gbInst, RomFile &romFile) {
 void loadState(sdl_renderer &render, gameboy &gbInst, RomFile &romFile) {
     gbInst.load_state(romFile.state());
     render.display_message("State loaded", 2000);
+}
+
+void printScanResults(address_scan_result result, Console &console, address_scan_result &last_result, int scanThreshold)
+{
+    if (last_result.size() > 1) {
+        result = last_result.mutual_set(result);
+    }
+    last_result = result;
+    console.addOutput("Found " + std::to_string((int) result.size()) + " results");
+    if (result.size() <= scanThreshold) {
+        for (int i = 0; i < result.size(); i++) {
+            std::stringstream s;
+            s << std::hex << result[i];
+            console.addOutput(std::to_string(i + 1) + ": 0x" + s.str());
+        }
+    }
 }

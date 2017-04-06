@@ -76,12 +76,6 @@ lua_macro_runner::lua_macro_runner(script_context &scriptContext) : state{luaL_n
 		return 0;
 	});
 
-    bindFunction("clear_canvas", [](lua_State *state) -> int {
-        script_context *ctx = contexts[state];
-        ctx->clear_canvas();
-        return 0;
-    });
-
     bindFunction("queue_key", [](lua_State *state) -> int {
 		script_context *ctx = contexts[state];
 		uint8_t key = (uint8_t)lua_tointegerx(state, 1, nullptr);

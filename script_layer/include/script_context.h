@@ -20,7 +20,6 @@ public:
 	void add_image(const std::string &name, int16_t x, int16_t y);
 	void add_rect(int16_t x, int16_t y, int16_t w, int16_t h, uint32_t stroke, uint32_t fill);
 	void add_text(const std::string& message, int16_t x, int16_t y);
-	void clear_canvas();
 	void queue_key(uint8_t key, uint32_t when, uint32_t duration);
 
 private:

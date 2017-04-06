@@ -138,12 +138,6 @@ WrenForeignMethodFn boundFunction(std::string name, std::string signature) {
                                            (uint32_t) wrenGetSlotDouble(wrenVm, 6));
             };
         }
-        else if(signature == "clearCanvas()")
-        {
-            return [](WrenVM *wrenVm) {
-                contexts[wrenVm]->clear_canvas();
-            };
-        }
         else if(signature == "queueKey(_,_,_)")
         {
             return [](WrenVM *wrenVm) {

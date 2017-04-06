@@ -27,14 +27,21 @@
 #include <SDL_gfxPrimitives.h>
 #include <SDL_image.h>
 
-#include <algorithm>
-
 const uint16_t WIN_MULTIPLIER = 2;
 
 static inline Uint32 getpixel(SDL_Surface *surface, int x, int y) {
     uint8_t *p = (uint8_t *) surface->pixels + y * surface->pitch + x * surface->format->BytesPerPixel;
     return *(Uint16 *) p;
 }
+
+static inline uint8_t red(uint32_t colour) { return (uint8_t) (colour & 0x000000ff); }
+
+static inline uint8_t green(uint32_t colour) { return (uint8_t) ((colour & 0x0000ff00) >> 8); }
+
+static inline uint8_t blue(uint32_t colour) { return (uint8_t) ((colour & 0x00ff0000) >> 16); }
+
+static inline uint8_t alpha(uint32_t colour) { return (uint8_t) ((colour & 0xff000000) >> 24); }
+
 
 sdl_renderer::sdl_renderer() {
 
@@ -51,7 +58,7 @@ void sdl_renderer::init_sdlvideo() {
     int h = GB_H * WIN_MULTIPLIER;
     uint32_t flags = SDL_SWSURFACE;
 
-    dpy = surf_ptr(SDL_SetVideoMode(w+200, h+200, 16, flags), [](SDL_Surface *) {});
+    dpy = surf_ptr(SDL_SetVideoMode(w + 200, h + 200, 16, flags), [](SDL_Surface *) {});
     scr = surf_ptr(SDL_CreateRGBSurface(SDL_SWSURFACE, GB_W, GB_H, 16, 0, 0, 0, 0), SDL_FreeSurface);
     SDL_FillRect(dpy.get(), nullptr, 0x00000000);
 }
@@ -69,27 +76,24 @@ void sdl_renderer::render_screen(uint8_t *buf, int width, int height, int depth)
         for (int x = 0; x < 160; x++) {
             Uint32 colour = getpixel(scr.get(), x, y);
             loc.x = (Sint16) (100 + (x * WIN_MULTIPLIER));
-            loc.y = (Sint16) (y * WIN_MULTIPLIER);
+            loc.y = (Sint16) (100 + (y * WIN_MULTIPLIER));
             SDL_FillRect(dpy.get(), &loc, colour);
         }
     }
 
-    for (auto &op : pending_operations)
-    {
+    for (auto &op : pending_operations) {
         op();
     }
 
     pending_operations.clear();
 
     renderOSDMessages();
-
-    //SDL_UpdateRect(dpy.get(), 0, 0, 0, 0);
 }
 
 void sdl_renderer::renderOSDMessages() {
     int16_t msg_number = 0;
     for (auto &osd_msg : osd_messages) {
-        string message = get<1>(osd_msg);
+        std::string message = std::get<1>(osd_msg);
 
         Sint16 y = (Sint16) (11 + msg_number * 20);
         Sint16 x = 11;
@@ -99,35 +103,35 @@ void sdl_renderer::renderOSDMessages() {
     }
 
     osd_messages.erase(
-            remove_if(osd_messages.begin(), osd_messages.end(), [](tuple<uint64_t, string> msg) -> bool {
-                return SDL_GetTicks() > get<0>(msg);
+            remove_if(osd_messages.begin(), osd_messages.end(), [](std::tuple<uint64_t, std::string> msg) -> bool {
+                return SDL_GetTicks() > std::get<0>(msg);
             }), osd_messages.end());
 }
 
 void
-sdl_renderer::drawRect(uint32_t colour, uint32_t fillColour, int16_t x, int16_t y, uint16_t width, uint16_t height) const {
-    uint8_t a = (uint8_t) ((colour & 0xff000000) >> 24);
-    uint8_t b = (uint8_t) ((colour & 0x00ff0000) >> 16);
-    uint8_t g = (uint8_t) ((colour & 0x0000ff00) >> 8);
-    uint8_t r = (uint8_t) (colour & 0x000000ff);
+sdl_renderer::drawRect(uint32_t colour, uint32_t fillColour, int16_t x, int16_t y, uint16_t width,
+                       uint16_t height) const {
+    uint8_t a = alpha(colour);
+    uint8_t b = blue(colour);
+    uint8_t g = green(colour);
+    uint8_t r = red(colour);
 
-    uint8_t fillAlpha = (uint8_t) ((fillColour & 0xff000000) >> 24);
-    uint8_t fillBlue = (uint8_t) ((fillColour & 0x00ff0000) >> 16);
-    uint8_t fillGreen = (uint8_t) ((fillColour & 0x0000ff00) >> 8);
-    uint8_t fillRed = (uint8_t) (fillColour & 0x000000ff);
+    uint8_t fillAlpha = alpha(fillColour);
+    uint8_t fillBlue = blue(fillColour);
+    uint8_t fillGreen = green(fillColour);
+    uint8_t fillRed = red(fillColour);
 
-    int16_t x1 = x;
-    int16_t x2 = x1 + width;
-    int16_t y1 = y;
-    int16_t y2 = y1 + height;
+    int16_t x2 = x + width;
+    int16_t y2 = y + height;
 
-    int16_t xpoints[] = {x1, x2, x2, x1};
-    int16_t ypoints[] = {y1, y1, y2, y2};
+    int16_t xpoints[] = {x, x2, x2, x};
+    int16_t ypoints[] = {y, y, y2, y2};
+
     filledPolygonRGBA(dpy.get(), xpoints, ypoints, 4, fillRed, fillGreen, fillBlue, fillAlpha);
     aapolygonRGBA(dpy.get(), xpoints, ypoints, 4, r, g, b, a);
 }
 
-void sdl_renderer::drawText(const string &message, Sint16 x, Sint16 y) const {
+void sdl_renderer::drawText(const std::string &message, Sint16 x, Sint16 y) const {
     stringRGBA(dpy.get(), x, y, message.c_str(), 0, 0, 0, 128);
     stringRGBA(dpy.get(), (Sint16) (x - 1), (Sint16) (y - 1), message.c_str(), 255, 255, 255, 255);
 }
@@ -143,7 +147,7 @@ namespace {
 }
 
 void sdl_renderer::init_sdlaudio() {
-    SDL_AudioSpec wanted = { 0 };
+    SDL_AudioSpec wanted = {0};
 
     wanted.freq = 44100;
     wanted.format = AUDIO_S16;
@@ -160,12 +164,12 @@ void sdl_renderer::init_sdlaudio() {
 }
 
 void sdl_renderer::display_message(const std::string &msg, uint64_t duration) {
-    std::cout << "MSG: " << msg << std::endl;
+    std::cout << msg << std::endl;
     osd_messages.emplace_back(std::tuple<uint64_t, std::string>{SDL_GetTicks() + duration, msg});
 }
 
 void sdl_renderer::add_rect(const osd_rect &rect) {
-    pending_operations.push_back([=]{
+    pending_operations.push_back([=] {
         uint32_t colour = rect.stroke();
         uint32_t fillColour = rect.fill();
         int16_t x = rect.x();
@@ -177,11 +181,8 @@ void sdl_renderer::add_rect(const osd_rect &rect) {
     });
 }
 
-void sdl_renderer::clear_canvas() {
-}
-
 void sdl_renderer::add_image(const osd_image &image) {
-    pending_operations.push_back([=]{
+    pending_operations.push_back([=] {
         SDL_Surface *src = lookupImage(image.name());
         if (src) {
             SDL_Rect pos = {image.x(), image.y(), (uint16_t) src->w, (uint16_t) src->h};
@@ -190,7 +191,7 @@ void sdl_renderer::add_image(const osd_image &image) {
     });
 }
 
-SDL_Surface *sdl_renderer::lookupImage(const string &name) {
+SDL_Surface *sdl_renderer::lookupImage(const std::string &name) {
     if (image_cache.find(name) == image_cache.end()) {
         SDL_Surface *icon = IMG_Load(name.c_str());
         if (icon != nullptr) {
@@ -202,8 +203,8 @@ SDL_Surface *sdl_renderer::lookupImage(const string &name) {
 
 sound_renderer *sdl_renderer::get_sound_renderer() { return snd_render; }
 
-void sdl_renderer::add_text(const string &text, int16_t x, int16_t y) {
-    pending_operations.push_back([=]{
+void sdl_renderer::add_text(const std::string &text, int16_t x, int16_t y) {
+    pending_operations.push_back([=] {
         drawText(text, x, y);
     });
 }
