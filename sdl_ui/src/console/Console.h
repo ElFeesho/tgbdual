@@ -12,8 +12,6 @@
 
 class Console {
 public:
-    Console();
-
     void open();
     void update(SDLKey param, SDLMod mod);
     void close();

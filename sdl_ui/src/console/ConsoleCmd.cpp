@@ -57,9 +57,3 @@ int ConsoleCmd::fromDec(const std::string &input) {
     return output;
 }
 
-int ConsoleCmd::toInt(const std::string &input) {
-    if (input.find("0x") == 0) {
-        return fromHex(input);
-    }
-    return fromDec(input);
-}

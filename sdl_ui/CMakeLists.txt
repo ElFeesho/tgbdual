@@ -31,6 +31,8 @@ set(SDL_UI_SOURCES
         src/sdlmain.cpp
         src/input/input_source.h
         src/json.hpp
+        src/RomFile.cpp
+        src/RomFile.h
         src/console/Console.cpp
         src/console/Console.h
         src/scripting/lua_macro_runner.cpp

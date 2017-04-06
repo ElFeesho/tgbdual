@@ -6,10 +6,6 @@
 #include <SDL/SDL_gfxPrimitives.h>
 #include <iostream>
 
-Console::Console() {
-
-}
-
 void Console::open() {
     _open = true;
 }
@@ -84,13 +80,12 @@ void Console::update(SDLKey key, SDLMod mod) {
             if (pair.first.find(_currentLine) == 0) {
                 if (replacement == "")
                 {
-                    replacement = pair.first;
+                    replacement = pair.first + " ";
                 }
                 else if(pair.first.length() < replacement.length())
                 {
-                    replacement = pair.first;
+                    replacement = pair.first + " ";
                 }
-
             }
         }
 

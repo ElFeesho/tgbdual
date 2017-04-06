@@ -46,6 +46,8 @@
 #include "scripting/lua_macro_runner.h"
 #include "limitter.h"
 
+#include "RomFile.h"
+
 link_cable_source *processArguments(int *argc, char ***argv) {
     int option = 0;
     link_cable_source *selected_cable_source = new null_link_source();
@@ -53,8 +55,8 @@ link_cable_source *processArguments(int *argc, char ***argv) {
         switch (option) {
             case 's': {
                 selected_cable_source = new tcp_server();
-            }
                 break;
+            }
             case 'm': {
                 cout << "Broadcasting availability as client" << endl;
                 multicast_transmitter mc_transmitter{"239.0.10.0", 1337};
@@ -62,19 +64,21 @@ link_cable_source *processArguments(int *argc, char ***argv) {
                     std::cout << "Should connect to " << addr << std::endl;
                     selected_cable_source = new tcp_client(addr);
                 });
-            }
                 break;
-            case 'c':
+            }
+            case 'c': {
                 selected_cable_source = new tcp_client(optarg);
                 break;
+            }
             default:
-            case '?':
+            case '?': {
                 if (optopt == 'c') {
                     cerr << "Target address must be passed in with -c" << endl;
                 } else {
                     cerr << "Unknown option " << optopt << endl;
                 }
                 break;
+            }
         }
     }
 
@@ -84,87 +88,11 @@ link_cable_source *processArguments(int *argc, char ***argv) {
     return selected_cable_source;
 }
 
-class RomFile {
-public:
-    RomFile(const std::string &romPath);
-
-    file_buffer &rom();
-
-    file_buffer &sram();
-
-    file_buffer &state();
-
-    void writeSram(uint8_t *sramData, uint32_t length);
-
-    void writeState(uint8_t *stateData, uint32_t length);
-
-private:
-    std::string _romPath;
-    std::string _sramPath;
-    std::string _statePath;
-
-    file_buffer _romBuffer;
-    file_buffer _sramBuffer;
-    file_buffer _stateBuffer;
-};
-
-RomFile::RomFile(const std::string &romPath) :
-        _romPath{romPath},
-        _sramPath{romPath.substr(0, romPath.find_last_of(".")) + ".sav"},
-        _statePath{romPath.substr(0, romPath.find_last_of(".")) + ".sv0"},
-        _romBuffer{_romPath},
-        _sramBuffer{_sramPath},
-        _stateBuffer{_statePath} {
-    struct stat st;
-    if (stat(_romPath.c_str(), &st) != 0) {
-        throw std::domain_error("Failed to open rom: " + _romPath);
-    }
-}
-
-file_buffer &RomFile::rom() {
-    return _romBuffer;
-}
-
-file_buffer &RomFile::sram() {
-    return _sramBuffer;
-}
-
-file_buffer &RomFile::state() {
-    return _stateBuffer;
-}
-
-void RomFile::writeSram(uint8_t *sramData, uint32_t length) {
-    std::fstream sram{_sramPath, std::ios::out};
-    sram.write((const char *) sramData, length);
-    sram.close();
-
-    _sramBuffer = file_buffer{_sramPath};
-}
-
-void RomFile::writeState(uint8_t *stateData, uint32_t length) {
-    std::fstream state{_statePath, std::ios::out};
-    state.write((const char *) stateData, length);
-    state.close();
-
-    _stateBuffer = file_buffer{_statePath};
-}
-
 void loadState(sdl_renderer &render, gameboy &gbInst, RomFile &stateFile);
-
 void saveState(sdl_renderer &render, gameboy &gbInst, RomFile &rom);
 
-void searchAddress8bit(sdl_renderer &render, gameboy &gbInst, uint32_t search_value, address_scan_result &last_result);
-
-void searchAddress16bit(sdl_renderer &render, gameboy &gbInst, uint32_t search_value, address_scan_result &last_result);
-
-void searchAddress32bit(sdl_renderer &render, gameboy &gbInst, uint32_t search_value, address_scan_result &last_result);
-
 void fastForwardSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimitter);
-
 void normalSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimitter);
-
-void displaySearchResults(sdl_renderer &render, address_scan_result &last_result, address_scan_result &result);
-
 
 int main(int argc, char *argv[]) {
 
@@ -194,12 +122,12 @@ int main(int argc, char *argv[]) {
     Console console;
 
     console.addCommand(new ConsoleCmd{"poke", [&](std::vector<std::string> args) {
-        uint32_t address = 0;
-        uint8_t value = 0;
-        address = ConsoleCmd::toInt(args[0]);
-        value = ConsoleCmd::toInt(args[1]);
-
-        gbInst.override_ram(address, (uint8_t) value);
+        if (args.size() == 2) {
+            gbInst.override_ram(ConsoleCmd::toInt<uint32_t>(args[0]), (uint8_t) ConsoleCmd::toInt<uint8_t>(args[1]));
+        }
+        else {
+            console.addError("Usage: poke [address] [value]");
+        }
     }});
 
     address_scan_result last_result{{}};
@@ -211,7 +139,7 @@ int main(int argc, char *argv[]) {
             return;
         }
 
-        int value = ConsoleCmd::toInt(args[0]);
+        int value = ConsoleCmd::toInt<int>(args[0]);
 
         if (value <= 255) {
             address_scan_result result = gbInst.scan_for_address((uint8_t) value);
@@ -263,7 +191,7 @@ int main(int argc, char *argv[]) {
         if (args.size() == 0) {
             console.addOutput("Scan threshold: " + std::to_string(scanThreshold));
         } else {
-            scanThreshold = ConsoleCmd::toInt(args[0]);
+            scanThreshold = ConsoleCmd::toInt<int>(args[0]);
             console.addOutput("Scan threshold now: " + std::to_string(scanThreshold));
         }
     }});
@@ -321,7 +249,7 @@ int main(int argc, char *argv[]) {
             if (scriptVms.find(file) != scriptVms.end()) {
                 scriptVms.erase(scriptVms.find(file));
             } else {
-                console.addError(file +" is not loaded");
+                console.addError(file + " is not loaded");
             }
         } else {
             console.addError("Usage: unload_script [loaded script file]");
@@ -338,7 +266,6 @@ int main(int argc, char *argv[]) {
         console.draw(screen);
         SDL_Flip(screen);
     }};
-
 
     while (!endGame) {
         while (SDL_PollEvent(&e)) {
