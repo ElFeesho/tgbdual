@@ -43,7 +43,7 @@ static inline uint8_t blue(uint32_t colour) { return (uint8_t) ((colour & 0x00ff
 static inline uint8_t alpha(uint32_t colour) { return (uint8_t) ((colour & 0xff000000) >> 24); }
 
 
-sdl_renderer::sdl_renderer() {
+sdl_renderer::sdl_renderer(render_callback renderCallback) : _renderCallback{renderCallback} {
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
@@ -88,6 +88,10 @@ void sdl_renderer::render_screen(uint8_t *buf, int width, int height, int depth)
     pending_operations.clear();
 
     renderOSDMessages();
+
+    _renderCallback();
+
+    SDL_UpdateRect(dpy.get(), 0,0, 480, 480);
 }
 
 void sdl_renderer::renderOSDMessages() {

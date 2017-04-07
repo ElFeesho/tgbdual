@@ -147,3 +147,19 @@ var activate = Fn.new {
 
     pokemon.item = 1
 }
+
+var bound = false
+var onLoad = Fn.new {
+
+}
+
+var handleCommand = Fn.new { |command,args|
+
+    GameBoy.print("HEllo?")
+    if (command == "test") {
+        GameBoy.print("TEST COMMAND %(args[0])")
+        return true
+    }
+    return false
+}
+

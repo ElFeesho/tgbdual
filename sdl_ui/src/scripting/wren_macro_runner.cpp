@@ -3,10 +3,10 @@
 //
 
 #include <wren.hpp>
+#include <wren.h>
 
 #include "wren_macro_runner.h"
 
-static std::map<WrenVM*, script_context*> contexts;
 WrenForeignMethodFn boundFunction(std::string name, std::string signature);
 void errorHandler(WrenVM *vm, WrenErrorType type, const char* module, int line, const char* message)
 {
@@ -50,10 +50,10 @@ wren_macro_runner::wren_macro_runner(script_context &context) : _wrenVm{nullptr,
 
     config.errorFn = errorHandler;
 
+    config.userData = &context;
+
     WrenVM *vm = wrenNewVM(&config);
     _wrenVm = wrenvm_holder(vm, wrenFreeVM);
-
-    contexts[_wrenVm.get()] = &context;
 }
 
 void wren_macro_runner::tick() {
@@ -68,17 +68,54 @@ void wren_macro_runner::activate() {
     wrenCall(_wrenVm.get(), wrenGetSlotHandle(_wrenVm.get(), 0));
 }
 
+
+
 void wren_macro_runner::loadScript(const std::string &scriptFile) {
     auto result = wrenInterpret(_wrenVm.get(), scriptFile.c_str());
     if (result == WREN_RESULT_COMPILE_ERROR)
     {
         std::cerr << "Failed to compile wren script" << std::endl;
-        contexts[_wrenVm.get()]->print_string("Failed to compile wren script");
+        script_context *context = (script_context *) wrenGetUserData(_wrenVm.get());
+        context->print_string("Failed to compile wren script");
     }
     else if(result == WREN_RESULT_RUNTIME_ERROR) {
         std::cerr << "Failed to execute wren script" << std::endl;
-        contexts[_wrenVm.get()]->print_string("Failed to execute wren script");
+
+        script_context *context = (script_context *) wrenGetUserData(_wrenVm.get());
+        context->print_string("Failed to execute wren script");
     }
+
+    wrenEnsureSlots(_wrenVm.get(), 1);
+    wrenGetVariable(_wrenVm.get(), "main", "onLoad", 0);
+    wrenCall(_wrenVm.get(), wrenGetSlotHandle(_wrenVm.get(), 0));
+}
+
+bool wren_macro_runner::handleUnhandledCommand(const std::string &command, std::vector<std::string> args) {
+    wrenEnsureSlots(_wrenVm.get(), 1);
+    wrenGetVariable(_wrenVm.get(), "main", "handleCommand", 0);
+    WrenType type = wrenGetSlotType(_wrenVm.get(), 0);
+    if (type == WREN_TYPE_NULL) {
+        return false;
+    }
+
+    wrenEnsureSlots(_wrenVm.get(), 2);
+    wrenSetSlotString(_wrenVm.get(), 1, command.c_str());
+    wrenSetSlotNewList(_wrenVm.get(), 2);
+    for(std::string &arg : args) {
+        wrenEnsureSlots(_wrenVm.get(), 1);
+        wrenSetSlotString(_wrenVm.get(), 3, arg.c_str());
+        wrenInsertInList(_wrenVm.get(), 2, -1, 3);
+        std::cout << "Inserted arg " << arg << std::endl;
+    }
+
+    WrenInterpretResult result = wrenCall(_wrenVm.get(), wrenGetSlotHandle(_wrenVm.get(), 0));
+    if (result == WREN_RESULT_SUCCESS)
+    {
+        bool result = wrenGetSlotBool(_wrenVm.get(), 0);
+        std::cout << "Result: " << result << std::endl;
+        return result;
+    }
+    return false;
 }
 
 WrenForeignMethodFn boundFunction(std::string name, std::string signature) {
@@ -87,51 +124,59 @@ WrenForeignMethodFn boundFunction(std::string name, std::string signature) {
         if (signature == "print(_)")
         {
             return [](WrenVM *wrenVm) {
-                contexts[wrenVm]->print_string(wrenGetSlotString(wrenVm, 1));
+                script_context *context = (script_context *) wrenGetUserData(wrenVm);
+                context->print_string(wrenGetSlotString(wrenVm, 1));
             };
         }
         else if(signature == "set8bit(_,_)")
         {
             return [](WrenVM *wrenVm) {
-                contexts[wrenVm]->set_8bit_value((uint32_t) wrenGetSlotDouble(wrenVm, 1), (uint8_t) wrenGetSlotDouble(wrenVm, 2));
+                script_context *context = (script_context *) wrenGetUserData(wrenVm);
+                context->set_8bit_value((uint32_t) wrenGetSlotDouble(wrenVm, 1), (uint8_t) wrenGetSlotDouble(wrenVm, 2));
             };
         }
         else if(signature == "set16bit(_,_)")
         {
             return [](WrenVM *wrenVm) {
-                contexts[wrenVm]->set_16bit_value((uint32_t) wrenGetSlotDouble(wrenVm, 1), (uint16_t) wrenGetSlotDouble(wrenVm, 2));
+                script_context *context = (script_context *) wrenGetUserData(wrenVm);
+                context->set_16bit_value((uint32_t) wrenGetSlotDouble(wrenVm, 1), (uint16_t) wrenGetSlotDouble(wrenVm, 2));
             };
         }
         else if(signature == "get8bit(_)")
         {
             return [](WrenVM *wrenVm) {
-                wrenSetSlotDouble(wrenVm, 0, contexts[wrenVm]->read_8bit_value((uint32_t) wrenGetSlotDouble(wrenVm, 1)));
+                script_context *context = (script_context *) wrenGetUserData(wrenVm);
+                wrenSetSlotDouble(wrenVm, 0, context->read_8bit_value((uint32_t) wrenGetSlotDouble(wrenVm, 1)));
             };
         }
         else if(signature == "get16bit(_)")
         {
             return [](WrenVM *wrenVm) {
-                wrenSetSlotDouble(wrenVm, 0, contexts[wrenVm]->read_16bit_value((uint32_t) wrenGetSlotDouble(wrenVm, 1)));
+                script_context *context = (script_context *) wrenGetUserData(wrenVm);
+                wrenSetSlotDouble(wrenVm, 0, context->read_16bit_value((uint32_t) wrenGetSlotDouble(wrenVm, 1)));
             };
         }
         else if(signature == "addImage(_,_,_)")
         {
             return [](WrenVM *wrenVm) {
-                contexts[wrenVm]->add_image(wrenGetSlotString(wrenVm, 1), (int16_t) wrenGetSlotDouble(wrenVm, 2),
+                script_context *context = (script_context *) wrenGetUserData(wrenVm);
+                context->add_image(wrenGetSlotString(wrenVm, 1), (int16_t) wrenGetSlotDouble(wrenVm, 2),
                                             (int16_t) wrenGetSlotDouble(wrenVm, 3));
             };
         }
         else if(signature == "addText(_,_,_)")
         {
             return [](WrenVM *wrenVm) {
-                contexts[wrenVm]->add_text(wrenGetSlotString(wrenVm, 1), (int16_t) wrenGetSlotDouble(wrenVm, 2),
+                script_context *context = (script_context *) wrenGetUserData(wrenVm);
+                context->add_text(wrenGetSlotString(wrenVm, 1), (int16_t) wrenGetSlotDouble(wrenVm, 2),
                                             (int16_t) wrenGetSlotDouble(wrenVm, 3));
             };
         }
         else if(signature == "addRect(_,_,_,_,_,_)")
         {
             return [](WrenVM *wrenVm) {
-                contexts[wrenVm]->add_rect((int16_t) wrenGetSlotDouble(wrenVm, 1), (int16_t) wrenGetSlotDouble(wrenVm, 2),
+                script_context *context = (script_context *) wrenGetUserData(wrenVm);
+                context->add_rect((int16_t) wrenGetSlotDouble(wrenVm, 1), (int16_t) wrenGetSlotDouble(wrenVm, 2),
                                            (int16_t) wrenGetSlotDouble(wrenVm, 3),
                                            (int16_t) wrenGetSlotDouble(wrenVm, 4),
                                            (uint32_t) wrenGetSlotDouble(wrenVm, 5),
@@ -141,7 +186,8 @@ WrenForeignMethodFn boundFunction(std::string name, std::string signature) {
         else if(signature == "queueKey(_,_,_)")
         {
             return [](WrenVM *wrenVm) {
-                contexts[wrenVm]->queue_key((uint8_t) wrenGetSlotDouble(wrenVm, 1),
+                script_context *context = (script_context *) wrenGetUserData(wrenVm);
+                context->queue_key((uint8_t) wrenGetSlotDouble(wrenVm, 1),
                                             (uint32_t) wrenGetSlotDouble(wrenVm, 2),
                                             (uint32_t) wrenGetSlotDouble(wrenVm, 3));
             };

@@ -27,11 +27,6 @@
 
 #include <gameboy.h>
 
-#include "network/tcp_client.h"
-#include "network/tcp_server.h"
-#include "network/null_link_source.h"
-#include "network/multicast_transmitter.h"
-
 #include "scripting/wren_macro_runner.h"
 #include "scripting/lua_macro_runner.h"
 
@@ -68,13 +63,29 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    sdl_renderer render;
     sdl_gamepad_source gp_source;
     std::unique_ptr<link_cable_source> cable_source{provideLinkCableSource(&argc, &argv)};
 
-    gameboy gbInst{&render, &gp_source, cable_source.get()};
+    std::map<std::string, std::unique_ptr<macro_runner>> scriptVms;
 
-    script_context context{&render, &gp_source, &gbInst};
+    Console console{[&](std::string &command, std::vector<std::string> &args) -> bool {
+        for(auto &vmPair : scriptVms) {
+            if (vmPair.second->handleUnhandledCommand(command, args))
+            {
+                return true;
+            }
+        }
+        return false;
+    }};
+
+
+    sdl_renderer render{[&](){
+        for (auto &vm : scriptVms) {
+            vm.second->tick();
+        }
+        console.draw(SDL_GetVideoSurface());
+    }};
+    gameboy gbInst{&render, &gp_source, cable_source.get()};
 
     RomFile romFile{argv[0]};
 
@@ -85,7 +96,8 @@ int main(int argc, char *argv[]) {
 
     bool endGame = false;
     bool fast_forward = false;
-    Console console;
+
+    script_context context{&render, &gp_source, &gbInst};
 
     console.addCommand(new ConsoleCmd{"poke", [&](std::vector<std::string> args) {
         if (args.size() == 2) {
@@ -123,8 +135,6 @@ int main(int argc, char *argv[]) {
             console.addOutput("Scan threshold now: " + std::to_string(scanThreshold));
         }
     }});
-
-    std::map<std::string, std::unique_ptr<macro_runner>> scriptVms;
 
     console.addCommand(new ConsoleCmd{"clear_scan", [&](std::vector<std::string> args) {
         last_result = address_scan_result{{}};
@@ -185,14 +195,8 @@ int main(int argc, char *argv[]) {
     }});
 
 
-    SDL_Surface *screen = SDL_GetVideoSurface();
     limitter frameLimitter{[&] {
-        for (auto &vm : scriptVms) {
-            vm.second->tick();
-        }
         gbInst.tick();
-        console.draw(screen);
-        SDL_Flip(screen);
     }};
 
     SDL_Event event;

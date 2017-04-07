@@ -6,6 +6,10 @@
 #include <SDL/SDL_gfxPrimitives.h>
 #include <iostream>
 
+Console::Console(Console::unhandled_command_func unhandledCommandFunc) : _unhandledCommandFunc{unhandledCommandFunc} {
+
+}
+
 void Console::open() {
     _open = true;
 }
@@ -48,9 +52,8 @@ bool Console::isOpen() {
 
 void Console::update(SDLKey key, SDLMod mod) {
     if (key == SDLK_LEFT) {
-        _cursorPos--;
-        if (_cursorPos < 0) {
-            _cursorPos = 0;
+        if (_cursorPos > 0) {
+            _cursorPos--;
         }
     } else if (key == SDLK_RIGHT) {
         _cursorPos++;
@@ -72,18 +75,13 @@ void Console::update(SDLKey key, SDLMod mod) {
         }
         _currentLine.insert(_cursorPos, 1, (char) (key - (32 * mod != 0 ? 1 : 0)));
         _cursorPos++;
-    }
-    else if(key == SDLK_TAB) {
+    } else if (key == SDLK_TAB) {
         std::string replacement;
-        for(auto &pair : _cmds)
-        {
+        for (auto &pair : _cmds) {
             if (pair.first.find(_currentLine) == 0) {
-                if (replacement == "")
-                {
+                if (replacement == "") {
                     replacement = pair.first + " ";
-                }
-                else if(pair.first.length() < replacement.length())
-                {
+                } else if (pair.first.length() < replacement.length()) {
                     replacement = pair.first + " ";
                 }
             }
@@ -93,18 +91,14 @@ void Console::update(SDLKey key, SDLMod mod) {
             _currentLine = replacement;
             _cursorPos = _currentLine.length();
         }
-    }
-    else if(key == SDLK_UP) {
+    } else if (key == SDLK_UP) {
         _historyIndex++;
         bool found = false;
-        for (int i = 0, j = 0; i < _history.size(); i++)
-        {
+        for (int i = 0, j = 0; i < _history.size(); i++) {
             unsigned long index = (_history.size() - 1) - i;
-            if (_history[index].outputType() == OutputType::command)
-            {
+            if (_history[index].outputType() == OutputType::command) {
                 j++;
-                if (j == _historyIndex)
-                {
+                if (j == _historyIndex) {
                     found = true;
                     _currentLine = _history[index].line();
                     _cursorPos = _currentLine.length();
@@ -112,21 +106,16 @@ void Console::update(SDLKey key, SDLMod mod) {
                 }
             }
         }
-        if (!found)
-        {
+        if (!found) {
             _historyIndex--;
         }
-    }
-    else if(key == SDLK_DOWN)
-    {
+    } else if (key == SDLK_DOWN) {
         _historyIndex--;
-        if (_historyIndex <= 0)
-        {
+        if (_historyIndex <= 0) {
             _historyIndex = 0;
             _currentLine = "";
             _cursorPos = 0;
-        }
-        else {
+        } else {
             for (int i = 0, j = 0; i < _history.size(); i++) {
                 unsigned long index = (_history.size() - 1) - i;
                 if (_history[index].outputType() == OutputType::command) {
@@ -164,7 +153,12 @@ void Console::processLine() {
             addHistory(_currentLine);
             _cmds[_currentLine]->invoke();
         } else {
-            addError("Command " + _currentLine + " not found");
+            std::vector<std::string> args;
+            if (!_unhandledCommandFunc(_currentLine, args)) {
+                addError("Command " + _currentLine + " not found");
+            } else {
+                addHistory(_currentLine);
+            }
         }
     } else {
         std::string command = _currentLine.substr(0, _currentLine.find(' '));
@@ -173,7 +167,12 @@ void Console::processLine() {
             addHistory(_currentLine);
             _cmds[command]->invoke(args);
         } else {
-            addError("Command " + command + " not found");
+            std::vector<std::string> vector = ConsoleCmd::splitArguments(args);
+            if (!_unhandledCommandFunc(command, vector)) {
+                addError("Command " + command + " not found");
+            } else {
+                addHistory(_currentLine);
+            }
         }
     }
 }

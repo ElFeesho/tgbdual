@@ -20,6 +20,8 @@ public:
     void activate() override;
     void loadScript(const std::string &scriptFile) override;
 
+    bool handleUnhandledCommand(const std::string &command, std::vector<std::string> args) override;
+
 private:
     wrenvm_holder _wrenVm;
 };

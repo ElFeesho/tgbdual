@@ -25,20 +25,7 @@ std::string stringUntil(const std::string &input, char delim) {
 }
 
 void ConsoleCmd::invoke(const std::string &args) {
-    std::vector<std::string> components;
-    std::string arg = args;
-    while(arg.length()>0)
-    {
-        std::string comp = stringUntil(arg, ' ');
-        arg = arg.substr(comp.length());
-        if (arg.find(' ') == 0)
-        {
-            arg = arg.substr(1);
-        }
-        components.push_back(comp);
-    }
-
-    _cb(components);
+    _cb(splitArguments(args));
 }
 
 int ConsoleCmd::fromHex(const std::string &input) {
@@ -55,5 +42,21 @@ int ConsoleCmd::fromDec(const std::string &input) {
     s << input;
     s >> output;
     return output;
+}
+
+std::vector<std::string> ConsoleCmd::splitArguments(const std::string &args) {
+    std::vector<std::string> components;
+    std::string arg = args;
+    while(arg.length()>0)
+    {
+        std::string comp = stringUntil(arg, ' ');
+        arg = arg.substr(comp.length());
+        if (arg.find(' ') == 0)
+        {
+            arg = arg.substr(1);
+        }
+        components.push_back(comp);
+    }
+    return components;
 }
 

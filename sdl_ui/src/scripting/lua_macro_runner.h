@@ -22,6 +22,7 @@ public:
 
     void tick() override;
 
+    bool handleUnhandledCommand(const std::string &command, std::vector<std::string> args) override;
 private:
     std::unique_ptr<lua_State,  void(*)(lua_State*)> state;
 

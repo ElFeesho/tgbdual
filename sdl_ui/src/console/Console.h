@@ -8,10 +8,14 @@
 #include <vector>
 #include <SDL/SDL.h>
 #include <map>
+#include <functional>
 #include "ConsoleCmd.h"
 
 class Console {
 public:
+    using unhandled_command_func = std::function<bool(std::string&, std::vector<std::string> &)>;
+    Console(unhandled_command_func unhandledCommandFunc);
+
     void open();
     void update(SDLKey param, SDLMod mod);
     void close();
@@ -49,4 +53,6 @@ private:
     int _historyIndex{0};
 
     std::map<std::string, std::unique_ptr<ConsoleCmd>> _cmds;
+
+    unhandled_command_func _unhandledCommandFunc;
 };

@@ -17,6 +17,7 @@ public:
 
     static int fromHex(const std::string &input);
     static int fromDec(const std::string &input);
+    static std::vector<std::string> splitArguments(const std::string &args);
 
     template<typename INTTYPE>
     static INTTYPE toInt(const std::string &input) {

@@ -29,9 +29,10 @@
 
 class sdl_renderer : public renderer, public osd_renderer {
 public:
+	using render_callback = std::function<void()>;
 	using surf_ptr = std::unique_ptr<SDL_Surface, void(*)(SDL_Surface*)>;
 	using draw_op = std::function<void()>;
-	sdl_renderer();
+	sdl_renderer(render_callback renderCallback);
 
 	void render_screen(uint8_t *buf, int width, int height, int depth) override;
 
@@ -64,4 +65,6 @@ private:
 	void drawRect(uint32_t colour, uint32_t fillColour, int16_t x, int16_t y, uint16_t width, uint16_t height) const;
 
 	void renderOSDMessages();
+
+	render_callback _renderCallback;
 };

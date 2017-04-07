@@ -356,7 +356,7 @@ end
 function filter()
     local result = {}
     local start = 1
-    for k, v in pairs(team) do
+    for _, v in pairs(team) do
         if (v:is_present()) then
             result[start] = v
             start = start + 1
@@ -366,8 +366,24 @@ function filter()
 end
 
 function tick()
-    bridge.clear_canvas()
-
     render_hud(filter(team))
+end
+
+function onLoad()
+    print("ON LOAD")
+end
+
+function handleCommand(command, args)
+    print("handleCommand ", command, #args)
+
+    if (command == "test") then
+        for k, v in pairs(args) do
+            print("Args: ",k, v)
+        end
+        return true
+    end
+
+
+    return false
 end
 
