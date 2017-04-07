@@ -73,7 +73,7 @@ TEST(address_scanner, can_find_changed_values) {
     uint8_t dummy_data[] = {0, 0, 0, 0, 0, 0, 0};
     address_scanner scanner{dummy_data, sizeof(dummy_data)};
 
-    address_scan_state<uint8_t> result = scanner.snapshot();
+    address_scan_state<uint8_t> result = scanner.snapshot<uint8_t>();
 
     dummy_data[0] = 1;
 
@@ -87,7 +87,7 @@ TEST(address_scanner, can_find_changed_values_twice) {
     uint8_t dummy_data[] = {0, 0, 0, 0, 0, 0, 0};
     address_scanner scanner{dummy_data, sizeof(dummy_data)};
 
-    address_scan_state<uint8_t> result = scanner.snapshot();
+    address_scan_state<uint8_t> result = scanner.snapshot<uint8_t>();
 
     dummy_data[0] = 1;
     dummy_data[2] = 1;
@@ -110,7 +110,7 @@ TEST(address_scanner, can_find_increased_values) {
     uint8_t dummy_data[] = {0, 0, 0, 0, 0, 0, 0};
     address_scanner scanner{dummy_data, sizeof(dummy_data)};
 
-    address_scan_state<uint8_t> result = scanner.snapshot();
+    address_scan_state<uint8_t> result = scanner.snapshot<uint8_t>();
 
     dummy_data[0] = 1;
     dummy_data[2] = 3;
@@ -134,7 +134,7 @@ TEST(address_scanner, can_find_increased_and_changed_values) {
     uint8_t dummy_data[] = {0, 0, 0, 0, 0, 0, 0};
     address_scanner scanner{dummy_data, sizeof(dummy_data)};
 
-    address_scan_state<uint8_t> result = scanner.snapshot();
+    address_scan_state<uint8_t> result = scanner.snapshot<uint8_t>();
 
     dummy_data[0] = 1;
     dummy_data[2] = 3;
@@ -159,7 +159,7 @@ TEST(address_scanner, can_find_decreased_values) {
     uint8_t dummy_data[] = {5, 4, 0, 0, 0, 0, 0};
     address_scanner scanner{dummy_data, sizeof(dummy_data)};
 
-    address_scan_state<uint8_t> result = scanner.snapshot();
+    address_scan_state<uint8_t> result = scanner.snapshot<uint8_t>();
 
     dummy_data[0] = 4;
     dummy_data[1] = 3;
@@ -176,7 +176,7 @@ TEST(address_scanner, can_find_unchanged) {
     uint8_t dummy_data[] = {5, 4, 0, 0, 0, 0, 0};
     address_scanner scanner{dummy_data, sizeof(dummy_data)};
 
-    address_scan_state<uint8_t> result = scanner.snapshot();
+    address_scan_state<uint8_t> result = scanner.snapshot<uint8_t>();
 
     result = scanner.unchanged_value(result);
 

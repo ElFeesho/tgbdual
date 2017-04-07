@@ -2,7 +2,31 @@ cmake_minimum_required(VERSION 3.0)
 
 project(gb_core C CXX)
 
-set(GB_CORE_SOURCES sound_renderer.h address_scanner.cpp gameboy.cpp gameboy.h link_cable_source.h apu.cpp gamepad_source.h cheat.cpp cpu.cpp gb.cpp gb.h lcd.cpp mbc.cpp renderer.h rom.cpp serializer.h address_scanner.cpp address_scanner.h)
-add_library(gb_core ${GB_CORE_SOURCES})
+set(GB_CORE_SOURCES
+        include/sound_renderer.h
+        include/gameboy.h
+        include/link_cable_source.h
+        include/gamepad_source.h
+        include/gb.h
+        include/renderer.h
+        include/serializer.h
+        include/address_scanner.h
+        include/apu.h
+        include/cheat.h
+        include/cpu.h
+        include/lcd.h
+        include/mbc.h
+        include/rom.h
+        src/address_scanner.cpp
+        src/gameboy.cpp
+        src/apu.cpp
+        src/cheat.cpp
+        src/cpu.cpp
+        src/gb.cpp
+        src/lcd.cpp
+        src/mbc.cpp
+        src/rom.cpp)
+
+add_library(gb_core STATIC ${GB_CORE_SOURCES})
 target_include_directories(gb_core PUBLIC include/)
 target_compile_features(gb_core PRIVATE cxx_auto_type)

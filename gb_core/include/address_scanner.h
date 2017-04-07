@@ -30,7 +30,8 @@ private:
 template<typename T>
 class address_scan_state {
 public:
-	address_scan_state();
+	address_scan_state() {}
+
 	size_t size() {
 		return _values.size();
 	}
@@ -90,7 +91,7 @@ public:
 	template<typename T>
 	address_scan_result find_value(T target_value) {
 		std::vector<ptrdiff_t> locations;
-		for (size_t i = 0; i < _size - sizeof(T); i++) {
+		for (int i = 0; i < _size - sizeof(T); i++) {
 			if (*((T *) (_memory + i)) == target_value) {
 				locations.push_back(i);
 			}
@@ -98,27 +99,32 @@ public:
 		return address_scan_result{locations};
 	}
 
-	address_scan_state<uint8_t> snapshot() {
-		return address_scan_state<uint8_t>{_memory, _size};
+	template<typename T>
+	address_scan_state<T> snapshot() {
+		return address_scan_state<T>{_memory, _size};
 	}
 
-	address_scan_state<uint8_t> changed_value(address_scan_state<uint8_t> &previousState) {
-		address_scan_state<uint8_t> currentState{_memory, _size};
+	template<typename T>
+	address_scan_state<T> changed_value(address_scan_state<T> &previousState) {
+		address_scan_state<T> currentState{_memory, _size};
 		return currentState.exclusive(previousState);
 	}
 
-	address_scan_state<uint8_t> unchanged_value(address_scan_state<uint8_t> &previousState) {
-		address_scan_state<uint8_t> currentState{_memory, _size};
+	template<typename T>
+	address_scan_state<T> unchanged_value(address_scan_state<T> &previousState) {
+		address_scan_state<T> currentState{_memory, _size};
 		return currentState.same(previousState);
 	}
 
-	address_scan_state<uint8_t> increased_value(address_scan_state<uint8_t> &previousState) {
-		address_scan_state<uint8_t> currentState{_memory, _size};
+	template<typename T>
+	address_scan_state<T> increased_value(address_scan_state<T> &previousState) {
+		address_scan_state<T> currentState{_memory, _size};
 		return currentState.greaterThan(previousState);
 	}
 
-	address_scan_state<uint8_t> decreased_value(address_scan_state<uint8_t> &previousState) {
-		address_scan_state<uint8_t> currentState{_memory, _size};
+	template<typename T>
+	address_scan_state<T> decreased_value(address_scan_state<T> &previousState) {
+		address_scan_state<T> currentState{_memory, _size};
 		return currentState.lessThan(previousState);
 	}
 
