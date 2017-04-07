@@ -200,6 +200,36 @@ int main(int argc, char *argv[]) {
     }};
 
     SDL_Event event;
+
+    std::map<SDLKey, std::function<void()>> uiActions {
+            {SDLK_F5, [&] {
+                saveState(render, gbInst, romFile);
+            }},
+            {SDLK_F7, [&] {
+              loadState(render, gbInst, romFile);
+            }},
+            {SDLK_ESCAPE, [&]{
+                endGame = true;
+            }},
+            {SDLK_SPACE, [&]{
+                std::for_each(scriptVms.begin(), scriptVms.end(), [](auto &pair) {
+                    pair.second->tick();
+                });
+            }},
+            {SDLK_TAB, [&] {
+                fast_forward = !fast_forward;
+                if (fast_forward) {
+                    fastForwardSpeed(render, gbInst, frameLimitter);
+                } else {
+                    normalSpeed(render, gbInst, frameLimitter);
+                }
+            }},
+            {SDLK_BACKQUOTE, [&]{
+                console.open();
+                gp_source.reset_pad();
+            }}
+    };
+
     while (!endGame) {
         while (SDL_PollEvent(&event)) {
             if (!console.isOpen()) {
@@ -217,26 +247,9 @@ int main(int argc, char *argv[]) {
                         console.update(sym, event.key.keysym.mod);
                     }
                 } else {
-                    if (sym == SDLK_BACKQUOTE) {
-                        console.open();
-                        gp_source.reset_pad();
-                    } else if (sym == SDLK_F5) {
-                        saveState(render, gbInst, romFile);
-                    } else if (sym == SDLK_F7) {
-                        loadState(render, gbInst, romFile);
-                    } else if (sym == SDLK_ESCAPE) {
-                        endGame = true;
-                    } else if (sym == SDLK_SPACE) {
-                        for (auto &vm : scriptVms) {
-                            vm.second->activate();
-                        }
-                    } else if (sym == SDLK_TAB) {
-                        fast_forward = !fast_forward;
-                        if (fast_forward) {
-                            fastForwardSpeed(render, gbInst, frameLimitter);
-                        } else {
-                            normalSpeed(render, gbInst, frameLimitter);
-                        }
+                    if (uiActions.find(sym) != uiActions.end())
+                    {
+                        uiActions[sym]();
                     }
                 }
             }
