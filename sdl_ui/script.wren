@@ -13,6 +13,25 @@ foreign class GameBoy {
     foreign static queueKey(key, delay, duration)
 }
 
+class Enemy {
+    construct new(x, y) {
+        _x = x
+        _y = y
+    }
+
+    pokemonNumber { GameBoy.get8bit(0x1204) }
+    hp { GameBoy.get8bit(0x1217) }
+    hpMax { GameBoy.get8bit(0x1219) }
+
+    draw() {
+        GameBoy.addRect(_x, _y, 320, 100, 0xffffffff, 0xff666666)
+        GameBoy.addRect(_x + 10, _y + 40, 80, 10, 0xff000000, 0xff333333)
+        GameBoy.addRect(_x + 12, _y + 42, 76 * (hp/hpMax), 6, 0x00000000, 0xff00ff00)
+        GameBoy.addImage("imgs/%(pokemonNumber).png", _x+5, _y+5)
+        GameBoy.addText("%(hp)/%(hpMax)", _x+20, _y+60)
+    }
+}
+
 class Pokemon {
     construct new(rosterPosition, x, y) {
         _rosterPosition = rosterPosition
@@ -76,7 +95,7 @@ class Pokemon {
 class MenuHelper {
     construct new() {
         _x = 0
-        _y = 320
+        _y = 400
         _w = 300
         _h = 70
     }
@@ -108,6 +127,8 @@ var pokemonSix = Pokemon.new(6,  419, 200)
 
 var targetAddress = 0x1cd8
 
+var enemy = Enemy.new(100, 0)
+
 var tick = Fn.new {
 
     menuHelper.draw()
@@ -118,7 +139,7 @@ var tick = Fn.new {
     pokemonFive.draw()
     pokemonSix.draw()
 
-    GameBoy.addText("%(GameBoy.get16bit(0x1cd8+0x12)) %(GameBoy.get16bit(0x1cea))", 200, 340)
+    enemy.draw()
 }
 
 var dec2hex = Fn.new { |input|

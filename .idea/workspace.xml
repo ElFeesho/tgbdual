@@ -19,42 +19,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="436204fa-82f6-4f04-912b-50bf26d1358e" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/gb_core/src/address_scanner.cpp" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gb_core/.clang-format" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gb_core/address_scanner.cpp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gb_core/address_scanner.h" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gb_core/include/op_cb.h" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gb_core/include/op_normal.h" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gb_core_test/message_pass_test.cpp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/sdl_ui/.clang-format" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/sdl_ui/format.sh" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core/apu.cpp" afterPath="$PROJECT_DIR$/gb_core/src/apu.cpp" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core/apu.h" afterPath="$PROJECT_DIR$/gb_core/include/apu.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core/cheat.cpp" afterPath="$PROJECT_DIR$/gb_core/src/cheat.cpp" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core/cheat.h" afterPath="$PROJECT_DIR$/gb_core/include/cheat.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core/cpu.cpp" afterPath="$PROJECT_DIR$/gb_core/src/cpu.cpp" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core/cpu.h" afterPath="$PROJECT_DIR$/gb_core/include/cpu.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core/gameboy.cpp" afterPath="$PROJECT_DIR$/gb_core/src/gameboy.cpp" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core/gameboy.h" afterPath="$PROJECT_DIR$/gb_core/include/gameboy.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core/gamepad_source.h" afterPath="$PROJECT_DIR$/gb_core/include/gamepad_source.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core/gb.cpp" afterPath="$PROJECT_DIR$/gb_core/src/gb.cpp" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core/gb.h" afterPath="$PROJECT_DIR$/gb_core/include/gb.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core/lcd.cpp" afterPath="$PROJECT_DIR$/gb_core/src/lcd.cpp" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core/lcd.h" afterPath="$PROJECT_DIR$/gb_core/include/lcd.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core/link_cable_source.h" afterPath="$PROJECT_DIR$/gb_core/include/link_cable_source.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core/mbc.cpp" afterPath="$PROJECT_DIR$/gb_core/src/mbc.cpp" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core/mbc.h" afterPath="$PROJECT_DIR$/gb_core/include/mbc.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core/renderer.h" afterPath="$PROJECT_DIR$/gb_core/include/renderer.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core/rom.cpp" afterPath="$PROJECT_DIR$/gb_core/src/rom.cpp" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core/rom.h" afterPath="$PROJECT_DIR$/gb_core/include/rom.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core/serializer.h" afterPath="$PROJECT_DIR$/gb_core/include/serializer.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core/sound_renderer.h" afterPath="$PROJECT_DIR$/gb_core/include/sound_renderer.h" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CMakeLists.txt" afterPath="$PROJECT_DIR$/CMakeLists.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gb_core/CMakeLists.txt" afterPath="$PROJECT_DIR$/gb_core/CMakeLists.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gb_core/include/address_scanner.h" afterPath="$PROJECT_DIR$/gb_core/include/address_scanner.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gb_core_test/address_scanner.t.cpp" afterPath="$PROJECT_DIR$/gb_core_test/address_scanner.t.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/script_layer/CMakeLists.txt" afterPath="$PROJECT_DIR$/script_layer/CMakeLists.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gb_core/include/gameboy.h" afterPath="$PROJECT_DIR$/gb_core/include/gameboy.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gb_core/src/gameboy.cpp" afterPath="$PROJECT_DIR$/gb_core/src/gameboy.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sdl_ui/script.wren" afterPath="$PROJECT_DIR$/sdl_ui/script.wren" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sdl_ui/src/sdl_renderer.cpp" afterPath="$PROJECT_DIR$/sdl_ui/src/sdl_renderer.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp" afterPath="$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <ignored path="$PROJECT_DIR$/gb_core_test/gtest/CMakeFiles/" />
@@ -68,11 +38,11 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="CMakeLists.txt" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/script_layer/CMakeLists.txt">
+      <file leaf-file-name="sdlmain.cpp" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="4" column="42" lean-forward="false" selection-start-line="4" selection-start-column="42" selection-end-line="4" selection-end-column="42" />
+            <state relative-caret-position="1553">
+              <caret line="155" column="56" lean-forward="false" selection-start-line="155" selection-start-column="56" selection-end-line="155" selection-end-column="56" />
               <folding />
             </state>
           </provider>
@@ -104,6 +74,7 @@
       <find>cxx_library</find>
       <find>gb_</find>
       <find>gb</find>
+      <find>poli</find>
     </findStrings>
     <replaceStrings>
       <replace>context</replace>
@@ -132,13 +103,10 @@
         <option value="$PROJECT_DIR$/script_layer/src/script_context.cpp" />
         <option value="$PROJECT_DIR$/script_layer/include/script_context.h" />
         <option value="$PROJECT_DIR$/sdl_ui/src/console/Console.cpp" />
-        <option value="$PROJECT_DIR$/sdl_ui/script.wren" />
         <option value="$PROJECT_DIR$/sdl_ui/src/scripting/wren_macro_runner.cpp" />
         <option value="$PROJECT_DIR$/sdl_ui/src/scripting/lua_macro_runner.cpp" />
         <option value="$PROJECT_DIR$/sdl_ui/script.lua" />
         <option value="$PROJECT_DIR$/sdl_ui/src/sdl_renderer.h" />
-        <option value="$PROJECT_DIR$/sdl_ui/src/sdl_renderer.cpp" />
-        <option value="$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp" />
         <option value="$PROJECT_DIR$/gb_core_test/address_scanner.t.cpp" />
         <option value="$PROJECT_DIR$/gb_core/address_scanner.cpp" />
         <option value="$PROJECT_DIR$/gb_core/address_scanner.h" />
@@ -148,6 +116,11 @@
         <option value="$PROJECT_DIR$/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/gb_core_test/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/script_layer/CMakeLists.txt" />
+        <option value="$PROJECT_DIR$/gb_core/src/gameboy.cpp" />
+        <option value="$PROJECT_DIR$/gb_core/include/gameboy.h" />
+        <option value="$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp" />
+        <option value="$PROJECT_DIR$/sdl_ui/src/sdl_renderer.cpp" />
+        <option value="$PROJECT_DIR$/sdl_ui/script.wren" />
       </list>
     </option>
   </component>
@@ -201,6 +174,24 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="sdl_ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tgbdual" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tgbdual" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sdl_ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -580,7 +571,7 @@
       <workItem from="1491545946063" duration="1831000" />
       <workItem from="1491564711057" duration="271000" />
       <workItem from="1491564997002" duration="9489000" />
-      <workItem from="1491597252699" duration="5912000" />
+      <workItem from="1491597252699" duration="9043000" />
     </task>
     <task id="LOCAL-00001" summary="Move gameboy output to middle of screen">
       <created>1491513742890</created>
@@ -603,7 +594,14 @@
       <option name="project" value="LOCAL" />
       <updated>1491601063103</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Restructure project">
+      <created>1491603186832</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1491603186832</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -639,7 +637,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="43171000" />
+    <option name="totallyTimeSpent" value="46302000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1676" height="1027" extended-state="6" />
@@ -683,7 +681,8 @@
     <MESSAGE value="Move gameboy output to middle of screen" />
     <MESSAGE value="Fix slow fast forward and provide mechanism for implementing custom console commands" />
     <MESSAGE value="Introduce ability to relatively search for values" />
-    <option name="LAST_COMMIT_MESSAGE" value="Introduce ability to relatively search for values" />
+    <MESSAGE value="Restructure project" />
+    <option name="LAST_COMMIT_MESSAGE" value="Restructure project" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1122,6 +1121,115 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="186">
           <caret line="1079" column="0" lean-forward="false" selection-start-line="1079" selection-start-column="0" selection-end-line="1079" selection-end-column="0" />
+          <folding>
+            <marker date="1487207607000" expanded="true" signature="0:370" ph="//..." />
+            <marker date="1487207607000" expanded="true" signature="421:4654" ph="/.../" />
+            <marker date="1487207607000" expanded="true" signature="4665:4767" ph="..." />
+            <marker date="1487207607000" expanded="false" signature="4882:4920" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="5011:7642" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="6000:6141" ph="..." />
+            <marker date="1487207607000" expanded="false" signature="7645:7683" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="7751:8086" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="8089:8127" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="8251:8366" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="8368:8406" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="8457:8893" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="8895:8933" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="9060:9085" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="9129:9167" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="9270:9296" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="9298:9336" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="9467:9505" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="9552:9590" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="9640:9643" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="9645:9683" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="9781:9836" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="9838:9876" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="10025:10052" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="10054:10092" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="10323:10361" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="10363:10401" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="10540:10578" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="10580:10618" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="10741:12069" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="12071:12109" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="12195:12793" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="12795:12833" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="12920:13801" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="13803:13841" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="13937:14563" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="14565:14603" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="14688:15567" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="15569:15607" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="15701:16327" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="16329:16367" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="16453:17051" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="17053:17091" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="17186:17784" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="17786:17824" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="17915:18513" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="18515:18553" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="18653:19251" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="19253:19291" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="19378:19997" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="19999:20037" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="20125:20723" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="20725:20763" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="20856:21454" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="21456:21494" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="21587:22185" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="22187:22224" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="22381:23276" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="23279:23316" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="23410:23472" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="23474:23511" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="23604:24530" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="24532:24555" ph="&lt;_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="24643:24705" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="24707:24730" ph="&lt;_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="24825:24896" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="24898:24921" ph="&lt;_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="25018:25089" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="25091:25128" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="25231:25315" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="25317:25354" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="25456:26910" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="26912:26935" ph="&lt;_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="27032:27116" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="27118:27141" ph="&lt;_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="27245:27369" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="27371:27394" ph="&lt;_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="27500:27624" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="27626:27664" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="27748:28252" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="28254:28292" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="28401:28827" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="28829:28867" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="28940:29419" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="29421:29459" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="29583:29708" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="29710:29748" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="29868:30071" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="30073:30111" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="30256:30466" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="30468:30506" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="30615:30685" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="30687:30725" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="30834:30878" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="30880:30918" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="31028:31066" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="31110:31145" ph="&lt;_Stream,_Tp&gt;" />
+            <marker date="1487207607000" expanded="true" signature="31198:31301" ph="&lt;~&gt;" />
+            <marker date="1487207607000" expanded="true" signature="31351:31401" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="31448:31503" ph="&lt;_CharT,_Traits,_Allocator&gt;" />
+            <marker date="1487207607000" expanded="true" signature="31652:31733" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="31735:31773" ph="&lt;_CharT,_Traits&gt;" />
+            <marker date="1487207607000" expanded="true" signature="31912:31981" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="31983:32031" ph="&lt;_CharT,_Traits,_Yp&gt;" />
+            <marker date="1487207607000" expanded="true" signature="32174:32207" ph="{...}" />
+            <marker date="1487207607000" expanded="false" signature="32209:32261" ph="&lt;_CharT,_Traits,size_t _Size&gt;" />
+            <marker date="1487207607000" expanded="true" signature="32369:32588" ph="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1247,13 +1355,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sdl_ui/script.wren">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="417">
-          <caret line="157" column="25" lean-forward="false" selection-start-line="157" selection-start-column="25" selection-end-line="157" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/extlibs/lua-5.3.3/include/lua.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="783">
@@ -1279,34 +1380,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sdl_ui/script.lua">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="368">
-          <caret line="359" column="32" lean-forward="true" selection-start-line="359" selection-start-column="32" selection-end-line="359" selection-end-column="32" />
-          <folding>
-            <marker date="1491596287000" expanded="true" signature="6697:7043" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="7082:8217" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="7104:8073" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="7132:7215" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="7248:7331" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="7373:7411" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="7452:7525" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="7562:7651" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="7687:8068" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="8102:8191" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="8138:8186" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="8253:8639" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="8849:8941" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="8962:9373" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="9407:9566" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="9585:9793" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="9810:9843" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="9862:9887" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="9926:10134" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/sdl_ui/src/limitter.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="285">
@@ -1323,6 +1396,12 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
           <caret line="8" column="10" lean-forward="false" selection-start-line="8" selection-start-column="10" selection-end-line="8" selection-end-column="10" />
+          <folding>
+            <marker date="1491288938000" expanded="true" signature="0:38" ph="//..." />
+            <marker date="1491288938000" expanded="true" signature="49:83" ph="..." />
+            <marker date="1491288938000" expanded="true" signature="183:207" ph="{...}" />
+            <marker date="1491288938000" expanded="true" signature="233:258" ph="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1346,22 +1425,6 @@
             <marker date="1491585098000" expanded="true" signature="5140:6220" ph="{...}" />
             <marker date="1491585098000" expanded="true" signature="6431:6435" ph="{...}" />
             <marker date="1491585098000" expanded="true" signature="6485:6506" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gb_core/src/gameboy.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="25" column="10" lean-forward="false" selection-start-line="25" selection-start-column="10" selection-end-line="25" selection-end-column="10" />
-          <folding>
-            <marker date="1491601791000" expanded="true" signature="9:42" ph="..." />
-            <marker date="1491601791000" expanded="true" signature="369:372" ph="{...}" />
-            <marker date="1491601791000" expanded="true" signature="469:526" ph="{...}" />
-            <marker date="1491601791000" expanded="true" signature="595:653" ph="{...}" />
-            <marker date="1491601791000" expanded="true" signature="696:733" ph="{...}" />
-            <marker date="1491601791000" expanded="true" signature="809:884" ph="{...}" />
-            <marker date="1491601791000" expanded="true" signature="907:925" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -1419,33 +1482,6 @@
             <marker date="1491596841000" expanded="true" signature="0:827" ph="/.../" />
             <marker date="1491596841000" expanded="true" signature="838:981" ph="..." />
             <marker date="1491596841000" expanded="true" signature="1041:2270" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sdl_ui/src/sdl_renderer.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="333">
-          <caret line="91" column="22" lean-forward="false" selection-start-line="91" selection-start-column="22" selection-end-line="91" selection-end-column="22" />
-          <folding>
-            <marker date="1491596864000" expanded="true" signature="0:827" ph="/.../" />
-            <marker date="1491596864000" expanded="true" signature="829:969" ph="//..." />
-            <marker date="1491596864000" expanded="true" signature="980:1067" ph="..." />
-            <marker date="1491596864000" expanded="true" signature="1171:1304" ph="{...}" />
-            <marker date="1491596864000" expanded="true" signature="1780:1874" ph="{...}" />
-            <marker date="1491596864000" expanded="true" signature="1911:2328" ph="{...}" />
-            <marker date="1491596864000" expanded="true" signature="2411:3230" ph="{...}" />
-            <marker date="1491596864000" expanded="true" signature="3271:3769" ph="{...}" />
-            <marker date="1491596864000" expanded="true" signature="3921:4511" ph="{...}" />
-            <marker date="1491596864000" expanded="true" signature="4595:4762" ph="{...}" />
-            <marker date="1491596864000" expanded="true" signature="4774:5094" ph="{...}" />
-            <marker date="1491596864000" expanded="true" signature="4838:5092" ph="{...}" />
-            <marker date="1491596864000" expanded="true" signature="5131:5499" ph="{...}" />
-            <marker date="1491596864000" expanded="true" signature="5579:5715" ph="{...}" />
-            <marker date="1491596864000" expanded="true" signature="5767:6092" ph="{...}" />
-            <marker date="1491596864000" expanded="true" signature="6147:6429" ph="{...}" />
-            <marker date="1491596864000" expanded="true" signature="6495:6720" ph="{...}" />
-            <marker date="1491596864000" expanded="true" signature="6872:6952" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -2263,23 +2299,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1530">
-          <caret line="214" column="75" lean-forward="false" selection-start-line="214" selection-start-column="75" selection-end-line="214" selection-end-column="75" />
-          <folding>
-            <marker date="1491598036000" expanded="true" signature="0:827" ph="/.../" />
-            <marker date="1491598036000" expanded="true" signature="838:1272" ph="..." />
-            <marker date="1491598036000" expanded="true" signature="1749:8861" ph="{...}" />
-            <marker date="1491598036000" expanded="true" signature="8944:9059" ph="{...}" />
-            <marker date="1491598036000" expanded="true" signature="9147:9259" ph="{...}" />
-            <marker date="1491598036000" expanded="true" signature="9333:9579" ph="{...}" />
-            <marker date="1491598036000" expanded="true" signature="9653:9746" ph="{...}" />
-            <marker date="1491598036000" expanded="true" signature="9869:10325" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/gb_core/include/cheat.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -2485,23 +2504,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/gb_core/include/gameboy.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <marker date="1491231555000" expanded="true" signature="23:174" ph="..." />
-            <marker date="1491231555000" expanded="true" signature="190:1019" ph="{...}" />
-            <marker date="1491231555000" expanded="false" signature="611:631" ph="&lt;T&gt;" />
-            <marker date="1491231555000" expanded="true" signature="679:728" ph="{...}" />
-            <marker date="1491231555000" expanded="false" signature="731:751" ph="&lt;T&gt;" />
-            <marker date="1491231555000" expanded="true" signature="799:854" ph="{...}" />
-            <marker date="1491231555000" expanded="false" signature="857:877" ph="&lt;T&gt;" />
-            <marker date="1491231555000" expanded="true" signature="909:963" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/sdl_ui/CMakeLists.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-273">
@@ -2514,6 +2516,121 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
           <caret line="4" column="42" lean-forward="false" selection-start-line="4" selection-start-column="42" selection-end-line="4" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gb_core/src/gameboy.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="465">
+          <caret line="31" column="0" lean-forward="false" selection-start-line="31" selection-start-column="0" selection-end-line="31" selection-end-column="0" />
+          <folding>
+            <marker date="1491603634000" expanded="true" signature="9:42" ph="..." />
+            <marker date="1491603634000" expanded="true" signature="369:372" ph="{...}" />
+            <marker date="1491603634000" expanded="true" signature="469:526" ph="{...}" />
+            <marker date="1491603634000" expanded="true" signature="595:653" ph="{...}" />
+            <marker date="1491603634000" expanded="true" signature="696:733" ph="{...}" />
+            <marker date="1491603634000" expanded="true" signature="809:884" ph="{...}" />
+            <marker date="1491603634000" expanded="true" signature="907:925" ph="{...}" />
+            <marker date="1491603634000" expanded="true" signature="967:995" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gb_core/include/gameboy.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="208">
+          <caret line="31" column="26" lean-forward="false" selection-start-line="31" selection-start-column="26" selection-end-line="31" selection-end-column="26" />
+          <folding>
+            <marker date="1491603817000" expanded="true" signature="23:174" ph="..." />
+            <marker date="1491603817000" expanded="true" signature="190:1703" ph="{...}" />
+            <marker date="1491603817000" expanded="true" signature="611:631" ph="&lt;T&gt;" />
+            <marker date="1491603817000" expanded="true" signature="671:716" ph="{...}" />
+            <marker date="1491603817000" expanded="false" signature="719:739" ph="&lt;T&gt;" />
+            <marker date="1491603817000" expanded="true" signature="787:836" ph="{...}" />
+            <marker date="1491603817000" expanded="false" signature="839:859" ph="&lt;T&gt;" />
+            <marker date="1491603817000" expanded="true" signature="907:962" ph="{...}" />
+            <marker date="1491603817000" expanded="false" signature="965:985" ph="&lt;T&gt;" />
+            <marker date="1491603817000" expanded="true" signature="1017:1071" ph="{...}" />
+            <marker date="1491603817000" expanded="true" signature="1074:1094" ph="&lt;T&gt;" />
+            <marker date="1491603817000" expanded="true" signature="1162:1216" ph="{...}" />
+            <marker date="1491603817000" expanded="true" signature="1218:1238" ph="&lt;T&gt;" />
+            <marker date="1491603817000" expanded="true" signature="1305:1359" ph="{...}" />
+            <marker date="1491603817000" expanded="true" signature="1361:1381" ph="&lt;T&gt;" />
+            <marker date="1491603817000" expanded="true" signature="1449:1501" ph="{...}" />
+            <marker date="1491603817000" expanded="true" signature="1503:1523" ph="&lt;T&gt;" />
+            <marker date="1491603817000" expanded="true" signature="1593:1647" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdl_ui/src/sdl_renderer.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="619">
+          <caret line="81" column="5" lean-forward="true" selection-start-line="81" selection-start-column="5" selection-end-line="81" selection-end-column="5" />
+          <folding>
+            <marker date="1491605281000" expanded="true" signature="0:827" ph="/.../" />
+            <marker date="1491605281000" expanded="true" signature="829:969" ph="//..." />
+            <marker date="1491605281000" expanded="true" signature="980:1067" ph="..." />
+            <marker date="1491605281000" expanded="true" signature="1171:1304" ph="{...}" />
+            <marker date="1491605281000" expanded="true" signature="1780:1874" ph="{...}" />
+            <marker date="1491605281000" expanded="true" signature="1911:2328" ph="{...}" />
+            <marker date="1491605281000" expanded="true" signature="2411:3230" ph="{...}" />
+            <marker date="1491605281000" expanded="true" signature="3271:3769" ph="{...}" />
+            <marker date="1491605281000" expanded="true" signature="3921:4511" ph="{...}" />
+            <marker date="1491605281000" expanded="true" signature="4595:4762" ph="{...}" />
+            <marker date="1491605281000" expanded="true" signature="4774:5094" ph="{...}" />
+            <marker date="1491605281000" expanded="true" signature="4838:5092" ph="{...}" />
+            <marker date="1491605281000" expanded="true" signature="5131:5499" ph="{...}" />
+            <marker date="1491605281000" expanded="true" signature="5579:5715" ph="{...}" />
+            <marker date="1491605281000" expanded="true" signature="5767:6092" ph="{...}" />
+            <marker date="1491605281000" expanded="true" signature="6147:6429" ph="{...}" />
+            <marker date="1491605281000" expanded="true" signature="6495:6720" ph="{...}" />
+            <marker date="1491605281000" expanded="true" signature="6872:6952" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdl_ui/script.lua">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="70" column="11" lean-forward="false" selection-start-line="70" selection-start-column="9" selection-end-line="70" selection-end-column="11" />
+          <folding>
+            <marker date="1491596287000" expanded="true" signature="6697:7043" ph="..." />
+            <marker date="1491596287000" expanded="true" signature="7082:8217" ph="..." />
+            <marker date="1491596287000" expanded="true" signature="7104:8073" ph="..." />
+            <marker date="1491596287000" expanded="true" signature="7132:7215" ph="..." />
+            <marker date="1491596287000" expanded="true" signature="7248:7331" ph="..." />
+            <marker date="1491596287000" expanded="true" signature="7373:7411" ph="..." />
+            <marker date="1491596287000" expanded="true" signature="7452:7525" ph="..." />
+            <marker date="1491596287000" expanded="true" signature="7562:7651" ph="..." />
+            <marker date="1491596287000" expanded="true" signature="7687:8068" ph="..." />
+            <marker date="1491596287000" expanded="true" signature="8102:8191" ph="..." />
+            <marker date="1491596287000" expanded="true" signature="8138:8186" ph="..." />
+            <marker date="1491596287000" expanded="true" signature="8253:8639" ph="..." />
+            <marker date="1491596287000" expanded="true" signature="8849:8941" ph="..." />
+            <marker date="1491596287000" expanded="true" signature="8962:9373" ph="..." />
+            <marker date="1491596287000" expanded="true" signature="9407:9566" ph="..." />
+            <marker date="1491596287000" expanded="true" signature="9585:9793" ph="..." />
+            <marker date="1491596287000" expanded="true" signature="9810:9843" ph="..." />
+            <marker date="1491596287000" expanded="true" signature="9862:9887" ph="..." />
+            <marker date="1491596287000" expanded="true" signature="9926:10134" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdl_ui/script.wren">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-40">
+          <caret line="29" column="8" lean-forward="false" selection-start-line="29" selection-start-column="8" selection-end-line="29" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1553">
+          <caret line="155" column="56" lean-forward="false" selection-start-line="155" selection-start-column="56" selection-end-line="155" selection-end-column="56" />
           <folding />
         </state>
       </provider>

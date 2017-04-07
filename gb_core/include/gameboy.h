@@ -29,6 +29,11 @@ public:
 	void set_speed(uint32_t speed);
 
 	template<typename T>
+	address_scan_state<T> initial_state() {
+		return _address_scanner.snapshot<T>();
+	}
+
+	template<typename T>
 	address_scan_result scan_for_address(T value) {
 		return _address_scanner.find_value(value);
 	}
@@ -43,6 +48,23 @@ public:
 	T read_ram(uint32_t address)
 	{
 		return *(T*)(_gb.get_cpu()->get_ram()+address);
+	}
+
+	template<typename T>
+	address_scan_state<T> search_greater(address_scan_state<T> state) {
+		return _address_scanner.increased_value(state);
+	}
+	template<typename T>
+	address_scan_state<T> search_lesser(address_scan_state<T> state) {
+		return _address_scanner.decreased_value(state);
+	}
+	template<typename T>
+	address_scan_state<T> search_changed(address_scan_state<T> state) {
+		return _address_scanner.changed_value(state);
+	}
+	template<typename T>
+	address_scan_state<T> search_unchanged(address_scan_state<T> state) {
+		return _address_scanner.unchanged_value(state);
 	}
 
 private:

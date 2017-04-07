@@ -23,8 +23,6 @@
 #include <fstream>
 #include <vector>
 
-#include <getopt.h>
-
 #include <gameboy.h>
 
 #include "scripting/wren_macro_runner.h"
@@ -53,8 +51,9 @@ void fastForwardSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimi
 
 void normalSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimitter);
 
-void printScanResults(address_scan_result result, Console &console, address_scan_result &last_result, int scanThreshold)
-;
+void printScanResults(address_scan_result result, Console &console, address_scan_result &last_result, int scanThreshold);
+
+void print_scan_state(Console &console, address_scan_state<uint8_t> &state, std::string searchType);
 
 int main(int argc, char *argv[]) {
 
@@ -69,9 +68,8 @@ int main(int argc, char *argv[]) {
     std::map<std::string, std::unique_ptr<macro_runner>> scriptVms;
 
     Console console{[&](std::string &command, std::vector<std::string> &args) -> bool {
-        for(auto &vmPair : scriptVms) {
-            if (vmPair.second->handleUnhandledCommand(command, args))
-            {
+        for (auto &vmPair : scriptVms) {
+            if (vmPair.second->handleUnhandledCommand(command, args)) {
                 return true;
             }
         }
@@ -79,7 +77,7 @@ int main(int argc, char *argv[]) {
     }};
 
 
-    sdl_renderer render{[&](){
+    sdl_renderer render{[&]() {
         for (auto &vm : scriptVms) {
             vm.second->tick();
         }
@@ -126,6 +124,71 @@ int main(int argc, char *argv[]) {
             printScanResults(gbInst.scan_for_address((uint32_t) value), console, last_result, scanThreshold);
         }
     }});
+
+    address_scan_state<uint8_t> state;
+
+    console.addCommand(new ConsoleCmd{"start_search", [&](std::vector<std::string> args) {
+        state = gbInst.initial_state<uint8_t>();
+    }});
+
+    console.addCommand(new ConsoleCmd{"search_greater", [&](std::vector<std::string> args) {
+        if (state.size() == 0) {
+            console.addOutput("No initial search state, creating now");
+            state = gbInst.initial_state<uint8_t>();
+        } else {
+            state = gbInst.search_greater(state);
+            if (state.size() <= scanThreshold) {
+                print_scan_state(console, state, "Greater values");
+            } else {
+                console.addOutput("Greater values: " + std::to_string(state.size()));
+            }
+        }
+    }});
+
+    console.addCommand(new ConsoleCmd{"search_lesser", [&](std::vector<std::string> args) {
+        if (state.size() == 0) {
+            console.addOutput("No initial search state, creating now");
+            state = gbInst.initial_state<uint8_t>();
+        } else {
+            state = gbInst.search_lesser(state);
+            if (state.size() <= scanThreshold) {
+
+                print_scan_state(console, state, "Lesser values");
+            } else {
+                console.addOutput("Lesser values: " + std::to_string(state.size()));
+            }
+        }
+    }});
+
+    console.addCommand(new ConsoleCmd{"search_changed", [&](std::vector<std::string> args) {
+        if (state.size() == 0) {
+            console.addOutput("No initial search state, creating now");
+            state = gbInst.initial_state<uint8_t>();
+        } else {
+            state = gbInst.search_changed(state);
+            if (state.size() <= scanThreshold) {
+
+                print_scan_state(console, state, "Changed values");
+            } else {
+                console.addOutput("Changed values: " + std::to_string(state.size()));
+            }
+        }
+    }});
+
+    console.addCommand(new ConsoleCmd{"search_unchanged", [&](std::vector<std::string> args) {
+        if (state.size() == 0) {
+            console.addOutput("No initial search state, creating now");
+            state = gbInst.initial_state<uint8_t>();
+        } else {
+            state = gbInst.search_unchanged(state);
+            if (state.size() <= scanThreshold) {
+                print_scan_state(console, state, "Unchanged values");
+            } else {
+                console.addOutput("Unchanged values: " + std::to_string(state.size()));
+            }
+        }
+    }
+    });
 
     console.addCommand(new ConsoleCmd{"scan_threshold", [&](std::vector<std::string> args) {
         if (args.size() == 0) {
@@ -201,22 +264,22 @@ int main(int argc, char *argv[]) {
 
     SDL_Event event;
 
-    std::map<SDLKey, std::function<void()>> uiActions {
-            {SDLK_F5, [&] {
+    std::map<SDLKey, std::function<void()>> uiActions{
+            {SDLK_F5,        [&] {
                 saveState(render, gbInst, romFile);
             }},
-            {SDLK_F7, [&] {
-              loadState(render, gbInst, romFile);
+            {SDLK_F7,        [&] {
+                loadState(render, gbInst, romFile);
             }},
-            {SDLK_ESCAPE, [&]{
+            {SDLK_ESCAPE,    [&] {
                 endGame = true;
             }},
-            {SDLK_SPACE, [&]{
+            {SDLK_SPACE,     [&] {
                 std::for_each(scriptVms.begin(), scriptVms.end(), [](auto &pair) {
                     pair.second->tick();
                 });
             }},
-            {SDLK_TAB, [&] {
+            {SDLK_TAB,       [&] {
                 fast_forward = !fast_forward;
                 if (fast_forward) {
                     fastForwardSpeed(render, gbInst, frameLimitter);
@@ -224,7 +287,7 @@ int main(int argc, char *argv[]) {
                     normalSpeed(render, gbInst, frameLimitter);
                 }
             }},
-            {SDLK_BACKQUOTE, [&]{
+            {SDLK_BACKQUOTE, [&] {
                 console.open();
                 gp_source.reset_pad();
             }}
@@ -247,8 +310,7 @@ int main(int argc, char *argv[]) {
                         console.update(sym, event.key.keysym.mod);
                     }
                 } else {
-                    if (uiActions.find(sym) != uiActions.end())
-                    {
+                    if (uiActions.find(sym) != uiActions.end()) {
                         uiActions[sym]();
                     }
                 }
@@ -264,6 +326,15 @@ int main(int argc, char *argv[]) {
     SDL_Quit();
 
     return 0;
+}
+
+void print_scan_state(Console &console, address_scan_state<uint8_t> &state, std::string searchType) {
+    console.addOutput(searchType);
+    for (auto &values : state.values()) {
+        std::stringstream s;
+        s << std::__1::hex << (unsigned int) values.first << ": " << std::__1::dec << (unsigned int) values.second << " (" << std::__1::hex << (unsigned int) values.second << ")";
+        console.addOutput(s.str());
+    }
 }
 
 void normalSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimitter) {
@@ -294,8 +365,7 @@ void loadState(sdl_renderer &render, gameboy &gbInst, RomFile &romFile) {
     render.display_message("State loaded", 2000);
 }
 
-void printScanResults(address_scan_result result, Console &console, address_scan_result &last_result, int scanThreshold)
-{
+void printScanResults(address_scan_result result, Console &console, address_scan_result &last_result, int scanThreshold) {
     if (last_result.size() > 1) {
         result = last_result.mutual_set(result);
     }
