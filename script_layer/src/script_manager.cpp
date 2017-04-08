@@ -31,3 +31,10 @@ bool script_manager::handleUnhandledCommand(const std::string &command, std::vec
     }
     return handled;
 }
+
+void script_manager::remove_vm(const std::string &name) {
+    if (_vms.find(name) != _vms.end())
+    {
+        _vms.erase(_vms.find(name));
+    }
+}
