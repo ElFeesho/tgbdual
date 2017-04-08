@@ -21,9 +21,7 @@
   <component name="ChangeListManager">
     <list default="true" id="436204fa-82f6-4f04-912b-50bf26d1358e" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/script_layer/include/script_manager.h" afterPath="$PROJECT_DIR$/script_layer/include/script_manager.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/script_layer/src/script_manager.cpp" afterPath="$PROJECT_DIR$/script_layer/src/script_manager.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/script_layer/test/script_manager.t.cpp" afterPath="$PROJECT_DIR$/script_layer/test/script_manager.t.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp" afterPath="$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <ignored path="$PROJECT_DIR$/gb_core_test/gtest/CMakeFiles/" />
@@ -38,11 +36,11 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="script_manager.t.cpp" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/script_layer/test/script_manager.t.cpp">
+      <file leaf-file-name="sdlmain.cpp" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="364">
-              <caret line="119" column="49" lean-forward="false" selection-start-line="119" selection-start-column="49" selection-end-line="119" selection-end-column="49" />
+            <state relative-caret-position="-635">
+              <caret line="112" column="54" lean-forward="true" selection-start-line="112" selection-start-column="54" selection-end-line="112" selection-end-column="54" />
               <folding />
             </state>
           </provider>
@@ -76,6 +74,7 @@
       <find>gb</find>
       <find>poli</find>
       <find>poke</find>
+      <find>scriptVms</find>
     </findStrings>
     <replaceStrings>
       <replace>context</replace>
@@ -112,7 +111,6 @@
         <option value="$PROJECT_DIR$/gb_core/include/gameboy.h" />
         <option value="$PROJECT_DIR$/sdl_ui/src/sdl_renderer.cpp" />
         <option value="$PROJECT_DIR$/sdl_ui/script.lua" />
-        <option value="$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp" />
         <option value="$PROJECT_DIR$/sdl_ui/script.wren" />
         <option value="$PROJECT_DIR$/gb_core_test/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/gb_core/CMakeLists.txt" />
@@ -130,6 +128,7 @@
         <option value="$PROJECT_DIR$/script_layer/include/script_manager.h" />
         <option value="$PROJECT_DIR$/script_layer/src/script_manager.cpp" />
         <option value="$PROJECT_DIR$/script_layer/test/script_manager.t.cpp" />
+        <option value="$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp" />
       </list>
     </option>
   </component>
@@ -393,7 +392,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Google Test.script_manager_test">
+  <component name="RunManager" selected="Application.tgbdual">
     <configuration default="true" type="#com.sylvanaar.idea.Lua.run.LuaConfigurationType" factoryName="Lua Script">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="INTERPRETER_PATH" value="" />
@@ -648,7 +647,7 @@
       <workItem from="1491545946063" duration="1831000" />
       <workItem from="1491564711057" duration="271000" />
       <workItem from="1491564997002" duration="9489000" />
-      <workItem from="1491597252699" duration="19290000" />
+      <workItem from="1491597252699" duration="19545000" />
     </task>
     <task id="LOCAL-00001" summary="Move gameboy output to middle of screen">
       <created>1491513742890</created>
@@ -706,16 +705,24 @@
       <option name="project" value="LOCAL" />
       <updated>1491673348538</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Add ability to remove script vm">
+      <created>1491673917090</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1491673917090</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Add ability to remove script vm">
+      <created>1491673967886</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1491673967886</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="script_manager_test - 2017.04.08 at 18h 49m 38s.xml">
-      <configuration name="script_manager_test" configurationId="CMakeGoogleTestRunConfigurationType" />
-    </history-entry>
-    <history-entry file="script_manager_test - 2017.04.08 at 18h 49m 40s.xml">
-      <configuration name="script_manager_test" configurationId="CMakeGoogleTestRunConfigurationType" />
-    </history-entry>
     <history-entry file="script_manager_test - 2017.04.08 at 18h 49m 42s.xml">
       <configuration name="script_manager_test" configurationId="CMakeGoogleTestRunConfigurationType" />
     </history-entry>
@@ -740,9 +747,15 @@
     <history-entry file="script_manager_test - 2017.04.08 at 18h 51m 47s.xml">
       <configuration name="script_manager_test" configurationId="CMakeGoogleTestRunConfigurationType" />
     </history-entry>
+    <history-entry file="script_manager_test - 2017.04.08 at 18h 52m 22s.xml">
+      <configuration name="script_manager_test" configurationId="CMakeGoogleTestRunConfigurationType" />
+    </history-entry>
+    <history-entry file="script_manager_test - 2017.04.08 at 18h 52m 42s.xml">
+      <configuration name="script_manager_test" configurationId="CMakeGoogleTestRunConfigurationType" />
+    </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="56549000" />
+    <option name="totallyTimeSpent" value="56804000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1676" height="1027" extended-state="6" />
@@ -753,7 +766,7 @@
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32941177" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32941177" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32941177" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32941177" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.29008567" sideWeight="0.5" order="4" side_tool="false" content_ui="combo" />
       <window_info id="LuaJ" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -791,7 +804,8 @@
     <MESSAGE value="Make testing easier" />
     <MESSAGE value="Add a script_manager class to handle multiple script vms" />
     <MESSAGE value="Rename macro_runner interface to script_vm" />
-    <option name="LAST_COMMIT_MESSAGE" value="Rename macro_runner interface to script_vm" />
+    <MESSAGE value="Add ability to remove script vm" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add ability to remove script vm" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -2208,24 +2222,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1832">
-          <caret line="114" column="32" lean-forward="false" selection-start-line="114" selection-start-column="32" selection-end-line="114" selection-end-column="32" />
-          <folding>
-            <marker date="1491673319000" expanded="true" signature="0:827" ph="/.../" />
-            <marker date="1491673319000" expanded="true" signature="838:1245" ph="..." />
-            <marker date="1491673319000" expanded="true" signature="1823:12020" ph="{...}" />
-            <marker date="1491673319000" expanded="true" signature="12122:12453" ph="{...}" />
-            <marker date="1491673319000" expanded="true" signature="12536:12651" ph="{...}" />
-            <marker date="1491673319000" expanded="true" signature="12739:12851" ph="{...}" />
-            <marker date="1491673319000" expanded="true" signature="12925:13171" ph="{...}" />
-            <marker date="1491673319000" expanded="true" signature="13245:13338" ph="{...}" />
-            <marker date="1491673319000" expanded="true" signature="13461:13917" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/script_layer/include/script_manager.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
@@ -2254,8 +2250,31 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/script_layer/test/script_manager.t.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="364">
-          <caret line="119" column="49" lean-forward="false" selection-start-line="119" selection-start-column="49" selection-end-line="119" selection-end-column="49" />
+        <state relative-caret-position="409">
+          <caret line="121" column="63" lean-forward="false" selection-start-line="121" selection-start-column="63" selection-end-line="121" selection-end-column="63" />
+          <folding>
+            <marker date="1491673960000" expanded="true" signature="9:108" ph="..." />
+            <marker date="1491673960000" expanded="true" signature="143:727" ph="{...}" />
+            <marker date="1491673960000" expanded="true" signature="351:381" ph="{...}" />
+            <marker date="1491673960000" expanded="true" signature="412:445" ph="{...}" />
+            <marker date="1491673960000" expanded="true" signature="503:511" ph="{...}" />
+            <marker date="1491673960000" expanded="true" signature="613:691" ph="{...}" />
+            <marker date="1491673960000" expanded="true" signature="770:1043" ph="{...}" />
+            <marker date="1491673960000" expanded="true" signature="1089:1372" ph="{...}" />
+            <marker date="1491673960000" expanded="true" signature="1427:1800" ph="{...}" />
+            <marker date="1491673960000" expanded="true" signature="1880:2162" ph="{...}" />
+            <marker date="1491673960000" expanded="true" signature="2239:2519" ph="{...}" />
+            <marker date="1491673960000" expanded="true" signature="2578:2930" ph="{...}" />
+            <marker date="1491673960000" expanded="true" signature="2987:3083" ph="{...}" />
+            <marker date="1491673960000" expanded="true" signature="3086:3922" ph="//..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-635">
+          <caret line="112" column="54" lean-forward="true" selection-start-line="112" selection-start-column="54" selection-end-line="112" selection-end-column="54" />
           <folding />
         </state>
       </provider>

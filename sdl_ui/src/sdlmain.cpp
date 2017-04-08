@@ -24,6 +24,7 @@
 #include <vector>
 
 #include <gameboy.h>
+#include <script_manager.h>
 
 #include "scripting/wren_script_vm.h"
 #include "scripting/lua_script_vm.h"
@@ -65,22 +66,15 @@ int main(int argc, char *argv[]) {
     sdl_gamepad_source gp_source;
     std::unique_ptr<link_cable_source> cable_source{provideLinkCableSource(&argc, &argv)};
 
-    std::map<std::string, std::unique_ptr<script_vm>> scriptVms;
+    script_manager scriptManager;
 
     Console console{[&](std::string &command, std::vector<std::string> &args) -> bool {
-        for (auto &vmPair : scriptVms) {
-            if (vmPair.second->handleUnhandledCommand(command, args)) {
-                return true;
-            }
-        }
-        return false;
+        return scriptManager.handleUnhandledCommand(command, args);
     }};
 
 
     sdl_renderer render{[&]() {
-        for (auto &vm : scriptVms) {
-            vm.second->tick();
-        }
+        scriptManager.tick();
         console.draw(SDL_GetVideoSurface());
     }};
     gameboy gbInst{&render, &gp_source, cable_source.get()};
@@ -237,18 +231,14 @@ int main(int argc, char *argv[]) {
             if (file.find(".wren") != std::string::npos) {
                 wren_script_vm *wrenVm = new wren_script_vm(context);
                 wrenVm->loadScript(file_buffer{file});
-                if (scriptVms.find(file) != scriptVms.end()) {
-                    scriptVms.erase(scriptVms.find(file));
-                }
-                scriptVms.emplace(file, std::unique_ptr<script_vm>(wrenVm));
+                scriptManager.remove_vm(file);
+                scriptManager.add_vm(file, wrenVm);
                 console.addOutput("Loaded " + file + " wren script");
             } else if (file.find(".lua") != std::string::npos) {
                 lua_script_vm *luaVm = new lua_script_vm(context);
                 luaVm->loadScript((file_buffer{file}));
-                if (scriptVms.find(file) != scriptVms.end()) {
-                    scriptVms.erase(scriptVms.find(file));
-                }
-                scriptVms.emplace(file, std::unique_ptr<script_vm>(luaVm));
+                scriptManager.remove_vm(file);
+                scriptManager.add_vm(file, luaVm);
                 console.addOutput("Loaded " + file + " lua script");
             } else {
                 console.addError("Cannot load " + file);
@@ -262,11 +252,7 @@ int main(int argc, char *argv[]) {
         if (args.size() == 1) {
             std::string &file = args[0];
 
-            if (scriptVms.find(file) != scriptVms.end()) {
-                scriptVms.erase(scriptVms.find(file));
-            } else {
-                console.addError(file + " is not loaded");
-            }
+            scriptManager.remove_vm(file);
         } else {
             console.addError("Usage: unload_script [loaded script file]");
         }
@@ -290,9 +276,7 @@ int main(int argc, char *argv[]) {
                 endGame = true;
             }},
             {SDLK_SPACE,     [&] {
-                std::for_each(scriptVms.begin(), scriptVms.end(), [](auto &pair) {
-                    pair.second->tick();
-                });
+                scriptManager.activate();
             }},
             {SDLK_TAB,       [&] {
                 fast_forward = !fast_forward;
