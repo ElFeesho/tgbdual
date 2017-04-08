@@ -4,17 +4,17 @@
 
 #pragma once
 
-#include <macro_runner.h>
+#include <script_vm.h>
 #include <script_context.h>
 #include <memory>
 
 #include <wren.hpp>
 
-class wren_macro_runner : public macro_runner {
+class wren_script_vm : public script_vm {
 public:
     using wrenvm_holder = std::unique_ptr<WrenVM, void(*)(WrenVM*)>;
 
-    wren_macro_runner(script_context &context);
+    wren_script_vm(script_context &context);
 
     void tick() override;
     void activate() override;

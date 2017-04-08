@@ -3,9 +3,9 @@
 #include <string>
 #include <vector>
 
-class macro_runner {
+class script_vm {
 public:
-    virtual ~macro_runner() {}
+    virtual ~script_vm() {}
 
     virtual void tick() = 0;
     virtual void activate() = 0;

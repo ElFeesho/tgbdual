@@ -25,8 +25,8 @@
 
 #include <gameboy.h>
 
-#include "scripting/wren_macro_runner.h"
-#include "scripting/lua_macro_runner.h"
+#include "scripting/wren_script_vm.h"
+#include "scripting/lua_script_vm.h"
 
 #include "console/Console.h"
 
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
     sdl_gamepad_source gp_source;
     std::unique_ptr<link_cable_source> cable_source{provideLinkCableSource(&argc, &argv)};
 
-    std::map<std::string, std::unique_ptr<macro_runner>> scriptVms;
+    std::map<std::string, std::unique_ptr<script_vm>> scriptVms;
 
     Console console{[&](std::string &command, std::vector<std::string> &args) -> bool {
         for (auto &vmPair : scriptVms) {
@@ -235,20 +235,20 @@ int main(int argc, char *argv[]) {
         if (args.size() == 1) {
             std::string &file = args[0];
             if (file.find(".wren") != std::string::npos) {
-                wren_macro_runner *wrenVm = new wren_macro_runner(context);
+                wren_script_vm *wrenVm = new wren_script_vm(context);
                 wrenVm->loadScript(file_buffer{file});
                 if (scriptVms.find(file) != scriptVms.end()) {
                     scriptVms.erase(scriptVms.find(file));
                 }
-                scriptVms.emplace(file, std::unique_ptr<macro_runner>(wrenVm));
+                scriptVms.emplace(file, std::unique_ptr<script_vm>(wrenVm));
                 console.addOutput("Loaded " + file + " wren script");
             } else if (file.find(".lua") != std::string::npos) {
-                lua_macro_runner *luaVm = new lua_macro_runner(context);
+                lua_script_vm *luaVm = new lua_script_vm(context);
                 luaVm->loadScript((file_buffer{file}));
                 if (scriptVms.find(file) != scriptVms.end()) {
                     scriptVms.erase(scriptVms.find(file));
                 }
-                scriptVms.emplace(file, std::unique_ptr<macro_runner>(luaVm));
+                scriptVms.emplace(file, std::unique_ptr<script_vm>(luaVm));
                 console.addOutput("Loaded " + file + " lua script");
             } else {
                 console.addError("Cannot load " + file);

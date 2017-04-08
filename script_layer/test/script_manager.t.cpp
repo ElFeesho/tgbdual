@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 #include <map>
 #include <memory>
-#include "macro_runner.h"
+#include "script_vm.h"
 #include "script_manager.h"
 
-class fake_vm : public macro_runner {
+class fake_vm : public script_vm {
 public:
     fake_vm(bool canHandleCommand = true) : _handleCommand{canHandleCommand} {}
     bool ticked = false;

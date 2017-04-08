@@ -5,7 +5,7 @@
 #include <wren.hpp>
 #include <wren.h>
 
-#include "wren_macro_runner.h"
+#include "wren_script_vm.h"
 
 WrenForeignMethodFn boundFunction(std::string name, std::string signature);
 void errorHandler(WrenVM *vm, WrenErrorType type, const char* module, int line, const char* message)
@@ -24,7 +24,7 @@ void errorHandler(WrenVM *vm, WrenErrorType type, const char* module, int line, 
     std::cerr << std::endl;
 }
 
-wren_macro_runner::wren_macro_runner(script_context &context) : _wrenVm{nullptr, wrenFreeVM} {
+wren_script_vm::wren_script_vm(script_context &context) : _wrenVm{nullptr, wrenFreeVM} {
     WrenConfiguration config;
     wrenInitConfiguration(&config);
 
@@ -56,13 +56,13 @@ wren_macro_runner::wren_macro_runner(script_context &context) : _wrenVm{nullptr,
     _wrenVm = wrenvm_holder(vm, wrenFreeVM);
 }
 
-void wren_macro_runner::tick() {
+void wren_script_vm::tick() {
     wrenEnsureSlots(_wrenVm.get(), 1);
     wrenGetVariable(_wrenVm.get(), "main", "tick", 0);
     wrenCall(_wrenVm.get(), wrenGetSlotHandle(_wrenVm.get(), 0));
 }
 
-void wren_macro_runner::activate() {
+void wren_script_vm::activate() {
     wrenEnsureSlots(_wrenVm.get(), 1);
     wrenGetVariable(_wrenVm.get(), "main", "activate", 0);
     wrenCall(_wrenVm.get(), wrenGetSlotHandle(_wrenVm.get(), 0));
@@ -70,7 +70,7 @@ void wren_macro_runner::activate() {
 
 
 
-void wren_macro_runner::loadScript(const std::string &scriptFile) {
+void wren_script_vm::loadScript(const std::string &scriptFile) {
     auto result = wrenInterpret(_wrenVm.get(), scriptFile.c_str());
     if (result == WREN_RESULT_COMPILE_ERROR)
     {
@@ -90,7 +90,7 @@ void wren_macro_runner::loadScript(const std::string &scriptFile) {
     wrenCall(_wrenVm.get(), wrenGetSlotHandle(_wrenVm.get(), 0));
 }
 
-bool wren_macro_runner::handleUnhandledCommand(const std::string &command, std::vector<std::string> args) {
+bool wren_script_vm::handleUnhandledCommand(const std::string &command, std::vector<std::string> args) {
     wrenEnsureSlots(_wrenVm.get(), 1);
     wrenGetVariable(_wrenVm.get(), "main", "handleCommand", 0);
     WrenType type = wrenGetSlotType(_wrenVm.get(), 0);

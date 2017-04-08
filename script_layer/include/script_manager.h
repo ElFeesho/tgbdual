@@ -2,11 +2,11 @@
 
 #include <string>
 #include <map>
-#include "macro_runner.h"
+#include "script_vm.h"
 
 class script_manager {
 public:
-    void add_vm(const std::string &name, macro_runner *vm);
+    void add_vm(const std::string &name, script_vm *vm);
 
     void tick();
     void activate();
@@ -14,5 +14,5 @@ public:
     bool handleUnhandledCommand(const std::string &command, std::vector<std::string> args);
 
 private:
-    std::map<std::string, std::unique_ptr<macro_runner>> _vms;
+    std::map<std::string, std::unique_ptr<script_vm>> _vms;
 };

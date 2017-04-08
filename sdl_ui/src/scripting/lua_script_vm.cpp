@@ -4,12 +4,12 @@
 
 #include <iostream>
 #include <map>
-#include "lua_macro_runner.h"
+#include "lua_script_vm.h"
 
 
 static std::map<lua_State *, script_context *> contexts;
 
-lua_macro_runner::lua_macro_runner(script_context &scriptContext) : state{luaL_newstate(), lua_close} {
+lua_script_vm::lua_script_vm(script_context &scriptContext) : state{luaL_newstate(), lua_close} {
     luaL_openlibs(state.get());
 
     contexts[state.get()] = &scriptContext;
@@ -108,21 +108,21 @@ lua_macro_runner::lua_macro_runner(script_context &scriptContext) : state{luaL_n
     }
 }
 
-void lua_macro_runner::bindFunction(const char *fnName, int (*fn)(lua_State *)) const {
+void lua_script_vm::bindFunction(const char *fnName, int (*fn)(lua_State *)) const {
     lua_pushcclosure(state.get(), fn, 0);
 
     lua_setfield(state.get(), -2, fnName);
 }
 
-void lua_macro_runner::activate() {
+void lua_script_vm::activate() {
     invokeLuaFunction("activate");
 }
 
-void lua_macro_runner::tick() {
+void lua_script_vm::tick() {
     invokeLuaFunction("tick");
 }
 
-void lua_macro_runner::invokeLuaFunction(const char *functionName) const {
+void lua_script_vm::invokeLuaFunction(const char *functionName) const {
     int function = lua_getglobal(state.get(), functionName);
     if (function == LUA_TFUNCTION) {
         if (lua_pcallk(state.get(), 0, 0, 0, 0, 0) != 0) {
@@ -133,7 +133,7 @@ void lua_macro_runner::invokeLuaFunction(const char *functionName) const {
     }
 }
 
-void lua_macro_runner::loadScript(const std::string &script) {
+void lua_script_vm::loadScript(const std::string &script) {
     if (luaL_loadstring(state.get(), script.c_str()) == LUA_OK) {
         contexts[state.get()]->print_string("Loaded script successfully");
         lua_pcallk(state.get(), 0, 0, 0, 0, nullptr);
@@ -142,7 +142,7 @@ void lua_macro_runner::loadScript(const std::string &script) {
     }
 }
 
-bool lua_macro_runner::handleUnhandledCommand(const std::string &command, std::vector<std::string> args) {
+bool lua_script_vm::handleUnhandledCommand(const std::string &command, std::vector<std::string> args) {
     if (lua_getglobal(state.get(), "handleCommand") == LUA_TFUNCTION) {
         lua_pushstring(state.get(), command.c_str());
         lua_createtable(state.get(), args.size(), 0);

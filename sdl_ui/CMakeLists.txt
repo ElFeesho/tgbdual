@@ -23,8 +23,8 @@ set(SDL_UI_SOURCES
         src/RomFile.cpp
         src/RomFile.h
         src/console/Console.cpp src/console/Console.h
-        src/scripting/lua_macro_runner.cpp src/scripting/lua_macro_runner.h
-        src/scripting/wren_macro_runner.cpp src/scripting/wren_macro_runner.h
+        src/scripting/lua_script_vm.cpp src/scripting/lua_script_vm.h
+        src/scripting/wren_script_vm.cpp src/scripting/wren_script_vm.h
         src/console/ConsoleCmd.cpp src/console/ConsoleCmd.h
         src/link_cable_source_provider.cpp src/link_cable_source_provider.h)
 

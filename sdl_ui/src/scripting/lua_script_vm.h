@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <macro_runner.h>
+#include <script_vm.h>
 #include <osd_renderer.h>
 #include <script_context.h>
 #include <input_queue.h>
@@ -12,9 +12,9 @@
 #include <lua.hpp>
 #include <memory>
 
-class lua_macro_runner : public macro_runner {
+class lua_script_vm : public script_vm {
 public:
-    lua_macro_runner(script_context &scriptContext);
+    lua_script_vm(script_context &scriptContext);
 
     void loadScript(const std::string &script) override;
 

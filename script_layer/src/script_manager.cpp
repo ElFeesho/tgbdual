@@ -4,8 +4,8 @@
 
 #include "script_manager.h"
 
-void script_manager::add_vm(const std::string &name, macro_runner *vm) {
-    _vms.emplace(name, std::unique_ptr<macro_runner>(vm));
+void script_manager::add_vm(const std::string &name, script_vm *vm) {
+    _vms.emplace(name, std::unique_ptr<script_vm>(vm));
 }
 
 void script_manager::tick() {
