@@ -2,14 +2,15 @@
 <project version="4">
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true" buildAllGenerated="true">
     <generated>
-      <config projectName="Project" targetName="gtest_main" />
       <config projectName="Project" targetName="gb_core" />
+      <config projectName="Project" targetName="gtest_main" />
       <config projectName="Project" targetName="gtest" />
+      <config projectName="Project" targetName="script_manager" />
       <config projectName="Project" targetName="address_scanner_test" />
       <config projectName="Project" targetName="cheat_test" />
-      <config projectName="Project" targetName="console_cmd_test" />
       <config projectName="Project" targetName="script_layer" />
       <config projectName="Project" targetName="tgbdual" />
+      <config projectName="Project" targetName="console_cmd" />
     </generated>
   </component>
   <component name="CMakeSettings" AUTO_RELOAD="true">
@@ -19,15 +20,185 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="436204fa-82f6-4f04-912b-50bf26d1358e" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sdl_ui/test/script_manager.t.cpp" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gb_core_test/CMakeLists.txt" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/address_scanner.t.cpp" afterPath="$PROJECT_DIR$/gb_core/test/address_scanner.t.cpp" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/cheat.t.cpp" afterPath="$PROJECT_DIR$/gb_core/test/cheat.t.cpp" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/console_cmd.t.cpp.cpp" afterPath="$PROJECT_DIR$/sdl_ui/test/console_cmd.t.cpp" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/CHANGES" afterPath="$PROJECT_DIR$/gtest/CHANGES" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/CMakeLists.txt" afterPath="$PROJECT_DIR$/gtest/CMakeLists.txt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/CONTRIBUTORS" afterPath="$PROJECT_DIR$/gtest/CONTRIBUTORS" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/LICENSE" afterPath="$PROJECT_DIR$/gtest/LICENSE" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/Makefile.am" afterPath="$PROJECT_DIR$/gtest/Makefile.am" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/README" afterPath="$PROJECT_DIR$/gtest/README" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/build-aux/.keep" afterPath="$PROJECT_DIR$/gtest/build-aux/.keep" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/cmake/internal_utils.cmake" afterPath="$PROJECT_DIR$/gtest/cmake/internal_utils.cmake" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/codegear/gtest.cbproj" afterPath="$PROJECT_DIR$/gtest/codegear/gtest.cbproj" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/codegear/gtest.groupproj" afterPath="$PROJECT_DIR$/gtest/codegear/gtest.groupproj" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/codegear/gtest_all.cc" afterPath="$PROJECT_DIR$/gtest/codegear/gtest_all.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/codegear/gtest_link.cc" afterPath="$PROJECT_DIR$/gtest/codegear/gtest_link.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/codegear/gtest_main.cbproj" afterPath="$PROJECT_DIR$/gtest/codegear/gtest_main.cbproj" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/codegear/gtest_unittest.cbproj" afterPath="$PROJECT_DIR$/gtest/codegear/gtest_unittest.cbproj" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/configure.ac" afterPath="$PROJECT_DIR$/gtest/configure.ac" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/gtest-death-test.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/gtest-death-test.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/gtest-message.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/gtest-message.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/gtest-param-test.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/gtest-param-test.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/gtest-param-test.h.pump" afterPath="$PROJECT_DIR$/gtest/include/gtest/gtest-param-test.h.pump" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/gtest-printers.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/gtest-printers.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/gtest-spi.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/gtest-spi.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/gtest-test-part.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/gtest-test-part.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/gtest-typed-test.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/gtest-typed-test.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/gtest.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/gtest.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/gtest_pred_impl.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/gtest_pred_impl.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/gtest_prod.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/gtest_prod.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-death-test-internal.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-death-test-internal.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-filepath.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-filepath.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-internal.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-internal.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-linked_ptr.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-linked_ptr.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-param-util-generated.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-param-util-generated.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-param-util-generated.h.pump" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-param-util-generated.h.pump" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-param-util.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-param-util.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-port.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-port.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-string.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-string.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-tuple.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-tuple.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-tuple.h.pump" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-tuple.h.pump" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-type-util.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-type-util.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-type-util.h.pump" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-type-util.h.pump" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/m4/acx_pthread.m4" afterPath="$PROJECT_DIR$/gtest/m4/acx_pthread.m4" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/m4/gtest.m4" afterPath="$PROJECT_DIR$/gtest/m4/gtest.m4" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/msvc/gtest-md.sln" afterPath="$PROJECT_DIR$/gtest/msvc/gtest-md.sln" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/msvc/gtest-md.vcproj" afterPath="$PROJECT_DIR$/gtest/msvc/gtest-md.vcproj" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/msvc/gtest.sln" afterPath="$PROJECT_DIR$/gtest/msvc/gtest.sln" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/msvc/gtest.vcproj" afterPath="$PROJECT_DIR$/gtest/msvc/gtest.vcproj" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/msvc/gtest_main-md.vcproj" afterPath="$PROJECT_DIR$/gtest/msvc/gtest_main-md.vcproj" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/msvc/gtest_main.vcproj" afterPath="$PROJECT_DIR$/gtest/msvc/gtest_main.vcproj" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/msvc/gtest_prod_test-md.vcproj" afterPath="$PROJECT_DIR$/gtest/msvc/gtest_prod_test-md.vcproj" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/msvc/gtest_prod_test.vcproj" afterPath="$PROJECT_DIR$/gtest/msvc/gtest_prod_test.vcproj" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/msvc/gtest_unittest-md.vcproj" afterPath="$PROJECT_DIR$/gtest/msvc/gtest_unittest-md.vcproj" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/msvc/gtest_unittest.vcproj" afterPath="$PROJECT_DIR$/gtest/msvc/gtest_unittest.vcproj" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/prime_tables.h" afterPath="$PROJECT_DIR$/gtest/samples/prime_tables.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample1.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample1.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample1.h" afterPath="$PROJECT_DIR$/gtest/samples/sample1.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample10_unittest.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample10_unittest.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample1_unittest.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample1_unittest.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample2.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample2.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample2.h" afterPath="$PROJECT_DIR$/gtest/samples/sample2.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample2_unittest.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample2_unittest.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample3-inl.h" afterPath="$PROJECT_DIR$/gtest/samples/sample3-inl.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample3_unittest.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample3_unittest.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample4.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample4.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample4.h" afterPath="$PROJECT_DIR$/gtest/samples/sample4.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample4_unittest.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample4_unittest.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample5_unittest.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample5_unittest.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample6_unittest.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample6_unittest.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample7_unittest.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample7_unittest.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample8_unittest.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample8_unittest.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample9_unittest.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample9_unittest.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/scripts/fuse_gtest_files.py" afterPath="$PROJECT_DIR$/gtest/scripts/fuse_gtest_files.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/scripts/gen_gtest_pred_impl.py" afterPath="$PROJECT_DIR$/gtest/scripts/gen_gtest_pred_impl.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/scripts/gtest-config.in" afterPath="$PROJECT_DIR$/gtest/scripts/gtest-config.in" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/scripts/pump.py" afterPath="$PROJECT_DIR$/gtest/scripts/pump.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/scripts/upload.py" afterPath="$PROJECT_DIR$/gtest/scripts/upload.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/scripts/upload_gtest.py" afterPath="$PROJECT_DIR$/gtest/scripts/upload_gtest.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/src/gtest-all.cc" afterPath="$PROJECT_DIR$/gtest/src/gtest-all.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/src/gtest-death-test.cc" afterPath="$PROJECT_DIR$/gtest/src/gtest-death-test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/src/gtest-filepath.cc" afterPath="$PROJECT_DIR$/gtest/src/gtest-filepath.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/src/gtest-internal-inl.h" afterPath="$PROJECT_DIR$/gtest/src/gtest-internal-inl.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/src/gtest-port.cc" afterPath="$PROJECT_DIR$/gtest/src/gtest-port.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/src/gtest-printers.cc" afterPath="$PROJECT_DIR$/gtest/src/gtest-printers.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/src/gtest-test-part.cc" afterPath="$PROJECT_DIR$/gtest/src/gtest-test-part.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/src/gtest-typed-test.cc" afterPath="$PROJECT_DIR$/gtest/src/gtest-typed-test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/src/gtest.cc" afterPath="$PROJECT_DIR$/gtest/src/gtest.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/src/gtest_main.cc" afterPath="$PROJECT_DIR$/gtest/src/gtest_main.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-death-test_ex_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-death-test_ex_test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-death-test_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-death-test_test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-filepath_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-filepath_test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-linked_ptr_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-linked_ptr_test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-listener_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-listener_test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-message_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-message_test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-options_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-options_test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-param-test2_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-param-test2_test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-param-test_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-param-test_test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-param-test_test.h" afterPath="$PROJECT_DIR$/gtest/test/gtest-param-test_test.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-port_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-port_test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-printers_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-printers_test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-test-part_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-test-part_test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-tuple_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-tuple_test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-typed-test2_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-typed-test2_test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-typed-test_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-typed-test_test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-typed-test_test.h" afterPath="$PROJECT_DIR$/gtest/test/gtest-typed-test_test.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-unittest-api_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-unittest-api_test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_all_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_all_test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_break_on_failure_unittest.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_break_on_failure_unittest.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_break_on_failure_unittest_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_break_on_failure_unittest_.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_catch_exceptions_test.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_catch_exceptions_test.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_catch_exceptions_test_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_catch_exceptions_test_.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_color_test.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_color_test.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_color_test_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_color_test_.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_env_var_test.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_env_var_test.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_env_var_test_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_env_var_test_.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_environment_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_environment_test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_filter_unittest.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_filter_unittest.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_filter_unittest_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_filter_unittest_.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_help_test.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_help_test.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_help_test_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_help_test_.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_list_tests_unittest.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_list_tests_unittest.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_list_tests_unittest_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_list_tests_unittest_.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_main_unittest.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_main_unittest.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_no_test_unittest.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_no_test_unittest.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_output_test.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_output_test.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_output_test_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_output_test_.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_output_test_golden_lin.txt" afterPath="$PROJECT_DIR$/gtest/test/gtest_output_test_golden_lin.txt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_pred_impl_unittest.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_pred_impl_unittest.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_premature_exit_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_premature_exit_test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_prod_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_prod_test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_repeat_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_repeat_test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_shuffle_test.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_shuffle_test.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_shuffle_test_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_shuffle_test_.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_sole_header_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_sole_header_test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_stress_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_stress_test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_test_utils.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_test_utils.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_throw_on_failure_ex_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_throw_on_failure_ex_test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_throw_on_failure_test.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_throw_on_failure_test.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_throw_on_failure_test_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_throw_on_failure_test_.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_uninitialized_test.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_uninitialized_test.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_uninitialized_test_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_uninitialized_test_.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_unittest.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_unittest.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_xml_outfile1_test_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_xml_outfile1_test_.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_xml_outfile2_test_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_xml_outfile2_test_.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_xml_outfiles_test.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_xml_outfiles_test.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_xml_output_unittest.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_xml_output_unittest.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_xml_output_unittest_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_xml_output_unittest_.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_xml_test_utils.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_xml_test_utils.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/production.cc" afterPath="$PROJECT_DIR$/gtest/test/production.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/production.h" afterPath="$PROJECT_DIR$/gtest/test/production.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Config/DebugProject.xcconfig" afterPath="$PROJECT_DIR$/gtest/xcode/Config/DebugProject.xcconfig" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Config/FrameworkTarget.xcconfig" afterPath="$PROJECT_DIR$/gtest/xcode/Config/FrameworkTarget.xcconfig" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Config/General.xcconfig" afterPath="$PROJECT_DIR$/gtest/xcode/Config/General.xcconfig" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Config/ReleaseProject.xcconfig" afterPath="$PROJECT_DIR$/gtest/xcode/Config/ReleaseProject.xcconfig" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Config/StaticLibraryTarget.xcconfig" afterPath="$PROJECT_DIR$/gtest/xcode/Config/StaticLibraryTarget.xcconfig" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Config/TestTarget.xcconfig" afterPath="$PROJECT_DIR$/gtest/xcode/Config/TestTarget.xcconfig" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Resources/Info.plist" afterPath="$PROJECT_DIR$/gtest/xcode/Resources/Info.plist" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Samples/FrameworkSample/Info.plist" afterPath="$PROJECT_DIR$/gtest/xcode/Samples/FrameworkSample/Info.plist" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Samples/FrameworkSample/WidgetFramework.xcodeproj/project.pbxproj" afterPath="$PROJECT_DIR$/gtest/xcode/Samples/FrameworkSample/WidgetFramework.xcodeproj/project.pbxproj" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Samples/FrameworkSample/runtests.sh" afterPath="$PROJECT_DIR$/gtest/xcode/Samples/FrameworkSample/runtests.sh" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Samples/FrameworkSample/widget.cc" afterPath="$PROJECT_DIR$/gtest/xcode/Samples/FrameworkSample/widget.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Samples/FrameworkSample/widget.h" afterPath="$PROJECT_DIR$/gtest/xcode/Samples/FrameworkSample/widget.h" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Samples/FrameworkSample/widget_test.cc" afterPath="$PROJECT_DIR$/gtest/xcode/Samples/FrameworkSample/widget_test.cc" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Scripts/runtests.sh" afterPath="$PROJECT_DIR$/gtest/xcode/Scripts/runtests.sh" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Scripts/versiongenerate.py" afterPath="$PROJECT_DIR$/gtest/xcode/Scripts/versiongenerate.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/gtest.xcodeproj/project.pbxproj" afterPath="$PROJECT_DIR$/gtest/xcode/gtest.xcodeproj/project.pbxproj" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gb_core/include/gameboy.h" afterPath="$PROJECT_DIR$/gb_core/include/gameboy.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gb_core/src/gameboy.cpp" afterPath="$PROJECT_DIR$/gb_core/src/gameboy.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CMakeLists.txt" afterPath="$PROJECT_DIR$/CMakeLists.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gb_core/CMakeLists.txt" afterPath="$PROJECT_DIR$/gb_core/CMakeLists.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sdl_ui/CMakeLists.txt" afterPath="$PROJECT_DIR$/sdl_ui/CMakeLists.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sdl_ui/script.lua" afterPath="$PROJECT_DIR$/sdl_ui/script.lua" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sdl_ui/script.wren" afterPath="$PROJECT_DIR$/sdl_ui/script.wren" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sdl_ui/src/sdl_renderer.cpp" afterPath="$PROJECT_DIR$/sdl_ui/src/sdl_renderer.cpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp" afterPath="$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <ignored path="$PROJECT_DIR$/gb_core_test/gtest/CMakeFiles/" />
+    <ignored path="$PROJECT_DIR$/gtest/CMakeFiles/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -38,11 +209,11 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="sdlmain.cpp" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp">
+      <file leaf-file-name="CMakeLists.txt" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/sdl_ui/CMakeLists.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1553">
-              <caret line="155" column="56" lean-forward="false" selection-start-line="155" selection-start-column="56" selection-end-line="155" selection-end-column="56" />
+            <state relative-caret-position="402">
+              <caret line="69" column="57" lean-forward="false" selection-start-line="69" selection-start-column="57" selection-end-line="69" selection-end-column="57" />
               <folding />
             </state>
           </provider>
@@ -75,6 +246,7 @@
       <find>gb_</find>
       <find>gb</find>
       <find>poli</find>
+      <find>poke</find>
     </findStrings>
     <replaceStrings>
       <replace>context</replace>
@@ -88,7 +260,6 @@
       <list>
         <option value="$PROJECT_DIR$/gb_core_test/console_cmd.t.cpp.cpp" />
         <option value="$PROJECT_DIR$/sdl_ui/src/RomFile.h" />
-        <option value="$PROJECT_DIR$/sdl_ui/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/sdl_ui/src/RomFile.cpp" />
         <option value="$PROJECT_DIR$/sdl_ui/src/link_cable_source_provider.h" />
         <option value="$PROJECT_DIR$/sdl_ui/src/link_cable_source_provider.cpp" />
@@ -105,22 +276,25 @@
         <option value="$PROJECT_DIR$/sdl_ui/src/console/Console.cpp" />
         <option value="$PROJECT_DIR$/sdl_ui/src/scripting/wren_macro_runner.cpp" />
         <option value="$PROJECT_DIR$/sdl_ui/src/scripting/lua_macro_runner.cpp" />
-        <option value="$PROJECT_DIR$/sdl_ui/script.lua" />
         <option value="$PROJECT_DIR$/sdl_ui/src/sdl_renderer.h" />
         <option value="$PROJECT_DIR$/gb_core_test/address_scanner.t.cpp" />
         <option value="$PROJECT_DIR$/gb_core/address_scanner.cpp" />
         <option value="$PROJECT_DIR$/gb_core/address_scanner.h" />
         <option value="$PROJECT_DIR$/gb_core/src/address_scanner.cpp" />
         <option value="$PROJECT_DIR$/gb_core/include/address_scanner.h" />
-        <option value="$PROJECT_DIR$/gb_core/CMakeLists.txt" />
-        <option value="$PROJECT_DIR$/CMakeLists.txt" />
-        <option value="$PROJECT_DIR$/gb_core_test/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/script_layer/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/gb_core/src/gameboy.cpp" />
         <option value="$PROJECT_DIR$/gb_core/include/gameboy.h" />
-        <option value="$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp" />
         <option value="$PROJECT_DIR$/sdl_ui/src/sdl_renderer.cpp" />
+        <option value="$PROJECT_DIR$/sdl_ui/script.lua" />
+        <option value="$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp" />
         <option value="$PROJECT_DIR$/sdl_ui/script.wren" />
+        <option value="$PROJECT_DIR$/gb_core_test/CMakeLists.txt" />
+        <option value="$PROJECT_DIR$/gb_core/CMakeLists.txt" />
+        <option value="$PROJECT_DIR$/CMakeLists.txt" />
+        <option value="$PROJECT_DIR$/sdl_ui/test/console_cmd.t.cpp" />
+        <option value="$PROJECT_DIR$/sdl_ui/test/script_manager.t.cpp" />
+        <option value="$PROJECT_DIR$/sdl_ui/CMakeLists.txt" />
       </list>
     </option>
   </component>
@@ -191,7 +365,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
+              <option name="myItemId" value="test" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -219,7 +393,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="gb_core_test" />
+              <option name="myItemId" value="gb_core" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -234,6 +408,10 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="gb_core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -255,24 +433,6 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="tgbdual" />
-              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="tgbdual" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="gb_core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="include" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
         </subPane>
       </pane>
     </panes>
@@ -285,6 +445,9 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/sdl_ui/test" />
+      <recent name="$PROJECT_DIR$/gb_core/test" />
+      <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/gb_core/include" />
       <recent name="$PROJECT_DIR$/gb_core/src" />
     </key>
@@ -301,7 +464,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.tgbdual">
+  <component name="RunManager" selected="Google Test.console_cmd_test">
     <configuration default="true" type="#com.sylvanaar.idea.Lua.run.LuaConfigurationType" factoryName="Lua Script">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="INTERPRETER_PATH" value="" />
@@ -500,10 +663,6 @@
       <envs />
       <method />
     </configuration>
-    <configuration default="false" name="gb_core" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Project" TARGET_NAME="gb_core" CONFIG_NAME="Debug">
-      <envs />
-      <method />
-    </configuration>
     <configuration default="false" name="address_scanner_test" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Project" TARGET_NAME="address_scanner_test" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Project" RUN_TARGET_NAME="address_scanner_test" TEST_MODE="SUITE_TEST">
       <envs />
       <method />
@@ -512,36 +671,25 @@
       <envs />
       <method />
     </configuration>
-    <configuration default="false" name="console_cmd_test" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Project" TARGET_NAME="console_cmd_test" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Project" RUN_TARGET_NAME="console_cmd_test" TEST_MODE="SUITE_TEST">
-      <envs />
-      <method />
-    </configuration>
-    <configuration default="false" name="gtest" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Project" TARGET_NAME="gtest" CONFIG_NAME="Debug">
-      <envs />
-      <method />
-    </configuration>
-    <configuration default="false" name="gtest_main" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Project" TARGET_NAME="gtest_main" CONFIG_NAME="Debug">
-      <envs />
-      <method />
-    </configuration>
-    <configuration default="false" name="script_layer" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Project" TARGET_NAME="script_layer" CONFIG_NAME="Debug">
-      <envs />
-      <method />
-    </configuration>
     <configuration default="false" name="tgbdual" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="crystal.gbc" WORKING_DIR="file://$PROJECT_DIR$/sdl_ui" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Project" TARGET_NAME="tgbdual" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Project" RUN_TARGET_NAME="tgbdual">
       <envs />
       <method />
     </configuration>
-    <list size="9">
+    <configuration default="false" name="console_cmd_test" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Project" TARGET_NAME="console_cmd" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Project" RUN_TARGET_NAME="console_cmd" TEST_MODE="SUITE_TEST">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="script_manager_test" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Project" TARGET_NAME="script_manager" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Project" RUN_TARGET_NAME="script_manager" TEST_MODE="SUITE_TEST">
+      <envs />
+      <method />
+    </configuration>
+    <list size="6">
       <item index="0" class="java.lang.String" itemvalue="Application.Build All" />
-      <item index="1" class="java.lang.String" itemvalue="Application.gb_core" />
-      <item index="2" class="java.lang.String" itemvalue="Google Test.address_scanner_test" />
-      <item index="3" class="java.lang.String" itemvalue="Google Test.cheat_test" />
+      <item index="1" class="java.lang.String" itemvalue="Google Test.address_scanner_test" />
+      <item index="2" class="java.lang.String" itemvalue="Google Test.cheat_test" />
+      <item index="3" class="java.lang.String" itemvalue="Application.tgbdual" />
       <item index="4" class="java.lang.String" itemvalue="Google Test.console_cmd_test" />
-      <item index="5" class="java.lang.String" itemvalue="Application.gtest" />
-      <item index="6" class="java.lang.String" itemvalue="Application.gtest_main" />
-      <item index="7" class="java.lang.String" itemvalue="Application.script_layer" />
-      <item index="8" class="java.lang.String" itemvalue="Application.tgbdual" />
+      <item index="5" class="java.lang.String" itemvalue="Google Test.script_manager_test" />
     </list>
   </component>
   <component name="ShelveChangesManager" show_recycled="false">
@@ -571,7 +719,7 @@
       <workItem from="1491545946063" duration="1831000" />
       <workItem from="1491564711057" duration="271000" />
       <workItem from="1491564997002" duration="9489000" />
-      <workItem from="1491597252699" duration="9043000" />
+      <workItem from="1491597252699" duration="16018000" />
     </task>
     <task id="LOCAL-00001" summary="Move gameboy output to middle of screen">
       <created>1491513742890</created>
@@ -601,22 +749,17 @@
       <option name="project" value="LOCAL" />
       <updated>1491603186832</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Implement fuzzy searching">
+      <created>1491608033248</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1491608033248</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="address_scanner_test - 2017.04.07 at 22h 32m 25s.xml">
-      <configuration name="address_scanner_test" configurationId="CMakeGoogleTestRunConfigurationType" />
-    </history-entry>
-    <history-entry file="address_scanner_test - 2017.04.07 at 22h 32m 38s.xml">
-      <configuration name="address_scanner_test" configurationId="CMakeGoogleTestRunConfigurationType" />
-    </history-entry>
-    <history-entry file="address_scanner_test - 2017.04.07 at 22h 34m 00s.xml">
-      <configuration name="address_scanner_test" configurationId="CMakeGoogleTestRunConfigurationType" />
-    </history-entry>
-    <history-entry file="address_scanner_test - 2017.04.07 at 22h 34m 39s.xml">
-      <configuration name="address_scanner_test" configurationId="CMakeGoogleTestRunConfigurationType" />
-    </history-entry>
     <history-entry file="address_scanner_test - 2017.04.07 at 22h 36m 23s.xml">
       <configuration name="address_scanner_test" configurationId="CMakeGoogleTestRunConfigurationType" />
     </history-entry>
@@ -635,9 +778,21 @@
     <history-entry file="address_scanner_test - 2017.04.07 at 23h 12m 14s.xml">
       <configuration name="address_scanner_test" configurationId="CMakeGoogleTestRunConfigurationType" />
     </history-entry>
+    <history-entry file="console_cmd_test - 2017.04.08 at 16h 58m 05s.xml">
+      <configuration name="console_cmd_test" configurationId="CMakeGoogleTestRunConfigurationType" />
+    </history-entry>
+    <history-entry file="console_cmd_test - 2017.04.08 at 17h 11m 53s.xml">
+      <configuration name="console_cmd_test" configurationId="CMakeGoogleTestRunConfigurationType" />
+    </history-entry>
+    <history-entry file="script_manager_test - 2017.04.08 at 16h 53m 40s.xml">
+      <configuration name="script_manager_test" configurationId="CMakeGoogleTestRunConfigurationType" />
+    </history-entry>
+    <history-entry file="script_manager_test - 2017.04.08 at 16h 54m 16s.xml">
+      <configuration name="script_manager_test" configurationId="CMakeGoogleTestRunConfigurationType" />
+    </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="46302000" />
+    <option name="totallyTimeSpent" value="53277000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1676" height="1027" extended-state="6" />
@@ -648,7 +803,7 @@
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32941177" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32941177" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32941177" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32941177" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.29008567" sideWeight="0.5" order="4" side_tool="false" content_ui="combo" />
       <window_info id="LuaJ" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -682,7 +837,8 @@
     <MESSAGE value="Fix slow fast forward and provide mechanism for implementing custom console commands" />
     <MESSAGE value="Introduce ability to relatively search for values" />
     <MESSAGE value="Restructure project" />
-    <option name="LAST_COMMIT_MESSAGE" value="Restructure project" />
+    <MESSAGE value="Implement fuzzy searching" />
+    <option name="LAST_COMMIT_MESSAGE" value="Implement fuzzy searching" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -691,425 +847,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/sdl_ui/src/network/multicast_transmitter.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="1" column="21" lean-forward="false" selection-start-line="1" selection-start-column="21" selection-end-line="1" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/functional">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="186">
-          <caret line="1816" column="0" lean-forward="false" selection-start-line="1816" selection-start-column="0" selection-end-line="1816" selection-end-column="0" />
-          <folding>
-            <marker date="1487207607000" expanded="true" signature="0:370" ph="//..." />
-            <marker date="1487207607000" expanded="true" signature="427:13710" ph="/.../" />
-            <marker date="1487207607000" expanded="true" signature="13721:13860" ph="..." />
-            <marker date="1487207607000" expanded="false" signature="14000:14027" ph="&lt;_Tp=void&gt;" />
-            <marker date="1487207607000" expanded="false" signature="14034:14054" ph="..." />
-            <marker date="1487207607000" expanded="true" signature="14129:14277" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="14305:14316" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="14357:14771" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="14363:14394" ph="&lt;_T1,_T2&gt;" />
-            <marker date="1487207607000" expanded="false" signature="14807:14834" ph="&lt;_Tp=void&gt;" />
-            <marker date="1487207607000" expanded="false" signature="14841:14861" ph="..." />
-            <marker date="1487207607000" expanded="true" signature="14937:15085" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="15113:15124" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="15166:15580" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="15172:15203" ph="&lt;_T1,_T2&gt;" />
-            <marker date="1487207607000" expanded="false" signature="15616:15643" ph="&lt;_Tp=void&gt;" />
-            <marker date="1487207607000" expanded="false" signature="15650:15670" ph="..." />
-            <marker date="1487207607000" expanded="true" signature="15751:15899" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="15927:15938" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="15985:16399" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="15991:16022" ph="&lt;_T1,_T2&gt;" />
-            <marker date="1487207607000" expanded="false" signature="16435:16462" ph="&lt;_Tp=void&gt;" />
-            <marker date="1487207607000" expanded="false" signature="16469:16489" ph="..." />
-            <marker date="1487207607000" expanded="true" signature="16567:16715" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="16743:16754" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="16798:17212" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="16804:16835" ph="&lt;_T1,_T2&gt;" />
-            <marker date="1487207607000" expanded="false" signature="17248:17275" ph="&lt;_Tp=void&gt;" />
-            <marker date="1487207607000" expanded="false" signature="17282:17302" ph="..." />
-            <marker date="1487207607000" expanded="true" signature="17380:17528" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="17556:17567" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="17611:18025" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="17617:17648" ph="&lt;_T1,_T2&gt;" />
-            <marker date="1487207607000" expanded="false" signature="18061:18088" ph="&lt;_Tp=void&gt;" />
-            <marker date="1487207607000" expanded="false" signature="18095:18115" ph="..." />
-            <marker date="1487207607000" expanded="true" signature="18186:18313" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="18341:18352" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="18395:18712" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="18401:18421" ph="&lt;_Tp&gt;" />
-            <marker date="1487207607000" expanded="false" signature="18748:18775" ph="&lt;_Tp=void&gt;" />
-            <marker date="1487207607000" expanded="false" signature="18782:18802" ph="..." />
-            <marker date="1487207607000" expanded="true" signature="18882:19032" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="19060:19071" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="19116:19533" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="19122:19153" ph="&lt;_T1,_T2&gt;" />
-            <marker date="1487207607000" expanded="false" signature="19569:19596" ph="&lt;_Tp=void&gt;" />
-            <marker date="1487207607000" expanded="false" signature="19603:19623" ph="..." />
-            <marker date="1487207607000" expanded="true" signature="19707:19857" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="19885:19896" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="19945:20362" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="19951:19982" ph="&lt;_T1,_T2&gt;" />
-            <marker date="1487207607000" expanded="false" signature="20398:20425" ph="&lt;_Tp=void&gt;" />
-            <marker date="1487207607000" expanded="false" signature="20432:20452" ph="..." />
-            <marker date="1487207607000" expanded="true" signature="20531:20680" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="20708:20719" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="20763:21177" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="20769:20800" ph="&lt;_T1,_T2&gt;" />
-            <marker date="1487207607000" expanded="false" signature="21245:21272" ph="&lt;_Tp=void&gt;" />
-            <marker date="1487207607000" expanded="false" signature="21279:21299" ph="..." />
-            <marker date="1487207607000" expanded="true" signature="21384:21534" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="21562:21573" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="21623:22040" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="21629:21660" ph="&lt;_T1,_T2&gt;" />
-            <marker date="1487207607000" expanded="false" signature="22076:22103" ph="&lt;_Tp=void&gt;" />
-            <marker date="1487207607000" expanded="false" signature="22110:22130" ph="..." />
-            <marker date="1487207607000" expanded="true" signature="22212:22362" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="22390:22401" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="22448:22865" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="22454:22485" ph="&lt;_T1,_T2&gt;" />
-            <marker date="1487207607000" expanded="false" signature="22901:22928" ph="&lt;_Tp=void&gt;" />
-            <marker date="1487207607000" expanded="false" signature="22935:22955" ph="..." />
-            <marker date="1487207607000" expanded="true" signature="23038:23188" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="23216:23227" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="23275:23692" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="23281:23312" ph="&lt;_T1,_T2&gt;" />
-            <marker date="1487207607000" expanded="false" signature="23728:23755" ph="&lt;_Tp=void&gt;" />
-            <marker date="1487207607000" expanded="false" signature="23762:23782" ph="..." />
-            <marker date="1487207607000" expanded="true" signature="23864:24014" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="24042:24053" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="24100:24517" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="24106:24137" ph="&lt;_T1,_T2&gt;" />
-            <marker date="1487207607000" expanded="false" signature="24553:24580" ph="&lt;_Tp=void&gt;" />
-            <marker date="1487207607000" expanded="false" signature="24587:24607" ph="..." />
-            <marker date="1487207607000" expanded="true" signature="24684:24812" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="24840:24851" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="24899:25213" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="24905:24925" ph="&lt;_Tp&gt;" />
-            <marker date="1487207607000" expanded="false" signature="25249:25276" ph="&lt;_Tp=void&gt;" />
-            <marker date="1487207607000" expanded="false" signature="25283:25303" ph="..." />
-            <marker date="1487207607000" expanded="true" signature="25381:25529" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="25557:25568" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="25612:26026" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="25618:25649" ph="&lt;_T1,_T2&gt;" />
-            <marker date="1487207607000" expanded="false" signature="26062:26089" ph="&lt;_Tp=void&gt;" />
-            <marker date="1487207607000" expanded="false" signature="26096:26116" ph="..." />
-            <marker date="1487207607000" expanded="true" signature="26193:26341" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="26369:26380" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="26423:26837" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="26429:26460" ph="&lt;_T1,_T2&gt;" />
-            <marker date="1487207607000" expanded="false" signature="26873:26900" ph="&lt;_Tp=void&gt;" />
-            <marker date="1487207607000" expanded="false" signature="26907:26927" ph="..." />
-            <marker date="1487207607000" expanded="true" signature="27005:27153" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="27181:27192" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="27236:27650" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="27242:27273" ph="&lt;_T1,_T2&gt;" />
-            <marker date="1487207607000" expanded="false" signature="27686:27713" ph="&lt;_Tp=void&gt;" />
-            <marker date="1487207607000" expanded="true" signature="27778:27905" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="27908:27919" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="27963:28277" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="27969:27989" ph="&lt;_Tp&gt;" />
-            <marker date="1487207607000" expanded="false" signature="28287:28314" ph="&lt;_Predicate&gt;" />
-            <marker date="1487207607000" expanded="true" signature="28426:28767" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="28770:28797" ph="&lt;_Predicate&gt;" />
-            <marker date="1487207607000" expanded="false" signature="28961:28988" ph="&lt;_Predicate&gt;" />
-            <marker date="1487207607000" expanded="true" signature="29059:29208" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="true" signature="29209:29630" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="29633:29660" ph="&lt;_Predicate&gt;" />
-            <marker date="1487207607000" expanded="false" signature="29826:29854" ph="&lt;__Operation&gt;" />
-            <marker date="1487207607000" expanded="true" signature="29920:30027" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="true" signature="30028:30692" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="30695:30734" ph="&lt;__Operation,_Tp&gt;" />
-            <marker date="1487207607000" expanded="false" signature="30889:30917" ph="&lt;__Operation&gt;" />
-            <marker date="1487207607000" expanded="true" signature="30983:31089" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="true" signature="31090:31734" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="31737:31776" ph="&lt;__Operation,_Tp&gt;" />
-            <marker date="1487207607000" expanded="false" signature="31931:31967" ph="&lt;_Arg,_Result&gt;" />
-            <marker date="1487207607000" expanded="true" signature="32065:32306" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="32309:32345" ph="&lt;_Arg,_Result&gt;" />
-            <marker date="1487207607000" expanded="false" signature="32509:32559" ph="&lt;_Arg1,_Arg2,_Result&gt;" />
-            <marker date="1487207607000" expanded="true" signature="32667:32942" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="32945:32995" ph="&lt;_Arg1,_Arg2,_Result&gt;" />
-            <marker date="1487207607000" expanded="false" signature="33182:33212" ph="&lt;_Sp,_Tp&gt;" />
-            <marker date="1487207607000" expanded="true" signature="33286:33506" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="33509:33550" ph="&lt;_Sp,_Tp,_Ap&gt;" />
-            <marker date="1487207607000" expanded="true" signature="33631:33870" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="33873:33903" ph="&lt;_Sp,_Tp&gt;" />
-            <marker date="1487207607000" expanded="false" signature="34022:34063" ph="&lt;_Sp,_Tp,_Ap&gt;" />
-            <marker date="1487207607000" expanded="false" signature="34195:34225" ph="&lt;_Sp,_Tp&gt;" />
-            <marker date="1487207607000" expanded="true" signature="34302:34525" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="34528:34569" ph="&lt;_Sp,_Tp,_Ap&gt;" />
-            <marker date="1487207607000" expanded="true" signature="34653:34895" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="34898:34928" ph="&lt;_Sp,_Tp&gt;" />
-            <marker date="1487207607000" expanded="false" signature="35059:35100" ph="&lt;_Sp,_Tp,_Ap&gt;" />
-            <marker date="1487207607000" expanded="false" signature="35244:35275" ph="&lt;_Sp,_Tp&gt;" />
-            <marker date="1487207607000" expanded="true" signature="35361:35605" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="35608:35650" ph="&lt;_Sp,_Tp,_Ap&gt;" />
-            <marker date="1487207607000" expanded="true" signature="35743:36006" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="36009:36040" ph="&lt;_Sp,_Tp&gt;" />
-            <marker date="1487207607000" expanded="false" signature="36177:36219" ph="&lt;_Sp,_Tp,_Ap&gt;" />
-            <marker date="1487207607000" expanded="false" signature="36369:36400" ph="&lt;_Sp,_Tp&gt;" />
-            <marker date="1487207607000" expanded="true" signature="36483:36730" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="36733:36775" ph="&lt;_Sp,_Tp,_Ap&gt;" />
-            <marker date="1487207607000" expanded="true" signature="36869:37135" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="37138:37169" ph="&lt;_Sp,_Tp&gt;" />
-            <marker date="1487207607000" expanded="false" signature="37318:37360" ph="&lt;_Sp,_Tp,_Ap&gt;" />
-            <marker date="1487207607000" expanded="false" signature="37726:37746" ph="&lt;_Tp&gt;" />
-            <marker date="1487207607000" expanded="true" signature="37799:38796" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="37993:38022" ph="&lt;..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="true" signature="38153:38229" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="38241:38787" ph="..." />
-            <marker date="1487207607000" expanded="false" signature="38799:38829" ph="&lt;_Rp,_Tp&gt;" />
-            <marker date="1487207607000" expanded="true" signature="38908:38950" ph="{...}" />
-            <marker date="1487207607000" expanded="true" signature="39249:39252" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="39255:39274" ph="&lt;_Fp&gt;" />
-            <marker date="1487207607000" expanded="true" signature="39348:39766" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="39351:39370" ph="&lt;_Rp&gt;" />
-            <marker date="1487207607000" expanded="true" signature="39413:39416" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="39419:39449" ph="&lt;_Rp,_A1&gt;" />
-            <marker date="1487207607000" expanded="true" signature="39540:39543" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="39546:39565" ph="&lt;_Rp&gt;" />
-            <marker date="1487207607000" expanded="true" signature="39609:39612" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="39615:39656" ph="&lt;_Rp,_A1,_A2&gt;" />
-            <marker date="1487207607000" expanded="true" signature="39759:39762" ph="{...}" />
-            <marker date="1487207607000" expanded="true" signature="39847:44203" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="39850:39869" ph="&lt;_Fp&gt;" />
-            <marker date="1487207607000" expanded="false" signature="39885:39924" ph="&lt;_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="true" signature="39957:40546" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="40549:40593" ph="&lt;_FD,_Alloc,_FB&gt;" />
-            <marker date="1487207607000" expanded="false" signature="40609:40673" ph="&lt;_Fp,_Alloc,_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="true" signature="40759:42139" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="42142:42206" ph="&lt;_Fp,_Alloc,_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="true" signature="42290:42652" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="42654:42718" ph="&lt;_Fp,_Alloc,_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="true" signature="42810:42866" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="42868:42932" ph="&lt;_Fp,_Alloc,_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="true" signature="42998:43045" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="43047:43111" ph="&lt;_Fp,_Alloc,_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="true" signature="43188:43423" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="43425:43489" ph="&lt;_Fp,_Alloc,_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="true" signature="43568:43707" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="43734:43798" ph="&lt;_Fp,_Alloc,_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="true" signature="43897:43986" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="43988:44052" ph="&lt;_Fp,_Alloc,_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="true" signature="44145:44172" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="44220:44259" ph="&lt;_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="true" signature="44476:48854" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="44619:44639" ph="&lt;_Fp&gt;" />
-            <marker date="1487207607000" expanded="false" signature="44736:44770" ph="&lt;_R2,..._Ap&gt;" />
-            <marker date="1487207607000" expanded="false" signature="44874:44919" ph="&lt;_R2,_Cp,..._Ap&gt;" />
-            <marker date="1487207607000" expanded="false" signature="45028:45073" ph="&lt;_R2,_Cp,..._Ap&gt;" />
-            <marker date="1487207607000" expanded="false" signature="45188:45233" ph="&lt;_R2,_Cp,..._Ap&gt;" />
-            <marker date="1487207607000" expanded="false" signature="45351:45396" ph="&lt;_R2,_Cp,..._Ap&gt;" />
-            <marker date="1487207607000" expanded="false" signature="45520:45554" ph="&lt;_R2,..._Ap&gt;" />
-            <marker date="1487207607000" expanded="false" signature="45675:45808" ph="&lt;_Fp,bool=!is_same&lt;_Fp,function&gt;::value&amp;&amp;__invokable&lt;_Fp&amp;,_ArgTypes...&gt;::value&gt;" />
-            <marker date="1487207607000" expanded="false" signature="45840:45860" ph="&lt;_Fp&gt;" />
-            <marker date="1487207607000" expanded="true" signature="45906:46107" ph="{...}" />
-            <marker date="1487207607000" expanded="true" signature="46005:46089" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="false" signature="46113:46133" ph="&lt;_Fp&gt;" />
-            <marker date="1487207607000" expanded="true" signature="46180:46236" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="46523:46542" ph="&lt;_Fp&gt;" />
-            <marker date="1487207607000" expanded="true" signature="46619:46797" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="false" signature="46816:46838" ph="&lt;_Alloc&gt;" />
-            <marker date="1487207607000" expanded="false" signature="46945:46967" ph="&lt;_Alloc&gt;" />
-            <marker date="1487207607000" expanded="false" signature="47085:47107" ph="&lt;_Alloc&gt;" />
-            <marker date="1487207607000" expanded="false" signature="47177:47199" ph="&lt;_Alloc&gt;" />
-            <marker date="1487207607000" expanded="false" signature="47264:47297" ph="&lt;_Fp,_Alloc&gt;" />
-            <marker date="1487207607000" expanded="false" signature="47569:47588" ph="&lt;_Fp&gt;" />
-            <marker date="1487207607000" expanded="true" signature="47620:47776" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="false" signature="47893:47926" ph="&lt;_Fp,_Alloc&gt;" />
-            <marker date="1487207607000" expanded="false" signature="48283:48323" ph="&lt;_R2,..._ArgTypes2&gt;" />
-            <marker date="1487207607000" expanded="false" signature="48403:48443" ph="&lt;_R2,..._ArgTypes2&gt;" />
-            <marker date="1487207607000" expanded="false" signature="48712:48735" ph="&lt;_Tp&gt;" />
-            <marker date="1487207607000" expanded="false" signature="48765:48788" ph="&lt;_Tp&gt;" />
-            <marker date="1487207607000" expanded="false" signature="48857:48896" ph="&lt;_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="true" signature="48956:49176" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="49178:49217" ph="&lt;_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="false" signature="49218:49241" ph="&lt;_Alloc&gt;" />
-            <marker date="1487207607000" expanded="true" signature="49370:49590" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="49592:49631" ph="&lt;_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="true" signature="49696:49933" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="49935:49974" ph="&lt;_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="false" signature="49975:49998" ph="&lt;_Alloc&gt;" />
-            <marker date="1487207607000" expanded="true" signature="50122:50359" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="50361:50400" ph="&lt;_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="false" signature="50401:50421" ph="&lt;_Fp&gt;" />
-            <marker date="1487207607000" expanded="true" signature="50562:50739" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="true" signature="50762:51410" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="51412:51451" ph="&lt;_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="false" signature="51452:51486" ph="&lt;_Fp,_Alloc&gt;" />
-            <marker date="1487207607000" expanded="true" signature="51673:52470" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="52472:52511" ph="&lt;_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="true" signature="52601:52653" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="52655:52694" ph="&lt;_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="true" signature="52789:53172" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="53174:53213" ph="&lt;_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="true" signature="53303:53452" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="53454:53493" ph="&lt;_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="false" signature="53494:53514" ph="&lt;_Fp&gt;" />
-            <marker date="1487207607000" expanded="true" signature="53534:53748" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="true" signature="53805:53878" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="53880:53919" ph="&lt;_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="true" signature="53961:54078" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="54080:54119" ph="&lt;_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="true" signature="54184:55111" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="55113:55152" ph="&lt;_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="true" signature="55223:55400" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="55427:55466" ph="&lt;_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="true" signature="55548:55631" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="55633:55672" ph="&lt;_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="false" signature="55673:55696" ph="&lt;_Tp&gt;" />
-            <marker date="1487207607000" expanded="true" signature="55750:55840" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="55842:55881" ph="&lt;_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="false" signature="55882:55905" ph="&lt;_Tp&gt;" />
-            <marker date="1487207607000" expanded="true" signature="55971:56073" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="56103:56143" ph="&lt;_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="false" signature="56270:56310" ph="&lt;_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="false" signature="56437:56477" ph="&lt;_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="false" signature="56609:56649" ph="&lt;_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="false" signature="56781:56821" ph="&lt;_Rp,..._ArgTypes&gt;" />
-            <marker date="1487207607000" expanded="false" signature="57003:57029" ph="..." />
-            <marker date="1487207607000" expanded="false" signature="57243:57262" ph="&lt;_Tp&gt;" />
-            <marker date="1487207607000" expanded="false" signature="57315:57334" ph="&lt;_Tp&gt;" />
-            <marker date="1487207607000" expanded="false" signature="57453:57472" ph="&lt;_Tp&gt;" />
-            <marker date="1487207607000" expanded="false" signature="57536:57555" ph="&lt;_Tp&gt;" />
-            <marker date="1487207607000" expanded="true" signature="57689:58110" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="57692:57710" ph="&lt;int _Np&gt;" />
-            <marker date="1487207607000" expanded="false" signature="58129:58146" ph="&lt;int _Np&gt;" />
-            <marker date="1487207607000" expanded="false" signature="58278:58309" ph="&lt;_Tp,_Uj&gt;" />
-            <marker date="1487207607000" expanded="true" signature="58387:58412" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="58414:58465" ph="&lt;_Ti,..._Uj,size_t..._Indx&gt;" />
-            <marker date="1487207607000" expanded="true" signature="58611:58680" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="58682:58716" ph="&lt;_Ti,..._Uj&gt;" />
-            <marker date="1487207607000" expanded="true" signature="58776:58843" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="true" signature="58889:59017" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="59019:59061" ph="&lt;bool IsPh,_Ti,_Uj&gt;" />
-            <marker date="1487207607000" expanded="false" signature="59087:59118" ph="&lt;_Ti,_Uj&gt;" />
-            <marker date="1487207607000" expanded="true" signature="59155:59242" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="59245:59276" ph="&lt;_Ti,_Uj&gt;" />
-            <marker date="1487207607000" expanded="true" signature="59329:59442" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="true" signature="59471:59625" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="59627:59658" ph="&lt;_Ti,_Uj&gt;" />
-            <marker date="1487207607000" expanded="true" signature="59711:59842" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="true" signature="59871:59891" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="59893:59990" ph="&lt;_Ti,bool IsReferenceWrapper,bool IsBindEx,bool IsPh,_TupleUj&gt;" />
-            <marker date="1487207607000" expanded="false" signature="60014:60065" ph="&lt;bool _Invokable,_Ti,..._Uj&gt;" />
-            <marker date="1487207607000" expanded="true" signature="60107:60134" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="60137:60171" ph="&lt;_Ti,..._Uj&gt;" />
-            <marker date="1487207607000" expanded="true" signature="60222:60284" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="60287:60321" ph="&lt;_Ti,..._Uj&gt;" />
-            <marker date="1487207607000" expanded="false" signature="60474:60510" ph="&lt;_Ti,_TupleUj&gt;" />
-            <marker date="1487207607000" expanded="true" signature="60567:60696" ph="{...}" />
-            <marker date="1487207607000" expanded="true" signature="60603:60680" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="false" signature="60699:60735" ph="&lt;_Ti,_TupleUj&gt;" />
-            <marker date="1487207607000" expanded="true" signature="60792:60833" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="60836:60872" ph="&lt;_Ti,_TupleUj&gt;" />
-            <marker date="1487207607000" expanded="true" signature="60930:60956" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="60959:60995" ph="&lt;_Ti,_TupleUj&gt;" />
-            <marker date="1487207607000" expanded="true" signature="61041:61352" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="true" signature="61353:61356" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="61359:61413" ph="&lt;_Fp,_BoundArgs,_TupleUj&gt;" />
-            <marker date="1487207607000" expanded="true" signature="61444:61484" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="61487:61544" ph="&lt;_Fp,..._BoundArgs,_TupleUj&gt;" />
-            <marker date="1487207607000" expanded="true" signature="61655:61733" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="false" signature="61746:61803" ph="&lt;_Fp,..._BoundArgs,_TupleUj&gt;" />
-            <marker date="1487207607000" expanded="true" signature="61920:62004" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="false" signature="62017:62146" ph="&lt;_Fp,_BoundArgs,_TupleUj,bool=__is_valid_bind_return&lt;_Fp,_BoundArgs,_TupleUj&gt;::value&gt;" />
-            <marker date="1487207607000" expanded="false" signature="62170:62227" ph="&lt;_Fp,..._BoundArgs,_TupleUj&gt;" />
-            <marker date="1487207607000" expanded="true" signature="62292:62469" ph="{...}" />
-            <marker date="1487207607000" expanded="true" signature="62331:62455" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="true" signature="62384:62440" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="false" signature="62472:62529" ph="&lt;_Fp,..._BoundArgs,_TupleUj&gt;" />
-            <marker date="1487207607000" expanded="true" signature="62600:62783" ph="{...}" />
-            <marker date="1487207607000" expanded="true" signature="62639:62769" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="true" signature="62692:62754" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="false" signature="62786:62854" ph="&lt;_Fp,_BoundArgs,size_t..._Indx,_Args&gt;" />
-            <marker date="1487207607000" expanded="true" signature="63052:63131" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="63133:63173" ph="&lt;_Fp,..._BoundArgs&gt;" />
-            <marker date="1487207607000" expanded="true" signature="63246:65517" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="63546:64196" ph="..." />
-            <marker date="1487207607000" expanded="false" signature="64249:64607" ph="&lt;_Gp,..._BA,=enable_if&lt;is_constructible&lt;_Fd,_Gp&gt;::value&amp;&amp;!is_same&lt;remove_reference&lt;_Gp&gt;::type,__bind&gt;::value&gt;::type&gt;" />
-            <marker date="1487207607000" expanded="true" signature="64356:64600" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="true" signature="64471:64560" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="false" signature="64808:64833" ph="&lt;..._Args&gt;" />
-            <marker date="1487207607000" expanded="true" signature="64981:65149" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="65155:65180" ph="&lt;..._Args&gt;" />
-            <marker date="1487207607000" expanded="true" signature="65346:65515" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="65520:65560" ph="&lt;_Fp,..._BoundArgs&gt;" />
-            <marker date="1487207607000" expanded="false" signature="65642:65693" ph="&lt;_Rp,_Fp,..._BoundArgs&gt;" />
-            <marker date="1487207607000" expanded="true" signature="65749:68161" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="65953:66495" ph="..." />
-            <marker date="1487207607000" expanded="false" signature="66548:66908" ph="&lt;_Gp,..._BA,=enable_if&lt;is_constructible&lt;_Fd,_Gp&gt;::value&amp;&amp;!is_same&lt;remove_reference&lt;_Gp&gt;::type,__bind_r&gt;::value&gt;::type&gt;" />
-            <marker date="1487207607000" expanded="true" signature="66655:66901" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="true" signature="66770:66861" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="false" signature="67101:67126" ph="&lt;..._Args&gt;" />
-            <marker date="1487207607000" expanded="true" signature="67196:67389" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="true" signature="67224:67324" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="true" signature="67442:67615" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="67621:67646" ph="&lt;..._Args&gt;" />
-            <marker date="1487207607000" expanded="true" signature="67716:67921" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="true" signature="67744:67856" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="true" signature="67980:68159" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="68164:68215" ph="&lt;_Rp,_Fp,..._BoundArgs&gt;" />
-            <marker date="1487207607000" expanded="false" signature="68304:68344" ph="&lt;_Fp,..._BoundArgs&gt;" />
-            <marker date="1487207607000" expanded="true" signature="68451:68587" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="68589:68640" ph="&lt;_Rp,_Fp,..._BoundArgs&gt;" />
-            <marker date="1487207607000" expanded="true" signature="68754:68897" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="68936:68947" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="69030:69146" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="69149:69160" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="69243:69359" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="69362:69373" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="69470:69593" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="69596:69607" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="69708:69833" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="69874:69885" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="69976:70096" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="70099:70110" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="70201:70321" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="70365:70376" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="70465:70584" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="70587:70598" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="70683:70800" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="70803:70814" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="70917:71043" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="71046:71057" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="71138:71253" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="71256:71267" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="71366:71490" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="71493:71504" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="71587:71703" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="71706:71717" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="71818:71943" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="71946:71957" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="72041:72044" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="72047:72058" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="72160:72163" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="72166:72177" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="72253:72491" ph="{...}" />
-            <marker date="1487207607000" expanded="true" signature="72338:72489" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="72494:72505" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="72583:72823" ph="{...}" />
-            <marker date="1487207607000" expanded="true" signature="72669:72821" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="72826:72837" ph="&lt;&gt;" />
-            <marker date="1487207607000" expanded="true" signature="72925:74020" ph="{...}" />
-            <marker date="1487207607000" expanded="true" signature="73016:74018" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="73140:73589" ph="..." />
-            <marker date="1487207607000" expanded="true" signature="73671:73819" ph="{...}" />
-            <marker date="1487207607000" expanded="true" signature="73733:73804" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="73954:74005" ph="..." />
-            <marker date="1487207607000" expanded="false" signature="74048:74068" ph="&lt;_Tp&gt;" />
-            <marker date="1487207607000" expanded="true" signature="74144:74434" ph="{...}" />
-            <marker date="1487207607000" expanded="true" signature="74314:74432" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="74470:74659" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/streambuf">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="186">
@@ -1262,38 +999,6 @@
             <marker date="1491583744000" expanded="true" signature="187:1316" ph="{...}" />
             <marker date="1491583744000" expanded="true" signature="715:770" ph="{...}" />
             <marker date="1491583744000" expanded="true" signature="794:1036" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sdl_ui/src/console/ConsoleCmd.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="19" column="75" lean-forward="true" selection-start-line="19" selection-start-column="75" selection-end-line="19" selection-end-column="75" />
-          <folding>
-            <marker date="1491583863000" expanded="true" signature="0:54" ph="//..." />
-            <marker date="1491583863000" expanded="true" signature="79:109" ph="..." />
-            <marker date="1491583863000" expanded="true" signature="128:806" ph="{...}" />
-            <marker date="1491583863000" expanded="false" signature="529:555" ph="&lt;INTTYPE&gt;" />
-            <marker date="1491583863000" expanded="true" signature="607:745" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sdl_ui/src/console/ConsoleCmd.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="235">
-          <caret line="26" column="50" lean-forward="false" selection-start-line="26" selection-start-column="50" selection-end-line="26" selection-end-column="50" />
-          <folding>
-            <marker date="1491583879000" expanded="true" signature="0:54" ph="//..." />
-            <marker date="1491583879000" expanded="true" signature="65:116" ph="..." />
-            <marker date="1491583879000" expanded="true" signature="214:218" ph="{...}" />
-            <marker date="1491583879000" expanded="true" signature="258:279" ph="{...}" />
-            <marker date="1491583879000" expanded="true" signature="343:521" ph="{...}" />
-            <marker date="1491583879000" expanded="true" signature="572:606" ph="{...}" />
-            <marker date="1491583879000" expanded="true" signature="658:766" ph="{...}" />
-            <marker date="1491583879000" expanded="true" signature="818:914" ph="{...}" />
-            <marker date="1491583879000" expanded="true" signature="993:1338" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -2380,7 +2085,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/gb_core_test/gtest/cmake/internal_utils.cmake">
+    <entry file="file://$PROJECT_DIR$/gtest/cmake/internal_utils.cmake">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="223">
           <caret line="152" column="13" lean-forward="false" selection-start-line="152" selection-start-column="13" selection-end-line="152" selection-end-column="13" />
@@ -2388,7 +2093,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/gb_core_test/gtest/CMakeLists.txt">
+    <entry file="file://$PROJECT_DIR$/gtest/CMakeLists.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="227">
           <caret line="69" column="34" lean-forward="false" selection-start-line="69" selection-start-column="34" selection-end-line="69" selection-end-column="34" />
@@ -2446,23 +2151,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/gb_core/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
-          <caret line="30" column="34" lean-forward="false" selection-start-line="30" selection-start-column="34" selection-end-line="30" selection-end-column="34" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="35" lean-forward="false" selection-start-line="10" selection-start-column="35" selection-end-line="10" selection-end-column="35" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gb_core_test/address_scanner.t.cpp">
+    <entry file="file://$PROJECT_DIR$/gb_core/test/address_scanner.t.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
           <caret line="4" column="0" lean-forward="false" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
@@ -2484,14 +2173,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/gb_core_test/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="12" column="31" lean-forward="true" selection-start-line="12" selection-start-column="31" selection-end-line="12" selection-end-column="31" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/script_layer/include/script_context.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
@@ -2501,14 +2182,6 @@
             <marker date="1491584172000" expanded="true" signature="79:164" ph="..." />
             <marker date="1491584172000" expanded="true" signature="187:992" ph="{...}" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sdl_ui/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-273">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2533,33 +2206,6 @@
             <marker date="1491603634000" expanded="true" signature="809:884" ph="{...}" />
             <marker date="1491603634000" expanded="true" signature="907:925" ph="{...}" />
             <marker date="1491603634000" expanded="true" signature="967:995" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gb_core/include/gameboy.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="208">
-          <caret line="31" column="26" lean-forward="false" selection-start-line="31" selection-start-column="26" selection-end-line="31" selection-end-column="26" />
-          <folding>
-            <marker date="1491603817000" expanded="true" signature="23:174" ph="..." />
-            <marker date="1491603817000" expanded="true" signature="190:1703" ph="{...}" />
-            <marker date="1491603817000" expanded="true" signature="611:631" ph="&lt;T&gt;" />
-            <marker date="1491603817000" expanded="true" signature="671:716" ph="{...}" />
-            <marker date="1491603817000" expanded="false" signature="719:739" ph="&lt;T&gt;" />
-            <marker date="1491603817000" expanded="true" signature="787:836" ph="{...}" />
-            <marker date="1491603817000" expanded="false" signature="839:859" ph="&lt;T&gt;" />
-            <marker date="1491603817000" expanded="true" signature="907:962" ph="{...}" />
-            <marker date="1491603817000" expanded="false" signature="965:985" ph="&lt;T&gt;" />
-            <marker date="1491603817000" expanded="true" signature="1017:1071" ph="{...}" />
-            <marker date="1491603817000" expanded="true" signature="1074:1094" ph="&lt;T&gt;" />
-            <marker date="1491603817000" expanded="true" signature="1162:1216" ph="{...}" />
-            <marker date="1491603817000" expanded="true" signature="1218:1238" ph="&lt;T&gt;" />
-            <marker date="1491603817000" expanded="true" signature="1305:1359" ph="{...}" />
-            <marker date="1491603817000" expanded="true" signature="1361:1381" ph="&lt;T&gt;" />
-            <marker date="1491603817000" expanded="true" signature="1449:1501" ph="{...}" />
-            <marker date="1491603817000" expanded="true" signature="1503:1523" ph="&lt;T&gt;" />
-            <marker date="1491603817000" expanded="true" signature="1593:1647" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -2593,44 +2239,169 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/sdl_ui/script.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="70" column="11" lean-forward="false" selection-start-line="70" selection-start-column="9" selection-end-line="70" selection-end-column="11" />
+        <state relative-caret-position="582">
+          <caret line="369" column="3" lean-forward="true" selection-start-line="369" selection-start-column="3" selection-end-line="369" selection-end-column="3" />
           <folding>
-            <marker date="1491596287000" expanded="true" signature="6697:7043" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="7082:8217" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="7104:8073" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="7132:7215" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="7248:7331" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="7373:7411" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="7452:7525" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="7562:7651" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="7687:8068" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="8102:8191" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="8138:8186" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="8253:8639" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="8849:8941" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="8962:9373" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="9407:9566" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="9585:9793" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="9810:9843" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="9862:9887" ph="..." />
-            <marker date="1491596287000" expanded="true" signature="9926:10134" ph="..." />
+            <marker date="1491660445000" expanded="true" signature="6697:7043" ph="..." />
+            <marker date="1491660445000" expanded="true" signature="7082:8217" ph="..." />
+            <marker date="1491660445000" expanded="true" signature="7104:8073" ph="..." />
+            <marker date="1491660445000" expanded="true" signature="7132:7215" ph="..." />
+            <marker date="1491660445000" expanded="true" signature="7248:7331" ph="..." />
+            <marker date="1491660445000" expanded="true" signature="7373:7411" ph="..." />
+            <marker date="1491660445000" expanded="true" signature="7452:7525" ph="..." />
+            <marker date="1491660445000" expanded="true" signature="7562:7651" ph="..." />
+            <marker date="1491660445000" expanded="true" signature="7687:8068" ph="..." />
+            <marker date="1491660445000" expanded="true" signature="8102:8191" ph="..." />
+            <marker date="1491660445000" expanded="true" signature="8138:8186" ph="..." />
+            <marker date="1491660445000" expanded="true" signature="8253:8639" ph="..." />
+            <marker date="1491660445000" expanded="true" signature="8849:8941" ph="..." />
+            <marker date="1491660445000" expanded="true" signature="8962:9373" ph="..." />
+            <marker date="1491660445000" expanded="true" signature="9407:9566" ph="..." />
+            <marker date="1491660445000" expanded="true" signature="9585:9793" ph="..." />
+            <marker date="1491660445000" expanded="true" signature="9810:9845" ph="..." />
+            <marker date="1491660445000" expanded="true" signature="9864:9889" ph="..." />
+            <marker date="1491660445000" expanded="true" signature="9928:10135" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gb_core/include/gameboy.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="208">
+          <caret line="47" column="6" lean-forward="false" selection-start-line="47" selection-start-column="6" selection-end-line="47" selection-end-column="6" />
+          <folding>
+            <marker date="1491603817000" expanded="true" signature="23:174" ph="..." />
+            <marker date="1491603817000" expanded="true" signature="190:1703" ph="{...}" />
+            <marker date="1491603817000" expanded="true" signature="611:631" ph="&lt;T&gt;" />
+            <marker date="1491603817000" expanded="true" signature="671:716" ph="{...}" />
+            <marker date="1491603817000" expanded="false" signature="719:739" ph="&lt;T&gt;" />
+            <marker date="1491603817000" expanded="true" signature="787:836" ph="{...}" />
+            <marker date="1491603817000" expanded="false" signature="839:859" ph="&lt;T&gt;" />
+            <marker date="1491603817000" expanded="true" signature="907:962" ph="{...}" />
+            <marker date="1491603817000" expanded="false" signature="965:985" ph="&lt;T&gt;" />
+            <marker date="1491603817000" expanded="true" signature="1017:1071" ph="{...}" />
+            <marker date="1491603817000" expanded="true" signature="1074:1094" ph="&lt;T&gt;" />
+            <marker date="1491603817000" expanded="true" signature="1162:1216" ph="{...}" />
+            <marker date="1491603817000" expanded="true" signature="1218:1238" ph="&lt;T&gt;" />
+            <marker date="1491603817000" expanded="true" signature="1305:1359" ph="{...}" />
+            <marker date="1491603817000" expanded="true" signature="1361:1381" ph="&lt;T&gt;" />
+            <marker date="1491603817000" expanded="true" signature="1449:1501" ph="{...}" />
+            <marker date="1491603817000" expanded="true" signature="1503:1523" ph="&lt;T&gt;" />
+            <marker date="1491603817000" expanded="true" signature="1593:1647" ph="{...}" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/sdl_ui/script.wren">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-40">
-          <caret line="29" column="8" lean-forward="false" selection-start-line="29" selection-start-column="8" selection-end-line="29" selection-end-column="8" />
+        <state relative-caret-position="1296">
+          <caret line="129" column="14" lean-forward="false" selection-start-line="129" selection-start-column="14" selection-end-line="129" selection-end-column="14" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1553">
-          <caret line="155" column="56" lean-forward="false" selection-start-line="155" selection-start-column="56" selection-end-line="155" selection-end-column="56" />
+        <state relative-caret-position="1608">
+          <caret line="114" column="32" lean-forward="false" selection-start-line="114" selection-start-column="32" selection-end-line="114" selection-end-column="32" />
+          <folding>
+            <marker date="1491663155000" expanded="true" signature="0:827" ph="/.../" />
+            <marker date="1491663155000" expanded="true" signature="838:1251" ph="..." />
+            <marker date="1491663155000" expanded="true" signature="1829:12047" ph="{...}" />
+            <marker date="1491663155000" expanded="true" signature="12149:12480" ph="{...}" />
+            <marker date="1491663155000" expanded="true" signature="12563:12678" ph="{...}" />
+            <marker date="1491663155000" expanded="true" signature="12766:12878" ph="{...}" />
+            <marker date="1491663155000" expanded="true" signature="12952:13198" ph="{...}" />
+            <marker date="1491663155000" expanded="true" signature="13272:13365" ph="{...}" />
+            <marker date="1491663155000" expanded="true" signature="13488:13944" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gb_core_test/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="22" column="0" lean-forward="true" selection-start-line="8" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="6" column="0" lean-forward="false" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdl_ui/src/console/ConsoleCmd.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" column="75" lean-forward="true" selection-start-line="19" selection-start-column="75" selection-end-line="19" selection-end-column="75" />
+          <folding>
+            <marker date="1491583863000" expanded="true" signature="0:54" ph="//..." />
+            <marker date="1491583863000" expanded="true" signature="79:109" ph="..." />
+            <marker date="1491583863000" expanded="true" signature="128:806" ph="{...}" />
+            <marker date="1491583863000" expanded="false" signature="529:555" ph="&lt;INTTYPE&gt;" />
+            <marker date="1491583863000" expanded="true" signature="607:745" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdl_ui/test/console_cmd.t.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" column="21" lean-forward="false" selection-start-line="5" selection-start-column="21" selection-end-line="5" selection-end-column="21" />
+          <folding>
+            <marker date="1491667015000" expanded="true" signature="0:38" ph="//..." />
+            <marker date="1491667015000" expanded="true" signature="49:118" ph="..." />
+            <marker date="1491667015000" expanded="true" signature="165:354" ph="{...}" />
+            <marker date="1491667015000" expanded="true" signature="415:814" ph="{...}" />
+            <marker date="1491667015000" expanded="true" signature="866:1175" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdl_ui/src/console/ConsoleCmd.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="26" column="50" lean-forward="false" selection-start-line="26" selection-start-column="50" selection-end-line="26" selection-end-column="50" />
+          <folding>
+            <marker date="1491583879000" expanded="true" signature="0:54" ph="//..." />
+            <marker date="1491583879000" expanded="true" signature="65:116" ph="..." />
+            <marker date="1491583879000" expanded="true" signature="214:218" ph="{...}" />
+            <marker date="1491583879000" expanded="true" signature="258:279" ph="{...}" />
+            <marker date="1491583879000" expanded="true" signature="343:521" ph="{...}" />
+            <marker date="1491583879000" expanded="true" signature="572:606" ph="{...}" />
+            <marker date="1491583879000" expanded="true" signature="658:766" ph="{...}" />
+            <marker date="1491583879000" expanded="true" signature="818:914" ph="{...}" />
+            <marker date="1491583879000" expanded="true" signature="993:1338" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdl_ui/test/script_manager.t.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="4" lean-forward="false" selection-start-line="3" selection-start-column="4" selection-end-line="3" selection-end-column="4" />
+          <folding>
+            <marker date="1491667138000" expanded="true" signature="66:70" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gb_core/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="28" column="0" lean-forward="true" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdl_ui/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="402">
+          <caret line="69" column="57" lean-forward="false" selection-start-line="69" selection-start-column="57" selection-end-line="69" selection-end-column="57" />
           <folding />
         </state>
       </provider>

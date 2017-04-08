@@ -92,6 +92,8 @@ int main(int argc, char *argv[]) {
 
     gbInst.load_rom(romBuffer, romBuffer.length(), saveBuffer, saveBuffer.length());
 
+    loadState(render, gbInst, romFile);
+
     bool endGame = false;
     bool fast_forward = false;
 
@@ -102,6 +104,19 @@ int main(int argc, char *argv[]) {
             gbInst.override_ram(ConsoleCmd::toInt<uint32_t>(args[0]), (uint8_t) ConsoleCmd::toInt<uint8_t>(args[1]));
         } else {
             console.addError("Usage: poke [address] [value]");
+        }
+    }});
+
+    console.addCommand(new ConsoleCmd{"peek", [&](std::vector<std::string> args) {
+        if (args.size() == 1) {
+
+            uint32_t address = ConsoleCmd::toInt<uint32_t>(args[0]);
+            uint8_t value = gbInst.read_ram<uint8_t>(address);
+            std::stringstream s;
+            s << "0x" << std::hex << address << ": " << std::dec << (uint32_t)value <<  " (0x" << std::hex << (uint32_t)value << std::dec << ")";
+            console.addOutput(s.str());
+        } else {
+            console.addError("Usage: peek [address]");
         }
     }});
 

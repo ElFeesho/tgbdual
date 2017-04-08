@@ -51,3 +51,27 @@ add_executable(tgbdual ${SDL_UI_SOURCES})
 target_include_directories(tgbdual PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(tgbdual gb_core script_layer ${SDL_LIBRARY} -L${PROJECT_SOURCE_DIR}/../extlibs/wren/lib -L${PROJECT_SOURCE_DIR}/../extlibs/lua-5.3.3/bin wren z lua -L/usr/local/lib SDL_gfx SDL_image)
 target_compile_features(tgbdual PRIVATE cxx_lambdas cxx_aggregate_default_initializers)
+
+
+#
+# Tests
+#
+function(create_test_target target_name)
+    set(OTHER_FILES "")
+    foreach(f ${ARGN})
+        set(OTHER_FILES ${OTHER_FILES} ${f})
+    endforeach()
+    add_test(${target_name} ${target_name})
+    add_executable(${target_name} test/${target_name}.t.cpp ${OTHER_FILES})
+
+    target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_compile_features(${target_name} PRIVATE cxx_lambdas cxx_aggregate_default_initializers)
+
+    target_link_libraries(${target_name} gtest gtest_main)
+endfunction()
+
+enable_testing()
+include_directories(${gtest_SOURCE_DIR}/include)
+
+create_test_target(script_manager)
+create_test_target(console_cmd src/console/ConsoleCmd.cpp)

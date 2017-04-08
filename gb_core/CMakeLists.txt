@@ -30,3 +30,19 @@ set(GB_CORE_SOURCES
 add_library(gb_core STATIC ${GB_CORE_SOURCES})
 target_include_directories(gb_core PUBLIC include/)
 target_compile_features(gb_core PRIVATE cxx_auto_type)
+
+#
+# Tests
+#
+enable_testing()
+include_directories(${gtest_SOURCE_DIR}/include)
+
+add_test(cheat_test cheat_test)
+add_test(address_scanner_test address_scanner_test)
+add_test(console_cmd_test console_cmd_test)
+
+add_executable(cheat_test test/cheat.t.cpp)
+add_executable(address_scanner_test test/address_scanner.t.cpp)
+
+target_link_libraries(address_scanner_test gtest gtest_main gb_core)
+target_link_libraries(cheat_test gtest gtest_main gb_core)
