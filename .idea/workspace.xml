@@ -20,181 +20,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="436204fa-82f6-4f04-912b-50bf26d1358e" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sdl_ui/test/script_manager.t.cpp" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gb_core_test/CMakeLists.txt" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/address_scanner.t.cpp" afterPath="$PROJECT_DIR$/gb_core/test/address_scanner.t.cpp" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/cheat.t.cpp" afterPath="$PROJECT_DIR$/gb_core/test/cheat.t.cpp" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/console_cmd.t.cpp.cpp" afterPath="$PROJECT_DIR$/sdl_ui/test/console_cmd.t.cpp" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/CHANGES" afterPath="$PROJECT_DIR$/gtest/CHANGES" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/CMakeLists.txt" afterPath="$PROJECT_DIR$/gtest/CMakeLists.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/CONTRIBUTORS" afterPath="$PROJECT_DIR$/gtest/CONTRIBUTORS" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/LICENSE" afterPath="$PROJECT_DIR$/gtest/LICENSE" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/Makefile.am" afterPath="$PROJECT_DIR$/gtest/Makefile.am" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/README" afterPath="$PROJECT_DIR$/gtest/README" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/build-aux/.keep" afterPath="$PROJECT_DIR$/gtest/build-aux/.keep" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/cmake/internal_utils.cmake" afterPath="$PROJECT_DIR$/gtest/cmake/internal_utils.cmake" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/codegear/gtest.cbproj" afterPath="$PROJECT_DIR$/gtest/codegear/gtest.cbproj" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/codegear/gtest.groupproj" afterPath="$PROJECT_DIR$/gtest/codegear/gtest.groupproj" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/codegear/gtest_all.cc" afterPath="$PROJECT_DIR$/gtest/codegear/gtest_all.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/codegear/gtest_link.cc" afterPath="$PROJECT_DIR$/gtest/codegear/gtest_link.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/codegear/gtest_main.cbproj" afterPath="$PROJECT_DIR$/gtest/codegear/gtest_main.cbproj" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/codegear/gtest_unittest.cbproj" afterPath="$PROJECT_DIR$/gtest/codegear/gtest_unittest.cbproj" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/configure.ac" afterPath="$PROJECT_DIR$/gtest/configure.ac" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/gtest-death-test.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/gtest-death-test.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/gtest-message.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/gtest-message.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/gtest-param-test.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/gtest-param-test.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/gtest-param-test.h.pump" afterPath="$PROJECT_DIR$/gtest/include/gtest/gtest-param-test.h.pump" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/gtest-printers.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/gtest-printers.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/gtest-spi.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/gtest-spi.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/gtest-test-part.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/gtest-test-part.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/gtest-typed-test.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/gtest-typed-test.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/gtest.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/gtest.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/gtest_pred_impl.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/gtest_pred_impl.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/gtest_prod.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/gtest_prod.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-death-test-internal.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-death-test-internal.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-filepath.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-filepath.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-internal.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-internal.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-linked_ptr.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-linked_ptr.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-param-util-generated.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-param-util-generated.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-param-util-generated.h.pump" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-param-util-generated.h.pump" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-param-util.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-param-util.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-port.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-port.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-string.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-string.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-tuple.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-tuple.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-tuple.h.pump" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-tuple.h.pump" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-type-util.h" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-type-util.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/include/gtest/internal/gtest-type-util.h.pump" afterPath="$PROJECT_DIR$/gtest/include/gtest/internal/gtest-type-util.h.pump" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/m4/acx_pthread.m4" afterPath="$PROJECT_DIR$/gtest/m4/acx_pthread.m4" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/m4/gtest.m4" afterPath="$PROJECT_DIR$/gtest/m4/gtest.m4" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/msvc/gtest-md.sln" afterPath="$PROJECT_DIR$/gtest/msvc/gtest-md.sln" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/msvc/gtest-md.vcproj" afterPath="$PROJECT_DIR$/gtest/msvc/gtest-md.vcproj" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/msvc/gtest.sln" afterPath="$PROJECT_DIR$/gtest/msvc/gtest.sln" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/msvc/gtest.vcproj" afterPath="$PROJECT_DIR$/gtest/msvc/gtest.vcproj" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/msvc/gtest_main-md.vcproj" afterPath="$PROJECT_DIR$/gtest/msvc/gtest_main-md.vcproj" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/msvc/gtest_main.vcproj" afterPath="$PROJECT_DIR$/gtest/msvc/gtest_main.vcproj" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/msvc/gtest_prod_test-md.vcproj" afterPath="$PROJECT_DIR$/gtest/msvc/gtest_prod_test-md.vcproj" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/msvc/gtest_prod_test.vcproj" afterPath="$PROJECT_DIR$/gtest/msvc/gtest_prod_test.vcproj" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/msvc/gtest_unittest-md.vcproj" afterPath="$PROJECT_DIR$/gtest/msvc/gtest_unittest-md.vcproj" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/msvc/gtest_unittest.vcproj" afterPath="$PROJECT_DIR$/gtest/msvc/gtest_unittest.vcproj" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/prime_tables.h" afterPath="$PROJECT_DIR$/gtest/samples/prime_tables.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample1.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample1.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample1.h" afterPath="$PROJECT_DIR$/gtest/samples/sample1.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample10_unittest.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample10_unittest.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample1_unittest.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample1_unittest.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample2.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample2.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample2.h" afterPath="$PROJECT_DIR$/gtest/samples/sample2.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample2_unittest.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample2_unittest.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample3-inl.h" afterPath="$PROJECT_DIR$/gtest/samples/sample3-inl.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample3_unittest.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample3_unittest.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample4.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample4.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample4.h" afterPath="$PROJECT_DIR$/gtest/samples/sample4.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample4_unittest.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample4_unittest.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample5_unittest.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample5_unittest.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample6_unittest.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample6_unittest.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample7_unittest.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample7_unittest.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample8_unittest.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample8_unittest.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/samples/sample9_unittest.cc" afterPath="$PROJECT_DIR$/gtest/samples/sample9_unittest.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/scripts/fuse_gtest_files.py" afterPath="$PROJECT_DIR$/gtest/scripts/fuse_gtest_files.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/scripts/gen_gtest_pred_impl.py" afterPath="$PROJECT_DIR$/gtest/scripts/gen_gtest_pred_impl.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/scripts/gtest-config.in" afterPath="$PROJECT_DIR$/gtest/scripts/gtest-config.in" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/scripts/pump.py" afterPath="$PROJECT_DIR$/gtest/scripts/pump.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/scripts/upload.py" afterPath="$PROJECT_DIR$/gtest/scripts/upload.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/scripts/upload_gtest.py" afterPath="$PROJECT_DIR$/gtest/scripts/upload_gtest.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/src/gtest-all.cc" afterPath="$PROJECT_DIR$/gtest/src/gtest-all.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/src/gtest-death-test.cc" afterPath="$PROJECT_DIR$/gtest/src/gtest-death-test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/src/gtest-filepath.cc" afterPath="$PROJECT_DIR$/gtest/src/gtest-filepath.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/src/gtest-internal-inl.h" afterPath="$PROJECT_DIR$/gtest/src/gtest-internal-inl.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/src/gtest-port.cc" afterPath="$PROJECT_DIR$/gtest/src/gtest-port.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/src/gtest-printers.cc" afterPath="$PROJECT_DIR$/gtest/src/gtest-printers.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/src/gtest-test-part.cc" afterPath="$PROJECT_DIR$/gtest/src/gtest-test-part.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/src/gtest-typed-test.cc" afterPath="$PROJECT_DIR$/gtest/src/gtest-typed-test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/src/gtest.cc" afterPath="$PROJECT_DIR$/gtest/src/gtest.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/src/gtest_main.cc" afterPath="$PROJECT_DIR$/gtest/src/gtest_main.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-death-test_ex_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-death-test_ex_test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-death-test_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-death-test_test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-filepath_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-filepath_test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-linked_ptr_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-linked_ptr_test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-listener_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-listener_test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-message_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-message_test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-options_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-options_test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-param-test2_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-param-test2_test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-param-test_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-param-test_test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-param-test_test.h" afterPath="$PROJECT_DIR$/gtest/test/gtest-param-test_test.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-port_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-port_test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-printers_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-printers_test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-test-part_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-test-part_test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-tuple_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-tuple_test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-typed-test2_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-typed-test2_test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-typed-test_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-typed-test_test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-typed-test_test.h" afterPath="$PROJECT_DIR$/gtest/test/gtest-typed-test_test.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest-unittest-api_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest-unittest-api_test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_all_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_all_test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_break_on_failure_unittest.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_break_on_failure_unittest.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_break_on_failure_unittest_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_break_on_failure_unittest_.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_catch_exceptions_test.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_catch_exceptions_test.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_catch_exceptions_test_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_catch_exceptions_test_.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_color_test.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_color_test.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_color_test_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_color_test_.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_env_var_test.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_env_var_test.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_env_var_test_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_env_var_test_.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_environment_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_environment_test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_filter_unittest.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_filter_unittest.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_filter_unittest_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_filter_unittest_.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_help_test.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_help_test.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_help_test_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_help_test_.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_list_tests_unittest.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_list_tests_unittest.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_list_tests_unittest_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_list_tests_unittest_.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_main_unittest.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_main_unittest.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_no_test_unittest.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_no_test_unittest.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_output_test.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_output_test.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_output_test_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_output_test_.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_output_test_golden_lin.txt" afterPath="$PROJECT_DIR$/gtest/test/gtest_output_test_golden_lin.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_pred_impl_unittest.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_pred_impl_unittest.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_premature_exit_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_premature_exit_test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_prod_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_prod_test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_repeat_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_repeat_test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_shuffle_test.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_shuffle_test.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_shuffle_test_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_shuffle_test_.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_sole_header_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_sole_header_test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_stress_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_stress_test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_test_utils.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_test_utils.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_throw_on_failure_ex_test.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_throw_on_failure_ex_test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_throw_on_failure_test.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_throw_on_failure_test.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_throw_on_failure_test_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_throw_on_failure_test_.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_uninitialized_test.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_uninitialized_test.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_uninitialized_test_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_uninitialized_test_.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_unittest.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_unittest.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_xml_outfile1_test_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_xml_outfile1_test_.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_xml_outfile2_test_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_xml_outfile2_test_.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_xml_outfiles_test.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_xml_outfiles_test.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_xml_output_unittest.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_xml_output_unittest.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_xml_output_unittest_.cc" afterPath="$PROJECT_DIR$/gtest/test/gtest_xml_output_unittest_.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/gtest_xml_test_utils.py" afterPath="$PROJECT_DIR$/gtest/test/gtest_xml_test_utils.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/production.cc" afterPath="$PROJECT_DIR$/gtest/test/production.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/test/production.h" afterPath="$PROJECT_DIR$/gtest/test/production.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Config/DebugProject.xcconfig" afterPath="$PROJECT_DIR$/gtest/xcode/Config/DebugProject.xcconfig" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Config/FrameworkTarget.xcconfig" afterPath="$PROJECT_DIR$/gtest/xcode/Config/FrameworkTarget.xcconfig" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Config/General.xcconfig" afterPath="$PROJECT_DIR$/gtest/xcode/Config/General.xcconfig" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Config/ReleaseProject.xcconfig" afterPath="$PROJECT_DIR$/gtest/xcode/Config/ReleaseProject.xcconfig" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Config/StaticLibraryTarget.xcconfig" afterPath="$PROJECT_DIR$/gtest/xcode/Config/StaticLibraryTarget.xcconfig" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Config/TestTarget.xcconfig" afterPath="$PROJECT_DIR$/gtest/xcode/Config/TestTarget.xcconfig" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Resources/Info.plist" afterPath="$PROJECT_DIR$/gtest/xcode/Resources/Info.plist" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Samples/FrameworkSample/Info.plist" afterPath="$PROJECT_DIR$/gtest/xcode/Samples/FrameworkSample/Info.plist" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Samples/FrameworkSample/WidgetFramework.xcodeproj/project.pbxproj" afterPath="$PROJECT_DIR$/gtest/xcode/Samples/FrameworkSample/WidgetFramework.xcodeproj/project.pbxproj" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Samples/FrameworkSample/runtests.sh" afterPath="$PROJECT_DIR$/gtest/xcode/Samples/FrameworkSample/runtests.sh" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Samples/FrameworkSample/widget.cc" afterPath="$PROJECT_DIR$/gtest/xcode/Samples/FrameworkSample/widget.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Samples/FrameworkSample/widget.h" afterPath="$PROJECT_DIR$/gtest/xcode/Samples/FrameworkSample/widget.h" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Samples/FrameworkSample/widget_test.cc" afterPath="$PROJECT_DIR$/gtest/xcode/Samples/FrameworkSample/widget_test.cc" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Scripts/runtests.sh" afterPath="$PROJECT_DIR$/gtest/xcode/Scripts/runtests.sh" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/Scripts/versiongenerate.py" afterPath="$PROJECT_DIR$/gtest/xcode/Scripts/versiongenerate.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/gb_core_test/gtest/xcode/gtest.xcodeproj/project.pbxproj" afterPath="$PROJECT_DIR$/gtest/xcode/gtest.xcodeproj/project.pbxproj" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/script_layer/include/script_manager.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/script_layer/src/script_manager.cpp" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/script_layer/test/script_manager.t.cpp" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/sdl_ui/test/script_manager.t.cpp" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CMakeLists.txt" afterPath="$PROJECT_DIR$/CMakeLists.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gb_core/CMakeLists.txt" afterPath="$PROJECT_DIR$/gb_core/CMakeLists.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/script_layer/CMakeLists.txt" afterPath="$PROJECT_DIR$/script_layer/CMakeLists.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sdl_ui/CMakeLists.txt" afterPath="$PROJECT_DIR$/sdl_ui/CMakeLists.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sdl_ui/script.lua" afterPath="$PROJECT_DIR$/sdl_ui/script.lua" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sdl_ui/script.wren" afterPath="$PROJECT_DIR$/sdl_ui/script.wren" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp" afterPath="$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <ignored path="$PROJECT_DIR$/gb_core_test/gtest/CMakeFiles/" />
@@ -209,11 +42,11 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="CMakeLists.txt" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/sdl_ui/CMakeLists.txt">
+      <file leaf-file-name="script_manager.t.cpp" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/script_layer/test/script_manager.t.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="402">
-              <caret line="69" column="57" lean-forward="false" selection-start-line="69" selection-start-column="57" selection-end-line="69" selection-end-column="57" />
+            <state relative-caret-position="-1039">
+              <caret line="11" column="40" lean-forward="true" selection-start-line="11" selection-start-column="40" selection-end-line="11" selection-end-column="40" />
               <folding />
             </state>
           </provider>
@@ -282,7 +115,6 @@
         <option value="$PROJECT_DIR$/gb_core/address_scanner.h" />
         <option value="$PROJECT_DIR$/gb_core/src/address_scanner.cpp" />
         <option value="$PROJECT_DIR$/gb_core/include/address_scanner.h" />
-        <option value="$PROJECT_DIR$/script_layer/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/gb_core/src/gameboy.cpp" />
         <option value="$PROJECT_DIR$/gb_core/include/gameboy.h" />
         <option value="$PROJECT_DIR$/sdl_ui/src/sdl_renderer.cpp" />
@@ -291,10 +123,14 @@
         <option value="$PROJECT_DIR$/sdl_ui/script.wren" />
         <option value="$PROJECT_DIR$/gb_core_test/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/gb_core/CMakeLists.txt" />
-        <option value="$PROJECT_DIR$/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/sdl_ui/test/console_cmd.t.cpp" />
         <option value="$PROJECT_DIR$/sdl_ui/test/script_manager.t.cpp" />
+        <option value="$PROJECT_DIR$/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/sdl_ui/CMakeLists.txt" />
+        <option value="$PROJECT_DIR$/script_layer/CMakeLists.txt" />
+        <option value="$PROJECT_DIR$/script_layer/include/script_manager.h" />
+        <option value="$PROJECT_DIR$/script_layer/src/script_manager.cpp" />
+        <option value="$PROJECT_DIR$/script_layer/test/script_manager.t.cpp" />
       </list>
     </option>
   </component>
@@ -393,6 +229,60 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="script_layer" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tgbdual" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tgbdual" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="script_layer" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tgbdual" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tgbdual" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="script_layer" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="include" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tgbdual" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tgbdual" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="gb_core" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -445,11 +335,11 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/script_layer/include" />
+      <recent name="$PROJECT_DIR$/script_layer/test" />
       <recent name="$PROJECT_DIR$/sdl_ui/test" />
       <recent name="$PROJECT_DIR$/gb_core/test" />
       <recent name="$PROJECT_DIR$" />
-      <recent name="$PROJECT_DIR$/gb_core/include" />
-      <recent name="$PROJECT_DIR$/gb_core/src" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -464,7 +354,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Google Test.console_cmd_test">
+  <component name="RunManager" selected="Google Test.script_manager_test">
     <configuration default="true" type="#com.sylvanaar.idea.Lua.run.LuaConfigurationType" factoryName="Lua Script">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="INTERPRETER_PATH" value="" />
@@ -719,7 +609,7 @@
       <workItem from="1491545946063" duration="1831000" />
       <workItem from="1491564711057" duration="271000" />
       <workItem from="1491564997002" duration="9489000" />
-      <workItem from="1491597252699" duration="16018000" />
+      <workItem from="1491597252699" duration="18639000" />
     </task>
     <task id="LOCAL-00001" summary="Move gameboy output to middle of screen">
       <created>1491513742890</created>
@@ -756,43 +646,50 @@
       <option name="project" value="LOCAL" />
       <updated>1491608033248</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Make testing easier">
+      <created>1491667933166</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1491667933166</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="address_scanner_test - 2017.04.07 at 22h 36m 23s.xml">
-      <configuration name="address_scanner_test" configurationId="CMakeGoogleTestRunConfigurationType" />
-    </history-entry>
-    <history-entry file="address_scanner_test - 2017.04.07 at 22h 36m 59s.xml">
-      <configuration name="address_scanner_test" configurationId="CMakeGoogleTestRunConfigurationType" />
-    </history-entry>
-    <history-entry file="address_scanner_test - 2017.04.07 at 22h 37m 32s.xml">
-      <configuration name="address_scanner_test" configurationId="CMakeGoogleTestRunConfigurationType" />
-    </history-entry>
-    <history-entry file="address_scanner_test - 2017.04.07 at 22h 40m 30s.xml">
-      <configuration name="address_scanner_test" configurationId="CMakeGoogleTestRunConfigurationType" />
-    </history-entry>
-    <history-entry file="address_scanner_test - 2017.04.07 at 23h 11m 25s.xml">
-      <configuration name="address_scanner_test" configurationId="CMakeGoogleTestRunConfigurationType" />
-    </history-entry>
-    <history-entry file="address_scanner_test - 2017.04.07 at 23h 12m 14s.xml">
-      <configuration name="address_scanner_test" configurationId="CMakeGoogleTestRunConfigurationType" />
-    </history-entry>
-    <history-entry file="console_cmd_test - 2017.04.08 at 16h 58m 05s.xml">
-      <configuration name="console_cmd_test" configurationId="CMakeGoogleTestRunConfigurationType" />
-    </history-entry>
-    <history-entry file="console_cmd_test - 2017.04.08 at 17h 11m 53s.xml">
-      <configuration name="console_cmd_test" configurationId="CMakeGoogleTestRunConfigurationType" />
-    </history-entry>
-    <history-entry file="script_manager_test - 2017.04.08 at 16h 53m 40s.xml">
+    <history-entry file="script_manager_test - 2017.04.08 at 17h 35m 43s.xml">
       <configuration name="script_manager_test" configurationId="CMakeGoogleTestRunConfigurationType" />
     </history-entry>
-    <history-entry file="script_manager_test - 2017.04.08 at 16h 54m 16s.xml">
+    <history-entry file="script_manager_test - 2017.04.08 at 17h 37m 50s.xml">
+      <configuration name="script_manager_test" configurationId="CMakeGoogleTestRunConfigurationType" />
+    </history-entry>
+    <history-entry file="script_manager_test - 2017.04.08 at 18h 35m 23s.xml">
+      <configuration name="script_manager_test" configurationId="CMakeGoogleTestRunConfigurationType" />
+    </history-entry>
+    <history-entry file="script_manager_test - 2017.04.08 at 18h 36m 10s.xml">
+      <configuration name="script_manager_test" configurationId="CMakeGoogleTestRunConfigurationType" />
+    </history-entry>
+    <history-entry file="script_manager_test - 2017.04.08 at 18h 36m 39s.xml">
+      <configuration name="script_manager_test" configurationId="CMakeGoogleTestRunConfigurationType" />
+    </history-entry>
+    <history-entry file="script_manager_test - 2017.04.08 at 18h 37m 13s.xml">
+      <configuration name="script_manager_test" configurationId="CMakeGoogleTestRunConfigurationType" />
+    </history-entry>
+    <history-entry file="script_manager_test - 2017.04.08 at 18h 37m 34s.xml">
+      <configuration name="script_manager_test" configurationId="CMakeGoogleTestRunConfigurationType" />
+    </history-entry>
+    <history-entry file="script_manager_test - 2017.04.08 at 18h 38m 40s.xml">
+      <configuration name="script_manager_test" configurationId="CMakeGoogleTestRunConfigurationType" />
+    </history-entry>
+    <history-entry file="script_manager_test - 2017.04.08 at 18h 38m 56s.xml">
+      <configuration name="script_manager_test" configurationId="CMakeGoogleTestRunConfigurationType" />
+    </history-entry>
+    <history-entry file="script_manager_test - 2017.04.08 at 18h 40m 49s.xml">
       <configuration name="script_manager_test" configurationId="CMakeGoogleTestRunConfigurationType" />
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="53277000" />
+    <option name="totallyTimeSpent" value="55898000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1676" height="1027" extended-state="6" />
@@ -838,7 +735,8 @@
     <MESSAGE value="Introduce ability to relatively search for values" />
     <MESSAGE value="Restructure project" />
     <MESSAGE value="Implement fuzzy searching" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implement fuzzy searching" />
+    <MESSAGE value="Make testing easier" />
+    <option name="LAST_COMMIT_MESSAGE" value="Make testing easier" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -847,129 +745,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file:///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/streambuf">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="186">
-          <caret line="359" column="0" lean-forward="false" selection-start-line="359" selection-start-column="0" selection-end-line="359" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/ostream">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="186">
-          <caret line="1079" column="0" lean-forward="false" selection-start-line="1079" selection-start-column="0" selection-end-line="1079" selection-end-column="0" />
-          <folding>
-            <marker date="1487207607000" expanded="true" signature="0:370" ph="//..." />
-            <marker date="1487207607000" expanded="true" signature="421:4654" ph="/.../" />
-            <marker date="1487207607000" expanded="true" signature="4665:4767" ph="..." />
-            <marker date="1487207607000" expanded="false" signature="4882:4920" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="5011:7642" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="6000:6141" ph="..." />
-            <marker date="1487207607000" expanded="false" signature="7645:7683" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="7751:8086" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="8089:8127" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="8251:8366" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="8368:8406" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="8457:8893" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="8895:8933" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="9060:9085" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="9129:9167" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="9270:9296" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="9298:9336" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="9467:9505" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="9552:9590" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="9640:9643" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="9645:9683" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="9781:9836" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="9838:9876" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="10025:10052" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="10054:10092" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="10323:10361" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="10363:10401" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="10540:10578" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="10580:10618" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="10741:12069" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="12071:12109" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="12195:12793" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="12795:12833" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="12920:13801" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="13803:13841" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="13937:14563" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="14565:14603" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="14688:15567" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="15569:15607" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="15701:16327" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="16329:16367" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="16453:17051" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="17053:17091" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="17186:17784" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="17786:17824" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="17915:18513" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="18515:18553" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="18653:19251" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="19253:19291" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="19378:19997" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="19999:20037" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="20125:20723" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="20725:20763" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="20856:21454" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="21456:21494" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="21587:22185" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="22187:22224" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="22381:23276" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="23279:23316" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="23410:23472" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="23474:23511" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="23604:24530" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="24532:24555" ph="&lt;_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="24643:24705" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="24707:24730" ph="&lt;_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="24825:24896" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="24898:24921" ph="&lt;_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="25018:25089" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="25091:25128" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="25231:25315" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="25317:25354" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="25456:26910" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="26912:26935" ph="&lt;_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="27032:27116" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="27118:27141" ph="&lt;_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="27245:27369" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="27371:27394" ph="&lt;_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="27500:27624" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="27626:27664" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="27748:28252" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="28254:28292" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="28401:28827" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="28829:28867" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="28940:29419" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="29421:29459" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="29583:29708" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="29710:29748" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="29868:30071" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="30073:30111" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="30256:30466" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="30468:30506" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="30615:30685" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="30687:30725" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="30834:30878" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="30880:30918" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="31028:31066" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="31110:31145" ph="&lt;_Stream,_Tp&gt;" />
-            <marker date="1487207607000" expanded="true" signature="31198:31301" ph="&lt;~&gt;" />
-            <marker date="1487207607000" expanded="true" signature="31351:31401" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="31448:31503" ph="&lt;_CharT,_Traits,_Allocator&gt;" />
-            <marker date="1487207607000" expanded="true" signature="31652:31733" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="31735:31773" ph="&lt;_CharT,_Traits&gt;" />
-            <marker date="1487207607000" expanded="true" signature="31912:31981" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="31983:32031" ph="&lt;_CharT,_Traits,_Yp&gt;" />
-            <marker date="1487207607000" expanded="true" signature="32174:32207" ph="{...}" />
-            <marker date="1487207607000" expanded="false" signature="32209:32261" ph="&lt;_CharT,_Traits,size_t _Size&gt;" />
-            <marker date="1487207607000" expanded="true" signature="32369:32588" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/sdl_ui/src/scripting/lua_macro_runner.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="360">
@@ -2185,14 +1960,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/script_layer/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="42" lean-forward="false" selection-start-line="4" selection-start-column="42" selection-end-line="4" selection-end-column="42" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/gb_core/src/gameboy.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="465">
@@ -2326,14 +2093,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" column="0" lean-forward="false" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/sdl_ui/src/console/ConsoleCmd.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="285">
@@ -2380,16 +2139,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sdl_ui/test/script_manager.t.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="4" lean-forward="false" selection-start-line="3" selection-start-column="4" selection-end-line="3" selection-end-column="4" />
-          <folding>
-            <marker date="1491667138000" expanded="true" signature="66:70" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/gb_core/CMakeLists.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="240">
@@ -2398,10 +2147,59 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" column="0" lean-forward="false" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/sdl_ui/CMakeLists.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="402">
-          <caret line="69" column="57" lean-forward="false" selection-start-line="69" selection-start-column="57" selection-end-line="69" selection-end-column="57" />
+        <state relative-caret-position="507">
+          <caret line="48" column="0" lean-forward="false" selection-start-line="48" selection-start-column="0" selection-end-line="48" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/script_layer/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="12" column="56" lean-forward="false" selection-start-line="12" selection-start-column="56" selection-end-line="12" selection-end-column="56" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/script_layer/include/script_manager.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="18" column="0" lean-forward="true" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+          <folding>
+            <marker date="1491673225000" expanded="true" signature="23:72" ph="..." />
+            <marker date="1491673225000" expanded="true" signature="95:371" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/script_layer/src/script_manager.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+          <folding>
+            <marker date="1491673237000" expanded="true" signature="0:54" ph="//..." />
+            <marker date="1491673237000" expanded="true" signature="156:218" ph="{...}" />
+            <marker date="1491673237000" expanded="true" signature="248:313" ph="{...}" />
+            <marker date="1491673237000" expanded="true" signature="347:416" ph="{...}" />
+            <marker date="1491673237000" expanded="true" signature="521:734" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/script_layer/test/script_manager.t.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1039">
+          <caret line="11" column="40" lean-forward="true" selection-start-line="11" selection-start-column="40" selection-end-line="11" selection-end-column="40" />
           <folding />
         </state>
       </provider>
