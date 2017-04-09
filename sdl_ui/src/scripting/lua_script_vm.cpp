@@ -120,7 +120,8 @@ void lua_script_vm::tick() {
 }
 
 void lua_script_vm::invokeLuaFunction(const char *functionName) const {
-    int function = lua_getglobal(state.get(), functionName);
+    lua_getglobal(state.get(), functionName);
+    int function = lua_type(state.get(), -1);
     if (function == LUA_TFUNCTION) {
         if (lua_pcallk(state.get(), 0, 0, 0, 0, 0) != 0) {
             std::stringstream ss;
@@ -140,7 +141,9 @@ void lua_script_vm::loadScript(const std::string &script) {
 }
 
 bool lua_script_vm::handleUnhandledCommand(const std::string &command, std::vector<std::string> args) {
-    if (lua_getglobal(state.get(), "handleCommand") == LUA_TFUNCTION) {
+    lua_getglobal(state.get(), "handleCommand");
+    int function = lua_type(state.get(), -1);
+    if (function == LUA_TFUNCTION) {
         lua_pushstring(state.get(), command.c_str());
         lua_createtable(state.get(), args.size(), 0);
         if (args.size() > 0) {

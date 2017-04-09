@@ -22,5 +22,5 @@ add_subdirectory(gtest)
 
 add_dependencies(tgbdual gb_core)
 add_dependencies(script_layer gb_core)
-add_dependencies(address_scanner_test gb_core)
-add_dependencies(cheat_test gb_core)
+add_dependencies(address_scanner gb_core)
+add_dependencies(cheat gb_core)
