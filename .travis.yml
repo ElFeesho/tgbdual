@@ -6,7 +6,7 @@ compiler:
 before_install:
   - echo $LANG
   - echo $LC_ALL
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update && sudo apt-cache search sdl dev; sudo apt-get install -y cmake libsdl-dev libsdl_image-dev lua; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update && sudo apt-cache search lua dev; sudo apt-get install -y cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-gfx1.2-dev lua; fi
   - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install sdl sdl_image sdl_gfx lua; fi
 
 script: 
