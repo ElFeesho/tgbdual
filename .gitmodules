@@ -1,0 +1,3 @@
+[submodule "extlibs/wren"]
+	path = extlibs/wren
+	url = git@github.com:munificent/wren
