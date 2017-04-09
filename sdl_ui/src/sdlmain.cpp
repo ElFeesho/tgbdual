@@ -250,9 +250,7 @@ int main(int argc, char *argv[]) {
 
     console.addCommand(new ConsoleCmd{"unload_script", [&](std::vector<std::string> args) {
         if (args.size() == 1) {
-            std::string &file = args[0];
-
-            scriptManager.remove_vm(file);
+            scriptManager.remove_vm(args[0]);
         } else {
             console.addError("Usage: unload_script [loaded script file]");
         }

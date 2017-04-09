@@ -277,16 +277,16 @@ end
 function create_pokemon_actor(number)
     local pokemon = {
         hp = function(self)
-            return bridge.read_8bit_value(0x1d02 + (0x30*(number-1)));
+            return GameBoy.get_8bit_value(0x1d02 + (0x30*(number-1)));
         end,
         hp_max = function(self)
-            return bridge.read_8bit_value(0x1d04 + (0x30*(number-1)));
+            return GameBoy.get_8bit_value(0x1d04 + (0x30*(number-1)));
         end,
         roster_position = function(self)
             return number
         end,
         pokemon_number = function(self)
-            return bridge.read_8bit_value(0x1cd8+(number-1))
+            return GameBoy.get_8bit_value(0x1cd8+(number-1))
         end,
         is_present = function(self)
             return self:pokemon_number() > 0 and self:pokemon_number() < 252
@@ -313,12 +313,12 @@ end
 function create_poke_hud(actor, x)
     local y = 288 - 50
 
-    bridge.add_rect(x, y, 50, 50, 0xffff0000, 0x88ffffff)
+    GameBoy.add_rect(x, y, 50, 50, 0xffff0000, 0x88ffffff)
 
-    bridge.add_rect(x+2, y+2, 46, 8, 0xff000000, 0xff000000)
-    bridge.add_rect(x+4, y+4, 42, 4, 0xff000000, 0xff444444)
-    bridge.add_rect(x+4, y+4, math.floor(42.0*(actor:hp()/actor:hp_max())), 4, 0xff000000, 0xff00ff00)
-    bridge.add_image("imgs/"..actor:pokemon_number()..".png", x+4, y+10)
+    GameBoy.add_rect(x+2, y+2, 46, 8, 0xff000000, 0xff000000)
+    GameBoy.add_rect(x+4, y+4, 42, 4, 0xff000000, 0xff444444)
+    GameBoy.add_rect(x+4, y+4, math.floor(42.0*(actor:hp()/actor:hp_max())), 4, 0xff000000, 0xff00ff00)
+    GameBoy.add_image("imgs/"..actor:pokemon_number()..".png", x+4, y+10)
 
 end
 
@@ -326,23 +326,23 @@ local team = {create_pokemon_actor(1), create_pokemon_actor(2), create_pokemon_a
 
 function tap_keys(keys, duration, interval)
     for i = 0, #keys do
-        bridge.queue_key(keys[i], interval*i, duration)
+        GameBoy.queue_key(keys[i], interval*i, duration)
     end
 end
 
 function activate()
 
---    print("Selected pokemon is "..bridge.read_8bit_value(0xfa9))
---    bridge.set_8bit_value(0xfa9, 4)
+--    print("Selected pokemon is "..GameBoy.read_8bit_value(0xfa9))
+--    GameBoy.set_8bit_value(0xfa9, 4)
 
 --    for _, v in pairs(team) do
 --        print(v)
 --    end
-    bridge.set_8bit_value(0xfa9, 0)
-    bridge.set_8bit_value(0xf74, 0)
+    GameBoy.set_8bit_value(0xfa9, 0)
+    GameBoy.set_8bit_value(0xf74, 0)
     tap_keys({GameBoy.KEY_START, GameBoy.KEY_DOWN, GameBoy.KEY_A, GameBoy.KEY_DOWN, GameBoy.KEY_A, GameBoy.KEY_A}, 100, 500)
 
-    --bridge.set_8bit_value(0x0f74, 5)
+    --GameBoy.set_8bit_value(0x0f74, 5)
 
 end
 

@@ -2,7 +2,6 @@ foreign class GameBoy {
     construct new() {}
 
     foreign static print(text)
-    foreign static clearCanvas()
     foreign static addRect(x, y, w, h, stroke, fill)
     foreign static addImage(image, x, y)
     foreign static addText(text, x, y)
@@ -11,6 +10,15 @@ foreign class GameBoy {
     foreign static set8bit(address, value)
     foreign static set16bit(address, value)
     foreign static queueKey(key, delay, duration)
+
+    static KEY_A { 0x01 }
+    static KEY_B { 0x02 }
+    static KEY_SELECT { 0x04 }
+    static KEY_START { 0x08 }
+    static KEY_DOWN { 0x10 }
+    static KEY_UP { 0x20 }
+    static KEY_LEFT { 0x40 }
+    static KEY_RIGHT { 0x80 }
 }
 
 class Enemy {

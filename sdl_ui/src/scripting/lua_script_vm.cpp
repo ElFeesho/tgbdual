@@ -15,9 +15,9 @@ lua_script_vm::lua_script_vm(script_context &scriptContext) : state{luaL_newstat
     contexts[state.get()] = &scriptContext;
 
     lua_createtable(state.get(), 0, 0);
-    lua_setglobal(state.get(), "bridge");
+    lua_setglobal(state.get(), "GameBoy");
 
-    lua_getglobal(state.get(), "bridge");
+    lua_getglobal(state.get(), "GameBoy");
 
     bindFunction("print", [](lua_State *state) -> int {
         script_context *ctx = contexts[state];
@@ -41,14 +41,14 @@ lua_script_vm::lua_script_vm(script_context &scriptContext) : state{luaL_newstat
         return 0;
     });
 
-    bindFunction("read_8bit_value", [](lua_State *state) -> int {
+    bindFunction("get_8bit_value", [](lua_State *state) -> int {
         script_context *ctx = contexts[state];
         uint8_t value = ctx->read_8bit_value((uint32_t) lua_tointegerx(state, 1, nullptr));
         lua_pushinteger(state, value);
         return 1;
     });
 
-    bindFunction("read_16bit_value", [](lua_State *state) -> int {
+    bindFunction("get_16bit_value", [](lua_State *state) -> int {
         script_context *ctx = contexts[state];
         uint16_t value = ctx->read_16bit_value((uint32_t) lua_tointegerx(state, 1, nullptr));
         lua_pushinteger(state, value);
@@ -86,9 +86,6 @@ lua_script_vm::lua_script_vm(script_context &scriptContext) : state{luaL_newstat
         ctx->queue_key(key, when, duration);
         return 0;
     });
-
-    lua_createtable(state.get(), 0, 0);
-    lua_setglobal(state.get(), "GameBoy");
 
     lua_getglobal(state.get(), "GameBoy");
 
