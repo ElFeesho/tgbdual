@@ -1,85 +1,43 @@
-# About this fork
-This emulator seems very thin on dependencies and has offered me a good opportunity to practise my _mad_ refactoring skills. 
+# TGBDual
+## About this fork
+This fork originally started out as an investigation into how much I could refactor the original project but has since grown far beyond this.
 
-This is not a serious attempt at creating something super awesome so go to the original source instead of using this.
+### New Features
+The following is an incomplete list of new features added:
+ * Link cable support (buggy/broken)
+   * Ability to advertise a session (host)
+   * Ability to join a session
+   * Ability to use some link cable functionality (pokemon trades seem to work the first time in a session)
+ * OSD
+   * Notify when state has been saved, when state has been loaded etc
+ * Console
+   * In game console can be used to modify game state
+     * Search for values in memory
+     * Write values in memory
+     * Relative search for values (greater, lesser, unchanged, changed)
+     * Tab completion on commands (very basic)
+ * Script VM support to augment game functionality and add console commands
+   * Lua support
+   * [Wren](https://github.com/munificent/wren) support
+ 
+### Missing Features
+I removed several features that were too difficult to maintain without a full understanding as to how they worked. The following is an incomplete list of removed features.
 
-*This repository is no longer maintained!*
-
-I'm in the process of porting the changes in this repository onto a fork of TGB Dual Kai, itdself a fork of the original that has additional debugging features.
-http://blog.gameboymania.com/search/label/GBハック
-My fork will be called TGB Dual L to distinguish it from the others, and because my username beings with the letter L :)
-https://github.com/libertyernie/tgbdual_L
-
-libretro (the upstream for this repo) has removed the win32 and sdl code.
-
---------------------------------------------------------------------------------
-
-TGB Dual - libertyernie's version
-https://github.com/libertyernie/tgbdual
-
-TGB Dual (originally written by Hii in 2000–2004) is an open-source Game Boy
-Color emulator with link cable support.
-
-TGB Dual makes it possible to emulate two Game Boy consoles at once (Slot 1
-and Slot 2), using two different ROMs and save files. Opening a ROM in Slot 2
-will open a new window. The two slots have different button mappings; you can
-check or change them with Options > Keys.
-
-Note: I have not checked whether network play (File > Netplay) works in this
-version. If it doesn't, download the original version at:
-http://gigo.retrogames.com/download.html#tgb-dual
-
-Besides Win32, there are two other frontends to the emulator core:
-* SDL - written in 2004 by shinichiro.h (http://shinh.skr.jp/tgbdualsdl) - no link cable support
-* libretro - written in 2012 by lifning (https://github.com/libretro/tgbdual-libretro)
-
-New features:
-* Windows and SDL versions:
-  * TGB Dual can now load ROMs built with Goomba and Goomba Color (GB emulators
-    for the GBA), and can read and write to those emulators' save files. This
-    is helpful if you want to share your save data between PC and GBA, because
-    the ROMs run faster in a GB emulator than they would in a GBA emulator
-    trying to run Goomba. (Also, you can use link cable emulation for games
-    like Pokémon.) See goomba.txt for more information.
-	* Because RetroArch loads/saves SRAM directly to a memory address instead
-	  of calling a function, implementing this feature in the libretro port
-	  would be more difficult.
-  * Supported file extensions added: .gba (for Goomba/Goomba Color) and .sgb.
-* Windows version only:
-  * A new "mirror mode" flips the entire display horizontally and also swaps
-    the inputs for the left and right directions on the D-pad. It can be
-    turned on through Options > Display > Mirror Mode.
-  * All dialogs/menus have been translated to English at the source code level.
-  * Along with the ROM and SRAM folders, users can now specify the SRAM file
-    extensions used for Slot1 and Slot2 (the defaults are still .sav and .sa2.)
-  * The options for showing the FPS meter are now Off, Slot1, Slot2, and Both.
-
-Bugfixes:
-* Windows version:
-  * All source code is now Unicode instead of Shift-JIS, which enables Japanese
-    text to display on any computer.
-  * The program now uses the DirectInput 8 API, not the old one which isn't
-    available anymore.
-  * Turbo mode is now off by default.
-* SDL version:
-  * The program will no longer crash when checking file extentions.
-
-Note: the SDL port saves SRAM data to ~/.tgbdual/save, and (unless it's Goomba
-data) compresses it with gzip. To use Goomba save files stored somewhere else,
-symbolic links are probably the way to go.
-
---------------------
-
-Git branches:
-* The "master" branch contains all the bugfixes, English-language dialogs
-  and menus, and new features. This includes automatic support for Goomba ROMS
-  (see docs/goomba.txt.)
-* The "japanese" branch contains the above, but uses the original Japanese
-  text (features that I added later are still in English.)
-  
-GIT NOTE:
-All source code in the repo is now encoded in UTF-8; however, Windows uses
-UTF-16, which Git doesn't recognize as text. I wrote a tiny program
-(endian_conv) that runs before TGB_Dual is built and again when the project is
-cleaned, to get the files encoded correctly. (When you make a Git commit, you
-should first clean the project in Visual Studio.)
+ * Configuration
+   * There is no way to customise controls anymore
+ * Super Gameboy support may be broken or missing
+ * No turbo button ability
+ 
+### Upcoming Features
+In no priority order:
+ * Android application
+ * Better script functionality
+ * More unit test coverage
+ * Fixed link cable support
+ * Tab completion on console commands that have come from scripts
+ * Enhanced debugging capabilities
+   * Graphic memory introspection
+   * Disassembly output (with stepping and breakpoints)
+   
+# Original Project
+The original [TGBDual repository can be found here](https://github.com/libertyernie/tgbdual).
