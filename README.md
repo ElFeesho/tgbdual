@@ -2,6 +2,8 @@
 ## About this fork
 This fork originally started out as an investigation into how much I could refactor the original project but has since grown far beyond this.
 
+Checkout the [Wiki](https://github.com/ElFeesho/tgbdual/wiki) for more information on new features and functionality.
+
 ### New Features
 The following is an incomplete list of new features added:
  * Link cable support (buggy/broken)
