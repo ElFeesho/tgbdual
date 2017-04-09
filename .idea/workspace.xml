@@ -19,14 +19,15 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="436204fa-82f6-4f04-912b-50bf26d1358e" name="Default" comment="">
+    <list default="true" id="436204fa-82f6-4f04-912b-50bf26d1358e" name="Default" comment="" />
+    <list id="e9cb9e42-7470-4ac8-b539-f542fa026006" name="IDE specfic" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp" afterPath="$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <ignored path="$PROJECT_DIR$/gb_core_test/gtest/CMakeFiles/" />
     <ignored path="$PROJECT_DIR$/gtest/CMakeFiles/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <file path="$PROJECT_DIR$/.idea/workspace.xml" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,11 +37,11 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="sdlmain.cpp" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp">
+      <file leaf-file-name="script.wren" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/sdl_ui/script.wren">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-635">
-              <caret line="112" column="54" lean-forward="true" selection-start-line="112" selection-start-column="54" selection-end-line="112" selection-end-column="54" />
+            <state relative-caret-position="345">
+              <caret line="23" column="13" lean-forward="false" selection-start-line="23" selection-start-column="13" selection-end-line="23" selection-end-column="13" />
               <folding />
             </state>
           </provider>
@@ -50,11 +51,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>skip_buf</find>
-      <find>skip</find>
-      <find>_</find>
-      <find>UNDERSCORE</find>
-      <find>std::vector</find>
       <find>std::vector&lt;std::un</find>
       <find>ERR</find>
       <find>TAB</find>
@@ -75,9 +71,20 @@
       <find>poli</find>
       <find>poke</find>
       <find>scriptVms</find>
+      <find>peek</find>
+      <find>read</find>
+      <find>s</find>
+      <find>read_</find>
+      <find>set_</find>
+      <find>queue</find>
+      <find>bridge =</find>
+      <find>bridge</find>
+      <find>bindF</find>
+      <find>add_re</find>
     </findStrings>
     <replaceStrings>
       <replace>context</replace>
+      <replace>GameBoy</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -110,8 +117,6 @@
         <option value="$PROJECT_DIR$/gb_core/src/gameboy.cpp" />
         <option value="$PROJECT_DIR$/gb_core/include/gameboy.h" />
         <option value="$PROJECT_DIR$/sdl_ui/src/sdl_renderer.cpp" />
-        <option value="$PROJECT_DIR$/sdl_ui/script.lua" />
-        <option value="$PROJECT_DIR$/sdl_ui/script.wren" />
         <option value="$PROJECT_DIR$/gb_core_test/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/gb_core/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/sdl_ui/test/console_cmd.t.cpp" />
@@ -128,7 +133,11 @@
         <option value="$PROJECT_DIR$/script_layer/include/script_manager.h" />
         <option value="$PROJECT_DIR$/script_layer/src/script_manager.cpp" />
         <option value="$PROJECT_DIR$/script_layer/test/script_manager.t.cpp" />
+        <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp" />
+        <option value="$PROJECT_DIR$/sdl_ui/script.lua" />
+        <option value="$PROJECT_DIR$/sdl_ui/src/scripting/lua_script_vm.cpp" />
+        <option value="$PROJECT_DIR$/sdl_ui/script.wren" />
       </list>
     </option>
   </component>
@@ -629,6 +638,7 @@
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="436204fa-82f6-4f04-912b-50bf26d1358e" name="Default" comment="" />
+      <changelist id="e9cb9e42-7470-4ac8-b539-f542fa026006" name="IDE specfic" comment="" />
       <created>1491289390526</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -647,7 +657,7 @@
       <workItem from="1491545946063" duration="1831000" />
       <workItem from="1491564711057" duration="271000" />
       <workItem from="1491564997002" duration="9489000" />
-      <workItem from="1491597252699" duration="19545000" />
+      <workItem from="1491597252699" duration="26395000" />
     </task>
     <task id="LOCAL-00001" summary="Move gameboy output to middle of screen">
       <created>1491513742890</created>
@@ -719,7 +729,28 @@
       <option name="project" value="LOCAL" />
       <updated>1491673967886</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Integrate script_manager into tgbdual">
+      <created>1491674174621</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1491674174621</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Wipe dust off of README">
+      <created>1491734288954</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1491734288954</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Add constants to wren script and change bridge to GameBoy for lua vms">
+      <created>1491776026982</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1491776026982</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -755,7 +786,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="56804000" />
+    <option name="totallyTimeSpent" value="63654000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1676" height="1027" extended-state="6" />
@@ -765,10 +796,10 @@
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32941177" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32941177" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32941177" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32941177" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32941177" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.29008567" sideWeight="0.5" order="4" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1866585" sideWeight="0.5" order="4" side_tool="false" content_ui="combo" />
       <window_info id="LuaJ" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32941177" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -805,7 +836,10 @@
     <MESSAGE value="Add a script_manager class to handle multiple script vms" />
     <MESSAGE value="Rename macro_runner interface to script_vm" />
     <MESSAGE value="Add ability to remove script vm" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add ability to remove script vm" />
+    <MESSAGE value="Integrate script_manager into tgbdual" />
+    <MESSAGE value="Wipe dust off of README" />
+    <MESSAGE value="Add constants to wren script and change bridge to GameBoy for lua vms" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add constants to wren script and change bridge to GameBoy for lua vms" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -814,13 +848,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file:///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/string">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="208">
-          <caret line="2432" column="51" lean-forward="false" selection-start-line="2432" selection-start-column="51" selection-end-line="2432" selection-end-column="51" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/sdl_ui/src/console/Console.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="240">
@@ -856,51 +883,41 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/extlibs/wren/src/include/wren.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1560">
-          <caret line="430" column="55" lean-forward="false" selection-start-line="430" selection-start-column="45" selection-end-line="430" selection-end-column="55" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sdl_ui/src/scripting/wren_script_vm.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="107">
-          <caret line="86" column="4" lean-forward="false" selection-start-line="86" selection-start-column="4" selection-end-line="86" selection-end-column="4" />
-          <folding>
-            <marker date="1491673319000" expanded="true" signature="0:38" ph="//..." />
-            <marker date="1491673319000" expanded="true" signature="49:106" ph="..." />
-            <marker date="1491673319000" expanded="true" signature="285:544" ph="{...}" />
-            <marker date="1491673319000" expanded="true" signature="633:1634" ph="{...}" />
-            <marker date="1491673319000" expanded="true" signature="1664:1827" ph="{...}" />
-            <marker date="1491673319000" expanded="true" signature="1861:2028" ph="{...}" />
-            <marker date="1491673319000" expanded="true" signature="2095:2876" ph="{...}" />
-            <marker date="1491673319000" expanded="true" signature="2981:3896" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/extlibs/lua-5.3.3/include/lua.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="783">
           <caret line="368" column="8" lean-forward="false" selection-start-line="368" selection-start-column="8" selection-end-line="368" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sdl_ui/src/scripting/lua_script_vm.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="529">
-          <caret line="143" column="0" lean-forward="true" selection-start-line="143" selection-start-column="0" selection-end-line="143" selection-end-column="0" />
           <folding>
-            <marker date="1491673310000" expanded="true" signature="0:54" ph="//..." />
-            <marker date="1491673310000" expanded="true" signature="65:117" ph="..." />
-            <marker date="1491673310000" expanded="true" signature="274:3716" ph="{...}" />
-            <marker date="1491673310000" expanded="true" signature="3801:3890" ph="{...}" />
-            <marker date="1491673310000" expanded="true" signature="3923:3961" ph="{...}" />
-            <marker date="1491673310000" expanded="true" signature="3990:4024" ph="{...}" />
-            <marker date="1491673310000" expanded="true" signature="4096:4433" ph="{...}" />
-            <marker date="1491673310000" expanded="true" signature="4493:4735" ph="{...}" />
-            <marker date="1491673310000" expanded="true" signature="4839:5581" ph="{...}" />
+            <marker date="1491231554000" expanded="true" signature="0:188" ph="/.../" />
+            <marker date="1491231554000" expanded="true" signature="229:282" ph="..." />
+            <marker date="1491231554000" expanded="true" signature="850:992" ph="/.../" />
+            <marker date="1491231554000" expanded="true" signature="1306:1326" ph="/.../" />
+            <marker date="1491231554000" expanded="true" signature="2084:2133" ph="/.../" />
+            <marker date="1491231554000" expanded="true" signature="2180:2220" ph="/.../" />
+            <marker date="1491231554000" expanded="true" signature="2298:2380" ph="/.../" />
+            <marker date="1491231554000" expanded="true" signature="2535:2580" ph="/.../" />
+            <marker date="1491231554000" expanded="true" signature="2663:2698" ph="/.../" />
+            <marker date="1491231554000" expanded="false" signature="2723:2742" ph="..." />
+            <marker date="1491231554000" expanded="true" signature="2752:2777" ph="/.../" />
+            <marker date="1491231554000" expanded="true" signature="2811:2838" ph="/.../" />
+            <marker date="1491231554000" expanded="true" signature="3131:3164" ph="/.../" />
+            <marker date="1491231554000" expanded="true" signature="3617:3655" ph="/.../" />
+            <marker date="1491231554000" expanded="true" signature="4728:4772" ph="/.../" />
+            <marker date="1491231554000" expanded="true" signature="5336:5372" ph="/.../" />
+            <marker date="1491231554000" expanded="true" signature="6165:6202" ph="/.../" />
+            <marker date="1491231554000" expanded="true" signature="6879:6916" ph="/.../" />
+            <marker date="1491231554000" expanded="true" signature="7480:7540" ph="/.../" />
+            <marker date="1491231554000" expanded="true" signature="8159:8187" ph="/.../" />
+            <marker date="1491231554000" expanded="true" signature="8534:8582" ph="/.../" />
+            <marker date="1491231554000" expanded="true" signature="8865:8897" ph="/.../" />
+            <marker date="1491231554000" expanded="true" signature="9303:9464" ph="/.../" />
+            <marker date="1491231554000" expanded="true" signature="10832:11020" ph="/.../" />
+            <marker date="1491231554000" expanded="false" signature="11058:11251" ph="..." />
+            <marker date="1491231554000" expanded="true" signature="11331:11499" ph="/.../" />
+            <marker date="1491231554000" expanded="true" signature="11502:11522" ph="/.../" />
+            <marker date="1491231554000" expanded="true" signature="11644:11664" ph="/.../" />
+            <marker date="1491231554000" expanded="true" signature="12903:13478" ph="{...}" />
+            <marker date="1491231554000" expanded="true" signature="13561:14823" ph="/**...*/" />
           </folding>
         </state>
       </provider>
@@ -2038,34 +2055,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sdl_ui/script.lua">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="582">
-          <caret line="369" column="3" lean-forward="true" selection-start-line="369" selection-start-column="3" selection-end-line="369" selection-end-column="3" />
-          <folding>
-            <marker date="1491660445000" expanded="true" signature="6697:7043" ph="..." />
-            <marker date="1491660445000" expanded="true" signature="7082:8217" ph="..." />
-            <marker date="1491660445000" expanded="true" signature="7104:8073" ph="..." />
-            <marker date="1491660445000" expanded="true" signature="7132:7215" ph="..." />
-            <marker date="1491660445000" expanded="true" signature="7248:7331" ph="..." />
-            <marker date="1491660445000" expanded="true" signature="7373:7411" ph="..." />
-            <marker date="1491660445000" expanded="true" signature="7452:7525" ph="..." />
-            <marker date="1491660445000" expanded="true" signature="7562:7651" ph="..." />
-            <marker date="1491660445000" expanded="true" signature="7687:8068" ph="..." />
-            <marker date="1491660445000" expanded="true" signature="8102:8191" ph="..." />
-            <marker date="1491660445000" expanded="true" signature="8138:8186" ph="..." />
-            <marker date="1491660445000" expanded="true" signature="8253:8639" ph="..." />
-            <marker date="1491660445000" expanded="true" signature="8849:8941" ph="..." />
-            <marker date="1491660445000" expanded="true" signature="8962:9373" ph="..." />
-            <marker date="1491660445000" expanded="true" signature="9407:9566" ph="..." />
-            <marker date="1491660445000" expanded="true" signature="9585:9793" ph="..." />
-            <marker date="1491660445000" expanded="true" signature="9810:9845" ph="..." />
-            <marker date="1491660445000" expanded="true" signature="9864:9889" ph="..." />
-            <marker date="1491660445000" expanded="true" signature="9928:10135" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/gb_core/include/gameboy.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="208">
@@ -2090,14 +2079,6 @@
             <marker date="1491603817000" expanded="true" signature="1503:1523" ph="&lt;T&gt;" />
             <marker date="1491603817000" expanded="true" signature="1593:1647" ph="{...}" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sdl_ui/script.wren">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1296">
-          <caret line="129" column="14" lean-forward="false" selection-start-line="129" selection-start-column="14" selection-end-line="129" selection-end-column="14" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2271,10 +2252,122 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="630">
+            <caret line="42" column="0" lean-forward="false" selection-start-line="42" selection-start-column="0" selection-end-line="42" selection-end-column="0" />
+            <folding />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/sdl_ui/src/sdlmain.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-635">
-          <caret line="112" column="54" lean-forward="true" selection-start-line="112" selection-start-column="54" selection-end-line="112" selection-end-column="54" />
+        <state relative-caret-position="292">
+          <caret line="251" column="31" lean-forward="false" selection-start-line="251" selection-start-column="31" selection-end-line="251" selection-end-column="31" />
+          <folding>
+            <marker date="1491776043000" expanded="true" signature="0:827" ph="/.../" />
+            <marker date="1491776043000" expanded="true" signature="838:1273" ph="..." />
+            <marker date="1491776043000" expanded="true" signature="1851:11307" ph="{...}" />
+            <marker date="1491776043000" expanded="true" signature="11409:11740" ph="{...}" />
+            <marker date="1491776043000" expanded="true" signature="11823:11938" ph="{...}" />
+            <marker date="1491776043000" expanded="true" signature="12026:12138" ph="{...}" />
+            <marker date="1491776043000" expanded="true" signature="12212:12458" ph="{...}" />
+            <marker date="1491776043000" expanded="true" signature="12532:12625" ph="{...}" />
+            <marker date="1491776043000" expanded="true" signature="12748:13204" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdl_ui/src/scripting/wren_script_vm.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="347">
+          <caret line="42" column="24" lean-forward="false" selection-start-line="42" selection-start-column="24" selection-end-line="42" selection-end-column="24" />
+          <folding>
+            <marker date="1491673319000" expanded="true" signature="0:38" ph="//..." />
+            <marker date="1491673319000" expanded="true" signature="49:106" ph="..." />
+            <marker date="1491673319000" expanded="true" signature="285:544" ph="{...}" />
+            <marker date="1491673319000" expanded="true" signature="633:1634" ph="{...}" />
+            <marker date="1491673319000" expanded="true" signature="1664:1827" ph="{...}" />
+            <marker date="1491673319000" expanded="true" signature="1861:2028" ph="{...}" />
+            <marker date="1491673319000" expanded="true" signature="2095:2876" ph="{...}" />
+            <marker date="1491673319000" expanded="true" signature="2981:3896" ph="{...}" />
+            <marker date="1491673319000" expanded="true" signature="3973:7573" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/extlibs/wren/src/include/wren.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="554">
+          <caret line="154" column="26" lean-forward="false" selection-start-line="154" selection-start-column="26" selection-end-line="154" selection-end-column="26" />
+          <folding>
+            <marker date="1491289720000" expanded="true" signature="40:91" ph="..." />
+            <marker date="1491289720000" expanded="true" signature="324:457" ph="//..." />
+            <marker date="1491289720000" expanded="true" signature="2972:3199" ph="{...}" />
+            <marker date="1491289720000" expanded="true" signature="3961:4381" ph="{...}" />
+            <marker date="1491289720000" expanded="true" signature="4680:8531" ph="{...}" />
+            <marker date="1491289720000" expanded="true" signature="8565:8648" ph="{...}" />
+            <marker date="1491289720000" expanded="true" signature="8829:9030" ph="{...}" />
+            <marker date="1491289720000" expanded="true" signature="11024:13203" ph="//..." />
+            <marker date="1491289720000" expanded="true" signature="13686:13803" ph="//..." />
+            <marker date="1491289720000" expanded="true" signature="15387:15838" ph="//..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdl_ui/src/scripting/lua_script_vm.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="379">
+          <caret line="92" column="3" lean-forward="false" selection-start-line="92" selection-start-column="3" selection-end-line="99" selection-end-column="31" />
+          <folding>
+            <marker date="1491776043000" expanded="true" signature="0:54" ph="//..." />
+            <marker date="1491776043000" expanded="true" signature="65:117" ph="..." />
+            <marker date="1491776043000" expanded="true" signature="274:3632" ph="{...}" />
+            <marker date="1491776043000" expanded="true" signature="3717:3806" ph="{...}" />
+            <marker date="1491776043000" expanded="true" signature="3839:3877" ph="{...}" />
+            <marker date="1491776043000" expanded="true" signature="3906:3940" ph="{...}" />
+            <marker date="1491776043000" expanded="true" signature="4012:4349" ph="{...}" />
+            <marker date="1491776043000" expanded="true" signature="4409:4651" ph="{...}" />
+            <marker date="1491776043000" expanded="true" signature="4755:5497" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdl_ui/script.lua">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="227">
+          <caret line="315" column="18" lean-forward="false" selection-start-line="315" selection-start-column="18" selection-end-line="315" selection-end-column="18" />
+          <folding>
+            <marker date="1491776043000" expanded="true" signature="6697:7043" ph="..." />
+            <marker date="1491776043000" expanded="true" signature="7082:8217" ph="..." />
+            <marker date="1491776043000" expanded="true" signature="7104:8073" ph="..." />
+            <marker date="1491776043000" expanded="true" signature="7132:7215" ph="..." />
+            <marker date="1491776043000" expanded="true" signature="7248:7331" ph="..." />
+            <marker date="1491776043000" expanded="true" signature="7373:7411" ph="..." />
+            <marker date="1491776043000" expanded="true" signature="7452:7525" ph="..." />
+            <marker date="1491776043000" expanded="true" signature="7562:7651" ph="..." />
+            <marker date="1491776043000" expanded="true" signature="7687:8068" ph="..." />
+            <marker date="1491776043000" expanded="true" signature="8102:8191" ph="..." />
+            <marker date="1491776043000" expanded="true" signature="8138:8186" ph="..." />
+            <marker date="1491776043000" expanded="true" signature="8253:8644" ph="..." />
+            <marker date="1491776043000" expanded="true" signature="8854:8947" ph="..." />
+            <marker date="1491776043000" expanded="true" signature="8968:9384" ph="..." />
+            <marker date="1491776043000" expanded="true" signature="9418:9577" ph="..." />
+            <marker date="1491776043000" expanded="true" signature="9596:9804" ph="..." />
+            <marker date="1491776043000" expanded="true" signature="9821:9856" ph="..." />
+            <marker date="1491776043000" expanded="true" signature="9875:9900" ph="..." />
+            <marker date="1491776043000" expanded="true" signature="9939:10146" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdl_ui/script.wren">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="23" column="13" lean-forward="false" selection-start-line="23" selection-start-column="13" selection-end-line="23" selection-end-column="13" />
           <folding />
         </state>
       </provider>
