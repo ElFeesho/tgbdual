@@ -34,6 +34,12 @@ script:
   - cd build
   - cmake .. -DCMAKE_CXX_COMPILER=$COMPILER
   - make
+  - cd gb_core
+  - ctest .
+  - cd ../tgbdual_desktop
+  - ctest .
+  - cd ../script_layer
+  - ctest .
 
 after_success:
   - echo Success
