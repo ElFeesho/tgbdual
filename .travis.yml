@@ -22,7 +22,7 @@ addons:
 before_install:
   - echo $LANG
   - echo $LC_ALL
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update; export COMPILER=clang++-3.6; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update; export COMPILER=clang++-3.6; ls -lah /usr/include/lua*; ls -lah /usr/local/include/; fi
   - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install sdl sdl_image sdl_gfx lua; export COMPILER=clang++; fi
 
 script: 
