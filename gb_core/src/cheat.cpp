@@ -31,19 +31,19 @@ static unsigned int fromHexToInt(const std::string &hexString) {
 
 static uint16_t extractAddress(const std::string &cheatString)
 {
-    uint16_t adr = fromHexToInt(cheatString.substr(4));
-    adr = ((adr << 8) & 0xff00) | ((adr >> 8) & 0x00ff);
+    uint16_t adr = (uint16_t) fromHexToInt(cheatString.substr(4));
+    adr = (uint16_t) (((adr << 8) & 0xff00) | ((adr >> 8) & 0x00ff));
     return adr;
 }
 
 static uint8_t extractData(const std::string &cheatString)
 {
-    return fromHexToInt(cheatString.substr(2, 2));
+    return (uint8_t) fromHexToInt(cheatString.substr(2, 2));
 }
 
 static uint8_t extractCode(const std::string &cheatString)
 {
-    return fromHexToInt(cheatString.substr(0, 2));
+    return (uint8_t) fromHexToInt(cheatString.substr(0, 2));
 }
 
 cheat_dat::cheat_dat(const std::string &cheat_code) {

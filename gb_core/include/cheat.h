@@ -28,8 +28,6 @@ public:
 
     void add_cheat(const std::string &code, cpu_writecb writecb);
 
-    void clear();
-
 private:
     std::map<uint16_t, cheat_dat> cheat_map;
 };

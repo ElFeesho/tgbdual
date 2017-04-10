@@ -26,16 +26,16 @@ set(SDL_UI_SOURCES
 
 find_package(SDL)
 find_package(LUA)
-set(LUA_LIB "lua.${LUA_VERSION_MAJOR}.${LUA_VERSION_MINOR}")
+set(LUA_LIB "lua")
 
 include_directories(${SDL_INCLUDE_DIR})
-include_directories(${PROJECT_SOURCE_DIR}/../extlibs/wren/src/include)
+include_directories(${PROJECT_SOURCE_DIR}/extlibs/wren/src/include)
 
 add_executable(tgbdual ${SDL_UI_SOURCES})
 target_include_directories(tgbdual PRIVATE ${LUA_INCLUDE_DIR})
 
 target_include_directories(tgbdual PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-target_link_libraries(tgbdual gb_core script_layer ${SDL_LIBRARY} -L${PROJECT_SOURCE_DIR}/../extlibs/wren/lib ${LUA_LIB} wren z -L/usr/local/lib SDL_gfx SDL_image)
+target_link_libraries(tgbdual gb_core script_layer ${SDL_LIBRARY} -L${PROJECT_SOURCE_DIR}/extlibs/wren/lib ${LUA_LIB} wren z -L/usr/local/lib SDL_gfx SDL_image)
 target_compile_features(tgbdual PRIVATE cxx_lambdas cxx_aggregate_default_initializers)
 
 

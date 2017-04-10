@@ -17,7 +17,13 @@ addons:
     - libsdl-gfx1.2-dev
     - liblua5.2-dev
 
+env:
+  global:
+    - LLVM_VERSION=3.6.2
+    - LLVM_ARCHIVE_PATH=$HOME/clang+llvm.tar.xz
+
 before_install:
+  - if [ $TRAVIS_OS_NAME == linux ]; then wget http://llvm.org/releases/$LLVM_VERSION/clang+llvm-$LLVM_VERSION-x86_64-linux-gnu-ubuntu-14.04.tar.xz -O $LLVM_ARCHIVE_PATH; mkdir $HOME/clang+llvm; tar xf $LLVM_ARCHIVE_PATH -C $HOME/clang+llvm --strip-components 1; export PATH=$HOME/clang+llvm/bin:$PATH; fi
   - echo $LANG
   - echo $LC_ALL
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update; fi
