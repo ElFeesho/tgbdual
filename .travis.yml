@@ -23,16 +23,16 @@ before_install:
   - echo $LANG
   - echo $LC_ALL
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update; export COMPILER=clang++-3.6; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install sdl sdl_image sdl_gfx lua; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install sdl sdl_image sdl_gfx lua; export COMPILER=clang++; fi
 
 script: 
   - git submodule update
   - cd extlibs/wren
-  - make
+  - make static
   - cd ../..
   - mkdir build
   - cd build
-  - cmake ..
+  - cmake .. -DCMAKE_CXX_COMPILER=$COMPILER
   - make
 
 after_success:
