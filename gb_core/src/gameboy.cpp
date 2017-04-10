@@ -30,3 +30,7 @@ void gameboy::set_speed(uint32_t speed) {
     _gb.set_skip(speed);
 }
 
+address_scanner gameboy::createAddressScanner() {
+    return _gb.create_address_scanner();
+}
+

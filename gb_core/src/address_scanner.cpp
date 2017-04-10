@@ -9,6 +9,10 @@ address_scanner::address_scanner(uint8_t *memory, size_t size) : _memory{memory}
 }
 
 
+address_scan_result::address_scan_result() : _locations{} {
+
+}
+
 address_scan_result::address_scan_result(std::vector<ptrdiff_t> locations) : _locations{locations} {}
 
 ptrdiff_t address_scan_result::operator[](long index) {

@@ -76,6 +76,17 @@ TEST(address_scanner, can_find_a_32bit_value) {
     EXPECT_EQ(0, address[0]);
 }
 
+TEST(address_scanner, can_find_a_32bit_value_at_the_end_of_memory) {
+    uint8_t dummy_data[] = {0x01, 0xff, 0xff, 0xff, 0xff};
+    address_scanner scanner{dummy_data, sizeof(dummy_data)};
+
+    uint32_t targetValue = 0xffffffff;
+
+    address_scan_result address = scanner.find_value(targetValue);
+    EXPECT_EQ(1, address.size());
+    EXPECT_EQ(1, address[0]);
+}
+
 TEST(address_scanner, can_find_changed_values) {
     uint8_t dummy_data[] = {0, 0, 0, 0, 0, 0, 0};
     address_scanner scanner{dummy_data, sizeof(dummy_data)};

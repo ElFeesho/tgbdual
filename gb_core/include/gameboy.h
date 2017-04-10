@@ -28,6 +28,8 @@ public:
 
 	void set_speed(uint32_t speed);
 
+	address_scanner createAddressScanner();
+
 	template<typename T>
 	address_scan_state<T> initial_state() {
 		return _address_scanner.snapshot<T>();

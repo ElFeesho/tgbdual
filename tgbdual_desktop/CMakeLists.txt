@@ -22,7 +22,7 @@ set(SDL_UI_SOURCES
         src/scripting/lua_script_vm.cpp src/scripting/lua_script_vm.h
         src/scripting/wren_script_vm.cpp src/scripting/wren_script_vm.h
         src/console/ConsoleCmd.cpp src/console/ConsoleCmd.h
-        src/link_cable_source_provider.cpp src/link_cable_source_provider.h)
+        src/link_cable_source_provider.cpp src/link_cable_source_provider.h src/scan_engine.cpp src/scan_engine.h)
 
 find_package(SDL)
 find_package(LUA)
@@ -57,3 +57,5 @@ target_compile_features(tgbdual PRIVATE cxx_lambdas cxx_aggregate_default_initia
 
 enable_testing()
 create_test_target(console_cmd src/console/ConsoleCmd.cpp)
+create_test_target(scan_engine src/scan_engine.cpp)
+target_link_libraries(scan_engine gb_core)

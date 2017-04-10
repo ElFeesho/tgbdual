@@ -44,6 +44,7 @@
 #include "RomFile.h"
 
 #include "link_cable_source_provider.h"
+#include "scan_engine.h"
 
 
 void loadState(gameboy &gbInst, RomFile &stateFile);
@@ -54,7 +55,7 @@ void fastForwardSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimi
 
 void normalSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimitter);
 
-void printScanResults(address_scan_result result, Console &console, address_scan_result &last_result, int scanThreshold);
+void printScanResults(std::vector<ptrdiff_t> &result, Console &console);
 
 void print_scan_state(Console &console, address_scan_state<uint8_t> &state, std::string searchType);
 
@@ -78,7 +79,9 @@ int main(int argc, char *argv[]) {
         scriptManager.tick();
         console.draw(SDL_GetVideoSurface());
     }};
+
     gameboy gbInst{&render, &gp_source, cable_source.get()};
+    scan_engine scanEngine{gbInst.createAddressScanner()};
 
     RomFile romFile{argv[0]};
 
@@ -107,15 +110,13 @@ int main(int argc, char *argv[]) {
             uint32_t address = ConsoleCmd::toInt<uint32_t>(args[0]);
             uint8_t value = gbInst.read_ram<uint8_t>(address);
             std::stringstream s;
-            s << "0x" << std::hex << address << ": " << std::dec << (uint32_t)value <<  " (0x" << std::hex << (uint32_t)value << std::dec << ")";
+            s << "0x" << std::hex << address << ": " << std::dec << (uint32_t) value << " (0x" << std::hex << (uint32_t) value << std::dec << ")";
             console.addOutput(s.str());
         } else {
             console.addError("Usage: peek [address]");
         }
     });
 
-    address_scan_result last_result{{}};
-    int scanThreshold = 3;
     console.addCommand("scan", [&](std::vector<std::string> args) {
 
         if (args.size() != 1) {
@@ -124,14 +125,11 @@ int main(int argc, char *argv[]) {
         }
 
         uint32_t value = ConsoleCmd::toInt<uint32_t>(args[0]);
-
-        if (value <= 255) {
-            printScanResults(gbInst.scan_for_address((uint8_t) value), console, last_result, scanThreshold);
-        } else if (value <= (0x1 << 16)) {
-            printScanResults(gbInst.scan_for_address((uint16_t) value), console, last_result, scanThreshold);
-        } else if (value <= (0x1 << 31)) {
-            printScanResults(gbInst.scan_for_address((uint32_t) value), console, last_result, scanThreshold);
-        }
+        size_t resultCount{0};
+        resultCount = scanEngine.scan(value, [&](std::vector<ptrdiff_t> &results) {
+            printScanResults(results, console);
+        });
+        console.addOutput("Found " + std::to_string((int) resultCount) + " results");
     });
 
     address_scan_state<uint8_t> state;
@@ -146,7 +144,7 @@ int main(int argc, char *argv[]) {
             state = gbInst.initial_state<uint8_t>();
         } else {
             state = gbInst.search_greater(state);
-            if (state.size() <= scanThreshold) {
+            if (state.size() <= scanEngine.scan_threshold())) {
                 print_scan_state(console, state, "Greater values");
             } else {
                 console.addOutput("Greater values: " + std::to_string(state.size()));
@@ -160,7 +158,7 @@ int main(int argc, char *argv[]) {
             state = gbInst.initial_state<uint8_t>();
         } else {
             state = gbInst.search_lesser(state);
-            if (state.size() <= scanThreshold) {
+            if (state.size() <= scanEngine.scan_threshold()) {
 
                 print_scan_state(console, state, "Lesser values");
             } else {
@@ -175,7 +173,7 @@ int main(int argc, char *argv[]) {
             state = gbInst.initial_state<uint8_t>();
         } else {
             state = gbInst.search_changed(state);
-            if (state.size() <= scanThreshold) {
+            if (state.size() <= scanEngine.scan_threshold())) {
 
                 print_scan_state(console, state, "Changed values");
             } else {
@@ -184,32 +182,33 @@ int main(int argc, char *argv[]) {
         }
     });
 
-    console.addCommand("search_unchanged", [&](std::vector<std::string> args) {
-        if (state.size() == 0) {
-            console.addOutput("No initial search state, creating now");
-            state = gbInst.initial_state<uint8_t>();
-        } else {
-            state = gbInst.search_unchanged(state);
-            if (state.size() <= scanThreshold) {
-                print_scan_state(console, state, "Unchanged values");
-            } else {
-                console.addOutput("Unchanged values: " + std::to_string(state.size()));
-            }
-        }
-    }
+    console.addCommand("search_unchanged",
+                       [&](std::vector<std::string> args) {
+                           if (state.size() == 0) {
+                               console.addOutput("No initial search state, creating now");
+                               state = gbInst.initial_state<uint8_t>();
+                           } else {
+                               state = gbInst.search_unchanged(state);
+                               if (state.size() <= scanEngine.scan_threshold())) {
+                                   print_scan_state(console, state, "Unchanged values");
+                               } else {
+                                   console.addOutput("Unchanged values: " + std::to_string(state.size()));
+                               }
+                           }
+                       }
     );
 
     console.addCommand("scan_threshold", [&](std::vector<std::string> args) {
         if (args.size() == 0) {
-            console.addOutput("Scan threshold: " + std::to_string(scanThreshold));
+            console.addOutput("Scan threshold: " + std::to_string(scanEngine.scan_threshold()));
         } else {
-            scanThreshold = ConsoleCmd::toInt<int>(args[0]);
-            console.addOutput("Scan threshold now: " + std::to_string(scanThreshold));
+            scanEngine.set_scan_threshold(ConsoleCmd::toInt<size_t>(args[0]));
+            console.addOutput("Scan threshold now: " + std::to_string(scanEngine.scan_threshold()));
         }
     });
 
     console.addCommand("clear_scan", [&](std::vector<std::string> args) {
-        last_result = address_scan_result{{}};
+        scanEngine.clear_scan();
         console.addOutput("Cleared previous search results");
     });
 
@@ -239,7 +238,7 @@ int main(int argc, char *argv[]) {
                     scriptManager.add_vm(file, wrenVm);
                     console.addOutput("Loaded " + file + " wren script");
                 }
-                catch(std::domain_error &e) {
+                catch (std::domain_error &e) {
                     console.addError(e.what());
                     delete wrenVm;
                 }
@@ -251,7 +250,7 @@ int main(int argc, char *argv[]) {
                     scriptManager.add_vm(file, luaVm);
                     console.addOutput("Loaded " + file + " lua script");
                 }
-                catch(std::domain_error &e) {
+                catch (std::domain_error &e) {
                     console.addError(e.what());
                     delete luaVm;
                 }
@@ -376,17 +375,11 @@ void loadState(gameboy &gbInst, RomFile &romFile) {
     gbInst.load_state(romFile.state());
 }
 
-void printScanResults(address_scan_result result, Console &console, address_scan_result &last_result, int scanThreshold) {
-    if (last_result.size() > 1) {
-        result = last_result.mutual_set(result);
-    }
-    last_result = result;
-    console.addOutput("Found " + std::to_string((int) result.size()) + " results");
-    if (result.size() <= scanThreshold) {
-        for (int i = 0; i < result.size(); i++) {
-            std::stringstream s;
-            s << std::hex << result[i];
-            console.addOutput(std::to_string(i + 1) + ": 0x" + s.str());
-        }
+void printScanResults(std::vector<ptrdiff_t> &results, Console &console) {
+    int i = 0;
+    for (ptrdiff_t &value : results) {
+        std::stringstream s;
+        s << std::hex << value;
+        console.addOutput(std::to_string(++i) + ": 0x" + s.str());
     }
 }

@@ -17,6 +17,7 @@ class address_scanner;
 
 class address_scan_result {
 public:
+    address_scan_result();
     address_scan_result(std::vector<ptrdiff_t> locations);
 
     ptrdiff_t operator[](long index);
