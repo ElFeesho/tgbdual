@@ -1,4 +1,4 @@
-# TGBDual
+# TGBDual ![Build status](https://travis-ci.org/ElFeesho/tgbdual.svg?branch=master)
 ## About this fork
 This fork originally started out as an investigation into how much I could refactor the original project but has since grown far beyond this.
 
