@@ -1,7 +1,3 @@
-cmake_minimum_required(VERSION 3.0)
-
-project(gb_core C CXX)
-
 set(GB_CORE_SOURCES
         include/sound_renderer.h
         include/gameboy.h

@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.2)
+project(tgbdual C CXX)
 set(PROJECT_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 function(create_test_target target_name)
     set(OTHER_FILES "")
