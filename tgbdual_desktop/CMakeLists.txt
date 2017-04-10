@@ -28,7 +28,7 @@ find_package(SDL)
 find_package(LUA)
 set(LUA_LIB "lua")
 
-if (!Lua_FOUND)
+if (NOT Lua_FOUND)
     set(LUA_LIB lua5.2)
     set(LUA_INCLUDE_DIR "/usr/include/lua5.2/")
     message("Set LUA lib to ${LUA_LIB} and include directory to ${LUA_INCLUDE_DIR}")

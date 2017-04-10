@@ -7,18 +7,15 @@ function(create_test_target target_name)
     endforeach()
     add_test(${target_name} ${target_name})
     add_executable(${target_name} test/${target_name}.t.cpp ${OTHER_FILES})
-
-
     target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/include)
     target_include_directories(${target_name} PRIVATE ${PROJECT_SOURCE_DIR}/gtest/include)
-    message("Including ${PROJECT_SOURCE_DIR}/gtest/include for ${target_name}")
     target_compile_features(${target_name} PRIVATE cxx_lambdas cxx_aggregate_default_initializers)
 
     target_link_libraries(${target_name} gtest gtest_main)
 endfunction()
 
 add_subdirectory(gb_core)
-add_subdirectory(sdl_ui)
+add_subdirectory(tgbdual_desktop)
 add_subdirectory(script_layer)
 add_subdirectory(gtest)
 
