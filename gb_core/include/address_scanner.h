@@ -10,6 +10,8 @@
 #include <cstddef>
 #include <vector>
 #include <map>
+#include <functional>
+#include <algorithm>
 
 class address_scanner;
 

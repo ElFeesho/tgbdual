@@ -25,3 +25,4 @@ CTestTest*
 Testing
 cmake-build-debug
 sdl_ui/imgs
+.idea/workspace.xml
