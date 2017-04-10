@@ -71,7 +71,7 @@ class Pokemon {
     }
 
     read16bit(address) {
-        return GameBoy.get8bit(address+1) + (GameBoy.get8bit(address) << 8)
+        return GameBoy.get16bit(address)
     }
 
     read24bit(address) {
