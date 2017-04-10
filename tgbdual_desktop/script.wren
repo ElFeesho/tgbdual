@@ -25,7 +25,7 @@ class Enemy {
     construct new(x, y) {
         _x = x
         _y = y
-        _healthBar = HealthBar.new(_x + 10, _y + 40, 200, 20)
+        _healthBar = HealthBar.new(_x + 10, _y + 40, 300, 20)
     }
 
     pokemonNumber { GameBoy.get8bit(0x1204) }
@@ -34,10 +34,15 @@ class Enemy {
 
     draw() {
         GameBoy.addRect(_x, _y, 320, 100, 0xffffffff, 0xff666666)
-        _healthBar.healthPercentage = hp/hpMax
-        _healthBar.draw()
-        GameBoy.addImage("imgs/%(pokemonNumber).png", _x+5, _y+5)
-        GameBoy.addText("%(hp)/%(hpMax)", _x+80, _y+48)
+
+        if (hp > 0) {
+            _healthBar.healthPercentage = hp/hpMax
+            _healthBar.draw()
+            GameBoy.addImage("imgs/%(pokemonNumber).png", _x+138, _y+5)
+            GameBoy.addText("%(hp)/%(hpMax)", _x+145, _y+48)
+        } else {
+            GameBoy.addText("(No Enemy)", _x+115, _y+48)
+        }
     }
 }
 
