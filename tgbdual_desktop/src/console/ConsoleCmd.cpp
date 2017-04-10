@@ -4,6 +4,7 @@
 
 #include <sstream>
 #include <vector>
+#include <iomanip>
 #include "ConsoleCmd.h"
 
 ConsoleCmd::ConsoleCmd(std::string name, ConsoleCmd::ConsoleCallback cb) : _name{name}, _cb{cb} {
