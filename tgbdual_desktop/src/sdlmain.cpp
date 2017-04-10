@@ -331,7 +331,7 @@ void print_scan_state(Console &console, address_scan_state<uint8_t> &state, std:
     console.addOutput(searchType);
     for (auto &values : state.values()) {
         std::stringstream s;
-        s << std::__1::hex << (unsigned int) values.first << ": " << std::__1::dec << (unsigned int) values.second << " (" << std::__1::hex << (unsigned int) values.second << ")";
+        s << std::hex << (unsigned int) values.first << ": " << std::dec << (unsigned int) values.second << " (" << std::hex << (unsigned int) values.second << ")";
         console.addOutput(s.str());
     }
 }
