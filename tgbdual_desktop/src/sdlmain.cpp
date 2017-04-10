@@ -20,6 +20,7 @@
 #include <SDL/SDL.h>
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <vector>
 
