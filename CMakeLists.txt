@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-
+set(PROJECT_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 function(create_test_target target_name)
     set(OTHER_FILES "")
     foreach(f ${ARGN})
@@ -8,8 +8,10 @@ function(create_test_target target_name)
     add_test(${target_name} ${target_name})
     add_executable(${target_name} test/${target_name}.t.cpp ${OTHER_FILES})
 
+
     target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/include)
-    target_include_directories(${target_name} PRIVATE ${gtest_SOURCE_DIR}/include)
+    target_include_directories(${target_name} PRIVATE ${PROJECT_ROOT}/gtest/include)
+    message("Including ${PROJECT_ROOT}/gtest/include for ${target_name}")
     target_compile_features(${target_name} PRIVATE cxx_lambdas cxx_aggregate_default_initializers)
 
     target_link_libraries(${target_name} gtest gtest_main)
