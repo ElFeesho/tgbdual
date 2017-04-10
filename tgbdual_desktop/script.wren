@@ -70,10 +70,6 @@ class Pokemon {
         _healthBar = HealthBar.new(_x+10, _y+40, 80, 10)
     }
 
-    read16bit(address) {
-        return GameBoy.get16bit(address)
-    }
-
     read24bit(address) {
         return (GameBoy.get8bit(address-2) << 16) + (GameBoy.get8bit(address-1)<<8) + GameBoy.get8bit(address)
     }
@@ -97,7 +93,7 @@ class Pokemon {
 
     pokemonNumber { GameBoy.get8bit(0x1cd8+(_rosterPosition-1)) }
 
-    originalTrainer { read16bit(0x1ce5 + _addressShift) }
+    originalTrainer { GameBoy.get16bit(0x1ce5 + _addressShift) }
 
     attack { GameBoy.get8bit(0x1d06 + _addressShift) }
     specialAttack { GameBoy.get8bit(0x1d06 + _addressShift) }

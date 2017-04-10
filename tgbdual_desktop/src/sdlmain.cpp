@@ -125,7 +125,7 @@ int main(int argc, char *argv[]) {
             return;
         }
 
-        int value = ConsoleCmd::toInt<int>(args[0]);
+        uint32_t value = ConsoleCmd::toInt<uint32_t>(args[0]);
 
         if (value <= 255) {
             printScanResults(gbInst.scan_for_address((uint8_t) value), console, last_result, scanThreshold);

@@ -51,7 +51,7 @@ TEST(address_scanner, can_find_a_16bit_value) {
     uint8_t dummy_data[] = {0x00, 0x33, 0x66, 3, 4, 5, 6, 7, 8};
     address_scanner scanner{dummy_data, sizeof(dummy_data)};
 
-    uint16_t targetValue = 0x6633;
+    uint16_t targetValue = 0x3366;
     address_scan_result address = scanner.find_value(targetValue);
     EXPECT_EQ(1, address.size());
     EXPECT_EQ(1, address[0]);
@@ -62,11 +62,11 @@ TEST(address_scanner, can_find_a_32bit_value) {
     uint8_t dummy_data[] = {0x00, 0x33, 0x66, 3, 4, 5, 6, 7, 8};
     address_scanner scanner{dummy_data, sizeof(dummy_data)};
 
-    uint32_t targetValue = 0x04036633;
+    uint32_t targetValue = 0x00336603;
 
     address_scan_result address = scanner.find_value(targetValue);
     EXPECT_EQ(1, address.size());
-    EXPECT_EQ(1, address[0]);
+    EXPECT_EQ(0, address[0]);
 }
 
 TEST(address_scanner, can_find_changed_values) {
