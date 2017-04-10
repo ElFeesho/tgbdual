@@ -74,7 +74,6 @@ int main(int argc, char *argv[]) {
         return scriptManager.handleUnhandledCommand(command, args);
     }};
 
-
     sdl_renderer render{[&]() {
         scriptManager.tick();
         console.draw(SDL_GetVideoSurface());
@@ -87,7 +86,6 @@ int main(int argc, char *argv[]) {
     file_buffer &saveBuffer = romFile.sram();
 
     gbInst.load_rom(romBuffer, romBuffer.length(), saveBuffer, saveBuffer.length());
-
     loadState(gbInst, romFile);
 
     bool endGame = false;
