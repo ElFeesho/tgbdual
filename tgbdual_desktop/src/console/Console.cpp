@@ -143,10 +143,6 @@ void Console::addError(std::string error) {
     _history.push_back(Console::HistoryLine{error, OutputType::stderr});
 }
 
-void Console::addCommand(ConsoleCmd *command) {
-    _cmds.emplace(command->name(), std::unique_ptr<ConsoleCmd>(command));
-}
-
 void Console::processLine() {
     if (_currentLine.find(" ") == std::string::npos) {
         if (_cmds.find(_currentLine) != _cmds.end()) {
@@ -175,6 +171,10 @@ void Console::processLine() {
             }
         }
     }
+}
+
+void Console::addCommand(const std::string &command, std::function<void(std::vector<std::string>)> commandFunc) {
+    _cmds.emplace(command, std::unique_ptr<ConsoleCmd>(new ConsoleCmd(command, commandFunc)));
 }
 
 Console::HistoryLine::HistoryLine(std::string line, Console::OutputType outputType) : _line(line),

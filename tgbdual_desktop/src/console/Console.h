@@ -29,7 +29,7 @@ public:
 
     bool isOpen();
 
-    void addCommand(ConsoleCmd *consoleCmd);
+    void addCommand(const std::string &command, std::function<void(std::vector<std::string>)> commandFunc);
 
     void processLine();
 private:

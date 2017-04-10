@@ -72,8 +72,6 @@ void wren_script_vm::activate() {
     invokeWrenMethod("activate");
 }
 
-
-
 void wren_script_vm::loadScript(const std::string &scriptFile) {
     auto result = wrenInterpret(_wrenVm.get(), scriptFile.c_str());
     if (result == WREN_RESULT_COMPILE_ERROR)
