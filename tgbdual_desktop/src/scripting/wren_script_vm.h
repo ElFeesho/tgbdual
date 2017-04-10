@@ -24,5 +24,7 @@ public:
 
 private:
     wrenvm_holder _wrenVm;
+
+    void invokeWrenMethod(const std::string &methodName);
 };
 

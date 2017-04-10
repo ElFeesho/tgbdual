@@ -34,10 +34,15 @@ if (NOT Lua_FOUND)
     message("Set LUA lib to ${LUA_LIB} and include directory to ${LUA_INCLUDE_DIR}")
 endif()
 
-include_directories(${SDL_INCLUDE_DIR})
-include_directories(${PROJECT_SOURCE_DIR}/extlibs/wren/src/include)
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    add_executable(tgbdual MACOSX_BUNDLE ${SDL_UI_SOURCES})
+else()
+    add_executable(tgbdual ${SDL_UI_SOURCES})
+endif()
 
-add_executable(tgbdual ${SDL_UI_SOURCES})
+target_include_directories(tgbdual PRIVATE ${SDL_INCLUDE_DIR})
+target_include_directories(tgbdual PRIVATE ${PROJECT_SOURCE_DIR}/extlibs/wren/src/include)
+
 target_include_directories(tgbdual PRIVATE ${LUA_INCLUDE_DIR})
 
 target_include_directories(tgbdual PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)

@@ -231,17 +231,30 @@ int main(int argc, char *argv[]) {
         if (args.size() == 1) {
             std::string &file = args[0];
             if (file.find(".wren") != std::string::npos) {
+
                 wren_script_vm *wrenVm = new wren_script_vm(context);
-                wrenVm->loadScript(file_buffer{file});
-                scriptManager.remove_vm(file);
-                scriptManager.add_vm(file, wrenVm);
-                console.addOutput("Loaded " + file + " wren script");
+                try {
+                    wrenVm->loadScript(file_buffer{file});
+                    scriptManager.remove_vm(file);
+                    scriptManager.add_vm(file, wrenVm);
+                    console.addOutput("Loaded " + file + " wren script");
+                }
+                catch(std::domain_error &e) {
+                    console.addError(e.what());
+                    delete wrenVm;
+                }
             } else if (file.find(".lua") != std::string::npos) {
                 lua_script_vm *luaVm = new lua_script_vm(context);
-                luaVm->loadScript((file_buffer{file}));
-                scriptManager.remove_vm(file);
-                scriptManager.add_vm(file, luaVm);
-                console.addOutput("Loaded " + file + " lua script");
+                try {
+                    luaVm->loadScript((file_buffer{file}));
+                    scriptManager.remove_vm(file);
+                    scriptManager.add_vm(file, luaVm);
+                    console.addOutput("Loaded " + file + " lua script");
+                }
+                catch(std::domain_error &e) {
+                    console.addError(e.what());
+                    delete luaVm;
+                }
             } else {
                 console.addError("Cannot load " + file);
             }

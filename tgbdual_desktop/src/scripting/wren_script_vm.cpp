@@ -57,15 +57,19 @@ wren_script_vm::wren_script_vm(script_context &context) : _wrenVm{nullptr, wrenF
 }
 
 void wren_script_vm::tick() {
+    invokeWrenMethod("tick");
+}
+
+void wren_script_vm::invokeWrenMethod(const std::string &methodName) {
     wrenEnsureSlots(_wrenVm.get(), 1);
-    wrenGetVariable(_wrenVm.get(), "main", "tick", 0);
-    wrenCall(_wrenVm.get(), wrenGetSlotHandle(_wrenVm.get(), 0));
+    wrenGetVariable(_wrenVm.get(), "main", methodName.c_str(), 0);
+    if (wrenGetSlotType(_wrenVm.get(), 0) == WREN_TYPE_UNKNOWN) {
+        wrenCall(_wrenVm.get(), wrenGetSlotHandle(_wrenVm.get(), 0));
+    }
 }
 
 void wren_script_vm::activate() {
-    wrenEnsureSlots(_wrenVm.get(), 1);
-    wrenGetVariable(_wrenVm.get(), "main", "activate", 0);
-    wrenCall(_wrenVm.get(), wrenGetSlotHandle(_wrenVm.get(), 0));
+    invokeWrenMethod("activate");
 }
 
 
@@ -85,9 +89,7 @@ void wren_script_vm::loadScript(const std::string &scriptFile) {
         context->print_string("Failed to execute wren script");
     }
 
-    wrenEnsureSlots(_wrenVm.get(), 1);
-    wrenGetVariable(_wrenVm.get(), "main", "onLoad", 0);
-    wrenCall(_wrenVm.get(), wrenGetSlotHandle(_wrenVm.get(), 0));
+    invokeWrenMethod("onLoad");
 }
 
 bool wren_script_vm::handleUnhandledCommand(const std::string &command, std::vector<std::string> args) {
