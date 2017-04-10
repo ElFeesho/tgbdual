@@ -17,6 +17,13 @@ TEST(address_scanner, can_find_an_8bit_value) {
     EXPECT_EQ(4, address[0]);
 }
 
+TEST(address_scanner, can_find_an_8bit_value_at_the_end_of_memory) {
+    uint8_t dummy_data[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    address_scanner scanner{dummy_data, sizeof(dummy_data)};
+
+    EXPECT_EQ(8, scanner.find_value<uint8_t>(8)[0]);
+}
+
 TEST(address_scanner, can_find_all_occurences_of_an_8bit_value) {
     uint8_t dummy_data[] = {0, 1, 2, 3, 2, 5, 2, 7, 8};
     address_scanner scanner{dummy_data, sizeof(dummy_data)};
