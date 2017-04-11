@@ -198,7 +198,7 @@ TEST(address_scanner, can_find_unchanged) {
 
     result = scanner.unchanged_value(result);
 
-    EXPECT_EQ(6, result.size());
+    EXPECT_EQ(7, result.size());
 
     EXPECT_EQ(5, result.values().at(0));
     EXPECT_EQ(4, result.values().at(1));

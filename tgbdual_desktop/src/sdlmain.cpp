@@ -50,6 +50,8 @@
 #include <commands/memory_commands.h>
 #include <commands/gameboy_commands.h>
 
+void loop(Console &console, sdl_gamepad_source &gp_source, bool &endGame, limitter &frameLimitter, std::map<SDLKey, std::function<void()>> &uiActions);
+
 void saveState(gameboy &gbInst, RomFile &romFile) {
     memory_buffer buffer;
 
@@ -64,19 +66,6 @@ void saveState(gameboy &gbInst, RomFile &romFile) {
 void loadState(gameboy &gbInst, RomFile &romFile) {
     gbInst.load_state(romFile.state());
 }
-
-void normalSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimitter) {
-    gbInst.set_speed(0);
-    render.display_message("Fast forward disabled", 2000);
-    frameLimitter.normal();
-}
-
-void fastForwardSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimitter) {
-    gbInst.set_speed(9);
-    render.display_message("Fast forward enabled", 2000);
-    frameLimitter.fast();
-}
-
 
 int main(int argc, char *argv[]) {
 
@@ -112,9 +101,6 @@ int main(int argc, char *argv[]) {
     gbInst.load_rom(romBuffer, romBuffer.length(), saveBuffer, saveBuffer.length());
     loadState(gbInst, romFile);
 
-    bool endGame = false;
-    bool fast_forward = false;
-
     script_context context{&render, &gp_source, &gbInst};
 
     registerMemoryCommands(console, gbInst);
@@ -122,6 +108,7 @@ int main(int argc, char *argv[]) {
     registerScriptCommands(scriptManager, console, context);
     registerGameBoyCommands(console, gbInst, romFile);
 
+    bool endGame = false;
     console.addCommand("quit", [&](std::vector<std::string> args) {
         endGame = true;
     });
@@ -129,8 +116,6 @@ int main(int argc, char *argv[]) {
     limitter frameLimitter{[&] {
         gbInst.tick();
     }};
-
-    SDL_Event event;
 
     std::map<SDLKey, std::function<void()>> uiActions{
             {SDLK_F5,        [&] {
@@ -148,11 +133,16 @@ int main(int argc, char *argv[]) {
                 scriptManager.activate();
             }},
             {SDLK_TAB,       [&] {
+                static bool fast_forward = false;
                 fast_forward = !fast_forward;
                 if (fast_forward) {
-                    fastForwardSpeed(render, gbInst, frameLimitter);
+                    gbInst.set_speed(9);
+                    render.display_message("Fast forward enabled", 2000);
+                    frameLimitter.fast();
                 } else {
-                    normalSpeed(render, gbInst, frameLimitter);
+                    gbInst.set_speed(0);
+                    render.display_message("Fast forward disabled", 2000);
+                    frameLimitter.normal();
                 }
             }},
             {SDLK_BACKQUOTE, [&] {
@@ -161,6 +151,19 @@ int main(int argc, char *argv[]) {
             }}
     };
 
+    loop(console, gp_source, endGame, frameLimitter, uiActions);
+
+    gbInst.save_sram([&](uint8_t *sramData, uint32_t len) {
+        romFile.writeSram(sramData, len);
+    });
+
+    SDL_Quit();
+
+    return 0;
+}
+
+void loop(Console &console, sdl_gamepad_source &gp_source, bool &endGame, limitter &frameLimitter, std::map<SDLKey, std::function<void()>> &uiActions) {
+    SDL_Event event;
     while (!endGame) {
         while (SDL_PollEvent(&event)) {
 
@@ -187,12 +190,4 @@ int main(int argc, char *argv[]) {
         }
         frameLimitter.limit();
     }
-
-    gbInst.save_sram([&](uint8_t *sramData, uint32_t len) {
-        romFile.writeSram(sramData, len);
-    });
-
-    SDL_Quit();
-
-    return 0;
 }

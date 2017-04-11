@@ -91,13 +91,6 @@ void wren_script_vm::loadScript(const std::string &scriptFile) {
 }
 
 bool wren_script_vm::handleUnhandledCommand(const std::string &command, std::vector<std::string> args) {
-    wrenEnsureSlots(_wrenVm.get(), 1);
-    wrenGetVariable(_wrenVm.get(), "main", "handleCommand", 0);
-    WrenType type = wrenGetSlotType(_wrenVm.get(), 0);
-    if (type == WREN_TYPE_NULL) {
-        return false;
-    }
-
     wrenEnsureSlots(_wrenVm.get(), 2);
     wrenSetSlotString(_wrenVm.get(), 1, command.c_str());
     wrenSetSlotNewList(_wrenVm.get(), 2);
@@ -108,7 +101,10 @@ bool wren_script_vm::handleUnhandledCommand(const std::string &command, std::vec
         std::cout << "Inserted arg " << arg << std::endl;
     }
 
-    WrenInterpretResult result = wrenCall(_wrenVm.get(), wrenGetSlotHandle(_wrenVm.get(), 0));
+    WrenHandle *handle = wrenMakeCallHandle(_wrenVm.get(), "call(_,_)");
+
+    wrenGetVariable(_wrenVm.get(), "main", "handleCommand", 0);
+    WrenInterpretResult result = wrenCall(_wrenVm.get(),handle);
     if (result == WREN_RESULT_SUCCESS)
     {
         bool result = wrenGetSlotBool(_wrenVm.get(), 0);

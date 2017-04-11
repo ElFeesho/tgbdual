@@ -140,16 +140,6 @@ void sdl_renderer::drawText(const std::string &message, Sint16 x, Sint16 y) cons
     stringRGBA(dpy.get(), (Sint16) (x - 1), (Sint16) (y - 1), message.c_str(), 255, 255, 255, 255);
 }
 
-namespace {
-    void fill_audio(void *userData, uint8_t *stream, int len) {
-        sdl_renderer *renderer = static_cast<sdl_renderer *>(userData);
-        sound_renderer *snd_render = renderer->get_sound_renderer();
-        if (snd_render != nullptr) {
-            snd_render->render((short *) stream, len / 4);
-        }
-    }
-}
-
 void sdl_renderer::init_sdlaudio() {
     SDL_AudioSpec wanted = {0};
 
@@ -157,7 +147,13 @@ void sdl_renderer::init_sdlaudio() {
     wanted.format = AUDIO_S16;
     wanted.channels = 2;
     wanted.samples = 4096;
-    wanted.callback = fill_audio;
+    wanted.callback = [](void *userData, uint8_t *stream, int len) {
+        sdl_renderer *renderer = static_cast<sdl_renderer *>(userData);
+        sound_renderer *snd_render = renderer->get_sound_renderer();
+        if (snd_render != nullptr) {
+            //snd_render->render((short *) stream, len / 8);
+        }
+    };
     wanted.userdata = (void *) this;
 
     if (SDL_OpenAudio(&wanted, NULL) < 0) {

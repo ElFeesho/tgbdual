@@ -9,6 +9,17 @@ foreign class GameBoy {
     foreign static get16bit(address)
     foreign static set8bit(address, value)
     foreign static set16bit(address, value)
+
+    static get24bit(address) {
+        return get8bit(address) + (get8bit(address-1) << 8) + (get8bit(address-2) << 16)
+    }
+
+    static set24bit(address, value) {
+        set8bit(address, value & 0xff)
+        set8bit(address-1, (value >> 8) & 0xff)
+        set8bit(address-2, (value >> 16) & 0xff)
+    }
+
     foreign static queueKey(key, delay, duration)
 
     static KEY_A { 0x01 }
@@ -75,15 +86,19 @@ class Pokemon {
         _healthBar = HealthBar.new(_x+10, _y+40, 80, 10)
     }
 
-    read24bit(address) {
-        return (GameBoy.get8bit(address-2) << 16) + (GameBoy.get8bit(address-1)<<8) + GameBoy.get8bit(address)
+    level=(lvl) {
+        GameBoy.set8bit((0x1cfe) + (0x30*(_rosterPosition-1)), lvl)
     }
 
     level { GameBoy.get8bit((0x1cfe) + (0x30*(_rosterPosition-1))) }
 
-    experience { read24bit(0x1ce9 + _addressShift) }
+    experience { GameBoy.get24bit(0x1ce9 + _addressShift) }
+    experience=(value) {
+        GameBoy.set24bit(0x1ce9 + _addressShift, value)
+    }
 
     hp { GameBoy.get8bit(0x1d02 + _addressShift) }
+    hp=(value) { GameBoy.set8bit(0x1d02 + _addressShift, value) }
 
     pp(moveNumber) { GameBoy.get8bit(0x1cf6 + moveNumber + _addressShift) }
 
@@ -117,7 +132,9 @@ class Pokemon {
 
             GameBoy.addImage("imgs/%(pokemonNumber).png", _x+5, _y+5)
 
-            GameBoy.addText("I: %(_itemList[item])", _x + 10, _y + 60)
+            if (item < _itemList.count) {
+                GameBoy.addText("I: %(_itemList[item])", _x + 10, _y + 60)
+            }
         }
     }
 }
@@ -130,6 +147,7 @@ class Player {
     currentRoom { GameBoy.get8bit(0x1fe4) }
     currentArea { GameBoy.get8bit(0x1fe3) }
     currentWorld { GameBoy.get8bit(0x1fe5) }
+    money { GameBoy.get24bit(0x1850) }
 }
 
 class MenuHelper {
@@ -164,6 +182,7 @@ var pokemonThree = Pokemon.new(3, 0, 200)
 var pokemonFour = Pokemon.new(4, 419, 0)
 var pokemonFive = Pokemon.new(5, 419, 100)
 var pokemonSix = Pokemon.new(6,  419, 200)
+var pokemons = [ pokemon, pokemonTwo, pokemonThree, pokemonFour, pokemonFive, pokemonSix ]
 
 var targetAddress = 0x1cd8
 
@@ -186,6 +205,8 @@ var tick = Fn.new {
     GameBoy.addText("Current Room %(player.currentRoom)", 300, 400)
     GameBoy.addText("Current Room %(player.currentArea)", 300, 410)
     GameBoy.addText("Current Room %(player.currentWorld)", 300, 420)
+    GameBoy.addText("Current Room %(player.money)", 300, 430)
+    GameBoy.addText("Repel: %(GameBoy.get8bit(0x1ca1))", 380, 440)
 }
 
 var dec2hex = Fn.new { |input|
@@ -222,9 +243,49 @@ var onLoad = Fn.new {
 
 var handleCommand = Fn.new { |command,args|
 
-    GameBoy.print("HEllo?")
-    if (command == "test") {
-        GameBoy.print("TEST COMMAND %(args[0])")
+    GameBoy.print("HEllo? %(command)")
+    if (command == "set_pokemon_exp") {
+        if (args.count != 2) {
+            GameBoy.print("Usage: set_pokemon_exp [pokemon_number (1-6)] [exp 24bit]")
+        } else {
+            pokemons[Num.fromString(args[0])].experience = Num.fromString(args[1])
+        }
+        return true
+    }
+
+    if (command == "set_pokemon_lvl") {
+        if (args.count != 2) {
+            GameBoy.print("Usage: set_pokemon_lvl [pokemon_number (1-6)] [level 1-100]")
+        } else {
+            pokemons[Num.fromString(args[0])].level = Num.fromString(args[1])
+        }
+        return true
+    }
+
+    if (command == "pokemon_centre") {
+        if (args.count != 0) {
+            GameBoy.print("Usage: pokemon_centre")
+        } else {
+            pokemons.each { |poke|
+                poke.hp = poke.hpMax
+            }
+        }
+        return true
+    }
+
+    if (command == "give_item") {
+        if (args.count != 2) {
+            GameBoy.print("Usage: give_item [pokemon number (1-6)] [Item number (0-245)]")
+        } else {
+            var itemNumber = Num.fromString(args[1])
+            if (itemNumber < 0) {
+                itemNumber = 0
+            } else if (itemNumber > 245) {
+                itemNumber = 245
+            }
+
+            pokemons[Num.fromString(args[0])].item = itemNumber
+        }
         return true
     }
     return false
