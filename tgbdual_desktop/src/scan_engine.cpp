@@ -1,6 +1,9 @@
 #include "scan_engine.h"
 
-scan_engine::scan_engine(address_scanner scanner) : _scanner{scanner}, _lastResult{{}} {
+scan_engine::scan_engine(address_scanner scanner, initial_scan_state_created_callback stateCreatedCallback) :
+        _scanner{scanner},
+        _stateCreatedCallback{stateCreatedCallback},
+        _lastResult{{}} {
 }
 
 size_t scan_engine::scan(uint32_t value, scan_engine::scan_callback cb) {
@@ -50,4 +53,61 @@ void scan_engine::set_scan_threshold(size_t newThreshold) {
 
 size_t scan_engine::scan_threshold() {
     return _scanThreshold;
+}
+
+size_t scan_engine::search_unchanged(search_callback callback) {
+    if (_lastState.size() == 0) {
+        _stateCreatedCallback();
+    }
+    _lastState = _scanner.unchanged_value(_lastState);
+
+    if (_lastState.size() <= _scanThreshold){
+        callback(_lastState.values());
+    }
+
+    return _lastState.size();
+}
+
+size_t scan_engine::search_changed(scan_engine::search_callback callback) {
+    if (_lastState.size() == 0) {
+        _stateCreatedCallback();
+    }
+    _lastState = _scanner.changed_value(_lastState);
+
+    if (_lastState.size() <= _scanThreshold){
+        callback(_lastState.values());
+    }
+
+    return _lastState.size();
+}
+
+size_t scan_engine::search_increased(scan_engine::search_callback callback) {
+    if (_lastState.size() == 0) {
+        _stateCreatedCallback();
+    }
+    _lastState = _scanner.increased_value(_lastState);
+
+    if (_lastState.size() <= _scanThreshold){
+        callback(_lastState.values());
+    }
+
+    return _lastState.size();
+}
+
+size_t scan_engine::search_decreased(scan_engine::search_callback callback) {
+    if (_lastState.size() == 0) {
+        _stateCreatedCallback();
+    }
+    _lastState = _scanner.decreased_value(_lastState);
+
+    if (_lastState.size() <= _scanThreshold){
+        callback(_lastState.values());
+    }
+
+    return _lastState.size();
+}
+
+void scan_engine::clear_search() {
+    _lastState = _scanner.snapshot<uint8_t>();
+    _stateCreatedCallback();
 }

@@ -46,7 +46,7 @@ private:
     friend class address_scanner;
 
     address_scan_state(uint8_t *memory, size_t size) {
-        for (size_t i = 0; i < size - sizeof(T); i++) {
+        for (size_t i = 0; i <= size - sizeof(T); i++) {
             _values[i] = *((T *) (memory + i));
         }
     }

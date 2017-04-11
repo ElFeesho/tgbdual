@@ -29,7 +29,6 @@
 #include <script_manager.h>
 
 #include "scripting/wren_script_vm.h"
-#include "scripting/lua_script_vm.h"
 
 #include "console/Console.h"
 
@@ -46,20 +45,38 @@
 #include "link_cable_source_provider.h"
 #include "scan_engine.h"
 
+#include <commands/scan_commands.h>
+#include <commands/script_commands.h>
+#include <commands/memory_commands.h>
+#include <commands/gameboy_commands.h>
 
-void loadState(gameboy &gbInst, RomFile &stateFile);
+void saveState(gameboy &gbInst, RomFile &romFile) {
+    memory_buffer buffer;
 
-void saveState(gameboy &gbInst, RomFile &rom);
+    gbInst.save_state([&](uint32_t length) {
+        buffer.alloc(length);
+        return (uint8_t *) buffer;
+    });
 
-void fastForwardSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimitter);
+    romFile.writeState(buffer, buffer.length());
+}
 
-void normalSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimitter);
+void loadState(gameboy &gbInst, RomFile &romFile) {
+    gbInst.load_state(romFile.state());
+}
 
-void printScanResults(std::vector<ptrdiff_t> &result, Console &console);
+void normalSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimitter) {
+    gbInst.set_speed(0);
+    render.display_message("Fast forward disabled", 2000);
+    frameLimitter.normal();
+}
 
-void print_scan_state(Console &console, address_scan_state<uint8_t> &state, std::string searchType);
+void fastForwardSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimitter) {
+    gbInst.set_speed(9);
+    render.display_message("Fast forward enabled", 2000);
+    frameLimitter.fast();
+}
 
-void printAddressValue(Console &console, uint32_t address, uint8_t value);
 
 int main(int argc, char *argv[]) {
 
@@ -68,7 +85,6 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    sdl_gamepad_source gp_source;
     std::unique_ptr<link_cable_source> cable_source{provideLinkCableSource(&argc, &argv)};
 
     script_manager scriptManager;
@@ -82,8 +98,11 @@ int main(int argc, char *argv[]) {
         console.draw(SDL_GetVideoSurface());
     }};
 
+    sdl_gamepad_source gp_source;
     gameboy gbInst{&render, &gp_source, cable_source.get()};
-    scan_engine scanEngine{gbInst.createAddressScanner()};
+    scan_engine scanEngine{gbInst.createAddressScanner(), [&] {
+        console.addOutput("Initial search state created");
+    }};
 
     RomFile romFile{argv[0]};
 
@@ -98,174 +117,13 @@ int main(int argc, char *argv[]) {
 
     script_context context{&render, &gp_source, &gbInst};
 
-    console.addCommand("poke", [&](std::vector<std::string> args) {
-        if (args.size() == 2) {
-            gbInst.override_ram(ConsoleCmd::toInt<uint32_t>(args[0]), (uint8_t) ConsoleCmd::toInt<uint8_t>(args[1]));
-        } else {
-            console.addError("Usage: poke [address] [value]");
-        }
-    });
-
-    console.addCommand("peek", [&](std::vector<std::string> args) {
-        if (args.size() == 1) {
-            uint32_t address = ConsoleCmd::toInt<uint32_t>(args[0]);
-            printAddressValue(console, address, gbInst.read_ram<uint8_t>(address));
-        } else {
-            console.addError("Usage: peek [address]");
-        }
-    });
-
-    console.addCommand("scan", [&](std::vector<std::string> args) {
-
-        if (args.size() != 1) {
-            console.addError("Usage: scan [value]");
-            return;
-        }
-
-        uint32_t value = ConsoleCmd::toInt<uint32_t>(args[0]);
-        size_t resultCount{0};
-        resultCount = scanEngine.scan(value, [&](std::vector<ptrdiff_t> &results) {
-            printScanResults(results, console);
-        });
-        console.addOutput("Found " + std::to_string((int) resultCount) + " results");
-    });
-
-    address_scan_state<uint8_t> state;
-
-    console.addCommand("start_search", [&](std::vector<std::string> args) {
-        state = gbInst.initial_state<uint8_t>();
-    });
-
-    console.addCommand("search_greater", [&](std::vector<std::string> args) {
-        if (state.size() == 0) {
-            console.addOutput("No initial search state, creating now");
-            state = gbInst.initial_state<uint8_t>();
-        } else {
-            state = gbInst.search_greater(state);
-            if (state.size() <= scanEngine.scan_threshold()) {
-                print_scan_state(console, state, "Greater values");
-            } else {
-                console.addOutput("Greater values: " + std::to_string(state.size()));
-            }
-        }
-    });
-
-    console.addCommand("search_lesser", [&](std::vector<std::string> args) {
-        if (state.size() == 0) {
-            console.addOutput("No initial search state, creating now");
-            state = gbInst.initial_state<uint8_t>();
-        } else {
-            state = gbInst.search_lesser(state);
-            if (state.size() <= scanEngine.scan_threshold()) {
-
-                print_scan_state(console, state, "Lesser values");
-            } else {
-                console.addOutput("Lesser values: " + std::to_string(state.size()));
-            }
-        }
-    });
-
-    console.addCommand("search_changed", [&](std::vector<std::string> args) {
-        if (state.size() == 0) {
-            console.addOutput("No initial search state, creating now");
-            state = gbInst.initial_state<uint8_t>();
-        } else {
-            state = gbInst.search_changed(state);
-            if (state.size() <= scanEngine.scan_threshold()) {
-
-                print_scan_state(console, state, "Changed values");
-            } else {
-                console.addOutput("Changed values: " + std::to_string(state.size()));
-            }
-        }
-    });
-
-    console.addCommand("search_unchanged",
-                       [&](std::vector<std::string> args) {
-                           if (state.size() == 0) {
-                               console.addOutput("No initial search state, creating now");
-                               state = gbInst.initial_state<uint8_t>();
-                           } else {
-                               state = gbInst.search_unchanged(state);
-                               if (state.size() <= scanEngine.scan_threshold()) {
-                                   print_scan_state(console, state, "Unchanged values");
-                               } else {
-                                   console.addOutput("Unchanged values: " + std::to_string(state.size()));
-                               }
-                           }
-                       }
-    );
-
-    console.addCommand("scan_threshold", [&](std::vector<std::string> args) {
-        if (args.size() == 0) {
-            console.addOutput("Scan threshold: " + std::to_string(scanEngine.scan_threshold()));
-        } else {
-            scanEngine.set_scan_threshold(ConsoleCmd::toInt<size_t>(args[0]));
-            console.addOutput("Scan threshold now: " + std::to_string(scanEngine.scan_threshold()));
-        }
-    });
-
-    console.addCommand("clear_scan", [&](std::vector<std::string> args) {
-        scanEngine.clear_scan();
-        console.addOutput("Cleared previous search results");
-    });
+    registerMemoryCommands(console, gbInst);
+    registerScanCommands(console, scanEngine);
+    registerScriptCommands(scriptManager, console, context);
+    registerGameBoyCommands(console, gbInst, romFile);
 
     console.addCommand("quit", [&](std::vector<std::string> args) {
         endGame = true;
-    });
-
-    console.addCommand("save", [&](std::vector<std::string> args) {
-        saveState(gbInst, romFile);
-        console.addOutput("State saved");
-    });
-
-    console.addCommand("load", [&](std::vector<std::string> args) {
-        loadState(gbInst, romFile);
-        console.addOutput("State loaded");
-    });
-
-    console.addCommand("load_script", [&](std::vector<std::string> args) {
-        if (args.size() == 1) {
-            std::string &file = args[0];
-            if (file.find(".wren") != std::string::npos) {
-
-                wren_script_vm *wrenVm = new wren_script_vm(context);
-                try {
-                    wrenVm->loadScript(file_buffer{file});
-                    scriptManager.remove_vm(file);
-                    scriptManager.add_vm(file, wrenVm);
-                    console.addOutput("Loaded " + file + " wren script");
-                }
-                catch (std::domain_error &e) {
-                    console.addError(e.what());
-                    delete wrenVm;
-                }
-            } else if (file.find(".lua") != std::string::npos) {
-                lua_script_vm *luaVm = new lua_script_vm(context);
-                try {
-                    luaVm->loadScript((file_buffer{file}));
-                    scriptManager.remove_vm(file);
-                    scriptManager.add_vm(file, luaVm);
-                    console.addOutput("Loaded " + file + " lua script");
-                }
-                catch (std::domain_error &e) {
-                    console.addError(e.what());
-                    delete luaVm;
-                }
-            } else {
-                console.addError("Cannot load " + file);
-            }
-        } else {
-            console.addError("Usage: load_script [file]");
-        }
-    });
-
-    console.addCommand("unload_script", [&](std::vector<std::string> args) {
-        if (args.size() == 1) {
-            scriptManager.remove_vm(args[0]);
-        } else {
-            console.addError("Usage: unload_script [loaded script file]");
-        }
     });
 
     limitter frameLimitter{[&] {
@@ -336,53 +194,4 @@ int main(int argc, char *argv[]) {
     SDL_Quit();
 
     return 0;
-}
-
-void printAddressValue(Console &console, uint32_t address, uint8_t value) {
-    std::stringstream s;
-    s << "0x" << std::hex << address << ": " << std::dec << (uint32_t) value << " (0x" << std::hex << (uint32_t) value << std::dec << ")";
-    console.addOutput(s.str());
-}
-
-void print_scan_state(Console &console, address_scan_state<uint8_t> &state, std::string searchType) {
-    console.addOutput(searchType);
-    for (auto &values : state.values()) {
-        printAddressValue(console, (uint32_t) values.first, values.second);
-    }
-}
-
-void normalSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimitter) {
-    gbInst.set_speed(0);
-    render.display_message("Fast forward disabled", 2000);
-    frameLimitter.normal();
-}
-
-void fastForwardSpeed(sdl_renderer &render, gameboy &gbInst, limitter &frameLimitter) {
-    gbInst.set_speed(9);
-    render.display_message("Fast forward enabled", 2000);
-    frameLimitter.fast();
-}
-
-void saveState(gameboy &gbInst, RomFile &romFile) {
-    memory_buffer buffer;
-
-    gbInst.save_state([&](uint32_t length) {
-        buffer.alloc(length);
-        return (uint8_t *) buffer;
-    });
-
-    romFile.writeState(buffer, buffer.length());
-}
-
-void loadState(gameboy &gbInst, RomFile &romFile) {
-    gbInst.load_state(romFile.state());
-}
-
-void printScanResults(std::vector<ptrdiff_t> &results, Console &console) {
-    int i = 0;
-    for (ptrdiff_t &value : results) {
-        std::stringstream s;
-        s << std::hex << value;
-        console.addOutput(std::to_string(++i) + ": 0x" + s.str());
-    }
 }

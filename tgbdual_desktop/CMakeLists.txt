@@ -22,7 +22,12 @@ set(SDL_UI_SOURCES
         src/scripting/lua_script_vm.cpp src/scripting/lua_script_vm.h
         src/scripting/wren_script_vm.cpp src/scripting/wren_script_vm.h
         src/console/ConsoleCmd.cpp src/console/ConsoleCmd.h
-        src/link_cable_source_provider.cpp src/link_cable_source_provider.h src/scan_engine.cpp src/scan_engine.h)
+        src/link_cable_source_provider.cpp src/link_cable_source_provider.h
+        src/scan_engine.cpp src/scan_engine.h
+        src/commands/scan_commands.cpp src/commands/scan_commands.h
+        src/commands/script_commands.cpp src/commands/script_commands.h
+        src/commands/memory_commands.cpp src/commands/memory_commands.h
+        src/commands/gameboy_commands.cpp src/commands/gameboy_commands.h)
 
 find_package(SDL)
 find_package(LUA)
