@@ -177,6 +177,12 @@ void Console::addCommand(const std::string &command, std::function<void(std::vec
     _cmds.emplace(command, std::unique_ptr<ConsoleCmd>(new ConsoleCmd(command, commandFunc)));
 }
 
+void Console::removeCommand(const std::string &command) {
+    if (_cmds.find(command) != _cmds.end()) {
+        _cmds.erase(_cmds.find(command));
+    }
+}
+
 Console::HistoryLine::HistoryLine(std::string line, Console::OutputType outputType) : _line(line),
                                                                                       _outputType(outputType) {
 

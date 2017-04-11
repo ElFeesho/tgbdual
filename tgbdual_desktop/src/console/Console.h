@@ -32,6 +32,9 @@ public:
     void addCommand(const std::string &command, std::function<void(std::vector<std::string>)> commandFunc);
 
     void processLine();
+
+    void removeCommand(const std::string &command);
+
 private:
     enum class OutputType {
         stdout,

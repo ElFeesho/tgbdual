@@ -9,6 +9,7 @@ foreign class GameBoy {
     foreign static get16bit(address)
     foreign static set8bit(address, value)
     foreign static set16bit(address, value)
+    foreign static registerConsoleCommand(name, func)
 
     static get24bit(address) {
         return get8bit(address) + (get8bit(address-1) << 8) + (get8bit(address-2) << 16)
@@ -238,7 +239,9 @@ var activate = Fn.new {
 
 var bound = false
 var onLoad = Fn.new {
-
+    GameBoy.registerConsoleCommand("woop", Fn.new { |args|
+        GameBoy.print("Awesome %(args)")
+    })
 }
 
 var handleCommand = Fn.new { |command,args|

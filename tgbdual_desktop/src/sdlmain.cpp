@@ -101,7 +101,14 @@ int main(int argc, char *argv[]) {
     gbInst.load_rom(romBuffer, romBuffer.length(), saveBuffer, saveBuffer.length());
     loadState(gbInst, romFile);
 
-    script_context context{&render, &gp_source, &gbInst};
+    script_context context{&render, &gp_source, &gbInst, [&](const std::string &name, script_context::script_command command) {
+        console.removeCommand(name);
+        console.addCommand(name, [command](std::vector<std::string> args) {
+            command(args);
+        });
+    }, [&](const std::string &name) {
+        //console.removeCommand(name);
+    }};
 
     registerMemoryCommands(console, gbInst);
     registerScanCommands(console, scanEngine);
