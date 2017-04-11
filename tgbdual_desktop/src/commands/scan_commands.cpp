@@ -59,26 +59,25 @@ void registerScanCommands(Console &console, scan_engine &scanEngine) {
     });
 
     console.addCommand("search_lesser", [&](std::vector<std::string> args) {
-        size_t resultCount = scanEngine.search_increased([&](const std::map<ptrdiff_t, uint8_t> &results) {
+        size_t resultCount = scanEngine.search_decreased([&](const std::map<ptrdiff_t, uint8_t> &results) {
             print_scan_state(console, "Lesser values", results);
         });
         console.addOutput("Total values: " + std::to_string(resultCount));
     });
 
     console.addCommand("search_changed", [&](std::vector<std::string> args) {
-        size_t resultCount = scanEngine.search_increased([&](const std::map<ptrdiff_t, uint8_t> &results) {
+        size_t resultCount = scanEngine.search_changed([&](const std::map<ptrdiff_t, uint8_t> &results) {
             print_scan_state(console, "Changed values", results);
         });
         console.addOutput("Total values: " + std::to_string(resultCount));
     });
 
     console.addCommand("search_unchanged", [&](std::vector<std::string> args) {
-                           size_t resultCount = scanEngine.search_increased([&](const std::map<ptrdiff_t, uint8_t> &results) {
-                               print_scan_state(console, "Unchanged values", results);
-                           });
-                           console.addOutput("Total values: " + std::to_string(resultCount));
-                       }
-    );
+        size_t resultCount = scanEngine.search_unchanged([&](const std::map<ptrdiff_t, uint8_t> &results) {
+            print_scan_state(console, "Unchanged values", results);
+        });
+        console.addOutput("Total values: " + std::to_string(resultCount));
+    });
 
     console.addCommand("scan_threshold", [&](std::vector<std::string> args) {
         if (args.size() == 0) {

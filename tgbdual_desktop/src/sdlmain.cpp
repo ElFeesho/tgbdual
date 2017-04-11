@@ -163,6 +163,7 @@ int main(int argc, char *argv[]) {
 
     while (!endGame) {
         while (SDL_PollEvent(&event)) {
+
             if (!console.isOpen()) {
                 gp_source.update_pad_state(event);
             }
