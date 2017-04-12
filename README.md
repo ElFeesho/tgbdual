@@ -32,14 +32,13 @@ I removed several features that were too difficult to maintain without a full un
  
 ### Upcoming Features
 In no priority order:
- * Android application
- * Better script functionality
- * More unit test coverage
- * Fixed link cable support
- * Tab completion on console commands that have come from scripts
- * Enhanced debugging capabilities
-   * Graphic memory introspection
-   * Disassembly output (with stepping and breakpoints)
+ * Android application 
+ * [ ] More unit test coverage
+ * [ ] Fixed link cable support
+ * [x] Tab completion on console commands that have come from scripts
+ * [ ] Enhanced debugging capabilities
+   * [ ] Graphic memory introspection
+   * [ ] Disassembly output (with stepping and breakpoints)
    
 # Original Project
 The original [TGBDual repository can be found here](https://github.com/libertyernie/tgbdual).
