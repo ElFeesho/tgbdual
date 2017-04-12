@@ -87,6 +87,29 @@ lua_script_vm::lua_script_vm(script_context &scriptContext) : state{luaL_newstat
         return 0;
     });
 
+    bindFunction("register_console_command", [](lua_State *state) -> int {
+        script_context *ctx = contexts[state];
+        const char *commandName = lua_tostring(state, 1);
+        if (lua_isfunction(state, 2))
+        {
+            int funcRef = luaL_ref(state, LUA_REGISTRYINDEX);
+            ctx->register_command(commandName, [=](std::vector<std::string> args){
+                lua_rawgeti(state, LUA_REGISTRYINDEX, funcRef);
+                lua_createtable(state, (int) args.size(), 0);
+                if (args.size() > 0) {
+                    int i = 0;
+                    for (std::string &value : args) {
+                        lua_pushstring(state, value.c_str());
+                        lua_rawseti(state, -2, ++i);
+                    }
+                }
+                lua_pcallk(state, 1, 0, 0, 0, 0);
+            });
+        }
+
+        return 0;
+    });
+
     lua_getglobal(state.get(), "GameBoy");
 
     std::map<std::string, int> keymap;
@@ -145,7 +168,7 @@ bool lua_script_vm::handleUnhandledCommand(const std::string &command, std::vect
     int function = lua_type(state.get(), -1);
     if (function == LUA_TFUNCTION) {
         lua_pushstring(state.get(), command.c_str());
-        lua_createtable(state.get(), args.size(), 0);
+        lua_createtable(state.get(), (int) args.size(), 0);
         if (args.size() > 0) {
             int i = 0;
             for (std::string &value : args) {

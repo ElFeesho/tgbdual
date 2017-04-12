@@ -371,6 +371,11 @@ end
 
 function onLoad()
     print("ON LOAD")
+    print("Here")
+    GameBoy.register_console_command("lwoop", function(args)
+        print("NAILED IT", #args)
+    end)
+    print("Here")
 end
 
 function handleCommand(command, args)
