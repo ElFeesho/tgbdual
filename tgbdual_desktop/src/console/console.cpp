@@ -43,7 +43,7 @@ void console::draw(SDL_Surface *screen) {
             }
         }
 
-        if (SDL_GetTicks() > lastRepeat+keyRepeatDelay && keyRepeatDelay != 0) {
+        if (SDL_GetTicks() > lastRepeat + keyRepeatDelay && keyRepeatDelay != 0) {
             handleKeyDown(keyToRepeat.first, keyToRepeat.second);
             keyRepeatDelay = 40;
             lastRepeat = SDL_GetTicks();
@@ -146,20 +146,33 @@ void console::scrollUpHistory() {
 }
 
 void console::completeCommand() {
-    std::string replacement;
-    for (auto &pair : _cmds) {
-        if (pair.first.find(_currentLine) == 0) {
-            if (replacement == "") {
-                replacement = pair.first + " ";
-            } else if (pair.first.length() < replacement.length()) {
-                replacement = pair.first + " ";
+    if (_cursorPos > 0) {
+        std::string replacement;
+        int potentialMatches = 0;
+        std::vector<std::string> allMatches;
+        for (auto &pair : _cmds) {
+            if (pair.first.find(_currentLine) == 0) {
+                potentialMatches++;
+                if (replacement == "") {
+                    replacement = pair.first;
+                } else if (pair.first.length() < replacement.length()) {
+                    replacement = pair.first;
+                }
+
+                std::string newReplacement(replacement.begin(), std::mismatch(replacement.begin(), replacement.end(), pair.first.begin()).first);
+                if (newReplacement.length() > _currentLine.length()) {
+                    replacement = newReplacement;
+                }
             }
         }
-    }
 
-    if (replacement.length() > 0) {
-        _currentLine = replacement;
-        _cursorPos = _currentLine.length();
+        if (replacement.length() > 0) {
+            if (potentialMatches == 1) {
+                replacement += " ";
+            }
+            _currentLine = replacement;
+            _cursorPos = _currentLine.length();
+        }
     }
 }
 
