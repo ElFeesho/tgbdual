@@ -30,13 +30,14 @@
 #include "cpu.h"
 #include "lcd.h"
 #include "mbc.h"
-#include "renderer.h"
+#include "video_renderer.h"
 #include "rom.h"
 #include "serializer.h"
 
 #include <functional>
 
 #include "address_scanner.h"
+#include "audio_renderer.h"
 
 #define INT_VBLANK 1
 #define INT_LCDC 2
@@ -59,8 +60,7 @@ class gb {
     friend class cpu;
 
 public:
-    gb(renderer *ref, gamepad_source *gamepad_source_ref, std::function<void()> sram_updated,
-       std::function<uint8_t()> link_read, std::function<void(uint8_t)> link_write);
+    gb(video_renderer *ref, audio_renderer *audio, gamepad_source *gamepad_source_ref, std::function<void()> sram_updated, std::function<uint8_t()> link_read, std::function<void(uint8_t)> link_write);
 
     cpu *get_cpu();
 
@@ -121,7 +121,7 @@ public:
     address_scanner create_address_scanner();
 
 private:
-    renderer *m_renderer;
+    video_renderer *m_renderer;
     gamepad_source *m_gamepad;
     lcd m_lcd;
     cpu m_cpu;

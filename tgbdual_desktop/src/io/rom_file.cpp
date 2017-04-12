@@ -4,11 +4,11 @@
 #include <fstream>
 #include <iomanip>
 
-#include "RomFile.h"
+#include "rom_file.h"
 
 #include <sys/stat.h>
 
-RomFile::RomFile(const std::string &romPath) :
+rom_file::rom_file(const std::string &romPath) :
         _romPath{romPath},
         _sramPath{romPath.substr(0, romPath.find_last_of(".")) + ".sav"},
         _statePath{romPath.substr(0, romPath.find_last_of(".")) + ".sv0"},
@@ -21,19 +21,19 @@ RomFile::RomFile(const std::string &romPath) :
     }
 }
 
-file_buffer &RomFile::rom() {
+file_buffer &rom_file::rom() {
     return _romBuffer;
 }
 
-file_buffer &RomFile::sram() {
+file_buffer &rom_file::sram() {
     return _sramBuffer;
 }
 
-file_buffer &RomFile::state() {
+file_buffer &rom_file::state() {
     return _stateBuffer;
 }
 
-void RomFile::writeSram(uint8_t *sramData, uint32_t length) {
+void rom_file::writeSram(uint8_t *sramData, uint32_t length) {
     std::fstream sram{_sramPath, std::ios::out};
     sram.write((const char *) sramData, length);
     sram.close();
@@ -41,7 +41,7 @@ void RomFile::writeSram(uint8_t *sramData, uint32_t length) {
     _sramBuffer = file_buffer{_sramPath};
 }
 
-void RomFile::writeState(uint8_t *stateData, uint32_t length) {
+void rom_file::writeState(uint8_t *stateData, uint32_t length) {
     std::fstream state{_statePath, std::ios::out};
     state.write((const char *) stateData, length);
     state.close();

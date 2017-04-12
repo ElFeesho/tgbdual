@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#include "sound_renderer.h"
+#include "sound_provider.h"
 
 class gb;
 class serializer;
@@ -80,13 +80,13 @@ struct apu_que {
 
 class apu;
 
-class apu_snd : public sound_renderer {
+class apu_snd : public sound_provider {
     friend class apu;
 
 public:
     apu_snd(apu *papu);
 
-    void render(short *buf, int sample);
+    void populate_audio_buffer(short *buf, int sample);
     void reset();
 
     void serialize(serializer &s);
@@ -119,7 +119,7 @@ class apu {
 public:
     apu(gb *ref);
 
-    apu_snd *get_renderer() { return &snd; }
+    apu_snd *get_stream_provider() { return &snd; }
 
     uint8_t read(uint16_t adr);
     void write(uint16_t adr, uint8_t dat, int clock);

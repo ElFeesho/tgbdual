@@ -526,7 +526,7 @@ void apu_snd::update() {
     counter++;
 }
 
-void apu_snd::render(short *buf, int sample) {
+void apu_snd::populate_audio_buffer(short *buf, int sample) {
     static short filter[8820 * 2];
     static int counter = 0;
 

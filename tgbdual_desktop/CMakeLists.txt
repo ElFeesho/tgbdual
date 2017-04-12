@@ -5,7 +5,8 @@ set(SDL_UI_SOURCES
         src/network/tcp_client.h src/network/tcp_client.cpp
         src/network/tcp_server.h src/network/tcp_server.cpp
         src/network/multicast_transmitter.cpp src/network/multicast_transmitter.h
-        src/sdl_renderer.cpp src/sdl_renderer.h
+        src/network/json.hpp
+        src/rendering/sdl_video_renderer.cpp src/rendering/sdl_video_renderer.h
         src/limitter.cpp src/limitter.h
         src/input/sdl_gamepad_source.cpp src/input/sdl_gamepad_source.h
         src/io/file_buffer.cpp src/io/file_buffer.h
@@ -15,19 +16,17 @@ set(SDL_UI_SOURCES
         src/io/buffer.h
         src/sdlmain.cpp
         src/input/input_source.h
-        src/json.hpp
-        src/RomFile.cpp
-        src/RomFile.h
+        src/io/rom_file.cpp src/io/rom_file.h
         src/console/Console.cpp src/console/Console.h
         src/scripting/lua_script_vm.cpp src/scripting/lua_script_vm.h
         src/scripting/wren_script_vm.cpp src/scripting/wren_script_vm.h
         src/console/ConsoleCmd.cpp src/console/ConsoleCmd.h
         src/link_cable_source_provider.cpp src/link_cable_source_provider.h
-        src/scan_engine.cpp src/scan_engine.h
+        src/memory/scan_engine.cpp src/memory/scan_engine.h
         src/commands/scan_commands.cpp src/commands/scan_commands.h
         src/commands/script_commands.cpp src/commands/script_commands.h
         src/commands/memory_commands.cpp src/commands/memory_commands.h
-        src/commands/gameboy_commands.cpp src/commands/gameboy_commands.h)
+        src/commands/gameboy_commands.cpp src/commands/gameboy_commands.h src/network/tcp_link_cable.cpp src/network/tcp_link_cable.h src/rendering/sdl_audio_renderer.cpp src/rendering/sdl_audio_renderer.h)
 
 find_package(SDL)
 find_package(LUA)
@@ -62,5 +61,5 @@ target_compile_features(tgbdual PRIVATE cxx_lambdas cxx_aggregate_default_initia
 
 enable_testing()
 create_test_target(console_cmd src/console/ConsoleCmd.cpp)
-create_test_target(scan_engine src/scan_engine.cpp)
+create_test_target(scan_engine src/memory/scan_engine.cpp)
 target_link_libraries(scan_engine gb_core)

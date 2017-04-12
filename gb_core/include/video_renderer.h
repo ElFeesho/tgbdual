@@ -25,16 +25,9 @@
 
 #include <cstdint>
 
-class sound_renderer;
-
-class renderer {
+class video_renderer {
 public:
-    virtual ~renderer() {}
-
-    void set_sound_renderer(sound_renderer *ref) { snd_render = ref; };
+    virtual ~video_renderer() {}
 
     virtual void render_screen(uint8_t *buf, int width, int height, int depth) = 0;
-
-protected:
-    sound_renderer *snd_render;
 };

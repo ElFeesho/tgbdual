@@ -4,7 +4,7 @@
 #include <string>
 #include <io/memory_buffer.h>
 
-void registerGameBoyCommands(Console &console, gameboy &gbInst, RomFile &romFile) {
+void registerGameBoyCommands(Console &console, gameboy &gbInst, rom_file &romFile) {
     console.addCommand("save", [&](std::vector<std::string> args) {
         memory_buffer buffer;
 

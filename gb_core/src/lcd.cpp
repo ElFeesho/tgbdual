@@ -914,7 +914,7 @@ void lcd::render(void *buf, int scanline) {
 
     if (ref_gb->get_rom()->get_info()->gb_type >= 3) {
         //		for (int i=0;i<64;i++)
-        //			mapped_pal[i>>2][i&3]=ref_gb->get_renderer()->map_color(col_pal[i>>2][i&3]);
+        //			mapped_pal[i>>2][i&3]=ref_gb->get_stream_provider()->map_color(col_pal[i>>2][i&3]);
 
         if (layer_enable[0] && layer_enable[1] && layer_enable[2]) {
             bg_render_color(buf, scanline);

@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #include <gb.h>
-#include <renderer.h>
+#include <video_renderer.h>
 #include <string>
 
 #include <functional>
@@ -14,7 +14,7 @@
 
 class gameboy {
 public:
-	gameboy(renderer *render, gamepad_source *gp_source, link_cable_source *link_cable_source);
+	gameboy(video_renderer *video, audio_renderer *audio, gamepad_source *gp_source, link_cable_source *link_cable_source);
 
 	void load_rom(uint8_t *romData, uint32_t romLength, uint8_t *ram = nullptr, uint32_t ramLength = 0);
 

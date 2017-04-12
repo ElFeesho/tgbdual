@@ -28,31 +28,31 @@
 #include <gameboy.h>
 #include <script_manager.h>
 
-#include "scripting/wren_script_vm.h"
+#include <scripting/wren_script_vm.h>
 
 #include "console/Console.h"
 
 #include "io/file_buffer.h"
 #include "io/memory_buffer.h"
 
-#include "sdl_renderer.h"
+#include <rendering/sdl_video_renderer.h>
 
-#include "input/sdl_gamepad_source.h"
+#include <input/sdl_gamepad_source.h>
 #include "limitter.h"
 
-#include "RomFile.h"
+#include <io/rom_file.h>
 
-#include "link_cable_source_provider.h"
-#include "scan_engine.h"
+#include <link_cable_source_provider.h>
 
 #include <commands/scan_commands.h>
 #include <commands/script_commands.h>
 #include <commands/memory_commands.h>
 #include <commands/gameboy_commands.h>
+#include <rendering/sdl_audio_renderer.h>
 
 void loop(Console &console, sdl_gamepad_source &gp_source, bool &endGame, limitter &frameLimitter, std::map<SDLKey, std::function<void()>> &uiActions);
 
-void saveState(gameboy &gbInst, RomFile &romFile) {
+void saveState(gameboy &gbInst, rom_file &romFile) {
     memory_buffer buffer;
 
     gbInst.save_state([&](uint32_t length) {
@@ -63,7 +63,7 @@ void saveState(gameboy &gbInst, RomFile &romFile) {
     romFile.writeState(buffer, buffer.length());
 }
 
-void loadState(gameboy &gbInst, RomFile &romFile) {
+void loadState(gameboy &gbInst, rom_file &romFile) {
     gbInst.load_state(romFile.state());
 }
 
@@ -82,18 +82,20 @@ int main(int argc, char *argv[]) {
         return scriptManager.handleUnhandledCommand(command, args);
     }};
 
-    sdl_renderer render{[&]() {
+    sdl_video_renderer video_renderer{[&]() {
         scriptManager.tick();
         console.draw(SDL_GetVideoSurface());
     }};
 
+    sdl_audio_renderer audio_renderer;
+
     sdl_gamepad_source gp_source;
-    gameboy gbInst{&render, &gp_source, cable_source.get()};
+    gameboy gbInst{&video_renderer, &audio_renderer, &gp_source, cable_source.get()};
     scan_engine scanEngine{gbInst.createAddressScanner(), [&] {
         console.addOutput("Initial search state created");
     }};
 
-    RomFile romFile{argv[0]};
+    rom_file romFile{argv[0]};
 
     file_buffer &romBuffer = romFile.rom();
     file_buffer &saveBuffer = romFile.sram();
@@ -101,7 +103,7 @@ int main(int argc, char *argv[]) {
     gbInst.load_rom(romBuffer, romBuffer.length(), saveBuffer, saveBuffer.length());
     loadState(gbInst, romFile);
 
-    script_context context{&render, &gp_source, &gbInst, [&](const std::string &name, script_context::script_command command) {
+    script_context context{&video_renderer, &gp_source, &gbInst, [&](const std::string &name, script_context::script_command command) {
         console.removeCommand(name);
         console.addCommand(name, [command](std::vector<std::string> args) {
             command(args);
@@ -125,30 +127,35 @@ int main(int argc, char *argv[]) {
     }};
 
     std::map<SDLKey, std::function<void()>> uiActions{
-            {SDLK_F5,        [&] {
+            {SDLK_F5,
+            [&] {
                 saveState(gbInst, romFile);
-                render.display_message("State saved", 2000);
+                video_renderer.display_message("State saved", 2000);
             }},
-            {SDLK_F7,        [&] {
+            {SDLK_F7,
+            [&] {
                 loadState(gbInst, romFile);
-                render.display_message("State loaded", 2000);
+                video_renderer.display_message("State loaded", 2000);
             }},
-            {SDLK_ESCAPE,    [&] {
+            {SDLK_ESCAPE,
+            [&] {
                 endGame = true;
             }},
-            {SDLK_SPACE,     [&] {
+            {SDLK_SPACE,
+            [&] {
                 scriptManager.activate();
             }},
-            {SDLK_TAB,       [&] {
+            {SDLK_TAB,
+            [&] {
                 static bool fast_forward = false;
                 fast_forward = !fast_forward;
                 if (fast_forward) {
                     gbInst.set_speed(9);
-                    render.display_message("Fast forward enabled", 2000);
+                    video_renderer.display_message("Fast forward enabled", 2000);
                     frameLimitter.fast();
                 } else {
                     gbInst.set_speed(0);
-                    render.display_message("Fast forward disabled", 2000);
+                    video_renderer.display_message("Fast forward disabled", 2000);
                     frameLimitter.normal();
                 }
             }},

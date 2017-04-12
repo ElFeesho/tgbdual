@@ -8,7 +8,7 @@
 #include <iostream>
 #include <network/tcp_client.h>
 #include <network/null_link_source.h>
-#include "link_cable_source_provider.h"
+#include <link_cable_source_provider.h>
 
 link_cable_source *provideLinkCableSource(int *argc, char ***argv) {
     int option = 0;
@@ -16,7 +16,7 @@ link_cable_source *provideLinkCableSource(int *argc, char ***argv) {
     while ((option = getopt(*argc, *argv, "smc:")) != -1) {
         switch (option) {
             case 's': {
-                selected_cable_source = new tcp_server();
+                selected_cable_source = create_tcp_server_cable();
                 break;
             }
             case 'm': {
@@ -24,12 +24,12 @@ link_cable_source *provideLinkCableSource(int *argc, char ***argv) {
                 multicast_transmitter mc_transmitter{"239.0.10.0", 1337};
                 mc_transmitter.transcieve([&](std::string addr) {
                     std::cout << "Should connect to " << addr << std::endl;
-                    selected_cable_source = new tcp_client(addr);
+                    selected_cable_source = create_client_cable(addr);
                 });
                 break;
             }
             case 'c': {
-                selected_cable_source = new tcp_client(optarg);
+                selected_cable_source = create_client_cable(optarg);
                 break;
             }
             default:

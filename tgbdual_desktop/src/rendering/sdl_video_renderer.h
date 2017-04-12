@@ -18,7 +18,7 @@
 */
 
 #include <stdio.h>
-#include <renderer.h>
+#include <video_renderer.h>
 
 #include <SDL.h>
 #include "osd_renderer.h"
@@ -27,17 +27,15 @@
 #include <map>
 #include <memory>
 
-class sdl_renderer : public renderer, public osd_renderer {
+class sdl_video_renderer : public video_renderer, public osd_renderer {
 public:
     using render_callback = std::function<void()>;
     using surf_ptr = std::unique_ptr<SDL_Surface, void (*)(SDL_Surface *)>;
     using draw_op = std::function<void()>;
 
-    sdl_renderer(render_callback renderCallback);
+    sdl_video_renderer(render_callback renderCallback);
 
     void render_screen(uint8_t *buf, int width, int height, int depth) override;
-
-    sound_renderer *get_sound_renderer();
 
     virtual void display_message(const std::string &msg, uint64_t duration) override;
 
@@ -48,9 +46,6 @@ public:
     virtual void add_image(const osd_image &image) override;
 
 private:
-    void init_sdlvideo();
-
-    void init_sdlaudio();
 
     SDL_Surface *lookupImage(const std::string &image_name);
 

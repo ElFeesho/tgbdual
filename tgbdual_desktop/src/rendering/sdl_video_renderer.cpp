@@ -18,10 +18,10 @@
 */
 
 //------------------------------------------------------
-// interface renderer の SDLを用いた実装
-// Using SDL implementation of interface renderer
+// interface video_renderer の SDLを用いた実装
+// Using SDL implementation of interface video_renderer
 
-#include "sdl_renderer.h"
+#include "sdl_video_renderer.h"
 
 #include <gb.h>
 #include <SDL_gfxPrimitives.h>
@@ -43,17 +43,12 @@ static inline uint8_t blue(uint32_t colour) { return (uint8_t) ((colour & 0x00ff
 static inline uint8_t alpha(uint32_t colour) { return (uint8_t) ((colour & 0xff000000) >> 24); }
 
 
-sdl_renderer::sdl_renderer(render_callback renderCallback) : _renderCallback{renderCallback} {
+sdl_video_renderer::sdl_video_renderer(render_callback renderCallback) : _renderCallback{renderCallback} {
 
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+    SDL_Init(SDL_INIT_VIDEO);
 
-    init_sdlvideo();
-    init_sdlaudio();
-}
-
-void sdl_renderer::init_sdlvideo() {
-    static const int GB_W = 160;
-    static const int GB_H = 144;
+    const int GB_W = 160;
+    const int GB_H = 144;
     int w = GB_W * WIN_MULTIPLIER;
     int h = GB_H * WIN_MULTIPLIER;
     uint32_t flags = SDL_SWSURFACE;
@@ -63,7 +58,7 @@ void sdl_renderer::init_sdlvideo() {
     SDL_FillRect(dpy.get(), nullptr, 0x00000000);
 }
 
-void sdl_renderer::render_screen(uint8_t *buf, int width, int height, int depth) {
+void sdl_video_renderer::render_screen(uint8_t *buf, int width, int height, int depth) {
     SDL_FillRect(dpy.get(), nullptr, 0x0000000000);
 
     for (int i = 0; i < height; i++) {
@@ -94,7 +89,7 @@ void sdl_renderer::render_screen(uint8_t *buf, int width, int height, int depth)
     SDL_UpdateRect(dpy.get(), 0,0, 520, 488);
 }
 
-void sdl_renderer::renderOSDMessages() {
+void sdl_video_renderer::renderOSDMessages() {
     int16_t msg_number = 0;
     for (auto &osd_msg : osd_messages) {
         std::string message = std::get<1>(osd_msg);
@@ -113,7 +108,7 @@ void sdl_renderer::renderOSDMessages() {
 }
 
 void
-sdl_renderer::drawRect(uint32_t colour, uint32_t fillColour, int16_t x, int16_t y, uint16_t width,
+sdl_video_renderer::drawRect(uint32_t colour, uint32_t fillColour, int16_t x, int16_t y, uint16_t width,
                        uint16_t height) const {
     uint8_t a = alpha(colour);
     uint8_t b = blue(colour);
@@ -135,40 +130,17 @@ sdl_renderer::drawRect(uint32_t colour, uint32_t fillColour, int16_t x, int16_t 
     aapolygonRGBA(dpy.get(), xpoints, ypoints, 4, r, g, b, a);
 }
 
-void sdl_renderer::drawText(const std::string &message, Sint16 x, Sint16 y) const {
+void sdl_video_renderer::drawText(const std::string &message, Sint16 x, Sint16 y) const {
     stringRGBA(dpy.get(), x, y, message.c_str(), 0, 0, 0, 128);
     stringRGBA(dpy.get(), (Sint16) (x - 1), (Sint16) (y - 1), message.c_str(), 255, 255, 255, 255);
 }
 
-void sdl_renderer::init_sdlaudio() {
-    SDL_AudioSpec wanted = {0};
-
-    wanted.freq = 44100;
-    wanted.format = AUDIO_S16;
-    wanted.channels = 2;
-    wanted.samples = 4096;
-    wanted.callback = [](void *userData, uint8_t *stream, int len) {
-        sdl_renderer *renderer = static_cast<sdl_renderer *>(userData);
-        sound_renderer *snd_render = renderer->get_sound_renderer();
-        if (snd_render != nullptr) {
-            //snd_render->render((short *) stream, len / 8);
-        }
-    };
-    wanted.userdata = (void *) this;
-
-    if (SDL_OpenAudio(&wanted, NULL) < 0) {
-        fprintf(stderr, "Could not open audio device: %s\n", SDL_GetError());
-    }
-
-    SDL_PauseAudio(0);
-}
-
-void sdl_renderer::display_message(const std::string &msg, uint64_t duration) {
+void sdl_video_renderer::display_message(const std::string &msg, uint64_t duration) {
     std::cout << msg << std::endl;
     osd_messages.emplace_back(std::tuple<uint64_t, std::string>{SDL_GetTicks() + duration, msg});
 }
 
-void sdl_renderer::add_rect(const osd_rect &rect) {
+void sdl_video_renderer::add_rect(const osd_rect &rect) {
     pending_operations.push_back([=] {
         uint32_t colour = rect.stroke();
         uint32_t fillColour = rect.fill();
@@ -181,7 +153,7 @@ void sdl_renderer::add_rect(const osd_rect &rect) {
     });
 }
 
-void sdl_renderer::add_image(const osd_image &image) {
+void sdl_video_renderer::add_image(const osd_image &image) {
     pending_operations.push_back([=] {
         SDL_Surface *src = lookupImage(image.name());
         if (src) {
@@ -191,7 +163,7 @@ void sdl_renderer::add_image(const osd_image &image) {
     });
 }
 
-SDL_Surface *sdl_renderer::lookupImage(const std::string &name) {
+SDL_Surface *sdl_video_renderer::lookupImage(const std::string &name) {
     if (image_cache.find(name) == image_cache.end()) {
         SDL_Surface *icon = IMG_Load(name.c_str());
         if (icon != nullptr) {
@@ -201,9 +173,7 @@ SDL_Surface *sdl_renderer::lookupImage(const std::string &name) {
     return image_cache[name];
 }
 
-sound_renderer *sdl_renderer::get_sound_renderer() { return snd_render; }
-
-void sdl_renderer::add_text(const std::string &text, int16_t x, int16_t y) {
+void sdl_video_renderer::add_text(const std::string &text, int16_t x, int16_t y) {
     pending_operations.push_back([=] {
         drawText(text, x, y);
     });

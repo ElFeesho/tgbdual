@@ -1,10 +1,11 @@
 set(GB_CORE_SOURCES
-        include/sound_renderer.h
+        include/sound_provider.h
         include/gameboy.h
         include/link_cable_source.h
         include/gamepad_source.h
         include/gb.h
-        include/renderer.h
+        include/video_renderer.h
+        include/audio_renderer.h
         include/serializer.h
         include/address_scanner.h
         include/apu.h

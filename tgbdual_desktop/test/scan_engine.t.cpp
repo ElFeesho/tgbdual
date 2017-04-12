@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <scan_engine.h>
+#include <memory/scan_engine.h>
 #include <algorithm>
 
 static inline scan_engine withMemory(uint8_t *memory, size_t memorySize, scan_engine::initial_scan_state_created_callback initialStateCallback = []{}) {

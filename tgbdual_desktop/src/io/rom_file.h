@@ -4,9 +4,9 @@
 
 #include "io/file_buffer.h"
 
-class RomFile {
+class rom_file {
 public:
-    RomFile(const std::string &romPath);
+    rom_file(const std::string &romPath);
 
     file_buffer &rom();
 

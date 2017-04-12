@@ -16,7 +16,7 @@ just one host and as a receiver on all the other hosts
 #include <netdb.h>
 #include <ifaddrs.h>
 
-#include "../json.hpp"
+#include "json.hpp"
 #include "multicast_transmitter.h"
 
 using nlohmann::json;

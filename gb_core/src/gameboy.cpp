@@ -2,8 +2,8 @@
 
 #include "gameboy.h"
 
-gameboy::gameboy(renderer *render, gamepad_source *gp_source, link_cable_source *link_cable_source)
-    : _gb{render, gp_source, [this] {}, [link_cable_source] { return link_cable_source->readByte(); }, [link_cable_source](uint8_t data) { link_cable_source->sendByte(data); }}, _address_scanner{_gb.create_address_scanner()} {
+gameboy::gameboy(video_renderer *video, audio_renderer *audio, gamepad_source *gp_source, link_cable_source *link_cable_source)
+    : _gb{video, audio, gp_source, [this] {}, [link_cable_source] { return link_cable_source->readByte(); }, [link_cable_source](uint8_t data) { link_cable_source->sendByte(data); }}, _address_scanner{_gb.create_address_scanner()} {
 }
 
 void gameboy::load_rom(uint8_t *romData, uint32_t romLength, uint8_t *ram, uint32_t ramLength) {

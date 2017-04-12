@@ -665,7 +665,7 @@ void mbc::mbc5_write(uint16_t adr, uint8_t dat) {
                 ref_gb->get_rom()->get_info()->cart_type == 0x1E) { // Rumble カートリッジ
                 sram_page = ref_gb->get_rom()->get_sram() +
                             0x2000 * (dat & 0x07 & (ram_size_tbl[ref_gb->get_rom()->get_info()->ram_size] - 1));
-                //ref_gb->get_renderer()->set_bibrate(dat & 0x8);
+                //ref_gb->get_stream_provider()->set_bibrate(dat & 0x8);
             } else
                 sram_page = ref_gb->get_rom()->get_sram() +
                             0x2000 * (dat & 0x0f & (ram_size_tbl[ref_gb->get_rom()->get_info()->ram_size] - 1));
@@ -801,7 +801,7 @@ void mbc::huc3_write(uint16_t adr, uint8_t dat) {
                                     mbc3_min=ref_gb->get_renderer()->get_time(9);
                                     mbc3_hour=ref_gb->get_renderer()->get_time(10);
                                     mbc3_dayl=ref_gb->get_renderer()->get_time(11);
-                                    mbc3_dayh=ref_gb->get_renderer()->get_time(12);
+                                    mbc3_dayh=ref_gb->get_stream_provider()->get_time(12);
                             }
                             mbc3_latch=1;
                     }
