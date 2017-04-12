@@ -4,11 +4,11 @@
 
 #include <gtest/gtest.h>
 #include <functional>
-#include <console/ConsoleCmd.h>
+#include <console/console_cmd.h>
 
 TEST(can_invoke_cmd_with_no_args, like_void) {
     bool executed = false;
-    ConsoleCmd testCommand{"test", [&](std::vector<std::string> args){
+    console_cmd testCommand{"test", [&](std::vector<std::string> args){
         executed = true;
     }};
 
@@ -21,9 +21,9 @@ TEST(can_invoke_cmd_with_args, like_two_ints_and_a_string) {
     int one, two;
     std::string three;
 
-    ConsoleCmd testCommand{"test", [&](std::vector<std::string> args){
-        one = ConsoleCmd::fromDec(args[0]);
-        two = ConsoleCmd::fromDec(args[1]);
+    console_cmd testCommand{"test", [&](std::vector<std::string> args){
+        one = console_cmd::fromDec(args[0]);
+        two = console_cmd::fromDec(args[1]);
         two = std::atoi(args[1].c_str());
         three = args[2];
     }};
@@ -38,10 +38,10 @@ TEST(can_invoke_cmd_with_args, like_two_ints_and_a_string) {
 TEST(can_invoke_cmd_with_args, like_two_hex_ints) {
     int one, two;
 
-    ConsoleCmd testCommand{"test", [&](std::vector<std::string> args){
+    console_cmd testCommand{"test", [&](std::vector<std::string> args){
         std::stringstream s;
-        one = ConsoleCmd::fromHex(args[0]);
-        two = ConsoleCmd::fromHex(args[1]);
+        one = console_cmd::fromHex(args[0]);
+        two = console_cmd::fromHex(args[1]);
     }};
 
     testCommand.invoke("0x10 0x20");

@@ -5,13 +5,13 @@
 #include <sstream>
 #include <vector>
 #include <iomanip>
-#include "ConsoleCmd.h"
+#include "console_cmd.h"
 
-ConsoleCmd::ConsoleCmd(std::string name, ConsoleCmd::ConsoleCallback cb) : _name{name}, _cb{cb} {
+console_cmd::console_cmd(std::string name, console_cmd::ConsoleCallback cb) : _name{name}, _cb{cb} {
 
 }
 
-const std::string &ConsoleCmd::name() {
+const std::string &console_cmd::name() {
     return _name;
 }
 
@@ -25,11 +25,11 @@ std::string stringUntil(const std::string &input, char delim) {
     return input.substr(0, delimPosition);
 }
 
-void ConsoleCmd::invoke(const std::string &args) {
+void console_cmd::invoke(const std::string &args) {
     _cb(splitArguments(args));
 }
 
-int ConsoleCmd::fromHex(const std::string &input) {
+int console_cmd::fromHex(const std::string &input) {
     int output;
     std::stringstream s;
     s << std::hex << input;
@@ -37,7 +37,7 @@ int ConsoleCmd::fromHex(const std::string &input) {
     return output;
 }
 
-int ConsoleCmd::fromDec(const std::string &input) {
+int console_cmd::fromDec(const std::string &input) {
     int output;
     std::stringstream s;
     s << input;
@@ -45,7 +45,7 @@ int ConsoleCmd::fromDec(const std::string &input) {
     return output;
 }
 
-std::vector<std::string> ConsoleCmd::splitArguments(const std::string &args) {
+std::vector<std::string> console_cmd::splitArguments(const std::string &args) {
     std::vector<std::string> components;
     std::string arg = args;
     while(arg.length()>0)

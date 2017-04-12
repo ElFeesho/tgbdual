@@ -7,10 +7,10 @@
 #include <string>
 #include <functional>
 
-class ConsoleCmd {
+class console_cmd {
 public:
     using ConsoleCallback = std::function<void(std::vector<std::string>)>;
-    ConsoleCmd(std::string name, ConsoleCallback cb);
+    console_cmd(std::string name, ConsoleCallback cb);
     const std::string &name();
 
     void invoke(const std::string &args = "");

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <console/Console.h>
+#include <console/console.h>
 #include <gameboy.h>
 
-void registerMemoryCommands(Console &console, gameboy &gbInst);
+void registerMemoryCommands(console &console, gameboy &gbInst);

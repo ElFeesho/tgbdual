@@ -8,7 +8,7 @@
 #include <io/file_buffer.h>
 #include <scripting/lua_script_vm.h>
 
-void registerScriptCommands(script_manager &scriptManager, Console &console, script_context &context) {
+void registerScriptCommands(script_manager &scriptManager, console &console, script_context &context) {
     console.addCommand("load_script", [&](std::vector<std::string> args) {
         if (args.size() == 1) {
             std::string &file = args[0];

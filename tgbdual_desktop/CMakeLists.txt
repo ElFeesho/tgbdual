@@ -17,10 +17,10 @@ set(SDL_UI_SOURCES
         src/sdlmain.cpp
         src/input/input_source.h
         src/io/rom_file.cpp src/io/rom_file.h
-        src/console/Console.cpp src/console/Console.h
+        src/console/console.cpp src/console/console.h
         src/scripting/lua_script_vm.cpp src/scripting/lua_script_vm.h
         src/scripting/wren_script_vm.cpp src/scripting/wren_script_vm.h
-        src/console/ConsoleCmd.cpp src/console/ConsoleCmd.h
+        src/console/console_cmd.cpp src/console/console_cmd.h
         src/link_cable_source_provider.cpp src/link_cable_source_provider.h
         src/memory/scan_engine.cpp src/memory/scan_engine.h
         src/commands/scan_commands.cpp src/commands/scan_commands.h
@@ -60,6 +60,6 @@ target_compile_features(tgbdual PRIVATE cxx_lambdas cxx_aggregate_default_initia
 #
 
 enable_testing()
-create_test_target(console_cmd src/console/ConsoleCmd.cpp)
+create_test_target(console_cmd src/console/console_cmd.cpp)
 create_test_target(scan_engine src/memory/scan_engine.cpp)
 target_link_libraries(scan_engine gb_core)

@@ -10,15 +10,16 @@
 #include <map>
 #include <memory>
 #include <functional>
-#include "ConsoleCmd.h"
+#include "console_cmd.h"
 
-class Console {
+class console {
 public:
     using unhandled_command_func = std::function<bool(std::string&, std::vector<std::string> &)>;
-    Console(unhandled_command_func unhandledCommandFunc);
+    console(unhandled_command_func unhandledCommandFunc);
 
     void open();
-    void update(SDLKey param, SDLMod mod);
+    void key_down(SDLKey param, SDLMod mod);
+    void key_up(SDLKey param, SDLMod mod);
     void close();
 
     void draw(SDL_Surface *screen);
@@ -30,8 +31,6 @@ public:
     bool isOpen();
 
     void addCommand(const std::string &command, std::function<void(std::vector<std::string>)> commandFunc);
-
-    void processLine();
 
     void removeCommand(const std::string &command);
 
@@ -56,7 +55,23 @@ private:
     std::vector<HistoryLine> _history;
     int _historyIndex{0};
 
-    std::map<std::string, std::unique_ptr<ConsoleCmd>> _cmds;
+    std::map<std::string, std::unique_ptr<console_cmd>> _cmds;
 
     unhandled_command_func _unhandledCommandFunc;
+
+    std::pair<SDLKey, SDLMod> keyToRepeat;
+    int keyRepeatDelay{ 0 };
+    long lastRepeat { 0 };
+
+    void decrementCursorPosition();
+    void incrementCursorPosition();
+    void eraseCharacter();
+    void processLine();
+    void completeCommand();
+    void scrollUpHistory();
+    void scrollDownHistory();
+    void insertKey(SDLKey &key, SDLMod &mod);
+    void handleKeyDown(SDLKey &key, SDLMod &mod);
+    void unqueueRepeats(SDLKey key, SDLMod mod);
+    void queueRepeats(SDLKey key, SDLMod mod);
 };

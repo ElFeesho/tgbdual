@@ -24,13 +24,14 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <map>
 
 #include <gameboy.h>
 #include <script_manager.h>
 
 #include <scripting/wren_script_vm.h>
 
-#include "console/Console.h"
+#include "console/console.h"
 
 #include "io/file_buffer.h"
 #include "io/memory_buffer.h"
@@ -50,7 +51,7 @@
 #include <commands/gameboy_commands.h>
 #include <rendering/sdl_audio_renderer.h>
 
-void loop(Console &console, sdl_gamepad_source &gp_source, bool &endGame, limitter &frameLimitter, std::map<SDLKey, std::function<void()>> &uiActions);
+void loop(console &console, sdl_gamepad_source &gp_source, bool &endGame, limitter &frameLimitter, std::map<SDLKey, std::function<void()>> &uiActions);
 
 void saveState(gameboy &gbInst, rom_file &romFile) {
     memory_buffer buffer;
@@ -78,7 +79,7 @@ int main(int argc, char *argv[]) {
 
     script_manager scriptManager;
 
-    Console console{[&](std::string &command, std::vector<std::string> &args) -> bool {
+    console console{[&](std::string &command, std::vector<std::string> &args) -> bool {
         return scriptManager.handleUnhandledCommand(command, args);
     }};
 
@@ -176,7 +177,7 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-void loop(Console &console, sdl_gamepad_source &gp_source, bool &endGame, limitter &frameLimitter, std::map<SDLKey, std::function<void()>> &uiActions) {
+void loop(console &console, sdl_gamepad_source &gp_source, bool &endGame, limitter &frameLimitter, std::map<SDLKey, std::function<void()>> &uiActions) {
     SDL_Event event;
     while (!endGame) {
         while (SDL_PollEvent(&event)) {
@@ -193,12 +194,18 @@ void loop(Console &console, sdl_gamepad_source &gp_source, bool &endGame, limitt
                     if (sym == SDLK_BACKQUOTE) {
                         console.close();
                     } else {
-                        console.update(sym, event.key.keysym.mod);
+                        console.key_down(sym, event.key.keysym.mod);
                     }
                 } else {
                     if (uiActions.find(sym) != uiActions.end()) {
                         uiActions[sym]();
                     }
+                }
+            }
+            else if (event.type == SDL_KEYUP) {
+                auto sym = event.key.keysym.sym;
+                if (console.isOpen()) {
+                    console.key_up(sym, event.key.keysym.mod);
                 }
             }
         }

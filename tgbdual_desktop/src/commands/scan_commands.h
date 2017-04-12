@@ -1,6 +1,6 @@
 #pragma once
 
 #include <memory/scan_engine.h>
-#include <console/Console.h>
+#include <console/console.h>
 
-void registerScanCommands(Console &console, scan_engine &scanEngine);
+void registerScanCommands(console &console, scan_engine &scanEngine);

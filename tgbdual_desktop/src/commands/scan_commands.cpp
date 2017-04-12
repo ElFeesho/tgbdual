@@ -8,13 +8,13 @@
 #include <map>
 #include <sstream>
 
-static inline void printAddressValue(Console &console, uint32_t address, uint8_t value) {
+static inline void printAddressValue(console &console, uint32_t address, uint8_t value) {
     std::stringstream s;
     s << "0x" << std::hex << address << ": " << std::dec << (uint32_t) value << " (0x" << std::hex << (uint32_t) value << std::dec << ")";
     console.addOutput(s.str());
 }
 
-void print_scan_state(Console &console, std::string searchType, const std::map<ptrdiff_t, uint8_t> &valuesMap) {
+void print_scan_state(console &console, std::string searchType, const std::map<ptrdiff_t, uint8_t> &valuesMap) {
     console.addOutput(searchType);
     for (auto &values : valuesMap) {
         printAddressValue(console, (uint32_t) values.first, values.second);
@@ -22,7 +22,7 @@ void print_scan_state(Console &console, std::string searchType, const std::map<p
 }
 
 
-void printScanResults(std::vector<ptrdiff_t> &results, Console &console) {
+void printScanResults(std::vector<ptrdiff_t> &results, console &console) {
     int i = 0;
     for (ptrdiff_t &value : results) {
         std::stringstream s;
@@ -31,7 +31,7 @@ void printScanResults(std::vector<ptrdiff_t> &results, Console &console) {
     }
 }
 
-void registerScanCommands(Console &console, scan_engine &scanEngine) {
+void registerScanCommands(console &console, scan_engine &scanEngine) {
     console.addCommand("scan", [&](std::vector<std::string> args) {
 
         if (args.size() != 1) {
@@ -39,7 +39,7 @@ void registerScanCommands(Console &console, scan_engine &scanEngine) {
             return;
         }
 
-        uint32_t value = ConsoleCmd::toInt<uint32_t>(args[0]);
+        uint32_t value = console_cmd::toInt<uint32_t>(args[0]);
         size_t resultCount{0};
         resultCount = scanEngine.scan(value, [&](std::vector<ptrdiff_t> &results) {
             printScanResults(results, console);
@@ -83,7 +83,7 @@ void registerScanCommands(Console &console, scan_engine &scanEngine) {
         if (args.size() == 0) {
             console.addOutput("Scan threshold: " + std::to_string(scanEngine.scan_threshold()));
         } else {
-            scanEngine.set_scan_threshold(ConsoleCmd::toInt<size_t>(args[0]));
+            scanEngine.set_scan_threshold(console_cmd::toInt<size_t>(args[0]));
             console.addOutput("Scan threshold now: " + std::to_string(scanEngine.scan_threshold()));
         }
     });
