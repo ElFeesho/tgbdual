@@ -30,48 +30,43 @@
 const uint16_t WIN_MULTIPLIER = 2;
 
 static inline Uint32 getpixel(SDL_Surface *surface, int x, int y) {
-    uint8_t *p = (uint8_t *) surface->pixels + y * surface->pitch + x * surface->format->BytesPerPixel;
-    return *(Uint16 *) p;
+    return *(Uint32 *)((Uint8*)surface->pixels + (y * surface->pitch + x * surface->format->BytesPerPixel));
 }
 
 static inline uint8_t red(uint32_t colour) { return (uint8_t) (colour & 0x000000ff); }
-
 static inline uint8_t green(uint32_t colour) { return (uint8_t) ((colour & 0x0000ff00) >> 8); }
-
 static inline uint8_t blue(uint32_t colour) { return (uint8_t) ((colour & 0x00ff0000) >> 16); }
-
 static inline uint8_t alpha(uint32_t colour) { return (uint8_t) ((colour & 0xff000000) >> 24); }
 
+const int GB_W = 160;
+const int GB_H = 144;
 
 sdl_video_renderer::sdl_video_renderer(render_callback renderCallback) : _renderCallback{renderCallback} {
 
     SDL_Init(SDL_INIT_VIDEO);
 
-    const int GB_W = 160;
-    const int GB_H = 144;
     int w = GB_W * WIN_MULTIPLIER;
     int h = GB_H * WIN_MULTIPLIER;
-    uint32_t flags = SDL_SWSURFACE;
 
-    dpy = surf_ptr(SDL_SetVideoMode(w + 200, h + 200, 16, flags), [](SDL_Surface *) {});
+    dpy = surf_ptr(SDL_SetVideoMode(w + 200, h + 200, 16, SDL_SWSURFACE), [](SDL_Surface *) {});
     scr = surf_ptr(SDL_CreateRGBSurface(SDL_SWSURFACE, GB_W, GB_H, 16, 0, 0, 0, 0), SDL_FreeSurface);
-    SDL_FillRect(dpy.get(), nullptr, 0x00000000);
+    SDL_FillRect(dpy.get(), nullptr, 0);
 }
 
-void sdl_video_renderer::render_screen(uint8_t *buf, int width, int height, int depth) {
-    SDL_FillRect(dpy.get(), nullptr, 0x0000000000);
+void sdl_video_renderer::render_screen(uint8_t *lcdPixels, int width, int height, int depth) {
+    SDL_FillRect(dpy.get(), nullptr, 0);
 
+    int step = width * depth / 8;
     for (int i = 0; i < height; i++) {
-        memcpy((void *) (((uint8_t *) scr->pixels) + (scr->pitch * i)), buf + (i * width * depth / 8),
-               (size_t) (width * depth / 8));
+        memcpy((void *) ((uint8_t *)scr->pixels + scr->pitch * i), lcdPixels + (i * step), size_t(step));
     }
 
     SDL_Rect loc = {0, 0, WIN_MULTIPLIER, WIN_MULTIPLIER};
-    for (int y = 0; y < 144; y++) {
-        for (int x = 0; x < 160; x++) {
+    for (int y = 0; y < GB_H; y++) {
+        for (int x = 0; x < GB_W; x++) {
             Uint32 colour = getpixel(scr.get(), x, y);
-            loc.x = (Sint16) (100 + (x * WIN_MULTIPLIER));
-            loc.y = (Sint16) (100 + (y * WIN_MULTIPLIER));
+            loc.x = Sint16(100 + x * WIN_MULTIPLIER);
+            loc.y = Sint16(100 + y * WIN_MULTIPLIER);
             SDL_FillRect(dpy.get(), &loc, colour);
         }
     }
@@ -91,20 +86,16 @@ void sdl_video_renderer::render_screen(uint8_t *buf, int width, int height, int 
 
 void sdl_video_renderer::renderOSDMessages() {
     int16_t msg_number = 0;
-    for (auto &osd_msg : osd_messages) {
-        std::string message = std::get<1>(osd_msg);
-
+    for (pending_osd_message &osd_msg : osd_messages) {
         Sint16 y = (Sint16) (11 + msg_number * 20);
         Sint16 x = 11;
-        drawText(message, x, y);
+        drawText(osd_msg.second, x, y);
 
         msg_number++;
     }
 
     osd_messages.erase(
-            remove_if(osd_messages.begin(), osd_messages.end(), [](std::tuple<uint64_t, std::string> msg) -> bool {
-                return SDL_GetTicks() > std::get<0>(msg);
-            }), osd_messages.end());
+            remove_if(osd_messages.begin(), osd_messages.end(), [](pending_osd_message &msg) { return SDL_GetTicks() > msg.first; }), osd_messages.end());
 }
 
 void
@@ -137,19 +128,12 @@ void sdl_video_renderer::drawText(const std::string &message, Sint16 x, Sint16 y
 
 void sdl_video_renderer::display_message(const std::string &msg, uint64_t duration) {
     std::cout << msg << std::endl;
-    osd_messages.emplace_back(std::tuple<uint64_t, std::string>{SDL_GetTicks() + duration, msg});
+    osd_messages.emplace_back(pending_osd_message{SDL_GetTicks() + duration, msg});
 }
 
 void sdl_video_renderer::add_rect(const osd_rect &rect) {
     pending_operations.push_back([=] {
-        uint32_t colour = rect.stroke();
-        uint32_t fillColour = rect.fill();
-        int16_t x = rect.x();
-        int16_t y = rect.y();
-        uint16_t width = rect.w();
-        uint16_t height = rect.h();
-
-        drawRect(colour, fillColour, x, y, width, height);
+        drawRect(rect.stroke(), rect.fill(), rect.x(), rect.y(), rect.w(), rect.h());
     });
 }
 
@@ -157,7 +141,7 @@ void sdl_video_renderer::add_image(const osd_image &image) {
     pending_operations.push_back([=] {
         SDL_Surface *src = lookupImage(image.name());
         if (src) {
-            SDL_Rect pos = {image.x(), image.y(), (uint16_t) src->w, (uint16_t) src->h};
+            SDL_Rect pos = {image.x(), image.y(), uint16_t(src->w), uint16_t(src->h)};
             SDL_BlitSurface(src, nullptr, dpy.get(), &pos);
         }
     });

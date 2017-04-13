@@ -3,12 +3,12 @@
 //
 
 #include <getopt.h>
-#include <network/tcp_server.h>
-#include <network/multicast_transmitter.h>
 #include <iostream>
-#include <network/tcp_client.h>
-#include <network/null_link_source.h>
-#include <link_cable_source_provider.h>
+#include <linkcable/null_link_source.h>
+#include <linkcable/link_cable_source_provider.h>
+#include <linkcable/network/tcp_server.h>
+#include <linkcable/network/multicast_transmitter.h>
+#include <linkcable/network/tcp_client.h>
 
 link_cable_source *provideLinkCableSource(int *argc, char ***argv) {
     int option = 0;

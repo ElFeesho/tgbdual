@@ -27,31 +27,30 @@
 #include <map>
 
 #include <gameboy.h>
-#include <script_manager.h>
 
+#include <script_manager.h>
 #include <scripting/wren_script_vm.h>
 
 #include "console/console.h"
 
-#include "io/file_buffer.h"
-#include "io/memory_buffer.h"
-
-#include <rendering/sdl_video_renderer.h>
-
 #include <input/sdl_gamepad_source.h>
-#include "limitter.h"
+#include <limitter.h>
 
 #include <io/rom_file.h>
+#include <io/file_buffer.h>
+#include <io/memory_buffer.h>
 
-#include <link_cable_source_provider.h>
+#include <linkcable/link_cable_source_provider.h>
 
 #include <commands/scan_commands.h>
 #include <commands/script_commands.h>
 #include <commands/memory_commands.h>
 #include <commands/gameboy_commands.h>
+
+#include <rendering/sdl_video_renderer.h>
 #include <rendering/sdl_audio_renderer.h>
 
-void loop(console &console, sdl_gamepad_source &gp_source, bool &endGame, limitter &frameLimitter, std::map<SDLKey, std::function<void()>> &uiActions);
+void loop(console &c, sdl_gamepad_source &gp_source, bool &endGame, limitter &frameLimitter, std::map<SDLKey, std::function<void()>> &uiActions);
 
 void saveState(gameboy &gbInst, rom_file &romFile) {
     memory_buffer buffer;
@@ -177,12 +176,12 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-void loop(console &console, sdl_gamepad_source &gp_source, bool &endGame, limitter &frameLimitter, std::map<SDLKey, std::function<void()>> &uiActions) {
+void loop(console &c, sdl_gamepad_source &gp_source, bool &endGame, limitter &frameLimitter, std::map<SDLKey, std::function<void()>> &uiActions) {
     SDL_Event event;
     while (!endGame) {
         while (SDL_PollEvent(&event)) {
 
-            if (!console.isOpen()) {
+            if (!c.isOpen()) {
                 gp_source.update_pad_state(event);
             }
 
@@ -190,11 +189,11 @@ void loop(console &console, sdl_gamepad_source &gp_source, bool &endGame, limitt
                 endGame = true;
             } else if (event.type == SDL_KEYDOWN) {
                 auto sym = event.key.keysym.sym;
-                if (console.isOpen()) {
+                if (c.isOpen()) {
                     if (sym == SDLK_BACKQUOTE) {
-                        console.close();
+                        c.close();
                     } else {
-                        console.key_down(sym, event.key.keysym.mod);
+                        c.key_down(sym, event.key.keysym.mod);
                     }
                 } else {
                     if (uiActions.find(sym) != uiActions.end()) {
@@ -204,8 +203,8 @@ void loop(console &console, sdl_gamepad_source &gp_source, bool &endGame, limitt
             }
             else if (event.type == SDL_KEYUP) {
                 auto sym = event.key.keysym.sym;
-                if (console.isOpen()) {
-                    console.key_up(sym, event.key.keysym.mod);
+                if (c.isOpen()) {
+                    c.key_up(sym, event.key.keysym.mod);
                 }
             }
         }

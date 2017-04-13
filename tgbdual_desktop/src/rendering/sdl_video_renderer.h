@@ -35,7 +35,7 @@ public:
 
     sdl_video_renderer(render_callback renderCallback);
 
-    void render_screen(uint8_t *buf, int width, int height, int depth) override;
+    void render_screen(uint8_t *lcdPixels, int width, int height, int depth) override;
 
     virtual void display_message(const std::string &msg, uint64_t duration) override;
 
@@ -46,13 +46,13 @@ public:
     virtual void add_image(const osd_image &image) override;
 
 private:
-
+    using pending_osd_message = std::pair<uint64_t, std::string>;
     SDL_Surface *lookupImage(const std::string &image_name);
 
     surf_ptr dpy{nullptr, SDL_FreeSurface};
     surf_ptr scr{nullptr, SDL_FreeSurface};
 
-    std::vector<std::tuple<uint64_t, std::string>> osd_messages;
+    std::vector<pending_osd_message> osd_messages;
     std::vector<draw_op> pending_operations;
 
     std::map<std::string, SDL_Surface *> image_cache;
