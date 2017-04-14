@@ -14,8 +14,9 @@
 
 class console {
 public:
+    using time_provider = std::function<long()>;
     using unhandled_command_func = std::function<bool(std::string&, std::vector<std::string> &)>;
-    console(unhandled_command_func unhandledCommandFunc);
+    console(unhandled_command_func unhandledCommandFunc, time_provider timeProvider);
 
     void open();
     void key_down(SDLKey param, SDLMod mod);
@@ -62,6 +63,8 @@ private:
     std::pair<SDLKey, SDLMod> keyToRepeat;
     int keyRepeatDelay{ 0 };
     long lastRepeat { 0 };
+
+    time_provider _timeProvider;
 
     void decrementCursorPosition();
     void incrementCursorPosition();

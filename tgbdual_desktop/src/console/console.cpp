@@ -6,7 +6,7 @@
 #include <SDL/SDL_gfxPrimitives.h>
 #include <iostream>
 
-console::console(console::unhandled_command_func unhandledCommandFunc) : _unhandledCommandFunc{unhandledCommandFunc} {
+console::console(console::unhandled_command_func unhandledCommandFunc, time_provider timeProvider) : _unhandledCommandFunc{unhandledCommandFunc}, _timeProvider{timeProvider} {
 
 }
 
@@ -26,7 +26,7 @@ void console::draw(SDL_Surface *screen) {
         stringRGBA(screen, 3, (Sint16) (screen->h / 2 - 10), ">", 255, 255, 255, 255);
 
         stringRGBA(screen, (Sint16) (10 + _cursorPos * 8), (Sint16) (screen->h / 2 - 10), "_", 255, 255, 255,
-                   (Uint8) (SDL_GetTicks() % 255));
+                   (Uint8) (_timeProvider() % 255));
         stringRGBA(screen, 10, (Sint16) (screen->h / 2 - 10), _currentLine.c_str(), 255, 255, 255, 255);
 
         for (int i = 0; i < _history.size(); i++) {
@@ -43,10 +43,10 @@ void console::draw(SDL_Surface *screen) {
             }
         }
 
-        if (SDL_GetTicks() > lastRepeat + keyRepeatDelay && keyRepeatDelay != 0) {
+        if (_timeProvider() > lastRepeat + keyRepeatDelay && keyRepeatDelay != 0) {
             handleKeyDown(keyToRepeat.first, keyToRepeat.second);
             keyRepeatDelay = 40;
-            lastRepeat = SDL_GetTicks();
+            lastRepeat = _timeProvider();
         }
     }
 }
@@ -68,7 +68,7 @@ void console::queueRepeats(SDLKey key, SDLMod mod) {
     keyToRepeat.first = key;
     keyToRepeat.second = mod;
     keyRepeatDelay = 300;
-    lastRepeat = SDL_GetTicks();
+    lastRepeat = _timeProvider();
 }
 
 void console::unqueueRepeats(SDLKey key, SDLMod mod) {

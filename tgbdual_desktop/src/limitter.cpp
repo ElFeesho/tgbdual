@@ -3,6 +3,7 @@
 //
 
 #include "limitter.h"
+#include "emulator_time.h"
 
 #include <SDL/SDL.h>
 
@@ -17,13 +18,13 @@ void limitter::normal() {
 }
 
 void limitter::limit() {
-    uint32_t startTime = SDL_GetTicks();
+    uint32_t startTime = emulator_time::current_time();
 
     _operation();
 
-    uint32_t operationTime = SDL_GetTicks() - startTime;
+    uint32_t operationTime = emulator_time::current_time() - startTime;
 
     if (operationTime < _targetTime) {
-        SDL_Delay(_targetTime - operationTime);
+        emulator_time::sleep(_targetTime - operationTime);
     }
 }

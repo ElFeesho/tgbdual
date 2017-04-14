@@ -32,6 +32,7 @@
 #include <scripting/wren_script_vm.h>
 
 #include "console/console.h"
+#include "emulator_time.h"
 
 #include <input/sdl_gamepad_source.h>
 #include <limitter.h>
@@ -75,13 +76,16 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
+    emulator_time::set_time_provider(&SDL_GetTicks);
+    emulator_time::set_sleep_provider(&SDL_Delay);
+
     std::unique_ptr<link_cable_source> cable_source{provideLinkCableSource(&argc, &argv)};
 
     script_manager scriptManager;
 
     console console{[&](std::string &command, std::vector<std::string> &args) -> bool {
         return scriptManager.handleUnhandledCommand(command, args);
-    }};
+    }, &emulator_time::current_time};
 
     SDL_Surface *screen = SDL_SetVideoMode(320 + 200, 288 + 200, 16, SDL_SWSURFACE);
     sdl_osd_renderer osdRenderer{screen};

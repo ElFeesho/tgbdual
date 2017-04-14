@@ -64,7 +64,9 @@ set(TGBDUAL_DESKTOP_SOURCES
         src/input/input_source.h
         src/io/rom_file.cpp src/io/rom_file.h
         src/memory/scan_engine.cpp src/memory/scan_engine.h
-        src/main.cpp)
+        src/main.cpp
+        src/emulator_time.cpp
+        src/emulator_time.h)
 
 find_package(SDL)
 find_package(LUA)

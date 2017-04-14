@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <time.h>
+#include <emulator_time.h>
 
 class multicast_transmitter {
 public:
