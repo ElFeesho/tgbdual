@@ -39,7 +39,7 @@ set(TGBDUAL_DESKTOP_SOURCES
         src/commands/script_commands.cpp src/commands/script_commands.h
         src/commands/memory_commands.cpp src/commands/memory_commands.h
         src/commands/gameboy_commands.cpp src/commands/gameboy_commands.h
-        src/rendering/sdl_audio_renderer.cpp src/rendering/sdl_audio_renderer.h)
+        src/rendering/sdl_audio_renderer.cpp src/rendering/sdl_audio_renderer.h src/rendering/sdl_osd_renderer.cpp src/rendering/sdl_osd_renderer.h)
 
 find_package(SDL)
 find_package(LUA)

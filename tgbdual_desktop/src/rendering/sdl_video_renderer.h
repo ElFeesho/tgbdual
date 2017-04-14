@@ -27,41 +27,19 @@
 #include <map>
 #include <memory>
 
-class sdl_video_renderer : public video_renderer, public osd_renderer {
+class sdl_video_renderer : public video_renderer {
 public:
     using render_callback = std::function<void()>;
     using surf_ptr = std::unique_ptr<SDL_Surface, void (*)(SDL_Surface *)>;
-    using draw_op = std::function<void()>;
 
-    sdl_video_renderer(render_callback renderCallback);
+    sdl_video_renderer(SDL_Surface *screen, uint16_t bevel, render_callback renderCallback);
 
     void render_screen(uint8_t *lcdPixels, int width, int height, int depth) override;
 
-    virtual void display_message(const std::string &msg, uint64_t duration) override;
-
-    virtual void add_rect(const osd_rect &rect) override;
-
-    virtual void add_text(const std::string &text, int16_t x, int16_t y) override;
-
-    virtual void add_image(const osd_image &image) override;
-
 private:
-    using pending_osd_message = std::pair<uint64_t, std::string>;
-    SDL_Surface *lookupImage(const std::string &image_name);
-
-    surf_ptr dpy{nullptr, SDL_FreeSurface};
+    SDL_Surface *_screen;
+    uint16_t _bevel;
     surf_ptr scr{nullptr, SDL_FreeSurface};
-
-    std::vector<pending_osd_message> osd_messages;
-    std::vector<draw_op> pending_operations;
-
-    std::map<std::string, SDL_Surface *> image_cache;
-
-    void drawText(const std::string &message, Sint16 x, Sint16 y) const;
-
-    void drawRect(uint32_t colour, uint32_t fillColour, int16_t x, int16_t y, uint16_t width, uint16_t height) const;
-
-    void renderOSDMessages();
 
     render_callback _renderCallback;
 };

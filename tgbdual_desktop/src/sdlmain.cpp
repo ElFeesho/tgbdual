@@ -49,6 +49,7 @@
 
 #include <rendering/sdl_video_renderer.h>
 #include <rendering/sdl_audio_renderer.h>
+#include <rendering/sdl_osd_renderer.h>
 
 void loop(console &c, sdl_gamepad_source &gp_source, bool &endGame, limitter &frameLimitter, std::map<SDLKey, std::function<void()>> &uiActions);
 
@@ -82,9 +83,13 @@ int main(int argc, char *argv[]) {
         return scriptManager.handleUnhandledCommand(command, args);
     }};
 
-    sdl_video_renderer video_renderer{[&]() {
+    SDL_Surface *screen = SDL_SetVideoMode(320 + 200, 288 + 200, 16, SDL_SWSURFACE);
+    sdl_osd_renderer osdRenderer{screen};
+    sdl_video_renderer video_renderer{screen, 100, [&]() {
         scriptManager.tick();
+        osdRenderer.render();
         console.draw(SDL_GetVideoSurface());
+        SDL_Flip(SDL_GetVideoSurface());
     }};
 
     sdl_audio_renderer audio_renderer;
@@ -103,7 +108,7 @@ int main(int argc, char *argv[]) {
     gbInst.load_rom(romBuffer, romBuffer.length(), saveBuffer, saveBuffer.length());
     loadState(gbInst, romFile);
 
-    script_context context{&video_renderer, &gp_source, &gbInst, [&](const std::string &name, script_context::script_command command) {
+    script_context context{&osdRenderer, &gp_source, &gbInst, [&](const std::string &name, script_context::script_command command) {
         console.removeCommand(name);
         console.addCommand(name, [command](std::vector<std::string> args) {
             command(args);
@@ -130,12 +135,12 @@ int main(int argc, char *argv[]) {
             {SDLK_F5,
             [&] {
                 saveState(gbInst, romFile);
-                video_renderer.display_message("State saved", 2000);
+                osdRenderer.display_message("State saved", 2000);
             }},
             {SDLK_F7,
             [&] {
                 loadState(gbInst, romFile);
-                video_renderer.display_message("State loaded", 2000);
+                osdRenderer.display_message("State loaded", 2000);
             }},
             {SDLK_ESCAPE,
             [&] {
@@ -151,11 +156,11 @@ int main(int argc, char *argv[]) {
                 fast_forward = !fast_forward;
                 if (fast_forward) {
                     gbInst.set_speed(9);
-                    video_renderer.display_message("Fast forward enabled", 2000);
+                    osdRenderer.display_message("Fast forward enabled", 2000);
                     frameLimitter.fast();
                 } else {
                     gbInst.set_speed(0);
-                    video_renderer.display_message("Fast forward disabled", 2000);
+                    osdRenderer.display_message("Fast forward disabled", 2000);
                     frameLimitter.normal();
                 }
             }},
