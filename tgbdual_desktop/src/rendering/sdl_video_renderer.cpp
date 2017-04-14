@@ -36,9 +36,6 @@ sdl_video_renderer::sdl_video_renderer(SDL_Surface *screen, uint16_t bevel, rend
 
     SDL_Init(SDL_INIT_VIDEO);
 
-    int w = GB_W * WIN_MULTIPLIER;
-    int h = GB_H * WIN_MULTIPLIER;
-
     scr = surf_ptr(SDL_CreateRGBSurface(SDL_SWSURFACE, GB_W, GB_H, 16, 0, 0, 0, 0), SDL_FreeSurface);
 }
 

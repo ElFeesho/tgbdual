@@ -15,31 +15,56 @@ set(LINKCABLE_SOURCES
         src/linkcable/link_cable_source_provider.cpp
         src/linkcable/link_cable_source_provider.h)
 
-set(TGBDUAL_DESKTOP_SOURCES
-        ${LINKCABLE_SOURCES}
+set(SDL_RENDERING_SOURCES
         src/rendering/sdl_video_renderer.cpp
         src/rendering/sdl_video_renderer.h
+        src/rendering/sdl_audio_renderer.cpp
+        src/rendering/sdl_audio_renderer.h
+        src/rendering/sdl_osd_renderer.cpp
+        src/rendering/sdl_osd_renderer.h)
+
+set(SDL_INPUT_SOURCES
+        src/input/sdl_gamepad_source.cpp
+        src/input/sdl_gamepad_source.h
+        src/input/joystick_input_source.cpp
+        src/input/joystick_input_source.h
+        src/input/keyboard_input_source.cpp
+        src/input/keyboard_input_source.h)
+
+set(SCRIPTING_SOURCES
+        src/scripting/lua_script_vm.cpp
+        src/scripting/lua_script_vm.h
+        src/scripting/wren_script_vm.cpp
+        src/scripting/wren_script_vm.h)
+
+set(CONSOLE_SOURCES
+        src/console/console.cpp
+        src/console/console.h
+        src/console/console_cmd.cpp
+        src/console/console_cmd.h
+        src/commands/scan_commands.cpp
+        src/commands/scan_commands.h
+        src/commands/script_commands.cpp
+        src/commands/script_commands.h
+        src/commands/memory_commands.cpp
+        src/commands/memory_commands.h
+        src/commands/gameboy_commands.cpp
+        src/commands/gameboy_commands.h)
+
+set(TGBDUAL_DESKTOP_SOURCES
+        ${LINKCABLE_SOURCES}
+        ${SDL_RENDERING_SOURCES}
+        ${SDL_INPUT_SOURCES}
+        ${SCRIPTING_SOURCES}
+        ${CONSOLE_SOURCES}
         src/limitter.cpp src/limitter.h
-        src/input/sdl_gamepad_source.cpp src/input/sdl_gamepad_source.h
+        src/io/buffer.h
         src/io/file_buffer.cpp src/io/file_buffer.h
         src/io/memory_buffer.cpp src/io/memory_buffer.h
-        src/input/joystick_input_source.cpp src/input/joystick_input_source.h
-        src/input/keyboard_input_source.cpp src/input/keyboard_input_source.h
-        src/io/buffer.h
-        src/sdlmain.cpp
         src/input/input_source.h
         src/io/rom_file.cpp src/io/rom_file.h
-        src/console/console.cpp src/console/console.h
-        src/scripting/lua_script_vm.cpp src/scripting/lua_script_vm.h
-        src/scripting/wren_script_vm.cpp src/scripting/wren_script_vm.h
-        src/console/console_cmd.cpp src/console/console_cmd.h
-
         src/memory/scan_engine.cpp src/memory/scan_engine.h
-        src/commands/scan_commands.cpp src/commands/scan_commands.h
-        src/commands/script_commands.cpp src/commands/script_commands.h
-        src/commands/memory_commands.cpp src/commands/memory_commands.h
-        src/commands/gameboy_commands.cpp src/commands/gameboy_commands.h
-        src/rendering/sdl_audio_renderer.cpp src/rendering/sdl_audio_renderer.h src/rendering/sdl_osd_renderer.cpp src/rendering/sdl_osd_renderer.h)
+        src/main.cpp)
 
 find_package(SDL)
 find_package(LUA)
