@@ -5,6 +5,7 @@
 #include <SDL_image.h>
 #include <iostream>
 #include <SDL_gfxPrimitives.h>
+#include <algorithm>
 #include "sdl_osd_renderer.h"
 
 static inline uint8_t red(uint32_t colour) { return (uint8_t) (colour & 0x000000ff); }
