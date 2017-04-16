@@ -53,8 +53,9 @@
 #include <rendering/gb_video_renderer.h>
 #include <rendering/gb_osd_renderer.h>
 #include <rendering/gb_audio_renderer.h>
+#include <input/gb_gamepad_source.h>
 
-void loop(console &c, sdl_gamepad_source &gp_source, bool &endGame, limitter &frameLimitter, std::map<SDLKey, std::function<void()>> &uiActions);
+void loop(console &c, bool &endGame, limitter &frameLimitter, std::map<SDLKey, std::function<void()>> &uiActions);
 
 void saveState(gameboy &gbInst, rom_file &romFile) {
     memory_buffer buffer;
@@ -101,8 +102,8 @@ int main(int argc, char *argv[]) {
     }, 100};
 
     gb_audio_renderer gb_audio{&sdl_audio};
-
-    sdl_gamepad_source gp_source;
+    sdl_gamepad_source sdl_input;
+    gb_gamepad_source gp_source{&sdl_input};
     gameboy gbInst{&video_renderer, &gb_audio, &gp_source, cable_source.get()};
     scan_engine scanEngine{gbInst.createAddressScanner(), std::bind(&console::addOutput, &cons, "Initial search state created")};
 
@@ -172,7 +173,7 @@ int main(int argc, char *argv[]) {
             }}
     };
 
-    loop(cons, gp_source, endGame, frameLimitter, uiActions);
+    loop(cons, endGame, frameLimitter, uiActions);
 
     gbInst.save_sram(std::bind(&rom_file::writeSram, &romFile, std::placeholders::_1, std::placeholders::_2));
 
@@ -181,14 +182,10 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-void loop(console &c, sdl_gamepad_source &gp_source, bool &endGame, limitter &frameLimitter, std::map<SDLKey, std::function<void()>> &uiActions) {
+void loop(console &c, bool &endGame, limitter &frameLimitter, std::map<SDLKey, std::function<void()>> &uiActions) {
     SDL_Event event;
     while (!endGame) {
         while (SDL_PollEvent(&event)) {
-
-            if (!c.isOpen()) {
-                gp_source.update_pad_state(event);
-            }
 
             if (event.type == SDL_QUIT) {
                 endGame = true;

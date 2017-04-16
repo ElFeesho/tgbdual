@@ -4,7 +4,7 @@
 
 #include "emulator_time.h"
 
-long emulator_time::current_time() {
+uint32_t emulator_time::current_time() {
     return emulator_time::_time_provider();
 }
 

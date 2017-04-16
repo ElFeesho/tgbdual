@@ -5,27 +5,23 @@
 #include <map>
 #include <vector>
 
-#include <input/sdl/keyboard_input_source.h>
-#include <input/sdl/joystick_input_source.h>
+#include <input/gamepad_source.h>
 #include "input_queue.h"
 
 
-class sdl_gamepad_source : public gamepad_source, public input_queue
-{
+class sdl_gamepad_source : public tgb::gamepad_source {
 public:
-	sdl_gamepad_source();
-	void update_pad_state(const SDL_Event &ev);
-	virtual uint8_t check_pad() override;
-	virtual void reset_pad() override;
-	virtual void queue_key(const input_event &event) override;
+    uint8_t provideState() override;
 
 private:
-	uint8_t padState { 0 };
-	std::map<int, input_source*> input_sources;
-	
-    keyboard_input_source keyboardSource;
-    joystick_input_source joystickSource;
-
-	std::vector<input_event> pending_events;
+    std::map<SDLKey, uint8_t> _keyMap{{SDLK_z,      0x02},
+                                      {SDLK_x,      0x01},
+                                      {SDLK_RSHIFT, 0x04},
+                                      {SDLK_RETURN, 0x08},
+                                      {SDLK_DOWN,   0x10},
+                                      {SDLK_UP,     0x20},
+                                      {SDLK_LEFT,   0x40},
+                                      {SDLK_RIGHT,  0x80}};
+    uint8_t padState{0};
 };
 

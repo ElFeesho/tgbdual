@@ -23,11 +23,7 @@ set(SDL_RENDERING_SOURCES
 
 set(SDL_INPUT_SOURCES
         src/input/sdl/sdl_gamepad_source.cpp
-        src/input/sdl/sdl_gamepad_source.h
-        src/input/sdl/joystick_input_source.cpp
-        src/input/sdl/joystick_input_source.h
-        src/input/sdl/keyboard_input_source.cpp
-        src/input/sdl/keyboard_input_source.h)
+        src/input/sdl/sdl_gamepad_source.h)
 
 set(SCRIPTING_SOURCES
         src/scripting/lua_script_vm.cpp
@@ -63,7 +59,7 @@ set(TGBDUAL_DESKTOP_SOURCES
         src/memory/scan_engine.cpp src/memory/scan_engine.h
         src/main.cpp
         src/emulator_time.cpp
-        src/emulator_time.h src/rendering/video_renderer.h src/rendering/gb_video_renderer.cpp src/rendering/gb_video_renderer.h src/rendering/gb_osd_renderer.cpp src/rendering/gb_osd_renderer.h src/rendering/audio_renderer.h src/rendering/gb_audio_renderer.cpp src/rendering/gb_audio_renderer.h)
+        src/emulator_time.h src/rendering/video_renderer.h src/rendering/gb_video_renderer.cpp src/rendering/gb_video_renderer.h src/rendering/gb_osd_renderer.cpp src/rendering/gb_osd_renderer.h src/rendering/audio_renderer.h src/rendering/gb_audio_renderer.cpp src/rendering/gb_audio_renderer.h src/input/gb_gamepad_source.cpp src/input/gb_gamepad_source.h src/input/gamepad_source.h)
 
 find_package(SDL)
 find_package(LUA)
