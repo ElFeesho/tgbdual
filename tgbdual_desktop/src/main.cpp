@@ -34,7 +34,7 @@
 #include "console/console.h"
 #include "emulator_time.h"
 
-#include <input/sdl_gamepad_source.h>
+#include <input/sdl/sdl_gamepad_source.h>
 #include <limitter.h>
 
 #include <io/rom_file.h>
@@ -48,9 +48,9 @@
 #include <commands/memory_commands.h>
 #include <commands/gameboy_commands.h>
 
-#include <rendering/sdl_video_renderer.h>
-#include <rendering/sdl_audio_renderer.h>
-#include <rendering/sdl_osd_renderer.h>
+#include <rendering/sdl/sdl_video_renderer.h>
+#include <rendering/sdl/sdl_audio_renderer.h>
+#include <rendering/sdl/sdl_osd_renderer.h>
 
 void loop(console &c, sdl_gamepad_source &gp_source, bool &endGame, limitter &frameLimitter, std::map<SDLKey, std::function<void()>> &uiActions);
 
@@ -83,9 +83,7 @@ int main(int argc, char *argv[]) {
 
     script_manager scriptManager;
 
-    console console{[&](std::string &command, std::vector<std::string> &args) -> bool {
-        return scriptManager.handleUnhandledCommand(command, args);
-    }, &emulator_time::current_time};
+    console console{std::bind(&script_manager::handleUnhandledCommand, &scriptManager, std::placeholders::_1, std::placeholders::_2), &emulator_time::current_time};
 
     SDL_Surface *screen = SDL_SetVideoMode(320 + 200, 288 + 200, 16, SDL_SWSURFACE);
     sdl_osd_renderer osdRenderer{screen};
@@ -100,9 +98,7 @@ int main(int argc, char *argv[]) {
 
     sdl_gamepad_source gp_source;
     gameboy gbInst{&video_renderer, &audio_renderer, &gp_source, cable_source.get()};
-    scan_engine scanEngine{gbInst.createAddressScanner(), [&] {
-        console.addOutput("Initial search state created");
-    }};
+    scan_engine scanEngine{gbInst.createAddressScanner(), std::bind(&console::addOutput, &console, "Initial search state created")};
 
     rom_file romFile{argv[0]};
 

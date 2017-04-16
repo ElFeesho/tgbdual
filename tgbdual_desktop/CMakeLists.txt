@@ -16,20 +16,20 @@ set(LINKCABLE_SOURCES
         src/linkcable/link_cable_source_provider.h)
 
 set(SDL_RENDERING_SOURCES
-        src/rendering/sdl_video_renderer.cpp
-        src/rendering/sdl_video_renderer.h
-        src/rendering/sdl_audio_renderer.cpp
-        src/rendering/sdl_audio_renderer.h
-        src/rendering/sdl_osd_renderer.cpp
-        src/rendering/sdl_osd_renderer.h)
+        src/rendering/sdl/sdl_video_renderer.cpp
+        src/rendering/sdl/sdl_video_renderer.h
+        src/rendering/sdl/sdl_audio_renderer.cpp
+        src/rendering/sdl/sdl_audio_renderer.h
+        src/rendering/sdl/sdl_osd_renderer.cpp
+        src/rendering/sdl/sdl_osd_renderer.h)
 
 set(SDL_INPUT_SOURCES
-        src/input/sdl_gamepad_source.cpp
-        src/input/sdl_gamepad_source.h
-        src/input/joystick_input_source.cpp
-        src/input/joystick_input_source.h
-        src/input/keyboard_input_source.cpp
-        src/input/keyboard_input_source.h)
+        src/input/sdl/sdl_gamepad_source.cpp
+        src/input/sdl/sdl_gamepad_source.h
+        src/input/sdl/joystick_input_source.cpp
+        src/input/sdl/joystick_input_source.h
+        src/input/sdl/keyboard_input_source.cpp
+        src/input/sdl/keyboard_input_source.h)
 
 set(SCRIPTING_SOURCES
         src/scripting/lua_script_vm.cpp
@@ -61,7 +61,6 @@ set(TGBDUAL_DESKTOP_SOURCES
         src/io/buffer.h
         src/io/file_buffer.cpp src/io/file_buffer.h
         src/io/memory_buffer.cpp src/io/memory_buffer.h
-        src/input/input_source.h
         src/io/rom_file.cpp src/io/rom_file.h
         src/memory/scan_engine.cpp src/memory/scan_engine.h
         src/main.cpp

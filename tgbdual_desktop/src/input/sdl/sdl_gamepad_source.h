@@ -5,8 +5,8 @@
 #include <map>
 #include <vector>
 
-#include "input/keyboard_input_source.h"
-#include "input/joystick_input_source.h"
+#include <input/sdl/keyboard_input_source.h>
+#include <input/sdl/joystick_input_source.h>
 #include "input_queue.h"
 
 
