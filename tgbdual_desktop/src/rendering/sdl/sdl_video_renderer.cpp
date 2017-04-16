@@ -51,4 +51,6 @@ void sdl_video_renderer::render_screen(uint8_t *lcdPixels, int width, int height
     }
 
     _renderCallback();
+
+    SDL_Flip(_screen);
 }

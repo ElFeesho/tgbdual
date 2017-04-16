@@ -92,8 +92,7 @@ int main(int argc, char *argv[]) {
     sdl_video_renderer video_renderer{screen, 100, [&]() {
         scriptManager.tick();
         osdRenderer.render();
-        cons.draw(SDL_GetVideoSurface());
-        SDL_Flip(SDL_GetVideoSurface());
+        cons.draw(screen);
     }};
 
     sdl_audio_renderer audio_renderer;
