@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
     gb_gamepad_source gp_source{&sdl_input};
 
     sdl_console_driver sdl_consoleDriver;
-    gb_console_driver consoleDriver{cons, &sdl_consoleDriver};
+    gb_console_driver consoleDriver{cons, &sdl_consoleDriver, std::bind(&gb_gamepad_source::enable, &gp_source)};
 
     gameboy gbInst{&video_renderer, &gb_audio, &gp_source, cable_source.get()};
     scan_engine scanEngine{gbInst.createAddressScanner(), std::bind(&console::addOutput, &cons, "Initial search state created")};
@@ -167,6 +167,7 @@ int main(int argc, char *argv[]) {
             }, [&] {
                 cons.open();
                 gp_source.reset_pad();
+                gp_source.disable();
             }
     };
 

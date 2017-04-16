@@ -11,7 +11,9 @@ gb_gamepad_source::gb_gamepad_source(tgb::gamepad_source *gamepad_source) : _gam
 }
 
 uint8_t gb_gamepad_source::check_pad() {
-    _padState = _gamepad_source->provideState();
+    if (_enabled) {
+        _padState = _gamepad_source->provideState();
+    }
 
     uint32_t epoch = emulator_time::current_time();
     for (auto &event : pending_events) {
@@ -45,4 +47,12 @@ void gb_gamepad_source::reset_pad() {
 
 void gb_gamepad_source::queue_key(const input_event &event) {
     pending_events.emplace_back(input_event{event.key, (uint32_t) (event.when + emulator_time::current_time()), event.duration});
+}
+
+void gb_gamepad_source::enable() {
+    _enabled = true;
+}
+
+void gb_gamepad_source::disable() {
+    _enabled = false;
 }

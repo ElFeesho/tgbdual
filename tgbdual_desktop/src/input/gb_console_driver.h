@@ -6,7 +6,8 @@
 
 class gb_console_driver {
 public:
-    gb_console_driver(console &consoleToDrive, tgb::console_driver *consoleDriver);
+    using console_close_cb = std::function<void()>;
+    gb_console_driver(console &consoleToDrive, tgb::console_driver *consoleDriver, console_close_cb consoleCloseCb);
 
     void update();
 
@@ -23,5 +24,6 @@ private:
     };
 
     console &_console;
+    console_close_cb _consoleCloseCb;
     tgb::console_driver *_consoleDriver;
 };

@@ -4,7 +4,7 @@
 
 #include "gb_console_driver.h"
 
-gb_console_driver::gb_console_driver(console &consoleToDrive, tgb::console_driver *consoleDriver) : _console{consoleToDrive}, _consoleDriver{consoleDriver} {
+gb_console_driver::gb_console_driver(console &consoleToDrive, tgb::console_driver *consoleDriver, console_close_cb consoleCloseCb) : _console{consoleToDrive}, _consoleDriver{consoleDriver}, _consoleCloseCb{consoleCloseCb} {
 
 }
 
@@ -20,6 +20,7 @@ void gb_console_driver::update() {
             [&](tgb::console_driver::CommandKey key) {
                 if (key == tgb::console_driver::CommandKey::CLOSE_CONSOLE) {
                     _console.close();
+                    _consoleCloseCb();
                 } else {
                     _console.key_down(commandKeyMap[key]);
                 }
