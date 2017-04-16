@@ -55,8 +55,10 @@
 #include <rendering/gb_audio_renderer.h>
 #include <input/gb_gamepad_source.h>
 #include <input/gb_sys_command_source.h>
+#include <input/sdl/sdl_console_driver.h>
+#include <input/gb_console_driver.h>
 
-void loop(console &c, bool &endGame, limitter &frameLimitter, gb_sys_command_source&);
+void loop(console &c, bool &endGame, limitter &frameLimitter, gb_sys_command_source&, gb_console_driver&);
 
 void saveState(gameboy &gbInst, rom_file &romFile) {
     memory_buffer buffer;
@@ -87,24 +89,28 @@ int main(int argc, char *argv[]) {
 
     script_manager scriptManager;
 
-    console cons{std::bind(&script_manager::handleUnhandledCommand, &scriptManager, std::placeholders::_1, std::placeholders::_2), &emulator_time::current_time};
-
     SDL_InitSubSystem(SDL_INIT_VIDEO);
 
     SDL_Surface *screen = SDL_SetVideoMode(320 + 200, 288 + 200, 16, SDL_SWSURFACE);
     sdl_video_renderer sdl_video{screen};
     sdl_audio_renderer sdl_audio;
 
+    console cons{&sdl_video, 520, 488/2, std::bind(&script_manager::handleUnhandledCommand, &scriptManager, std::placeholders::_1, std::placeholders::_2), &emulator_time::current_time};
+
     gb_osd_renderer osdRenderer{&sdl_video};
     gb_video_renderer video_renderer{&sdl_video, [&]() {
         scriptManager.tick();
         osdRenderer.render();
-        cons.draw(screen);
+        cons.draw();
     }, 100};
 
     gb_audio_renderer gb_audio{&sdl_audio};
     sdl_gamepad_source sdl_input;
     gb_gamepad_source gp_source{&sdl_input};
+
+    sdl_console_driver sdl_consoleDriver;
+    gb_console_driver consoleDriver{cons, &sdl_consoleDriver};
+
     gameboy gbInst{&video_renderer, &gb_audio, &gp_source, cable_source.get()};
     scan_engine scanEngine{gbInst.createAddressScanner(), std::bind(&console::addOutput, &cons, "Initial search state created")};
 
@@ -164,7 +170,7 @@ int main(int argc, char *argv[]) {
             }
     };
 
-    loop(cons, endGame, frameLimitter, sys_command_source);
+    loop(cons, endGame, frameLimitter, sys_command_source, consoleDriver);
 
     gbInst.save_sram(std::bind(&rom_file::writeSram, &romFile, std::placeholders::_1, std::placeholders::_2));
 
@@ -173,31 +179,12 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-void loop(console &c, bool &endGame, limitter &frameLimitter, gb_sys_command_source &sys_command_source) {
-    SDL_Event event;
+void loop(console &c, bool &endGame, limitter &frameLimitter, gb_sys_command_source &sys_command_source, gb_console_driver &consoleDriver) {
     while (!endGame) {
         if (!c.isOpen()) {
             sys_command_source.update();
         } else {
-            while (SDL_PollEvent(&event)) {
-
-                if (event.type == SDL_QUIT) {
-                    endGame = true;
-                } else if (event.type == SDL_KEYDOWN) {
-                    auto sym = event.key.keysym.sym;
-                    if (sym == SDLK_BACKQUOTE) {
-                        c.close();
-                    } else {
-                        c.key_down(sym, event.key.keysym.mod);
-                    }
-                } else if (event.type == SDL_KEYUP) {
-                    auto sym = event.key.keysym.sym;
-                    if (c.isOpen()) {
-                        c.key_up(sym, event.key.keysym.mod);
-                    }
-                }
-            }
-
+            consoleDriver.update();
         }
         frameLimitter.limit();
     }

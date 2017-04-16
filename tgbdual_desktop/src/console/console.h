@@ -10,20 +10,21 @@
 #include <map>
 #include <memory>
 #include <functional>
+#include <rendering/video_renderer.h>
 #include "console_cmd.h"
 
 class console {
 public:
     using time_provider = std::function<long()>;
     using unhandled_command_func = std::function<bool(std::string&, std::vector<std::string> &)>;
-    console(unhandled_command_func unhandledCommandFunc, time_provider timeProvider);
+    console(tgb::video_renderer *renderer, uint32_t width, uint32_t height, unhandled_command_func unhandledCommandFunc, time_provider timeProvider);
 
     void open();
-    void key_down(SDLKey param, SDLMod mod);
-    void key_up(SDLKey param, SDLMod mod);
+    void key_down(char key);
+    void key_up(char key);
     void close();
 
-    void draw(SDL_Surface *screen);
+    void draw();
 
     void addOutput(std::string output);
     void addHistory(std::string output);
@@ -50,6 +51,8 @@ private:
         std::string _line;
         OutputType _outputType;
     };
+    tgb::video_renderer *_renderer;
+    uint32_t _width, _height;
     bool _open { false };
     std::string _currentLine { "" };
     unsigned long _cursorPos {0 };
@@ -60,7 +63,7 @@ private:
 
     unhandled_command_func _unhandledCommandFunc;
 
-    std::pair<SDLKey, SDLMod> keyToRepeat;
+    std::pair<char, int> keyToRepeat;
     int keyRepeatDelay{ 0 };
     long lastRepeat { 0 };
 
@@ -73,8 +76,8 @@ private:
     void completeCommand();
     void scrollUpHistory();
     void scrollDownHistory();
-    void insertKey(SDLKey &key, SDLMod &mod);
-    void handleKeyDown(SDLKey &key, SDLMod &mod);
-    void unqueueRepeats(SDLKey key, SDLMod mod);
-    void queueRepeats(SDLKey key, SDLMod mod);
+    void insertKey(char key);
+    void handleKeyDown(char key);
+    void unqueueRepeats(char key);
+    void queueRepeats(char key);
 };

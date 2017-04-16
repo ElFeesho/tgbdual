@@ -3,11 +3,14 @@
 //
 
 #include "console.h"
-#include <SDL/SDL_gfxPrimitives.h>
 #include <iostream>
 
-console::console(console::unhandled_command_func unhandledCommandFunc, time_provider timeProvider) : _unhandledCommandFunc{unhandledCommandFunc}, _timeProvider{timeProvider} {
-
+console::console(tgb::video_renderer *renderer, uint32_t width, uint32_t height, unhandled_command_func unhandledCommandFunc, time_provider timeProvider) :
+        _renderer{renderer},
+        _width{width},
+        _height{height},
+        _unhandledCommandFunc{unhandledCommandFunc},
+        _timeProvider{timeProvider} {
 }
 
 void console::open() {
@@ -18,33 +21,27 @@ void console::close() {
     _open = false;
 }
 
-void console::draw(SDL_Surface *screen) {
+void console::draw() {
     if (_open) {
-        Sint16 x[] = {0, 0, (Sint16) screen->w, (Sint16) screen->w};
-        Sint16 y[] = {0, (Sint16) (screen->h / 2), (Sint16) (screen->h / 2), 0};
-        filledPolygonRGBA(screen, x, y, 4, 33, 33, 33, 220);
-        stringRGBA(screen, 3, (Sint16) (screen->h / 2 - 10), ">", 255, 255, 255, 255);
-
-        stringRGBA(screen, (Sint16) (10 + _cursorPos * 8), (Sint16) (screen->h / 2 - 10), "_", 255, 255, 255,
-                   (Uint8) (_timeProvider() % 255));
-        stringRGBA(screen, 10, (Sint16) (screen->h / 2 - 10), _currentLine.c_str(), 255, 255, 255, 255);
+        _renderer->fillRect(0, 0, _width, _height, 0xcc333333, 0xcc333333);
+        _renderer->text(">", 3, _height - 10, 0xffffffff);
+        _renderer->text("_", (int32_t) (10 + _cursorPos * 8), _height - 10, 0xffffffff);
+        _renderer->text(_currentLine.c_str(), 10, _height -10, 0xffffffff);
 
         for (int i = 0; i < _history.size(); i++) {
             auto history = _history[i];
+            int32_t historyLineY = (int32_t) ((_height - 10) - (10 * (_history.size() - i)));
             if (history.outputType() == OutputType::stdout) {
-                stringRGBA(screen, 3, (Sint16) ((Sint16) (screen->h / 2 - 10) - (10 * (_history.size() - i))),
-                           history.line().c_str(), 255, 255, 255, 255);
+                _renderer->text(history.line().c_str(), 3, historyLineY, 0xffffffff);
             } else if (history.outputType() == OutputType::command) {
-                stringRGBA(screen, 3, (Sint16) ((Sint16) (screen->h / 2 - 10) - (10 * (_history.size() - i))),
-                           history.line().c_str(), 0, 255, 0, 255);
+                _renderer->text(history.line().c_str(), 3, historyLineY, 0xff00ff00);
             } else {
-                stringRGBA(screen, 3, (Sint16) ((Sint16) (screen->h / 2 - 10) - (10 * (_history.size() - i))),
-                           history.line().c_str(), 255, 0, 0, 255);
+                _renderer->text(history.line().c_str(), 3, historyLineY, 0xff0000ff);
             }
         }
 
         if (_timeProvider() > lastRepeat + keyRepeatDelay && keyRepeatDelay != 0) {
-            handleKeyDown(keyToRepeat.first, keyToRepeat.second);
+            handleKeyDown(keyToRepeat.first);
             keyRepeatDelay = 40;
             lastRepeat = _timeProvider();
         }
@@ -55,52 +52,48 @@ bool console::isOpen() {
     return _open;
 }
 
-void console::key_down(SDLKey key, SDLMod mod) {
-    handleKeyDown(key, mod);
-    queueRepeats(key, mod);
+void console::key_down(char key) {
+    handleKeyDown(key);
+    queueRepeats(key);
 }
 
-void console::key_up(SDLKey key, SDLMod mod) {
-    unqueueRepeats(key, mod);
+void console::key_up(char key) {
+    unqueueRepeats(key);
 }
 
-void console::queueRepeats(SDLKey key, SDLMod mod) {
+void console::queueRepeats(char key) {
     keyToRepeat.first = key;
-    keyToRepeat.second = mod;
+    keyToRepeat.second = 0;
     keyRepeatDelay = 300;
     lastRepeat = _timeProvider();
 }
 
-void console::unqueueRepeats(SDLKey key, SDLMod mod) {
+void console::unqueueRepeats(char key) {
     keyRepeatDelay = 0;
 }
 
-void console::handleKeyDown(SDLKey &key, SDLMod &mod) {
-    if (key == SDLK_LEFT) {
+void console::handleKeyDown(char key) {
+    if (key == 2) {
         decrementCursorPosition();
-    } else if (key == SDLK_RIGHT) {
+    } else if (key == 3) {
         incrementCursorPosition();
-    } else if (key == SDLK_BACKSPACE) {
+    } else if (key == 7) {
         eraseCharacter();
-    } else if (key == SDLK_RETURN) {
+    } else if (key == 5) {
         processLine();
-    } else if ((key >= SDLK_0 && key <= SDLK_z) || key == SDLK_SPACE || key == SDLK_MINUS || key == SDLK_PERIOD) {
-        insertKey(key, mod);
-    } else if (key == SDLK_TAB) {
+    } else if (key == 6) {
         completeCommand();
-    } else if (key == SDLK_UP) {
+    } else if (key == 0) {
         scrollUpHistory();
-    } else if (key == SDLK_DOWN) {
+    } else if (key == 1) {
         scrollDownHistory();
+    } else {
+        insertKey(key);
     }
 }
 
-void console::insertKey(SDLKey &key, SDLMod &mod) {
-    if (key == SDLK_MINUS && mod == 1) {
-        key = SDLK_UNDERSCORE;
-        mod = KMOD_NONE;
-    }
-    _currentLine.insert(_cursorPos, 1, (char) (key - (32 * mod != 0 ? 1 : 0)));
+void console::insertKey(char key) {
+    _currentLine.insert(_cursorPos, 1, key);
     _cursorPos++;
 }
 
