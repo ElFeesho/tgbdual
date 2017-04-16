@@ -2,6 +2,7 @@
 
 #include <video_renderer.h>
 #include <functional>
+#include <memory>
 #include <rendering/video_renderer.h>
 
 class gb_video_renderer : public video_renderer {
