@@ -4,6 +4,7 @@
 
 #include <emulator_time.h>
 #include <iostream>
+#include <algorithm>
 #include "gb_osd_renderer.h"
 
 gb_osd_renderer::gb_osd_renderer(tgb::video_renderer *renderer) : _renderer{renderer} {

@@ -2,6 +2,7 @@
 // Created by Christopher Sawczuk on 16/04/2017.
 //
 
+#include <algorithm>
 #include <emulator_time.h>
 #include "gb_gamepad_source.h"
 
