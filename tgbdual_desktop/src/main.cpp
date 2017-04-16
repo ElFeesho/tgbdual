@@ -50,7 +50,8 @@
 
 #include <rendering/sdl/sdl_video_renderer.h>
 #include <rendering/sdl/sdl_audio_renderer.h>
-#include <rendering/sdl/sdl_osd_renderer.h>
+#include <rendering/gb_video_renderer.h>
+#include <rendering/gb_osd_renderer.h>
 
 void loop(console &c, sdl_gamepad_source &gp_source, bool &endGame, limitter &frameLimitter, std::map<SDLKey, std::function<void()>> &uiActions);
 
@@ -88,13 +89,14 @@ int main(int argc, char *argv[]) {
     SDL_InitSubSystem(SDL_INIT_VIDEO);
 
     SDL_Surface *screen = SDL_SetVideoMode(320 + 200, 288 + 200, 16, SDL_SWSURFACE);
-    sdl_osd_renderer osdRenderer{screen};
-    sdl_video_renderer video_renderer{screen, 100, [&]() {
+    sdl_video_renderer sdl_video{screen};
+    gb_osd_renderer osdRenderer{&sdl_video};
+
+    gb_video_renderer video_renderer{&sdl_video,  [&]() {
         scriptManager.tick();
         osdRenderer.render();
         cons.draw(screen);
-    }};
-
+    }, 100};
     sdl_audio_renderer audio_renderer;
 
     sdl_gamepad_source gp_source;

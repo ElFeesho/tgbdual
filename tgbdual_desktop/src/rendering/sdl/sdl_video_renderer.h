@@ -26,20 +26,29 @@
 #include <tuple>
 #include <map>
 #include <memory>
+#include <rendering/video_renderer.h>
 
-class sdl_video_renderer : public video_renderer {
+class sdl_video_renderer : public tgb::video_renderer {
 public:
-    using render_callback = std::function<void()>;
     using surf_ptr = std::unique_ptr<SDL_Surface, void (*)(SDL_Surface *)>;
 
-    sdl_video_renderer(SDL_Surface *screen, uint16_t bevel, render_callback renderCallback);
+    sdl_video_renderer(SDL_Surface *screen);
 
-    void render_screen(uint8_t *lcdPixels, int width, int height, int depth) override;
+    void fillRect(int32_t x, int32_t y, uint32_t w, uint32_t h, uint32_t stroke, uint32_t fill) override;
+
+    void text(const char *text, int32_t x, int32_t y, uint32_t colour) override;
+
+    void pixels(void *pixels, int32_t x, int32_t y, uint32_t w, uint32_t h) override;
+
+    void image(const char *imgFile, int32_t x, int32_t y) override;
+
+    void clear(uint32_t colour) override;
+
+    void flip() override;
 
 private:
-    SDL_Surface *_screen;
-    uint16_t _bevel;
-    surf_ptr scr{nullptr, SDL_FreeSurface};
+    SDL_Surface *lookupImage(const std::string &name);
 
-    render_callback _renderCallback;
+    SDL_Surface *_screen;
+    std::map<std::string, SDL_Surface *> image_cache;
 };

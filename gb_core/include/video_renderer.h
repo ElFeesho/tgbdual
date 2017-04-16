@@ -29,5 +29,5 @@ class video_renderer {
 public:
     virtual ~video_renderer() {}
 
-    virtual void render_screen(uint8_t *buf, int width, int height, int depth) = 0;
+    virtual void render_screen(uint8_t *buf, uint32_t width, uint32_t height, uint32_t depth) = 0;
 };
