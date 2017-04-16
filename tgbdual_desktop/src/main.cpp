@@ -83,14 +83,16 @@ int main(int argc, char *argv[]) {
 
     script_manager scriptManager;
 
-    console console{std::bind(&script_manager::handleUnhandledCommand, &scriptManager, std::placeholders::_1, std::placeholders::_2), &emulator_time::current_time};
+    console cons{std::bind(&script_manager::handleUnhandledCommand, &scriptManager, std::placeholders::_1, std::placeholders::_2), &emulator_time::current_time};
+
+    SDL_InitSubSystem(SDL_INIT_VIDEO);
 
     SDL_Surface *screen = SDL_SetVideoMode(320 + 200, 288 + 200, 16, SDL_SWSURFACE);
     sdl_osd_renderer osdRenderer{screen};
     sdl_video_renderer video_renderer{screen, 100, [&]() {
         scriptManager.tick();
         osdRenderer.render();
-        console.draw(SDL_GetVideoSurface());
+        cons.draw(SDL_GetVideoSurface());
         SDL_Flip(SDL_GetVideoSurface());
     }};
 
@@ -98,7 +100,7 @@ int main(int argc, char *argv[]) {
 
     sdl_gamepad_source gp_source;
     gameboy gbInst{&video_renderer, &audio_renderer, &gp_source, cable_source.get()};
-    scan_engine scanEngine{gbInst.createAddressScanner(), std::bind(&console::addOutput, &console, "Initial search state created")};
+    scan_engine scanEngine{gbInst.createAddressScanner(), std::bind(&console::addOutput, &cons, "Initial search state created")};
 
     rom_file romFile{argv[0]};
 
@@ -109,27 +111,23 @@ int main(int argc, char *argv[]) {
     loadState(gbInst, romFile);
 
     script_context context{&osdRenderer, &gp_source, &gbInst, [&](const std::string &name, script_context::script_command command) {
-        console.removeCommand(name);
-        console.addCommand(name, [command](std::vector<std::string> args) {
+        cons.removeCommand(name);
+        cons.addCommand(name, [command](std::vector<std::string> args) {
             command(args);
         });
-    }, [&](const std::string &name) {
-        //console.removeCommand(name);
     }};
 
-    registerMemoryCommands(console, gbInst);
-    registerScanCommands(console, scanEngine);
-    registerScriptCommands(scriptManager, console, context);
-    registerGameBoyCommands(console, gbInst, romFile);
+    registerMemoryCommands(cons, gbInst);
+    registerScanCommands(cons, scanEngine);
+    registerScriptCommands(scriptManager, cons, context);
+    registerGameBoyCommands(cons, gbInst, romFile);
 
     bool endGame = false;
-    console.addCommand("quit", [&](std::vector<std::string> args) {
+    cons.addCommand("quit", [&](std::vector<std::string> args) {
         endGame = true;
     });
 
-    limitter frameLimitter{[&] {
-        gbInst.tick();
-    }};
+    limitter frameLimitter{std::bind(&gameboy::tick, &gbInst)};
 
     std::map<SDLKey, std::function<void()>> uiActions{
             {SDLK_F5,
@@ -165,18 +163,16 @@ int main(int argc, char *argv[]) {
                 }
             }},
             {SDLK_BACKQUOTE, [&] {
-                console.open();
+                cons.open();
                 gp_source.reset_pad();
             }}
     };
 
-    loop(console, gp_source, endGame, frameLimitter, uiActions);
+    loop(cons, gp_source, endGame, frameLimitter, uiActions);
 
-    gbInst.save_sram([&](uint8_t *sramData, uint32_t len) {
-        romFile.writeSram(sramData, len);
-    });
+    gbInst.save_sram(std::bind(&rom_file::writeSram, &romFile, std::placeholders::_1, std::placeholders::_2));
 
-    SDL_Quit();
+    SDL_QuitSubSystem(SDL_INIT_VIDEO);
 
     return 0;
 }

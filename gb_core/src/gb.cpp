@@ -59,9 +59,6 @@ void gb::reset() {
 
     memset(&c_regs, 0, sizeof(c_regs));
 
-    if (m_rom.get_loaded()) {
-        m_rom.get_info()->gb_type = (m_rom.get_rom()[0x143] & 0x80) ? 3 : 1;
-    }
     m_cpu.reset();
     m_lcd.reset();
     m_apu.reset();

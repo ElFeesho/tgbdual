@@ -5,13 +5,12 @@
 #include <osd_renderer.h>
 #include <script_context.h>
 
-script_context::script_context(osd_renderer *osd, input_queue *queue, gameboy *gb,  std::function<void(const std::string&, script_command)> consoleCommandRegistrar, std::function<void(const std::string&)> consoleCommandUnregistrar) :
+script_context::script_context(osd_renderer *osd, input_queue *queue, gameboy *gb, std::function<void(const std::string &, script_command)> consoleCommandRegistrar) :
         _osd{osd},
         _queue{queue},
         _gameboy{gb},
-        _consoleCommandRegistrar{consoleCommandRegistrar},
-        _consoleCommandUnregistrar{consoleCommandUnregistrar}{
-
+        _consoleCommandRegistrar{consoleCommandRegistrar}
+{
 }
 
 void script_context::print_string(const std::string &msg) {
@@ -53,9 +52,5 @@ void script_context::add_text(const std::string &message, int16_t x, int16_t y) 
 
 void script_context::register_command(const std::string &cmdName, script_context::script_command command) {
     _consoleCommandRegistrar(cmdName, command);
-}
-
-void script_context::unregister_command(const std::string &cmdName) {
-    _consoleCommandUnregistrar(cmdName);
 }
 

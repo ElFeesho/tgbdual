@@ -33,9 +33,6 @@ const int GB_W = 160;
 const int GB_H = 144;
 
 sdl_video_renderer::sdl_video_renderer(SDL_Surface *screen, uint16_t bevel, render_callback renderCallback) : _screen{screen}, _bevel{bevel}, _renderCallback{renderCallback} {
-
-    SDL_Init(SDL_INIT_VIDEO);
-
     scr = surf_ptr(SDL_CreateRGBSurface(SDL_SWSURFACE, GB_W, GB_H, 16, 0, 0, 0, 0), SDL_FreeSurface);
 }
 

@@ -1,8 +1,8 @@
 #include <SDL.h>
+#include <iostream>
 #include "sdl_audio_renderer.h"
 
 sdl_audio_renderer::sdl_audio_renderer() {
-    SDL_Init(SDL_INIT_AUDIO);
     SDL_AudioSpec wanted = {0};
 
     wanted.freq = 44100;

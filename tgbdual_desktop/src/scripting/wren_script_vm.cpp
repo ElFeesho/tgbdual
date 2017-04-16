@@ -24,12 +24,7 @@ void populateWrenList(WrenVM *wrenVm, const std::vector<std::string> &args);
 void destroyWrenVM(WrenVM *vm) {
     wrenGetUserData(vm);
     WrenVMMetadata *wrenVmMetadata = WrenVMMetadata::fromWrenVM(vm);
-    for(const std::string &command : wrenVmMetadata->registeredCommands)
-    {
-        wrenVmMetadata->scriptContext->unregister_command(command);
-    }
     wrenFreeVM(vm);
-
     delete wrenVmMetadata;
 }
 
