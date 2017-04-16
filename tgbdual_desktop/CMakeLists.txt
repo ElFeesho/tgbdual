@@ -63,7 +63,7 @@ set(TGBDUAL_DESKTOP_SOURCES
         src/memory/scan_engine.cpp src/memory/scan_engine.h
         src/main.cpp
         src/emulator_time.cpp
-        src/emulator_time.h src/rendering/video_renderer.h src/rendering/gb_video_renderer.cpp src/rendering/gb_video_renderer.h src/rendering/gb_osd_renderer.cpp src/rendering/gb_osd_renderer.h)
+        src/emulator_time.h src/rendering/video_renderer.h src/rendering/gb_video_renderer.cpp src/rendering/gb_video_renderer.h src/rendering/gb_osd_renderer.cpp src/rendering/gb_osd_renderer.h src/rendering/audio_renderer.h src/rendering/gb_audio_renderer.cpp src/rendering/gb_audio_renderer.h)
 
 find_package(SDL)
 find_package(LUA)

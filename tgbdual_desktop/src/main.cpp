@@ -52,6 +52,7 @@
 #include <rendering/sdl/sdl_audio_renderer.h>
 #include <rendering/gb_video_renderer.h>
 #include <rendering/gb_osd_renderer.h>
+#include <rendering/gb_audio_renderer.h>
 
 void loop(console &c, sdl_gamepad_source &gp_source, bool &endGame, limitter &frameLimitter, std::map<SDLKey, std::function<void()>> &uiActions);
 
@@ -90,17 +91,19 @@ int main(int argc, char *argv[]) {
 
     SDL_Surface *screen = SDL_SetVideoMode(320 + 200, 288 + 200, 16, SDL_SWSURFACE);
     sdl_video_renderer sdl_video{screen};
-    gb_osd_renderer osdRenderer{&sdl_video};
+    sdl_audio_renderer sdl_audio;
 
+    gb_osd_renderer osdRenderer{&sdl_video};
     gb_video_renderer video_renderer{&sdl_video,  [&]() {
         scriptManager.tick();
         osdRenderer.render();
         cons.draw(screen);
     }, 100};
-    sdl_audio_renderer audio_renderer;
+
+    gb_audio_renderer gb_audio{&sdl_audio};
 
     sdl_gamepad_source gp_source;
-    gameboy gbInst{&video_renderer, &audio_renderer, &gp_source, cable_source.get()};
+    gameboy gbInst{&video_renderer, &gb_audio, &gp_source, cable_source.get()};
     scan_engine scanEngine{gbInst.createAddressScanner(), std::bind(&console::addOutput, &cons, "Initial search state created")};
 
     rom_file romFile{argv[0]};

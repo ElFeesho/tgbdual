@@ -1,12 +1,13 @@
 #pragma once
 
-#include <audio_renderer.h>
+#include <rendering/audio_renderer.h>
 
-class sdl_audio_renderer : public audio_renderer {
+class sdl_audio_renderer : public tgb::audio_renderer {
 public:
     sdl_audio_renderer();
 
-    void connect_audio_provider(sound_provider *sound_provider) override;
+    void provideFillBufferCallback(tgb::audio_renderer::fill_buffer_cb) override;
+
 private:
-    sound_provider *_sound_provider{nullptr};
+    tgb::audio_renderer::fill_buffer_cb _fill_cb;
 };
