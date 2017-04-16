@@ -54,8 +54,9 @@
 #include <rendering/gb_osd_renderer.h>
 #include <rendering/gb_audio_renderer.h>
 #include <input/gb_gamepad_source.h>
+#include <input/gb_sys_command_source.h>
 
-void loop(console &c, bool &endGame, limitter &frameLimitter, std::map<SDLKey, std::function<void()>> &uiActions);
+void loop(console &c, bool &endGame, limitter &frameLimitter, gb_sys_command_source&);
 
 void saveState(gameboy &gbInst, rom_file &romFile) {
     memory_buffer buffer;
@@ -95,7 +96,7 @@ int main(int argc, char *argv[]) {
     sdl_audio_renderer sdl_audio;
 
     gb_osd_renderer osdRenderer{&sdl_video};
-    gb_video_renderer video_renderer{&sdl_video,  [&]() {
+    gb_video_renderer video_renderer{&sdl_video, [&]() {
         scriptManager.tick();
         osdRenderer.render();
         cons.draw(screen);
@@ -134,27 +135,14 @@ int main(int argc, char *argv[]) {
 
     limitter frameLimitter{std::bind(&gameboy::tick, &gbInst)};
 
-    std::map<SDLKey, std::function<void()>> uiActions{
-            {SDLK_F5,
+    gb_sys_command_source sys_command_source{ &sdl_input,
             [&] {
                 saveState(gbInst, romFile);
                 osdRenderer.display_message("State saved", 2000);
-            }},
-            {SDLK_F7,
-            [&] {
+            }, [&] {
                 loadState(gbInst, romFile);
                 osdRenderer.display_message("State loaded", 2000);
-            }},
-            {SDLK_ESCAPE,
-            [&] {
-                endGame = true;
-            }},
-            {SDLK_SPACE,
-            [&] {
-                scriptManager.activate();
-            }},
-            {SDLK_TAB,
-            [&] {
+            }, [&] {
                 static bool fast_forward = false;
                 fast_forward = !fast_forward;
                 if (fast_forward) {
@@ -166,14 +154,17 @@ int main(int argc, char *argv[]) {
                     osdRenderer.display_message("Fast forward disabled", 2000);
                     frameLimitter.normal();
                 }
-            }},
-            {SDLK_BACKQUOTE, [&] {
+            }, [&] {
+                endGame = true;
+            }, [&] {
+                scriptManager.activate();
+            }, [&] {
                 cons.open();
                 gp_source.reset_pad();
-            }}
+            }
     };
 
-    loop(cons, endGame, frameLimitter, uiActions);
+    loop(cons, endGame, frameLimitter, sys_command_source);
 
     gbInst.save_sram(std::bind(&rom_file::writeSram, &romFile, std::placeholders::_1, std::placeholders::_2));
 
@@ -182,33 +173,31 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-void loop(console &c, bool &endGame, limitter &frameLimitter, std::map<SDLKey, std::function<void()>> &uiActions) {
+void loop(console &c, bool &endGame, limitter &frameLimitter, gb_sys_command_source &sys_command_source) {
     SDL_Event event;
     while (!endGame) {
-        while (SDL_PollEvent(&event)) {
+        if (!c.isOpen()) {
+            sys_command_source.update();
+        } else {
+            while (SDL_PollEvent(&event)) {
 
-            if (event.type == SDL_QUIT) {
-                endGame = true;
-            } else if (event.type == SDL_KEYDOWN) {
-                auto sym = event.key.keysym.sym;
-                if (c.isOpen()) {
+                if (event.type == SDL_QUIT) {
+                    endGame = true;
+                } else if (event.type == SDL_KEYDOWN) {
+                    auto sym = event.key.keysym.sym;
                     if (sym == SDLK_BACKQUOTE) {
                         c.close();
                     } else {
                         c.key_down(sym, event.key.keysym.mod);
                     }
-                } else {
-                    if (uiActions.find(sym) != uiActions.end()) {
-                        uiActions[sym]();
+                } else if (event.type == SDL_KEYUP) {
+                    auto sym = event.key.keysym.sym;
+                    if (c.isOpen()) {
+                        c.key_up(sym, event.key.keysym.mod);
                     }
                 }
             }
-            else if (event.type == SDL_KEYUP) {
-                auto sym = event.key.keysym.sym;
-                if (c.isOpen()) {
-                    c.key_up(sym, event.key.keysym.mod);
-                }
-            }
+
         }
         frameLimitter.limit();
     }
