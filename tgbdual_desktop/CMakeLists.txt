@@ -4,6 +4,16 @@ set(USE_SDL ON)
 
 set(TGBDUAL_LIBS wren z)
 
+set(TGBDUAL_INTERFACE_SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/rendering/audio_renderer.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/rendering/video_renderer.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/input/gamepad_source.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/input/console_driver.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/input/sys_command_source.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/emulation/core_services.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/emulator_time.h
+        )
+
 set(LINKCABLE_SOURCES
         src/linkcable/null_link_source.h
         src/linkcable/null_link_source.cpp
@@ -20,40 +30,11 @@ set(LINKCABLE_SOURCES
         src/linkcable/link_cable_source_provider.h)
 
 if (USE_SDL)
-    list(APPEND TGBDUAL_LIBS ${SDL_LIBRARY} SDL_gfx SDL_image)
-    find_package(SDL)
-        message("SDL it is")
-        add_definitions(-DUSE_SDL)
-set(SDL_SOURCES
-        src/rendering/sdl/sdl_video_renderer.cpp
-        src/rendering/sdl/sdl_video_renderer.h
-        src/rendering/sdl/sdl_audio_renderer.cpp
-        src/rendering/sdl/sdl_audio_renderer.h
-        src/input/sdl/sdl_gamepad_source.cpp
-        src/input/sdl/sdl_gamepad_source.h
-        src/input/sdl/sdl_console_driver.cpp
-        src/input/sdl/sdl_console_driver.h
-        src/emulation/sdl/sdl_core_services.cpp
-        src/emulation/sdl/sdl_core_services.h)
+    list(APPEND TGBDUAL_LIBS sdl_adapters)
+    message("SDL it is")
+    add_definitions(-DUSE_SDL)
 else()
-    message("SFML IT IS!")
-    set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
-    find_package(SFML COMPONENTS system audio graphics window)
-    list(APPEND TGBDUAL_LIBS ${SFML_LIBRARIES})
-    set(SFML_SOURCES
-        src/emulation/sfml/sfml_core_services.cpp
-        src/emulation/sfml/sfml_core_services.h
-        src/rendering/sfml/sfml_video_renderer.cpp
-        src/rendering/sfml/sfml_video_renderer.h
-            src/input/sfml/sfml_console_driver.cpp
-            src/input/sfml/sfml_console_driver.h
-            src/input/sfml/sfml_gamepad_source.cpp
-            src/input/sfml/sfml_gamepad_source.h
-            src/input/sfml/sfml_sys_command_source.cpp
-            src/input/sfml/sfml_sys_command_source.h
-            src/rendering/sfml/sfml_audio_renderer.cpp
-            src/rendering/sfml/sfml_audio_renderer.h)
-    include_directories(${SFML_INCLUDE_DIRECTORIES})
+    list(APPEND TGBDUAL_LIBS sfml_adapters)
 endif()
 
 set(SCRIPTING_SOURCES
@@ -82,6 +63,7 @@ set(TGBDUAL_DESKTOP_SOURCES
         ${SFML_SOURCES}
         ${SCRIPTING_SOURCES}
         ${CONSOLE_SOURCES}
+        ${TGBDUAL_INTERFACE_SOURCES}
         src/limitter.cpp src/limitter.h
         src/io/buffer.h
         src/io/file_buffer.cpp src/io/file_buffer.h
@@ -91,23 +73,18 @@ set(TGBDUAL_DESKTOP_SOURCES
         src/main.cpp
         src/emulator_time.cpp
         src/emulator_time.h
-        src/rendering/video_renderer.h
         src/rendering/gb_video_renderer.cpp
         src/rendering/gb_video_renderer.h
         src/rendering/gb_osd_renderer.cpp
         src/rendering/gb_osd_renderer.h
-        src/rendering/audio_renderer.h
         src/rendering/gb_audio_renderer.cpp
         src/rendering/gb_audio_renderer.h
         src/input/gb_gamepad_source.cpp
         src/input/gb_gamepad_source.h
-        src/input/gamepad_source.h
         src/input/gb_sys_command_source.cpp
         src/input/gb_sys_command_source.h
-        src/input/sys_command_source.h
         src/input/gb_console_driver.cpp
         src/input/gb_console_driver.h
-        src/input/console_driver.h
         src/emulation/core_services.h
         src/rendering/dummy/dummy_audio_renderer.cpp
         src/rendering/dummy/dummy_audio_renderer.h
@@ -119,6 +96,10 @@ set(TGBDUAL_DESKTOP_SOURCES
         src/input/dummy/dummy_gamepad_source.h
         src/input/dummy/dummy_sys_command_source.cpp
         src/input/dummy/dummy_sys_command_source.h)
+
+add_library(tgbdual_impls INTERFACE)
+target_sources(tgbdual_impls INTERFACE ${TGBDUAL_INTERFACE_SOURCES})
+target_include_directories(tgbdual_impls INTERFACE src/)
 
 find_package(LUA)
 

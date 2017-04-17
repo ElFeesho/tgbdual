@@ -3,16 +3,11 @@
 #include <SFML/Graphics.hpp>
 
 #include <emulation/core_services.h>
-#include <input/dummy/dummy_gamepad_source.h>
-#include <rendering/dummy/dummy_video_renderer.h>
-#include <rendering/sfml/sfml_video_renderer.h>
-#include <input/dummy/dummy_console_driver.h>
-#include <input/dummy/dummy_sys_command_source.h>
-#include <rendering/dummy/dummy_audio_renderer.h>
-#include <input/sfml/sfml_gamepad_source.h>
-#include <input/sfml/sfml_sys_command_source.h>
-#include <input/sfml/sfml_console_driver.h>
-#include <rendering/sfml/sfml_audio_renderer.h>
+#include <rendering/sfml_video_renderer.h>
+#include <input/sfml_gamepad_source.h>
+#include <input/sfml_sys_command_source.h>
+#include <input/sfml_console_driver.h>
+#include <rendering/sfml_audio_renderer.h>
 
 class sfml_core_services : public core_services {
 public:
@@ -34,6 +29,6 @@ private:
     sfml_video_renderer _videoRenderer;
     sfml_console_driver _consoleDriver;
     sfml_sys_command_source _sysCommandSource;
-    dummy_audio_renderer _audioRenderer;
+    sfml_audio_renderer _audioRenderer;
 
 };

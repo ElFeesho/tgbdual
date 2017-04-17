@@ -21,9 +21,12 @@
 // interface video_renderer の SDLを用いた実装
 // Using SDL implementation of interface video_renderer
 
+#include "sdl_video_renderer.h"
+
 #include <SDL_gfxPrimitives.h>
 #include <SDL_image.h>
-#include "sdl_video_renderer.h"
+
+#include <string>
 
 static inline uint8_t red(uint32_t colour) { return (uint8_t) (colour & 0x000000ff); }
 static inline uint8_t green(uint32_t colour) { return (uint8_t) ((colour & 0x0000ff00) >> 8); }

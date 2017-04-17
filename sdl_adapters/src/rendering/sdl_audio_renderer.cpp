@@ -17,7 +17,7 @@ sdl_audio_renderer::sdl_audio_renderer() {
     wanted.userdata = (void *) this;
 
     if (SDL_OpenAudio(&wanted, NULL) < 0) {
-        fprintf(stderr, "Could not open audio device: %s\n", SDL_GetError());
+        std::cerr << "Could not open audio device: " << SDL_GetError() << std::endl;
     }
 
     SDL_PauseAudio(0);

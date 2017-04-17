@@ -1,10 +1,10 @@
 #pragma once
 
 #include <emulation/core_services.h>
-#include <rendering/sdl/sdl_video_renderer.h>
-#include <input/sdl/sdl_gamepad_source.h>
-#include <input/sdl/sdl_console_driver.h>
-#include <rendering/sdl/sdl_audio_renderer.h>
+#include <rendering/sdl_video_renderer.h>
+#include <rendering/sdl_audio_renderer.h>
+#include <input/sdl_gamepad_source.h>
+#include <input/sdl_console_driver.h>
 
 class sdl_core_services : public core_services {
 public:

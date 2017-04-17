@@ -18,8 +18,8 @@ bool sfml_audio_renderer::onGetData(sf::SoundStream::Chunk &data) {
     static int sampleCount = 8192;
     static sf::Int16 samples[8192] = {0};
     data.samples = samples;
-    data.sampleCount = sampleCount/2;
-    _cb((unsigned char*)data.samples, sampleCount);
+    data.sampleCount = sampleCount;
+    _cb((unsigned char*)data.samples, sampleCount/4);
     return true;
 }
 

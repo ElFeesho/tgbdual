@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <functional>
 
 class emulator_time {
@@ -12,5 +13,4 @@ public:
     static void sleep(uint32_t duration);
     static time_provider _time_provider;
     static sleep_provider _sleep_provider;
-
 };

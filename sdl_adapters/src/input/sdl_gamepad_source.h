@@ -1,13 +1,12 @@
 #pragma once
 
-#include <SDL.h>
-#include <gamepad_source.h>
 #include <map>
 #include <vector>
 
+#include <SDL.h>
+#include <input/gamepad_source.h>
 #include <input/gamepad_source.h>
 #include <input/sys_command_source.h>
-#include "input_queue.h"
 
 
 class sdl_gamepad_source : public tgb::gamepad_source, public tgb::sys_command_source {

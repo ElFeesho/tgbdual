@@ -18,10 +18,9 @@
 */
 
 #include <stdio.h>
-#include <video_renderer.h>
+#include <rendering/video_renderer.h>
 
 #include <SDL.h>
-#include "osd_renderer.h"
 #include <vector>
 #include <tuple>
 #include <map>

@@ -16,6 +16,8 @@ endfunction()
 
 add_subdirectory(gb_core)
 add_subdirectory(tgbdual_desktop)
+add_subdirectory(sdl_adapters)
+add_subdirectory(sfml_adapters)
 add_subdirectory(script_layer)
 add_subdirectory(gtest)
 
