@@ -3,10 +3,13 @@
 //
 
 #include <emulator_time.h>
+#include <iostream>
 #include "sfml_core_services.h"
 
-sfml_core_services::sfml_core_services() : _window{sf::VideoMode(520, 488), "tgbdual"}, _videoRenderer{_window}, _gamepadSource{_window}, _sysCommandSource{_window}, _consoleDriver{_window} {
-
+sfml_core_services::sfml_core_services() : _window{sf::VideoMode(520, 488), "tgbdual"},_font{}, _videoRenderer{_window, _font}, _gamepadSource{_window}, _sysCommandSource{_window}, _consoleDriver{_window} {
+    if (!_font.loadFromFile("font.ttf")) {
+        std::cerr << "Failed to load font.ttf, text will not be rendered" << std::endl;
+    }
 }
 
 tgb::gamepad_source *sfml_core_services::gamepadSource() {

@@ -9,9 +9,10 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <map>
+#include <SFML/Graphics/Text.hpp>
 #include "sfml_video_renderer.h"
 
-sfml_video_renderer::sfml_video_renderer(sf::RenderWindow &window) : _window{window} {
+sfml_video_renderer::sfml_video_renderer(sf::RenderWindow &window, sf::Font &font) : _window{window}, _font{font} {
 
 }
 
@@ -25,7 +26,11 @@ void sfml_video_renderer::fillRect(int32_t x, int32_t y, uint32_t w, uint32_t h,
 }
 
 void sfml_video_renderer::text(const char *text, int32_t x, int32_t y, uint32_t colour) {
+    sf::Text t{text, _font, 10};
+    t.move(x, y);
+    t.setFillColor(sf::Color{colour});
 
+    _window.draw(t);
 }
 
 void sfml_video_renderer::pixels(void *pixels, int32_t x, int32_t y, uint32_t w, uint32_t h) {

@@ -27,11 +27,12 @@ public:
 
     tgb::audio_renderer *audioRenderer() override;
 private:
+    sf::Font _font;
+    sf::RenderWindow _window;
     sfml_gamepad_source _gamepadSource;
     sfml_video_renderer _videoRenderer;
     sfml_console_driver _consoleDriver;
     sfml_sys_command_source _sysCommandSource;
     dummy_audio_renderer _audioRenderer;
 
-    sf::RenderWindow _window;
 };

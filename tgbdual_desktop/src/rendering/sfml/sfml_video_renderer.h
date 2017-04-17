@@ -2,10 +2,11 @@
 
 #include <rendering/video_renderer.h>
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/Font.hpp>
 
 class sfml_video_renderer : public tgb::video_renderer {
 public:
-    sfml_video_renderer(sf::RenderWindow &window);
+    sfml_video_renderer(sf::RenderWindow &window, sf::Font &font);
 
     void fillRect(int32_t x, int32_t y, uint32_t w, uint32_t h, uint32_t stroke, uint32_t fill) override;
 
@@ -22,5 +23,6 @@ public:
 private:
     sf::Clock _clock;
     sf::RenderWindow &_window;
+    sf::Font &_font;
 };
 
