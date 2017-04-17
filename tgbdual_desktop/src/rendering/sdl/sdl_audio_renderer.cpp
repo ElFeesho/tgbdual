@@ -12,7 +12,7 @@ sdl_audio_renderer::sdl_audio_renderer() {
     wanted.samples = 4096;
     wanted.callback = [](void *userData, uint8_t *stream, int len) {
         sdl_audio_renderer *thiz = static_cast<sdl_audio_renderer *>(userData);
-        thiz->_fill_cb(stream, len);
+        thiz->_fill_cb(stream, len/4);
     };
     wanted.userdata = (void *) this;
 

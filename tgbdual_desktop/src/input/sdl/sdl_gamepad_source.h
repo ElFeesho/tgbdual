@@ -19,8 +19,8 @@ private:
                            std::function<void()> openConsole) override;
 
 private:
-    std::map<SDLKey, uint8_t> _keyMap{{SDLK_z,      0x02},
-                                      {SDLK_x,      0x01},
+    std::map<SDLKey, uint8_t> _keyMap{{SDLK_z,      0x01},
+                                      {SDLK_x,      0x02},
                                       {SDLK_RSHIFT, 0x04},
                                       {SDLK_RETURN, 0x08},
                                       {SDLK_DOWN,   0x10},

@@ -1,6 +1,6 @@
 set(CMAKE_CXX_FLAGS "-O3 -Wall")
 
-set(USE_SDL OFF)
+set(USE_SDL ON)
 
 set(TGBDUAL_LIBS wren z)
 
