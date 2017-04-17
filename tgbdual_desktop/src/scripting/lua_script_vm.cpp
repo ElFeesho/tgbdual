@@ -6,7 +6,6 @@
 #include <map>
 #include "lua_script_vm.h"
 
-
 static std::map<lua_State *, script_context *> contexts;
 
 lua_script_vm::lua_script_vm(script_context &scriptContext) : state{luaL_newstate(), lua_close} {

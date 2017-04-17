@@ -14,6 +14,8 @@ function(create_test_target target_name)
     target_link_libraries(${target_name} gtest gtest_main)
 endfunction()
 
+enable_testing()
+
 add_subdirectory(gb_core)
 add_subdirectory(tgbdual_desktop)
 add_subdirectory(sdl_adapters)
@@ -21,8 +23,3 @@ add_subdirectory(sfml_adapters)
 add_subdirectory(dummy_adapters)
 add_subdirectory(script_layer)
 add_subdirectory(gtest)
-
-add_dependencies(tgbdual gb_core)
-add_dependencies(script_layer gb_core)
-add_dependencies(address_scanner gb_core)
-add_dependencies(cheat gb_core)
