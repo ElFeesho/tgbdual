@@ -5,8 +5,6 @@
 #include "limitter.h"
 #include "emulator_time.h"
 
-#include <SDL/SDL.h>
-
 limitter::limitter(LimittedOperation operation) : _operation{operation} {}
 
 void limitter::fast() {

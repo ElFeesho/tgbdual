@@ -24,6 +24,6 @@ private:
     };
 
     console &_console;
-    console_close_cb _consoleCloseCb;
     tgb::console_driver *_consoleDriver;
+    console_close_cb _consoleCloseCb;
 };

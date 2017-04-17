@@ -1,5 +1,9 @@
 set(CMAKE_CXX_FLAGS "-O3 -Wall")
 
+set(USE_SDL OFF)
+
+set(TGBDUAL_LIBS wren z)
+
 set(LINKCABLE_SOURCES
         src/linkcable/null_link_source.h
         src/linkcable/null_link_source.cpp
@@ -15,15 +19,35 @@ set(LINKCABLE_SOURCES
         src/linkcable/link_cable_source_provider.cpp
         src/linkcable/link_cable_source_provider.h)
 
-set(SDL_RENDERING_SOURCES
+if (USE_SDL)
+    list(APPEND TGBDUAL_LIBS ${SDL_LIBRARY} SDL_gfx SDL_image)
+    find_package(SDL)
+        message("SDL it is")
+        add_definitions(-DUSE_SDL)
+set(SDL_SOURCES
         src/rendering/sdl/sdl_video_renderer.cpp
         src/rendering/sdl/sdl_video_renderer.h
         src/rendering/sdl/sdl_audio_renderer.cpp
-        src/rendering/sdl/sdl_audio_renderer.h)
-
-set(SDL_INPUT_SOURCES
+        src/rendering/sdl/sdl_audio_renderer.h
         src/input/sdl/sdl_gamepad_source.cpp
-        src/input/sdl/sdl_gamepad_source.h)
+        src/input/sdl/sdl_gamepad_source.h
+        src/input/sdl/sdl_console_driver.cpp
+        src/input/sdl/sdl_console_driver.h
+        src/emulation/sdl/sdl_core_services.cpp
+        src/emulation/sdl/sdl_core_services.h)
+else()
+    message("SFML IT IS!")
+    set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
+    find_package(SFML COMPONENTS system audio graphics window)
+    list(APPEND TGBDUAL_LIBS ${SFML_LIBRARIES})
+    set(SFML_SOURCES
+        src/emulation/sfml/sfml_core_services.cpp
+        src/emulation/sfml/sfml_core_services.h
+        src/rendering/sfml/sfml_video_renderer.cpp
+        src/rendering/sfml/sfml_video_renderer.h
+            src/input/sfml/sfml_console_driver.cpp src/input/sfml/sfml_console_driver.h)
+    include_directories(${SFML_INCLUDE_DIRECTORIES})
+endif()
 
 set(SCRIPTING_SOURCES
         src/scripting/lua_script_vm.cpp
@@ -47,8 +71,8 @@ set(CONSOLE_SOURCES
 
 set(TGBDUAL_DESKTOP_SOURCES
         ${LINKCABLE_SOURCES}
-        ${SDL_RENDERING_SOURCES}
-        ${SDL_INPUT_SOURCES}
+        ${SDL_SOURCES}
+        ${SFML_SOURCES}
         ${SCRIPTING_SOURCES}
         ${CONSOLE_SOURCES}
         src/limitter.cpp src/limitter.h
@@ -77,21 +101,28 @@ set(TGBDUAL_DESKTOP_SOURCES
         src/input/gb_console_driver.cpp
         src/input/gb_console_driver.h
         src/input/console_driver.h
-        src/input/sdl/sdl_console_driver.cpp
-        src/input/sdl/sdl_console_driver.h
         src/emulation/core_services.h
-        src/emulation/sdl/sdl_core_services.cpp
-        src/emulation/sdl/sdl_core_services.h)
+        src/rendering/dummy/dummy_audio_renderer.cpp
+        src/rendering/dummy/dummy_audio_renderer.h
+        src/rendering/dummy/dummy_video_renderer.cpp
+        src/rendering/dummy/dummy_video_renderer.h
+        src/input/dummy/dummy_console_driver.cpp
+        src/input/dummy/dummy_console_driver.h
+        src/input/dummy/dummy_gamepad_source.cpp
+        src/input/dummy/dummy_gamepad_source.h
+        src/input/dummy/dummy_sys_command_source.cpp
+        src/input/dummy/dummy_sys_command_source.h src/input/sfml/sfml_gamepad_source.cpp src/input/sfml/sfml_gamepad_source.h src/input/sfml/sfml_sys_command_source.cpp src/input/sfml/sfml_sys_command_source.h)
 
-find_package(SDL)
 find_package(LUA)
-set(LUA_LIB "lua")
 
 if (NOT Lua_FOUND)
     set(LUA_LIB lua5.2)
     set(LUA_INCLUDE_DIR "/usr/include/lua5.2/")
     message("Set LUA lib to ${LUA_LIB} and include directory to ${LUA_INCLUDE_DIR}")
-endif ()
+else()
+    set(LUA_LIB lua)
+endif()
+list(APPEND TGBDUAL_LIBS ${LUA_LIB})
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     add_executable(tgbdual MACOSX_BUNDLE ${TGBDUAL_DESKTOP_SOURCES})
@@ -106,7 +137,7 @@ target_include_directories(tgbdual PRIVATE ${LUA_INCLUDE_DIR})
 
 target_include_directories(tgbdual PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_include_directories(tgbdual PRIVATE ${LUA_INCLUDE_DIR})
-target_link_libraries(tgbdual gb_core script_layer ${SDL_LIBRARY} -L${PROJECT_SOURCE_DIR}/extlibs/wren/lib ${LUA_LIB} wren z -L/usr/local/lib SDL_gfx SDL_image)
+target_link_libraries(tgbdual gb_core script_layer -L${PROJECT_SOURCE_DIR}/extlibs/wren/lib ${TGBDUAL_LIBS} -L/usr/local/lib)
 target_compile_features(tgbdual PRIVATE cxx_lambdas cxx_aggregate_default_initializers)
 
 

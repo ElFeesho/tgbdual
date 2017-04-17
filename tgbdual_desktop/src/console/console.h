@@ -6,7 +6,6 @@
 
 #include <string>
 #include <vector>
-#include <SDL/SDL.h>
 #include <map>
 #include <memory>
 #include <functional>
