@@ -1,4 +1,5 @@
 #include <emulator_time.h>
+#include <SDL_ttf.h>
 #include "sdl_core_services.h"
 
 sdl_core_services::sdl_core_services() : _videoRenderer{SDL_SetVideoMode(520, 488, 0, SDL_SWSURFACE)}, _gamepadSource{}, _consoleDriver{}, _audioRenderer{}  {
@@ -27,9 +28,11 @@ tgb::audio_renderer *sdl_core_services::audioRenderer() {
 
 std::unique_ptr<core_services, void(*)(core_services*)> createCoreServices() {
     SDL_Init(SDL_INIT_VIDEO);
+    TTF_Init();
     emulator_time::set_time_provider(&SDL_GetTicks);
     emulator_time::set_sleep_provider(&SDL_Delay);
-    return std::unique_ptr<core_services, void(*)(core_services*)>(new sdl_core_services, [](core_services* services){
+    return std::unique_ptr<core_services, void(*)(core_services*)>(new sdl_core_services(), [](core_services* services){
+        TTF_Quit();
         SDL_QuitSubSystem(SDL_INIT_VIDEO);
         delete services;
     });

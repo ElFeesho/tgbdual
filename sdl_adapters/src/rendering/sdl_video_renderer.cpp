@@ -34,7 +34,8 @@ static inline uint8_t blue(uint32_t colour) { return (uint8_t) ((colour & 0x00ff
 static inline uint8_t alpha(uint32_t colour) { return (uint8_t) ((colour & 0xff000000) >> 24); }
 
 
-sdl_video_renderer::sdl_video_renderer(SDL_Surface *screen) : _screen{screen} {
+sdl_video_renderer::sdl_video_renderer(SDL_Surface *screen) : _screen{screen}, _font{TTF_OpenFont("font.ttf", 10)} {
+
 }
 
 void sdl_video_renderer::fillRect(int32_t x, int32_t y, uint32_t w, uint32_t h, uint32_t stroke, uint32_t fill) {
@@ -59,13 +60,26 @@ void sdl_video_renderer::fillRect(int32_t x, int32_t y, uint32_t w, uint32_t h, 
 }
 
 void sdl_video_renderer::text(const char *text, int32_t x, int32_t y, uint32_t colour) {
+    static SDL_Rect pos;
     uint8_t a = alpha(colour);
     uint8_t b = blue(colour);
     uint8_t g = green(colour);
     uint8_t r = red(colour);
 
-    stringRGBA(_screen, x, y, text, 0, 0, 0, 128);
-    stringRGBA(_screen, (Sint16) (x - 1), (Sint16) (y - 1), text, r, g, b, a);
+    SDL_Surface *textSurface = TTF_RenderText_Blended(_font, text, SDL_Color{r, g, b, a});
+    SDL_Surface *shadowSurface = TTF_RenderText_Blended(_font, text, SDL_Color{0, 0, 0, 220});
+    if (textSurface != nullptr) {
+        pos.x = x;
+        pos.y = y;
+        pos.w = textSurface->w;
+        pos.h = textSurface->h;
+        SDL_BlitSurface(shadowSurface, nullptr, _screen, &pos);
+        pos.x = x-1;
+        pos.y = y-1;
+        SDL_BlitSurface(textSurface, nullptr, _screen, &pos);
+        SDL_FreeSurface(textSurface);
+        SDL_FreeSurface(shadowSurface);
+    }
 }
 
 void sdl_video_renderer::pixels(void *pixels, int32_t x, int32_t y, uint32_t w, uint32_t h) {

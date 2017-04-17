@@ -25,7 +25,7 @@ void console::draw() {
     if (_open) {
         _renderer->fillRect(0, 0, _width, _height, 0xcc333333, 0xcc333333);
         _renderer->text(">", 3, _height - 10, 0xffffffff);
-        _renderer->text("_", (int32_t) (10 + _cursorPos * 8), _height - 10, 0xffffffff);
+        _renderer->text("_", (int32_t) (10 + _cursorPos * 6), _height - 10, 0xffffffff);
         _renderer->text(_currentLine.c_str(), 10, _height -10, 0xffffffff);
 
         for (int i = 0; i < _history.size(); i++) {

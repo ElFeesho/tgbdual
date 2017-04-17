@@ -26,6 +26,7 @@
 #include <map>
 #include <memory>
 #include <rendering/video_renderer.h>
+#include <SDL_ttf.h>
 
 class sdl_video_renderer : public tgb::video_renderer {
 public:
@@ -49,5 +50,6 @@ private:
     SDL_Surface *lookupImage(const std::string &name);
 
     SDL_Surface *_screen;
+    TTF_Font *_font;
     std::map<std::string, SDL_Surface *> image_cache;
 };
