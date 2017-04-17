@@ -17,15 +17,6 @@
    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#include <SDL/SDL.h>
-
-#include <iostream>
-#include <iomanip>
-#include <fstream>
-#include <sstream>
-#include <vector>
-#include <map>
-
 #include <gameboy.h>
 
 #include <script_manager.h>
@@ -34,11 +25,9 @@
 #include "console/console.h"
 #include "emulator_time.h"
 
-#include <input/sdl/sdl_gamepad_source.h>
 #include <limitter.h>
 
 #include <io/rom_file.h>
-#include <io/file_buffer.h>
 #include <io/memory_buffer.h>
 
 #include <linkcable/link_cable_source_provider.h>
@@ -48,17 +37,15 @@
 #include <commands/memory_commands.h>
 #include <commands/gameboy_commands.h>
 
-#include <rendering/sdl/sdl_video_renderer.h>
-#include <rendering/sdl/sdl_audio_renderer.h>
 #include <rendering/gb_video_renderer.h>
 #include <rendering/gb_osd_renderer.h>
 #include <rendering/gb_audio_renderer.h>
 #include <input/gb_gamepad_source.h>
 #include <input/gb_sys_command_source.h>
-#include <input/sdl/sdl_console_driver.h>
 #include <input/gb_console_driver.h>
+#include <emulation/core_services.h>
 
-void loop(console &c, bool &endGame, limitter &frameLimitter, gb_sys_command_source&, gb_console_driver&);
+void loop(console &c, limitter &frameLimitter, gb_sys_command_source &, gb_console_driver &);
 
 void saveState(gameboy &gbInst, rom_file &romFile) {
     memory_buffer buffer;
@@ -82,34 +69,28 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    emulator_time::set_time_provider(&SDL_GetTicks);
-    emulator_time::set_sleep_provider(&SDL_Delay);
-
     std::unique_ptr<link_cable_source> cable_source{provideLinkCableSource(&argc, &argv)};
 
     script_manager scriptManager;
 
-    SDL_InitSubSystem(SDL_INIT_VIDEO);
+    auto services = createCoreServices();
 
-    SDL_Surface *screen = SDL_SetVideoMode(320 + 200, 288 + 200, 16, SDL_SWSURFACE);
-    sdl_video_renderer sdl_video{screen};
-    sdl_audio_renderer sdl_audio;
+    console cons{services->videoRenderer(),
+                 520, 488 / 2,
+                 std::bind(&script_manager::handleUnhandledCommand, &scriptManager, std::placeholders::_1, std::placeholders::_2),
+                 &emulator_time::current_time};
 
-    console cons{&sdl_video, 520, 488/2, std::bind(&script_manager::handleUnhandledCommand, &scriptManager, std::placeholders::_1, std::placeholders::_2), &emulator_time::current_time};
-
-    gb_osd_renderer osdRenderer{&sdl_video};
-    gb_video_renderer video_renderer{&sdl_video, [&]() {
+    gb_osd_renderer osdRenderer{services->videoRenderer()};
+    gb_video_renderer video_renderer{services->videoRenderer(), [&]() {
         scriptManager.tick();
         osdRenderer.render();
         cons.draw();
     }, 100};
 
-    gb_audio_renderer gb_audio{&sdl_audio};
-    sdl_gamepad_source sdl_input;
-    gb_gamepad_source gp_source{&sdl_input};
+    gb_audio_renderer gb_audio{services->audioRenderer()};
+    gb_gamepad_source gp_source{services->gamepadSource()};
 
-    sdl_console_driver sdl_consoleDriver;
-    gb_console_driver consoleDriver{cons, &sdl_consoleDriver, std::bind(&gb_gamepad_source::enable, &gp_source)};
+    gb_console_driver consoleDriver{cons, services->consoleDriver(), std::bind(&gb_gamepad_source::enable, &gp_source)};
 
     gameboy gbInst{&video_renderer, &gb_audio, &gp_source, cable_source.get()};
     scan_engine scanEngine{gbInst.createAddressScanner(), std::bind(&console::addOutput, &cons, "Initial search state created")};
@@ -124,9 +105,7 @@ int main(int argc, char *argv[]) {
 
     script_context context{&osdRenderer, &gp_source, &gbInst, [&](const std::string &name, script_context::script_command command) {
         cons.removeCommand(name);
-        cons.addCommand(name, [command](std::vector<std::string> args) {
-            command(args);
-        });
+        cons.addCommand(name, command);
     }};
 
     registerMemoryCommands(cons, gbInst);
@@ -141,52 +120,53 @@ int main(int argc, char *argv[]) {
 
     limitter frameLimitter{std::bind(&gameboy::tick, &gbInst)};
 
-    gb_sys_command_source sys_command_source{ &sdl_input,
-            [&] {
-                saveState(gbInst, romFile);
-                osdRenderer.display_message("State saved", 2000);
-            }, [&] {
-                loadState(gbInst, romFile);
-                osdRenderer.display_message("State loaded", 2000);
-            }, [&] {
-                static bool fast_forward = false;
-                fast_forward = !fast_forward;
-                if (fast_forward) {
-                    gbInst.set_speed(9);
-                    osdRenderer.display_message("Fast forward enabled", 2000);
-                    frameLimitter.fast();
-                } else {
-                    gbInst.set_speed(0);
-                    osdRenderer.display_message("Fast forward disabled", 2000);
-                    frameLimitter.normal();
-                }
-            }, [&] {
-                endGame = true;
-            }, [&] {
-                scriptManager.activate();
-            }, [&] {
-                cons.open();
-                gp_source.reset_pad();
-                gp_source.disable();
+    gb_sys_command_source sys_command_source{services->sysCommandSource(),
+        [&] {
+            saveState(gbInst, romFile);
+            osdRenderer.display_message("State saved", 2000);
+        },
+        [&] {
+            loadState(gbInst, romFile);
+            osdRenderer.display_message("State loaded", 2000);
+        },
+        [&] {
+            static bool fast_forward = false;
+            fast_forward = !fast_forward;
+            if (fast_forward) {
+                gbInst.set_speed(9);
+                osdRenderer.display_message("Fast forward enabled", 2000);
+                frameLimitter.fast();
+            } else {
+                gbInst.set_speed(0);
+                osdRenderer.display_message("Fast forward disabled", 2000);
+                frameLimitter.normal();
             }
+        },
+        [&] {
+            endGame = true;
+        },
+        std::bind(&script_manager::activate, &scriptManager),
+        [&] {
+            cons.open();
+            gp_source.reset_pad();
+            gp_source.disable();
+        }
     };
 
-    loop(cons, endGame, frameLimitter, sys_command_source, consoleDriver);
+    while (!endGame) {
+        loop(cons, frameLimitter, sys_command_source, consoleDriver);
+    }
 
     gbInst.save_sram(std::bind(&rom_file::writeSram, &romFile, std::placeholders::_1, std::placeholders::_2));
-
-    SDL_QuitSubSystem(SDL_INIT_VIDEO);
 
     return 0;
 }
 
-void loop(console &c, bool &endGame, limitter &frameLimitter, gb_sys_command_source &sys_command_source, gb_console_driver &consoleDriver) {
-    while (!endGame) {
-        if (!c.isOpen()) {
-            sys_command_source.update();
-        } else {
-            consoleDriver.update();
-        }
-        frameLimitter.limit();
+void loop(console &c, limitter &frameLimitter, gb_sys_command_source &sys_command_source, gb_console_driver &consoleDriver) {
+    if (!c.isOpen()) {
+        sys_command_source.update();
+    } else {
+        consoleDriver.update();
     }
+    frameLimitter.limit();
 }
