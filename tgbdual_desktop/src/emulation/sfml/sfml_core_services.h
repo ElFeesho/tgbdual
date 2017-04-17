@@ -12,6 +12,7 @@
 #include <input/sfml/sfml_gamepad_source.h>
 #include <input/sfml/sfml_sys_command_source.h>
 #include <input/sfml/sfml_console_driver.h>
+#include <rendering/sfml/sfml_audio_renderer.h>
 
 class sfml_core_services : public core_services {
 public:

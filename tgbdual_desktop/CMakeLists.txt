@@ -50,7 +50,9 @@ else()
             src/input/sfml/sfml_gamepad_source.cpp
             src/input/sfml/sfml_gamepad_source.h
             src/input/sfml/sfml_sys_command_source.cpp
-            src/input/sfml/sfml_sys_command_source.h)
+            src/input/sfml/sfml_sys_command_source.h
+            src/rendering/sfml/sfml_audio_renderer.cpp
+            src/rendering/sfml/sfml_audio_renderer.h)
     include_directories(${SFML_INCLUDE_DIRECTORIES})
 endif()
 
