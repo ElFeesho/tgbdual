@@ -8,6 +8,7 @@
 #include <input/sfml_sys_command_source.h>
 #include <input/sfml_console_driver.h>
 #include <rendering/sfml_audio_renderer.h>
+#include <rendering/dummy_audio_renderer.h>
 
 class sfml_core_services : public core_services {
 public:
@@ -29,6 +30,6 @@ private:
     sfml_video_renderer _videoRenderer;
     sfml_console_driver _consoleDriver;
     sfml_sys_command_source _sysCommandSource;
-    sfml_audio_renderer _audioRenderer;
+    dummy_audio_renderer _audioRenderer;
 
 };

@@ -66,11 +66,14 @@ set(TGBDUAL_DESKTOP_SOURCES
         ${TGBDUAL_INTERFACE_SOURCES}
         src/limitter.cpp src/limitter.h
         src/io/buffer.h
-        src/io/file_buffer.cpp src/io/file_buffer.h
-        src/io/memory_buffer.cpp src/io/memory_buffer.h
-        src/io/rom_file.cpp src/io/rom_file.h
-        src/memory/scan_engine.cpp src/memory/scan_engine.h
-        src/main.cpp
+        src/io/file_buffer.cpp
+        src/io/file_buffer.h
+        src/io/memory_buffer.cpp
+        src/io/memory_buffer.h
+        src/io/rom_file.cpp
+        src/io/rom_file.h
+        src/memory/scan_engine.cpp
+        src/memory/scan_engine.h
         src/emulator_time.cpp
         src/emulator_time.h
         src/rendering/gb_video_renderer.cpp
@@ -86,16 +89,7 @@ set(TGBDUAL_DESKTOP_SOURCES
         src/input/gb_console_driver.cpp
         src/input/gb_console_driver.h
         src/emulation/core_services.h
-        src/rendering/dummy/dummy_audio_renderer.cpp
-        src/rendering/dummy/dummy_audio_renderer.h
-        src/rendering/dummy/dummy_video_renderer.cpp
-        src/rendering/dummy/dummy_video_renderer.h
-        src/input/dummy/dummy_console_driver.cpp
-        src/input/dummy/dummy_console_driver.h
-        src/input/dummy/dummy_gamepad_source.cpp
-        src/input/dummy/dummy_gamepad_source.h
-        src/input/dummy/dummy_sys_command_source.cpp
-        src/input/dummy/dummy_sys_command_source.h)
+        src/main.cpp)
 
 add_library(tgbdual_impls INTERFACE)
 target_sources(tgbdual_impls INTERFACE ${TGBDUAL_INTERFACE_SOURCES})

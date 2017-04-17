@@ -15,6 +15,6 @@ add_library(sfml_adapters
         src/input/sfml_sys_command_source.cpp
         src/input/sfml_sys_command_source.h)
 
-target_link_libraries(sfml_adapters PUBLIC ${SFML_LIBRARIES} tgbdual_impls)
+target_link_libraries(sfml_adapters PUBLIC ${SFML_LIBRARIES} tgbdual_impls dummy_adapters)
 target_include_directories(sfml_adapters PRIVATE ${SFML_INCLUDE_DIRECTORIES} src/)
 target_compile_features(sfml_adapters PRIVATE cxx_lambdas cxx_aggregate_default_initializers)
