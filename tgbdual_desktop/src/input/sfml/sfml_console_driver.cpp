@@ -4,6 +4,7 @@
 
 #include <SFML/Window/Event.hpp>
 #include <map>
+#include <iostream>
 #include "sfml_console_driver.h"
 
 sfml_console_driver::sfml_console_driver(sf::RenderWindow &window) : _window{window} {
@@ -31,35 +32,19 @@ void sfml_console_driver::update(tgb::console_driver::key_down down, tgb::consol
             auto key = e.key.code;
             if (commandKeys.find(key) != commandKeys.end()) {
                 commandkey_down(commandKeys[key]);
-            } else {
-                if (key != sf::Keyboard::Key::Unknown && !(key == sf::Keyboard::Key::LShift || key == sf::Keyboard::Key::RShift)) {
-                    if (e.key.shift) {
-                        if (key >= sf::Keyboard::Key::A && key <= sf::Keyboard::Key::Z) {
-                            down('A' + key);
-                        } else if (key == sf::Keyboard::Key::Dash) {
-                            down('_');
-                        }
-                    } else {
-                        down('a' + key);
-                    }
-                }
             }
         } else if (e.type == sf::Event::KeyReleased) {
             auto key = e.key.code;
             if (commandKeys.find(key) != commandKeys.end()) {
                 commandkey_up(commandKeys[key]);
-            } else {
-                if (key != sf::Keyboard::Key::Unknown && !(key == sf::Keyboard::Key::LShift || key == sf::Keyboard::Key::RShift)) {
-                    if (e.key.shift) {
-                        if (key >= sf::Keyboard::Key::A && key <= sf::Keyboard::Key::Z) {
-                            up('A' + key);
-                        } else if (key == sf::Keyboard::Key::Dash) {
-                            up('_');
-                        }
-                    } else {
-                        up('a' + key);
-                    }
-                }
+            }
+        }
+        else if (e.type == sf::Event::TextEntered) {
+
+            sf::Uint32 keyValue = e.text.unicode;
+            if (keyValue != '\t' && keyValue != '\b' && keyValue != '\n' && keyValue != '\r') {
+                down(keyValue);
+                up(keyValue);
             }
         }
     }

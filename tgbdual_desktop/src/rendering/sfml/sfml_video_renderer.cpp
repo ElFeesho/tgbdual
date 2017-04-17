@@ -12,6 +12,13 @@
 #include <SFML/Graphics/Text.hpp>
 #include "sfml_video_renderer.h"
 
+static inline uint32_t swapEndianness(uint32_t input) {
+    return ((input >> 24) & 0xff) |
+           ((input << 8) & 0xff0000) |
+           ((input >> 8) & 0xff00) |
+           ((input << 24) & 0xff000000);
+}
+
 sfml_video_renderer::sfml_video_renderer(sf::RenderWindow &window, sf::Font &font) : _window{window}, _font{font} {
 
 }
@@ -19,8 +26,8 @@ sfml_video_renderer::sfml_video_renderer(sf::RenderWindow &window, sf::Font &fon
 void sfml_video_renderer::fillRect(int32_t x, int32_t y, uint32_t w, uint32_t h, uint32_t stroke, uint32_t fill) {
     sf::RectangleShape r{{(float)w, (float)h}};
     r.move(x, y);
-    r.setFillColor(sf::Color{fill});
-    r.setOutlineColor(sf::Color{stroke});
+    r.setFillColor(sf::Color{swapEndianness(fill)});
+    r.setOutlineColor(sf::Color{swapEndianness(stroke)});
     r.setOutlineThickness(1.0f);
     _window.draw(r);
 }
@@ -28,7 +35,7 @@ void sfml_video_renderer::fillRect(int32_t x, int32_t y, uint32_t w, uint32_t h,
 void sfml_video_renderer::text(const char *text, int32_t x, int32_t y, uint32_t colour) {
     sf::Text t{text, _font, 10};
     t.move(x, y);
-    t.setFillColor(sf::Color{colour});
+    t.setFillColor(sf::Color{swapEndianness(colour)});
 
     _window.draw(t);
 }
@@ -63,7 +70,7 @@ void sfml_video_renderer::pixels(void *pixels, int32_t x, int32_t y, uint32_t w,
 }
 
 void sfml_video_renderer::image(const char *imgFile, int32_t x, int32_t y) {
-    static std::map<const char *, sf::Texture> imageMap;
+    static std::map<std::string, sf::Texture> imageMap;
     if (imageMap.find(imgFile) == imageMap.end())
     {
         imageMap[imgFile].loadFromFile(imgFile);
@@ -74,7 +81,7 @@ void sfml_video_renderer::image(const char *imgFile, int32_t x, int32_t y) {
 }
 
 void sfml_video_renderer::clear(uint32_t colour) {
-    _window.clear(sf::Color(colour));
+    _window.clear(sf::Color(swapEndianness(colour)));
 }
 
 void sfml_video_renderer::flip() {
