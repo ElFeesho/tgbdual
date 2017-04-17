@@ -11,10 +11,7 @@
 
 class sfml_gamepad_source : public tgb::gamepad_source {
 public:
-    sfml_gamepad_source(sf::RenderWindow &window);
     uint8_t provideState() override;
-private:
-    sf::RenderWindow &_window;
 };
 
 

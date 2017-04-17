@@ -45,7 +45,12 @@ else()
         src/emulation/sfml/sfml_core_services.h
         src/rendering/sfml/sfml_video_renderer.cpp
         src/rendering/sfml/sfml_video_renderer.h
-            src/input/sfml/sfml_console_driver.cpp src/input/sfml/sfml_console_driver.h)
+            src/input/sfml/sfml_console_driver.cpp
+            src/input/sfml/sfml_console_driver.h
+            src/input/sfml/sfml_gamepad_source.cpp
+            src/input/sfml/sfml_gamepad_source.h
+            src/input/sfml/sfml_sys_command_source.cpp
+            src/input/sfml/sfml_sys_command_source.h)
     include_directories(${SFML_INCLUDE_DIRECTORIES})
 endif()
 
@@ -111,7 +116,7 @@ set(TGBDUAL_DESKTOP_SOURCES
         src/input/dummy/dummy_gamepad_source.cpp
         src/input/dummy/dummy_gamepad_source.h
         src/input/dummy/dummy_sys_command_source.cpp
-        src/input/dummy/dummy_sys_command_source.h src/input/sfml/sfml_gamepad_source.cpp src/input/sfml/sfml_gamepad_source.h src/input/sfml/sfml_sys_command_source.cpp src/input/sfml/sfml_sys_command_source.h)
+        src/input/dummy/dummy_sys_command_source.h)
 
 find_package(LUA)
 

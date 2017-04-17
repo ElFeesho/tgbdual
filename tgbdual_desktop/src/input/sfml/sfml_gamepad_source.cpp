@@ -6,10 +6,6 @@
 #include <map>
 #include "sfml_gamepad_source.h"
 
-sfml_gamepad_source::sfml_gamepad_source(sf::RenderWindow &window) : _window{window} {
-
-}
-
 uint8_t sfml_gamepad_source::provideState() {
     uint8_t state = 0;
     std::map<sf::Keyboard::Key, uint8_t> keyMap {
