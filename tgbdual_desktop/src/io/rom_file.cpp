@@ -1,6 +1,3 @@
-//
-// Created by Christopher Sawczuk on 06/04/2017.
-//
 #include <fstream>
 #include <iomanip>
 

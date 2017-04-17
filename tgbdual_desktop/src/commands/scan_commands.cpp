@@ -1,7 +1,3 @@
-//
-// Created by Christopher Sawczuk on 11/04/2017.
-//
-
 #include "scan_commands.h"
 
 #include <vector>

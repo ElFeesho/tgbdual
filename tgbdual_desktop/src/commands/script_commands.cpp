@@ -1,7 +1,3 @@
-//
-// Created by Christopher Sawczuk on 11/04/2017.
-//
-
 #include "script_commands.h"
 
 #include <scripting/wren_script_vm.h>

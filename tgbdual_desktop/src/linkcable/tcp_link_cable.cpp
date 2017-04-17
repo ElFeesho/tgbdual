@@ -1,7 +1,3 @@
-//
-// Created by Christopher Sawczuk on 12/04/2017.
-//
-
 #include <sys/socket.h>
 #include "tcp_link_cable.h"
 

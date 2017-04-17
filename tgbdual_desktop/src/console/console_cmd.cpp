@@ -1,7 +1,3 @@
-//
-// Created by Christopher Sawczuk on 05/04/2017.
-//
-
 #include <sstream>
 #include <vector>
 #include <iomanip>

@@ -1,7 +1,3 @@
-//
-// Created by chris on 02/04/17.
-//
-
 #include "console.h"
 #include <iostream>
 

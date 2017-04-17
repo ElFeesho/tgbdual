@@ -1,7 +1,3 @@
-//
-// Created by Christopher Sawczuk on 06/04/2017.
-//
-
 #include <getopt.h>
 #include <iostream>
 #include <linkcable/null_link_source.h>

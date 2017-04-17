@@ -1,7 +1,3 @@
-//
-// Created by Christopher Sawczuk on 16/04/2017.
-//
-
 #include "gb_console_driver.h"
 
 gb_console_driver::gb_console_driver(console &consoleToDrive, tgb::console_driver *consoleDriver, console_close_cb consoleCloseCb) : _console{consoleToDrive}, _consoleDriver{consoleDriver}, _consoleCloseCb{consoleCloseCb} {
