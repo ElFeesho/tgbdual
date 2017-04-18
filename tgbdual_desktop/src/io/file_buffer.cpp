@@ -11,8 +11,6 @@ file_buffer::file_buffer(const std::string &name) {
         _buffer = std::unique_ptr<uint8_t>(new uint8_t[_length]);
         _file.read((char *) _buffer.get(), _length);
         _file.close();
-    } else {
-        throw std::domain_error("Failed to read contents of "+name);
     }
 }
 
