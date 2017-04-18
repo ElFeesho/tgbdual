@@ -4,6 +4,7 @@
 
 #include <emulator_time.h>
 #include <SFML/Window.hpp>
+#include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Sprite.hpp>

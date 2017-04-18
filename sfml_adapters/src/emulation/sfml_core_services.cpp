@@ -2,6 +2,7 @@
 // Created by Christopher Sawczuk on 17/04/2017.
 //
 
+#include <SFML/System.hpp>
 #include <emulator_time.h>
 #include <iostream>
 #include "sfml_core_services.h"
