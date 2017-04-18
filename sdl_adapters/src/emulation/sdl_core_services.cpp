@@ -35,5 +35,6 @@ std::unique_ptr<core_services, void(*)(core_services*)> createCoreServices() {
         delete services;
         TTF_Quit();
         SDL_QuitSubSystem(SDL_INIT_VIDEO);
+        SDL_Quit();
     });
 }
