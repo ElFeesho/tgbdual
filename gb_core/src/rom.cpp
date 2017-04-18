@@ -24,13 +24,6 @@
 #include <memory.h>
 #include "serializer.h"
 
-rom::rom() {
-    b_loaded = false;
-
-    dat = nullptr;
-    sram = nullptr;
-}
-
 rom::~rom() {
     free(dat);
     free(sram);

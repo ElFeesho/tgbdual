@@ -18,8 +18,6 @@ struct rom_info {
 
 class rom {
 public:
-    rom();
-
     ~rom();
 
     rom_info *get_info();
@@ -39,10 +37,10 @@ public:
 private:
     rom_info info;
 
-    uint8_t *dat;
-    uint8_t *sram;
+    uint8_t *dat { nullptr };
+    uint8_t *sram { nullptr };
 
-    uint8_t *first_page;
+    uint8_t *first_page { nullptr };
 
-    bool b_loaded;
+    bool b_loaded { false };
 };
