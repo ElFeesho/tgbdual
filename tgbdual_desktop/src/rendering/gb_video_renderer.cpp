@@ -5,7 +5,7 @@
 #include "gb_video_renderer.h"
 
 gb_video_renderer::gb_video_renderer(tgb::video_renderer *renderer, gb_video_renderer::render_callback callback, uint32_t bevel) : _renderer{renderer}, _callback{callback}, _bevel{bevel} {
-    _doublePixelBuffer = std::unique_ptr<uint8_t>(new uint8_t[320 * 288 * 2]);
+    _doublePixelBuffer = std::unique_ptr<uint8_t[]>(new uint8_t[320 * 288 * 2]);
 }
 
 void gb_video_renderer::render_screen(uint8_t *buf, uint32_t width, uint32_t height, uint32_t depth) {

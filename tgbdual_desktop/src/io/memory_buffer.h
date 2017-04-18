@@ -20,5 +20,5 @@ public:
     }
 private:
     uint32_t _length;
-    std::unique_ptr<uint8_t> _buffer { nullptr };
+    std::unique_ptr<uint8_t[]> _buffer { nullptr };
 };

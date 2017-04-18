@@ -24,6 +24,6 @@ public:
     
 private:
     uint32_t _length { 0 };
-    std::unique_ptr<uint8_t> _buffer;
+    std::unique_ptr<uint8_t[]> _buffer;
 };
 
