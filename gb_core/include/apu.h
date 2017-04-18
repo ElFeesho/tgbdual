@@ -8,68 +8,67 @@ class gb;
 class serializer;
 
 struct apu_stat {
-    bool sq1_playing;
-    int sq1_sw_time;
-    int sq1_sw_dir;
-    int sq1_sw_shift;
+    bool sq1_playing { false };
+    int32_t sq1_sw_time;
+    int32_t sq1_sw_dir;
+    int32_t sq1_sw_shift;
 
-    int sq1_len;
-    int sq1_init_len;
-    int sq1_type;
+    int32_t sq1_len;
+    int32_t sq1_init_len;
+    int32_t sq1_type;
 
-    int sq1_vol;
-    int sq1_init_vol;
-    int sq1_env_dir;
-    int sq1_env_speed;
+    int32_t sq1_vol;
+    int32_t sq1_init_vol;
+    int32_t sq1_env_dir;
+    int32_t sq1_env_speed;
 
-    int sq1_freq;
-    int sq1_init_freq;
+    int32_t sq1_freq;
+    int32_t sq1_init_freq;
 
-    int sq1_hold;
+    int32_t sq1_hold;
 
-    bool sq2_playing;
+    bool sq2_playing { false };
 
-    int sq2_len;
-    int sq2_init_len;
-    int sq2_type;
+    int32_t sq2_len;
+    int32_t sq2_init_len;
+    int32_t sq2_type;
 
-    int sq2_vol;
-    int sq2_init_vol;
-    int sq2_env_dir;
-    int sq2_env_speed;
+    int32_t sq2_vol;
+    int32_t sq2_init_vol;
+    int32_t sq2_env_dir;
+    int32_t sq2_env_speed;
 
-    int sq2_freq;
-    int sq2_init_freq;
+    int32_t sq2_freq;
+    int32_t sq2_init_freq;
 
-    int sq2_hold;
+    int32_t sq2_hold;
 
-    bool wav_playing;
-    int wav_vol;
-    int wav_freq;
-    int wav_init_freq;
-    int wav_init_len;
-    int wav_len;
-    int wav_hold;
+    bool wav_playing { false };
+    int32_t wav_vol;
+    int32_t wav_freq;
+    int32_t wav_init_len;
+    int32_t wav_len;
+    int32_t wav_hold;
 
-    bool noi_playing;
-    int noi_len;
-    int noi_init_len;
+    bool noi_playing { false };
+    int32_t noi_len;
+    int32_t noi_init_len;
 
-    int noi_vol;
-    int noi_init_vol;
-    int noi_env_dir;
-    int noi_env_speed;
+    int32_t noi_vol;
+    int32_t noi_init_vol;
+    int32_t noi_env_dir;
+    int32_t noi_env_speed;
 
-    int noi_freq;
-    int noi_init_freq;
-    int noi_hold;
-    int noi_step;
+    int32_t noi_freq;
+    int32_t noi_init_freq;
+    int32_t noi_hold;
+    int32_t noi_step;
 
-    int master_enable;
-    int ch_enable[4][2];
-    int master_vol[2];
-    int ch_on[4];
-    int wav_enable;
+    int32_t master_enable;
+    int32_t ch_enable[4][2];
+    int32_t master_vol[2];
+    int32_t ch_on[4];
+    int32_t wav_enable;
 };
 
 struct apu_que {

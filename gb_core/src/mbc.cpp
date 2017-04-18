@@ -183,12 +183,6 @@ uint8_t mbc::ext_read(uint16_t adr) {
 }
 
 void mbc::ext_write(uint16_t adr, uint8_t dat) {
-    // char op_name[][20]={"プリフィックス","書込み","読込み","消去"};
-    // char
-    // pre_op_name[][20]={"書込み消去禁止","全アドレス書込み","全アドレス消去","書込み消去許可"};
-    char op_name[][20] = {"prefix", "write", "read", "erase"};
-    char pre_op_name[][20] = {"Write-erase denied", "Write all addresses",
-                              "Erase all addresses", "Allow write erase"};
     int i;
 
     switch (ref_gb->get_rom()->get_info()->cart_type) {
@@ -212,43 +206,28 @@ void mbc::ext_write(uint16_t adr, uint8_t dat) {
         case 0x13:
             ref_gb->set_time(mbc3_timer, dat);
             break;
-        case 0xFE: // HuC-3
-            //		extern FILE *file;
-            //		fprintf(file,"%04X : HuC-3 ext_write %04X <=
-            //%02X\n",ref_gb->get_cpu()->get_regs()->PC,adr,dat);
+        case 0xFE:
             break;
-        case 0xFD: // TAMA5
-            //		extern FILE *file;
-            //		fprintf(file,"%04X : TAMA5 ext_write %04X <=
-            //%02X\n",ref_gb->get_cpu()->get_regs()->PC,adr,dat);
+        case 0xFD:
             break;
-        case 0x22: // コロコロカービィ // Korokoro Kirby
+        case 0x22:
             if (adr == 0xA080) {
                 int bef_cs = mbc7_cs, bef_sk = mbc7_sk;
 
                 mbc7_cs = dat >> 7;
-                mbc7_sk = (dat >> 6) & 1;
+                mbc7_sk = (uint8_t) ((dat >> 6) & 1);
 
                 if (!bef_cs && mbc7_cs) {
                     if (mbc7_state == 5) {
                         if (mbc7_write_enable) {
-                            *(ref_gb->get_rom()->get_sram() + mbc7_adr * 2) = mbc7_buf >> 8;
-                            *(ref_gb->get_rom()->get_sram() + mbc7_adr * 2 + 1) =
-                                    mbc7_buf & 0xff;
-                            ////
-                            ///fprintf(file,"書き込み完了\n");
-                            //						fprintf(file,"Write
-                            //complete\n");
+                            *(ref_gb->get_rom()->get_sram() + mbc7_adr * 2) = (uint8_t) (mbc7_buf >> 8);
+                            *(ref_gb->get_rom()->get_sram() + mbc7_adr * 2 + 1) = (uint8_t) (mbc7_buf & 0xff);
                         }
                         mbc7_state = 0;
                         mbc7_ret = 1;
                     } else {
-                        mbc7_idle = true; // アイドル状態突入
+                        mbc7_idle = true;
                         mbc7_state = 0;
-                        ////					fprintf(file,"アイドル状態突入
-                        ///ステート:アイドル状態\n");
-                        //					fprintf(file,"Idle: idle state
-                        //rush\n");
                     }
                 }
 

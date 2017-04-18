@@ -23,7 +23,7 @@
 
 #define CLOCKS_PER_INTERVAL \
     16384 // 1/256秒あたりのクロック数 (4MHz時) // Number of clock ticks per
-          // second / 256 (at 4MHz)
+// second / 256 (at 4MHz)
 
 #include "apu.h"
 #include <memory.h>
@@ -36,7 +36,7 @@ static uint32_t wav_cur_pos = 0;
 static uint32_t noi_cur_pos = 0;
 
 apu::apu(gb *ref)
-    : snd{this} {
+        : snd{this} {
     ref_gb = ref;
     reset();
 }
@@ -46,19 +46,16 @@ void apu::reset() {
 }
 
 uint8_t apu::read(uint16_t adr) {
-    if (adr == 0xff26) 
-    {
+    if (adr == 0xff26) {
         return (!snd.stat.master_enable) ? 0x00 : (0x80 |
-                          (((snd.stat.sq1_playing && snd.stat.wav_vol) ? 1 : 0) |
-                           ((snd.stat.sq2_playing && snd.stat.wav_vol) ? 2 : 0) |
-                           ((snd.stat.wav_enable && snd.stat.wav_playing &&
-                             snd.stat.wav_vol)
-                                ? 4
-                                : 0) |
-                           ((snd.stat.noi_playing && snd.stat.noi_vol) ? 8 : 0)));
-    }
-    else 
-    {
+                                                   (((snd.stat.sq1_playing && snd.stat.wav_vol) ? 1 : 0) |
+                                                    ((snd.stat.sq2_playing && snd.stat.wav_vol) ? 2 : 0) |
+                                                    ((snd.stat.wav_enable && snd.stat.wav_playing &&
+                                                      snd.stat.wav_vol)
+                                                     ? 4
+                                                     : 0) |
+                                                    ((snd.stat.noi_playing && snd.stat.noi_vol) ? 8 : 0)));
+    } else {
         return snd.mem[adr - 0xff10];
     }
 }
@@ -109,8 +106,8 @@ void apu_snd::reset() {
     stat.wav_playing = false;
     stat.noi_playing = false;
     stat.ch_enable[0][0] = stat.ch_enable[0][1] = stat.ch_enable[1][0] =
-        stat.ch_enable[1][1] = stat.ch_enable[2][0] = stat.ch_enable[2][1] =
-            stat.ch_enable[3][0] = stat.ch_enable[3][1] = 1;
+    stat.ch_enable[1][1] = stat.ch_enable[2][0] = stat.ch_enable[2][1] =
+    stat.ch_enable[3][0] = stat.ch_enable[3][1] = 1;
     stat.ch_on[0] = stat.ch_on[1] = stat.ch_on[2] = stat.ch_on[3] = 1;
     stat.master_enable = 1;
     stat.master_vol[0] = stat.master_vol[1] = 7;
@@ -122,10 +119,11 @@ void apu_snd::reset() {
     uint8_t gbc_init_wav[] = {0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF,
                               0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF};
 
-    if (ref_apu->ref_gb->get_rom()->get_info()->gb_type == 1) // 初期型GB // GB early type
+    if (ref_apu->ref_gb->get_rom()->get_info()->gb_type == 1) {
         memcpy(mem + 20, gb_init_wav, 16);
-    else if (ref_apu->ref_gb->get_rom()->get_info()->gb_type >= 3) // GBC
+    } else if (ref_apu->ref_gb->get_rom()->get_info()->gb_type >= 3) {
         memcpy(mem + 20, gbc_init_wav, 16);
+    }
 }
 
 void apu_snd::process(uint16_t adr, uint8_t dat) {
@@ -207,10 +205,7 @@ void apu_snd::process(uint16_t adr, uint8_t dat) {
         case 0xFF1B:
             stat.wav_init_len = (256 - dat);
             stat.wav_len = stat.wav_init_len;
-            if ((stat.wav_len && dat) || !stat.wav_hold)
-                stat.wav_playing = true;
-            else
-                stat.wav_playing = false;
+            stat.wav_playing = (stat.wav_len && dat) || !stat.wav_hold;
             break;
         case 0xFF1C:
             stat.wav_vol = tb[(dat >> 5) & 3];
@@ -249,7 +244,7 @@ void apu_snd::process(uint16_t adr, uint8_t dat) {
             break;
         case 0xFF22: // noi freq
             stat.noi_init_freq =
-                4194304 * mul_t[dat & 7] / div_t[dat & 7] / div_t2[(dat >> 4) & 15] / 8;
+                    4194304 * mul_t[dat & 7] / div_t[dat & 7] / div_t2[(dat >> 4) & 15] / 8;
             stat.noi_freq = stat.noi_init_freq;
             stat.noi_step = (dat & 8) ? 7 : 15;
 
@@ -309,8 +304,8 @@ inline short apu_snd::sq1_produce(int freq) {
         return 15000;
 
     if (freq) {
-        ret = sq_wav_dat[stat.sq1_type & 3][cur_sample] * 20000 - 10000;
-        cur_freq = ((freq * 8) > 0x10000) ? 0xffff : freq * 8;
+        ret = (short) (sq_wav_dat[stat.sq1_type & 3][cur_sample] * 20000 - 10000);
+        cur_freq = (uint32_t) (((freq * 8) > 0x10000) ? 0xffff : freq * 8);
         sq1_cur_pos += (cur_freq << 16) / 44100;
         if (sq1_cur_pos & 0xffff0000) {
             cur_sample = (cur_sample + (sq1_cur_pos >> 16)) & 7;
@@ -331,8 +326,8 @@ inline short apu_snd::sq2_produce(int freq) {
         return 15000;
 
     if (freq) {
-        ret = sq_wav_dat[stat.sq2_type & 3][cur_sample] * 20000 - 10000;
-        cur_freq = ((freq * 8) > 0x10000) ? 0xffff : freq * 8;
+        ret = (short) (sq_wav_dat[stat.sq2_type & 3][cur_sample] * 20000 - 10000);
+        cur_freq = (uint32_t) (((freq * 8) > 0x10000) ? 0xffff : freq * 8);
         sq2_cur_pos += (cur_freq << 16) / 44100;
         if (sq2_cur_pos & 0xffff0000) {
             cur_sample = (cur_sample + (sq2_cur_pos >> 16)) & 7;
@@ -351,25 +346,27 @@ inline short apu_snd::wav_produce(int freq, bool interpolation) {
     short ret;
 
     if (freq > 65000)
-        return (mem[0x20] >> 4) * 4000 - 30000;
+        return (short) ((mem[0x20] >> 4) * 4000 - 30000);
 
     if (freq) {
         if (interpolation) {
-            ret = ((cur_sample * 2500 - 15000) * wav_cur_pos +
-                   (bef_sample * 2500 - 15000) * (0x10000 - wav_cur_pos)) /
-                  0x10000;
+            ret = (short) (((cur_sample * 2500 - 15000) * wav_cur_pos +
+                               (bef_sample * 2500 - 15000) * (0x10000 - wav_cur_pos)) /
+                           0x10000);
         } else {
-            ret = cur_sample * 2500 - 15000;
+            ret = (short) (cur_sample * 2500 - 15000);
         }
-        cur_freq = (freq > 0x10000) ? 0xffff : freq;
+        cur_freq = (uint32_t) ((freq > 0x10000) ? 0xffff : freq);
         wav_cur_pos += (cur_freq << 16) / 44100;
         if (wav_cur_pos & 0xffff0000) {
             bef_sample = cur_sample;
             cur_pos2 = (cur_pos2 + (wav_cur_pos >> 16)) & 31;
-            if (cur_pos2 & 1)
-                cur_sample = mem[0x20 + cur_pos2 / 2] & 0xf;
-            else
+            if (cur_pos2 & 1) {
+                cur_sample = (uint8_t) (mem[0x20 + cur_pos2 / 2] & 0xf);
+            }
+            else {
                 cur_sample = mem[0x20 + cur_pos2 / 2] >> 4;
+            }
             wav_cur_pos &= 0xffff;
         }
     } else
@@ -388,8 +385,9 @@ static inline unsigned int _mrand(uint32_t degree) {
 
     if (bef_degree != degree) {
         shift_reg &= (degree ? 0x7fff : 0x7f);
-        if (!shift_reg)
+        if (!shift_reg) {
             shift_reg = degree ? 0x7fff : 0x7f;
+        }
     }
     bef_degree = degree;
 
@@ -399,14 +397,17 @@ static inline unsigned int _mrand(uint32_t degree) {
         masked >>= 1;
     }
 
-    if (xor_reg)
+    if (xor_reg) {
         shift_reg |= (degree ? 0x8000 : 0x80);
-    else
+    }
+    else {
         shift_reg &= ~(degree ? 0x8000 : 0x80);
+    }
     shift_reg >>= 1;
 
-    return shift_reg;
+    return (unsigned int) shift_reg;
 }
+
 /*
 inline short apu_snd::noi_produce(int freq)
 {
@@ -430,7 +431,7 @@ inline short apu_snd::noi_produce(int freq)
         return ret;
 }*/
 inline short apu_snd::noi_produce(int freq) {
-    static int cur_sample = 10000;
+    static short cur_sample = 10000;
     uint32_t cur_freq;
     short ret;
     int sc;
@@ -440,11 +441,13 @@ inline short apu_snd::noi_produce(int freq) {
         noi_cur_pos += cur_freq;
         sc = 0;
         while (noi_cur_pos > 44100) {
-            if (sc == 0)
-                cur_sample = (_mrand(stat.noi_step) & 1) ? 12000 : -10000;
-            else
+            if (sc == 0) {
+                cur_sample = (short) ((_mrand(stat.noi_step) & 1) ? 12000 : -10000);
+            }
+            else {
                 cur_sample += (_mrand(stat.noi_step) & 1) ? 12000 : -10000;
-            //			cur_sample=(_mrand(stat.noi_step)&0x1f)*1000;
+            }
+
             noi_cur_pos -= 44100;
             sc++;
         }
@@ -527,8 +530,12 @@ void apu_snd::update() {
 }
 
 void apu_snd::populate_audio_buffer(short *buf, int sample) {
-    static short filter[8820 * 2];
+    static short filter[8820 * 2] = {0};
     static int counter = 0;
+    static int tmp_sample = 0;
+    static int now_time = 0;
+    static int bef_sample_l[5] = {0, 0, 0, 0, 0};
+    static int bef_sample_r[5] = {0, 0, 0, 0, 0};
 
     memcpy(&stat_tmp, &stat, sizeof(stat));
     memcpy(&stat, &stat_cpy, sizeof(stat_cpy));
@@ -536,11 +543,9 @@ void apu_snd::populate_audio_buffer(short *buf, int sample) {
     int tmp_l, tmp_r, tmp;
     int now_clock = ref_apu->ref_gb->get_cpu()->get_clock();
     int cur = 0;
-    static int tmp_sample = 0, now_time, bef_sample_l[5] = {0, 0, 0, 0, 0},
-               bef_sample_r[5] = {0, 0, 0, 0, 0};
     int update_count = 0;
 
-    memset(buf, 0, sample * 4);
+    memset(buf, 0, (size_t) (sample * 4));
 
     for (int i = 0; i < sample; i++) {
         now_time = bef_clock + (now_clock - bef_clock) * i / sample;
@@ -548,49 +553,52 @@ void apu_snd::populate_audio_buffer(short *buf, int sample) {
         if ((cur != 0x10000) && (now_time > write_que[cur].clock) && (que_count)) {
             process(write_que[cur].adr, write_que[cur].dat);
             cur++;
-            if (cur >= que_count)
+            if (cur >= que_count) {
                 cur = 0x10000;
+            }
         }
 
         tmp_l = tmp_r = 0;
         if (stat.master_enable) {
             if (b_enable[0] && stat.sq1_playing /*&&(stat.sq1_freq!=0x7ff)*/) {
-                tmp = sq1_produce((131072 / (2048 - (stat.sq1_freq & 0x7FF)))) *
-                      stat.sq1_vol / 20;
-                if (stat.ch_enable[0][0])
+                tmp = sq1_produce((131072 / (2048 - (stat.sq1_freq & 0x7FF)))) * stat.sq1_vol / 20;
+                if (stat.ch_enable[0][0]) {
                     tmp_l += tmp * stat.master_vol[0] / 8;
-                if (stat.ch_enable[0][1])
+                }
+                if (stat.ch_enable[0][1]) {
                     tmp_r += tmp * stat.master_vol[1] / 8;
+                }
             }
             if (b_enable[1] && stat.sq2_playing /*&&(stat.sq2_freq!=0x7ff)*/) {
-                tmp = sq2_produce((131072 / (2048 - (stat.sq2_freq & 0x7FF)))) *
-                      stat.sq2_vol / 20;
-                if (stat.ch_enable[1][0])
+                tmp = sq2_produce((131072 / (2048 - (stat.sq2_freq & 0x7FF)))) * stat.sq2_vol / 20;
+                if (stat.ch_enable[1][0]) {
                     tmp_l += tmp * stat.master_vol[0] / 8;
-                if (stat.ch_enable[1][1])
+                }
+                if (stat.ch_enable[1][1]) {
                     tmp_r += tmp * stat.master_vol[1] / 8;
+                }
             }
             if (b_enable[2] && stat.wav_playing /*&&(stat.wav_freq!=0x7ff)*/) {
-                tmp = wav_produce((65536 / (2048 - (stat.wav_freq & 0x7FF))) * 32,
-                                  false) *
-                      stat.wav_vol / 10 * stat.wav_enable;
-                if (stat.ch_enable[2][0])
+                tmp = wav_produce((65536 / (2048 - (stat.wav_freq & 0x7FF))) * 32, false) * stat.wav_vol / 10 * stat.wav_enable;
+                if (stat.ch_enable[2][0]) {
                     tmp_l += tmp * stat.master_vol[0] / 8;
-                if (stat.ch_enable[2][1])
+                }
+                if (stat.ch_enable[2][1]) {
                     tmp_r += tmp * stat.master_vol[1] / 8;
+                }
             }
             if (b_enable[3] && stat.noi_playing) {
                 tmp = noi_produce(stat.noi_freq) * stat.noi_vol / 20;
-                if (stat.ch_enable[3][0])
+                if (stat.ch_enable[3][0]) {
                     tmp_l += tmp * stat.master_vol[0] / 8;
-                if (stat.ch_enable[3][1])
+                }
+                if (stat.ch_enable[3][1]) {
                     tmp_r += tmp * stat.master_vol[1] / 8;
+                }
             }
         }
+
         if (b_echo) {
-            // エコー
-            //			tmp_l/=2;
-            //			tmp_r/=2;
             int ttmp_l = tmp_l, ttmp_r = tmp_r;
             ttmp_l *= 5;
             ttmp_r *= 5;
@@ -600,17 +608,15 @@ void apu_snd::populate_audio_buffer(short *buf, int sample) {
             ttmp_r /= 5;
             tmp_l = ttmp_l;
             tmp_r = ttmp_r;
-            filter[counter * 2] = tmp_l;
-            filter[counter * 2 + 1] = tmp_r;
+            filter[counter * 2] = (short) tmp_l;
+            filter[counter * 2 + 1] = (short) tmp_r;
             counter++;
-            if (counter >= 2000)
+            if (counter >= 2000) {
                 counter = 0;
-            //			tmp_l/=2;
-            //			tmp_r/=2;
+            }
         }
+
         if (b_lowpass) {
-            // 出力をフィルタリング
-            // Filtering the output
             bef_sample_l[4] = bef_sample_l[3];
             bef_sample_l[3] = bef_sample_l[2];
             bef_sample_l[2] = bef_sample_l[1];
@@ -621,39 +627,26 @@ void apu_snd::populate_audio_buffer(short *buf, int sample) {
             bef_sample_r[2] = bef_sample_r[1];
             bef_sample_r[1] = bef_sample_r[0];
             bef_sample_r[0] = tmp_r;
-            tmp_l = (bef_sample_l[4] + bef_sample_l[3] * 2 + bef_sample_l[2] * 8 +
-                     bef_sample_l[1] * 2 + bef_sample_l[0]) /
-                    14;
-            tmp_r = (bef_sample_r[4] + bef_sample_r[3] * 2 + bef_sample_r[2] * 8 +
-                     bef_sample_r[1] * 2 + bef_sample_r[0]) /
-                    14;
+            tmp_l = (bef_sample_l[4] + bef_sample_l[3] * 2 + bef_sample_l[2] * 8 + bef_sample_l[1] * 2 + bef_sample_l[0]) / 14;
+            tmp_r = (bef_sample_r[4] + bef_sample_r[3] * 2 + bef_sample_r[2] * 8 + bef_sample_r[1] * 2 + bef_sample_r[0]) / 14;
         }
-        tmp_l = (tmp_l > 32767) ? 32767 : tmp_l;
+        tmp_l = (tmp_l >  32767) ?  32767 : tmp_l;
         tmp_l = (tmp_l < -32767) ? -32767 : tmp_l;
-        tmp_r = (tmp_r > 32767) ? 32767 : tmp_r;
+        tmp_r = (tmp_r >  32767) ?  32767 : tmp_r;
         tmp_r = (tmp_r < -32767) ? -32767 : tmp_r;
 
-        //どうやらうちの3.5インチベイ内蔵スピーカが出力を逆にしていたみたい…
-        // Built-in speaker 3.5-inch bay had to reverse the output apparently...
-        //		buf[i*2]=tmp_l;
-        //		buf[i*2+1]=tmp_r;
-        buf[i * 2] = tmp_r;
-        buf[i * 2 + 1] = tmp_l;
+        buf[i * 2] = (short) tmp_r;
+        buf[i * 2 + 1] = (short) tmp_l;
 
         tmp_sample++;
 
-        while (update_count * CLOCKS_PER_INTERVAL *
-                   (ref_apu->ref_gb->get_cpu()->get_speed() ? 2 : 1) <
-               now_time - bef_clock) {
+        while (update_count * CLOCKS_PER_INTERVAL * (ref_apu->ref_gb->get_cpu()->get_speed() ? 2 : 1) < now_time - bef_clock) {
             update();
             update_count++;
         }
-        //		if (tmp_sample>UPDATE_INTERVAL){
-        //			tmp_sample-=UPDATE_INTERVAL;
-        //			update();
-        //		}
     }
-    while (cur < que_count) { // 取りこぼし // Lose information
+
+    while (cur < que_count) {
         process(write_que[cur].adr, write_que[cur].dat);
         cur++;
     }
@@ -668,6 +661,7 @@ void apu_snd::populate_audio_buffer(short *buf, int sample) {
 void apu::serialize(serializer &s) {
     snd.serialize(s);
 }
+
 void apu_snd::serialize(serializer &s) {
     // originally, the only things saved were stat, stat_cpy,
     // and the first 0x30 uint8_ts of mem.

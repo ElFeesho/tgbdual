@@ -27,6 +27,7 @@ set(GB_CORE_SOURCES
 add_library(gb_core STATIC ${GB_CORE_SOURCES})
 target_include_directories(gb_core PUBLIC include/)
 target_compile_features(gb_core PRIVATE cxx_auto_type)
+target_compile_options(gb_core PRIVATE -Wall)
 
 #
 # Tests

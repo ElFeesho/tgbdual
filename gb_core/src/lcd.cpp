@@ -93,16 +93,12 @@ void lcd::bg_render(void *buf, int scanline) {
     uint16_t *dat = ((uint16_t *) buf) + scanline * 160;
 
     int start = ref_gb->get_regs()->SCX >> 3;
-    int end = (start + 20 > 32) ? 32 : (start + 21);
-    int y_and_7 = y & 7;
     int y_div_8 = y >> 3;
     int prefix = 0;
     uint8_t *trans = trans_tbl;
     uint8_t *now_tile = vrams[0] + back + ((y_div_8) << 5) + start;
     uint16_t *now_share = (uint16_t *) (vrams[0] + share + ((y & 7) << 1));
     uint16_t *now_pat = (uint16_t *) (vrams[0] + pat + ((y & 7) << 1));
-    uint16_t *now_share2 = (uint16_t *) (vrams[0] + share + 14 - ((y & 7) << 1));
-    uint16_t *now_pat2 = (uint16_t *) (vrams[0] + pat + 14 - ((y & 7) << 1));
     uint32_t tmp_dat;
     uint32_t calc1, calc2;
 
@@ -128,14 +124,14 @@ void lcd::bg_render(void *buf, int scanline) {
     *(dat++) = pal[calc2 & 3];
     *(dat++) = pal[calc1 & 3];
 
-    *(trans++) = (calc2 >> 6);
-    *(trans++) = (calc1 >> 6);
-    *(trans++) = (calc2 >> 4) & 3;
-    *(trans++) = (calc1 >> 4) & 3;
-    *(trans++) = (calc2 >> 2) & 3;
-    *(trans++) = (calc1 >> 2) & 3;
-    *(trans++) = calc2 & 3;
-    *(trans++) = calc1 & 3;
+    *(trans++) = (uint8_t) (calc2 >> 6);
+    *(trans++) = (uint8_t) (calc1 >> 6);
+    *(trans++) = (uint8_t) ((calc2 >> 4) & 3);
+    *(trans++) = (uint8_t) ((calc1 >> 4) & 3);
+    *(trans++) = (uint8_t) ((calc2 >> 2) & 3);
+    *(trans++) = (uint8_t) ((calc1 >> 2) & 3);
+    *(trans++) = (uint8_t) (calc2 & 3);
+    *(trans++) = (uint8_t) (calc1 & 3);
 
     dat -= 8;
     trans -= 8;
@@ -143,7 +139,7 @@ void lcd::bg_render(void *buf, int scanline) {
     for (i = 0; i < 8 - (x & 7); i++) { // スクロール補正
         *(dat) = *(dat + (x & 7));
         dat++;
-        *(trans++) = *(dat + (x & 7));
+        *(trans++) = (uint8_t) *(dat + (x & 7));
     }
 
     for (i = 0; i < 20; i++) {
@@ -174,14 +170,14 @@ void lcd::bg_render(void *buf, int scanline) {
         *(dat++) = pal[calc2 & 3];
         *(dat++) = pal[calc1 & 3];
 
-        *(trans++) = (calc2 >> 6);
-        *(trans++) = (calc1 >> 6);
-        *(trans++) = (calc2 >> 4) & 3;
-        *(trans++) = (calc1 >> 4) & 3;
-        *(trans++) = (calc2 >> 2) & 3;
-        *(trans++) = (calc1 >> 2) & 3;
-        *(trans++) = calc2 & 3;
-        *(trans++) = calc1 & 3;
+        *(trans++) = (uint8_t) (calc2 >> 6);
+        *(trans++) = (uint8_t) (calc1 >> 6);
+        *(trans++) = (uint8_t) ((calc2 >> 4) & 3);
+        *(trans++) = (uint8_t) ((calc1 >> 4) & 3);
+        *(trans++) = (uint8_t) ((calc2 >> 2) & 3);
+        *(trans++) = (uint8_t) ((calc1 >> 2) & 3);
+        *(trans++) = (uint8_t) (calc2 & 3);
+        *(trans++) = (uint8_t) (calc1 & 3);
     }
 }
 
@@ -190,9 +186,6 @@ void lcd::win_render(void *buf, int scanline) {
         !(ref_gb->get_regs()->LCDC & 0x20) ||
         ref_gb->get_regs()->WY >= (scanline + 1) ||
         ref_gb->get_regs()->WX > 166) {
-        //		if
-        //((ref_gb->get_regs()->WY>=(scanline+1))&&((ref_gb->get_regs()->LCDC&0x21)!=0x21))
-        //			memset(((uint16_t*)buf)+160*scanline,0,160*2);
         return;
     }
 
@@ -200,8 +193,8 @@ void lcd::win_render(void *buf, int scanline) {
     now_win_line++;
     uint8_t *trans = trans_tbl;
 
-    uint16_t back = (ref_gb->get_regs()->LCDC & 0x40) ? 0x1C00 : 0x1800;
-    uint16_t pat = (ref_gb->get_regs()->LCDC & 0x10) ? 0x0000 : 0x1000;
+    uint16_t back = (uint16_t) ((ref_gb->get_regs()->LCDC & 0x40) ? 0x1C00 : 0x1800);
+    uint16_t pat = (uint16_t) ((ref_gb->get_regs()->LCDC & 0x10) ? 0x0000 : 0x1000);
     uint16_t share = 0x0000; // prefix
     uint16_t pal[4];
     uint16_t *dat = (uint16_t *) buf;
@@ -215,10 +208,8 @@ void lcd::win_render(void *buf, int scanline) {
     dat += 160 * scanline + ref_gb->get_regs()->WX - 7;
     trans += ref_gb->get_regs()->WX - 7;
     uint8_t *now_tile = ref_gb->get_cpu()->get_vram() + back + (((y >> 3) - 1) << 5);
-    uint16_t *now_share =
-            (uint16_t *) (ref_gb->get_cpu()->get_vram() + share + ((y & 7) << 1));
-    uint16_t *now_pat =
-            (uint16_t *) (ref_gb->get_cpu()->get_vram() + pat + ((y & 7) << 1));
+    uint16_t *now_share = (uint16_t *) (ref_gb->get_cpu()->get_vram() + share + ((y & 7) << 1));
+    uint16_t *now_pat = (uint16_t *) (ref_gb->get_cpu()->get_vram() + pat + ((y & 7) << 1));
     uint32_t tmp_dat;
     uint32_t calc1, calc2;
 
@@ -246,14 +237,14 @@ void lcd::win_render(void *buf, int scanline) {
         *(dat++) = pal[calc2 & 3];
         *(dat++) = pal[calc1 & 3];
 
-        *(trans++) = (calc2 >> 6);
-        *(trans++) = (calc1 >> 6);
-        *(trans++) = (calc2 >> 4) & 3;
-        *(trans++) = (calc1 >> 4) & 3;
-        *(trans++) = (calc2 >> 2) & 3;
-        *(trans++) = (calc1 >> 2) & 3;
-        *(trans++) = calc2 & 3;
-        *(trans++) = calc1 & 3;
+        *(trans++) = (uint8_t)((calc2 >> 6));
+        *(trans++) = (uint8_t)((calc1 >> 6));
+        *(trans++) = (uint8_t)((calc2 >> 4) & 3);
+        *(trans++) = (uint8_t)((calc1 >> 4) & 3);
+        *(trans++) = (uint8_t)((calc2 >> 2) & 3);
+        *(trans++) = (uint8_t)((calc1 >> 2) & 3);
+        *(trans++) = (uint8_t)(calc2 & 3);
+        *(trans++) = (uint8_t)(calc1 & 3);
     }
 }
 
@@ -268,7 +259,7 @@ void lcd::sprite_render(void *buf, int scanline) {
     uint8_t *oam = ref_gb->get_cpu()->get_oam(),
             *vram = ref_gb->get_cpu()->get_vram();
 
-    bool sp_size = (ref_gb->get_regs()->LCDC & 0x04) ? true : false;
+    bool sp_size = (ref_gb->get_regs()->LCDC & 0x04) != 0;
     int palnum;
 
     pal[0][0] = m_pal16[ref_gb->get_regs()->OBP1 & 0x3];
@@ -326,10 +317,10 @@ void lcd::sprite_render(void *buf, int scanline) {
         l2 |= tmp_dat;
 
         if (atr & 0x20) { // 反転する
-            uint8_t tmp_p = l2;
-            l2 = ((l1 >> 2) & 0x33) | ((l1 << 2) & 0xcc);
+            uint8_t tmp_p = (uint8_t) l2;
+            l2 = (uint16_t) (((l1 >> 2) & 0x33) | ((l1 << 2) & 0xcc));
             ROL_BYTE(l2, 4);
-            l1 = ((tmp_p >> 2) & 0x33) | ((tmp_p << 2) & 0xcc);
+            l1 = (uint16_t) (((tmp_p >> 2) & 0x33) | ((tmp_p << 2) & 0xcc));
             ROL_BYTE(l1, 4);
         }
 
@@ -454,8 +445,8 @@ void lcd::bg_render_color(void *buf, int scanline) {
         return;
     }
 
-    uint16_t back = (ref_gb->get_regs()->LCDC & 0x08) ? 0x1C00 : 0x1800;
-    uint16_t pat = (ref_gb->get_regs()->LCDC & 0x10) ? 0x0000 : 0x1000;
+    uint16_t back = (uint16_t) ((ref_gb->get_regs()->LCDC & 0x08) ? 0x1C00 : 0x1800);
+    uint16_t pat = (uint16_t) ((ref_gb->get_regs()->LCDC & 0x10) ? 0x0000 : 0x1000);
     uint16_t share = 0x0000; // prefix
     uint16_t *pal;
     uint8_t tile;
@@ -471,8 +462,6 @@ void lcd::bg_render_color(void *buf, int scanline) {
     uint16_t *dat = ((uint16_t *) buf) + scanline * 160;
 
     int start = ref_gb->get_regs()->SCX >> 3;
-    int end = (start + 20 > 32) ? 32 : (start + 21);
-    int y_and_7 = y & 7;
     int y_div_8 = y >> 3;
     int prefix = 0;
     uint8_t *now_tile = vrams[0] + back + ((y_div_8) << 5) + start;
