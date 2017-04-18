@@ -51,5 +51,5 @@ private:
 
     SDL_Surface *_screen;
     TTF_Font *_font;
-    std::map<std::string, SDL_Surface *> image_cache;
+    std::map<std::string, std::unique_ptr<SDL_Surface, void(*)(SDL_Surface*)>> image_cache;
 };

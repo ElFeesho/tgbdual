@@ -69,13 +69,13 @@ void sdl_video_renderer::text(const char *text, int32_t x, int32_t y, uint32_t c
     SDL_Surface *textSurface = TTF_RenderText_Blended(_font, text, SDL_Color{r, g, b, a});
     SDL_Surface *shadowSurface = TTF_RenderText_Blended(_font, text, SDL_Color{0, 0, 0, 220});
     if (textSurface != nullptr) {
-        pos.x = x;
-        pos.y = y;
-        pos.w = textSurface->w;
-        pos.h = textSurface->h;
+        pos.x = (int16_t)x;
+        pos.y = (int16_t)y;
+        pos.w = (uint16_t)textSurface->w;
+        pos.h = (uint16_t)textSurface->h;
         SDL_BlitSurface(shadowSurface, nullptr, _screen, &pos);
-        pos.x = x-1;
-        pos.y = y-1;
+        pos.x = int16_t(x-1);
+        pos.y = int16_t(y-1);
         SDL_BlitSurface(textSurface, nullptr, _screen, &pos);
         SDL_FreeSurface(textSurface);
         SDL_FreeSurface(shadowSurface);
@@ -87,6 +87,8 @@ void sdl_video_renderer::pixels(void *pixels, int32_t x, int32_t y, uint32_t w, 
     SDL_Rect loc = {Sint16(x), Sint16(y), Uint16(w), Uint16(h) };
 
     SDL_BlitSurface(fromPixels, nullptr, _screen, &loc);
+
+    SDL_FreeSurface(fromPixels);
 }
 
 void sdl_video_renderer::image(const char *imgFile, int32_t x, int32_t y) {
@@ -109,9 +111,9 @@ SDL_Surface *sdl_video_renderer::lookupImage(const std::string &name) {
     if (image_cache.find(name) == image_cache.end()) {
         SDL_Surface *icon = IMG_Load(name.c_str());
         if (icon != nullptr) {
-            image_cache[name] = icon;
+            image_cache.emplace(name, std::unique_ptr<SDL_Surface, void(*)(SDL_Surface*)>(icon, SDL_FreeSurface));
         }
     }
-    return image_cache[name];
+    return image_cache.at(name).get();
 }
 
