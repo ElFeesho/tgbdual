@@ -653,6 +653,8 @@ void mbc::tama5_write(uint16_t adr, uint8_t dat) {
 }
 
 void mbc::mmm01_write(uint16_t adr, uint8_t dat) {
+    uint8_t *rom = ref_gb->get_rom()->get_rom();
+    int romSize = rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1;
     if (mbc1_16_8) {
         switch (adr >> 13) {
             default:
@@ -661,36 +663,32 @@ void mbc::mmm01_write(uint16_t adr, uint8_t dat) {
             case 1:
                 mbc1_dat = (uint8_t) ((mbc1_dat & 0x60) + (dat & 0x1F));
                 rom_page =
-                        ref_gb->get_rom()->get_rom() +
+                        rom +
                         0x4000 *
-                        ((mbc1_dat == 0 ? 1 : mbc1_dat) & (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) - 0x4000;
+                        ((mbc1_dat == 0 ? 1 : mbc1_dat) & romSize) - 0x4000;
                 break;
             case 2:
                 mbc1_dat = (uint8_t) (((dat << 5) & 0x60) + (mbc1_dat & 0x1F));
                 rom_page =
-                        ref_gb->get_rom()->get_rom() + 0x4000 * ((mbc1_dat == 0 ? 1 : mbc1_dat) & (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) - 0x4000;
+                        rom + 0x4000 * ((mbc1_dat == 0 ? 1 : mbc1_dat) & romSize) - 0x4000;
                 break;
             case 3:
                 mbc1_16_8 = (dat & 1) == 0;
                 mbc1_dat = 0;
                 break;
         }
-    } else { // 4/32モード // 4/32 mode
+    } else {
         switch (adr >> 13) {
             default:
             case 0:
                 break;
             case 1:
                 rom_page =
-                        ref_gb->get_rom()->get_rom() +
-                        0x4000 *
-                        ((dat & 3) * 0x10 + (dat == 0 ? 1 : dat) & 0x0f &
-                         (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
-                        0x4000;
+                        rom + ((0x4000 * ((dat & 3) * 0x10 + (dat == 0 ? 1 : dat)) & (0x0f & romSize))) - 0x4000;
                 break;
             case 2:
                 ref_gb->get_rom()->set_first((dat & 3) * 0x10);
-                rom_page = ref_gb->get_rom()->get_rom() + 0x4000 * ((dat & 3) * 0x10);
+                rom_page = rom + 0x4000 * ((dat & 3) * 0x10);
                 mbc1_dat = (uint8_t) (dat & 3);
                 break;
             case 3:
