@@ -64,7 +64,7 @@ struct apu_stat {
     int32_t noi_hold;
     int32_t noi_step;
 
-    int32_t master_enable;
+    int32_t master_enable { 1 };
     int32_t ch_enable[4][2];
     int32_t master_vol[2];
     int32_t ch_on[4];

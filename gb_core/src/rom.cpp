@@ -27,8 +27,8 @@
 rom::rom() {
     b_loaded = false;
 
-    dat = NULL;
-    sram = NULL;
+    dat = nullptr;
+    sram = nullptr;
 }
 
 rom::~rom() {
@@ -38,7 +38,7 @@ rom::~rom() {
 
 uint16_t rom::get_sram_size() {
     static const uint16_t tbl_ram[] = {1, 1, 1, 4, 16, 8};
-    return 0x2000 * tbl_ram[info.ram_size];
+    return (uint16_t) (0x2000 * tbl_ram[info.ram_size]);
 }
 
 bool rom::load_rom(uint8_t *buf, size_t size, uint8_t *ram, size_t ram_size) {
@@ -87,8 +87,6 @@ void rom::serialize(serializer &s) {
 }
 
 void rom::set_first(int32_t page) { first_page = dat + 0x4000 * page; }
-
-bool rom::get_loaded() { return b_loaded; }
 
 uint8_t *rom::get_sram() { return sram; }
 

@@ -8,13 +8,12 @@ class gb;
 class serializer;
 
 struct rom_info {
-    char cart_name[18];
-    int32_t cart_type;
-    uint8_t rom_size;
-    uint8_t ram_size;
+    char cart_name[18] { 0 };
+    int32_t cart_type { 0 };
+    uint8_t rom_size { 0 };
+    uint8_t ram_size { 0 };
 
-    bool check_sum;
-    int32_t gb_type;
+    int32_t gb_type { 0 };
 };
 
 class rom {
@@ -28,8 +27,6 @@ public:
     uint8_t *get_rom();
 
     uint8_t *get_sram();
-
-    bool get_loaded();
 
     uint16_t get_sram_size();
 

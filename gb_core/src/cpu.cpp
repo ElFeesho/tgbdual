@@ -39,7 +39,6 @@ constexpr uint8_t initialiseGB2Z80Table(int i) {
 
 cpu::cpu(gb *ref) {
     ref_gb = ref;
-    b_trace = false;
 
     for (int i = 0; i < 256; i++) {
         z802gb[i] = initialiseZ802GBTable(i);
@@ -75,7 +74,6 @@ void cpu::reset() {
     b_dma_first = false;
     gdma_rest = 0;
 
-    last_int = 0;
     int_desable = false;
 
     memset(ram, 0, sizeof(ram));
@@ -87,44 +85,6 @@ void cpu::reset() {
     rp_que[0] = 0x000001cc;
     rp_que[1] = 0x00000000;
     que_cur = 1;
-}
-
-void cpu::save_state(int *dat) {
-    dat[0] = (int) ((ram_bank - ram) / 0x1000);
-    dat[1] = (int) ((vram_bank - vram) / 0x2000);
-
-    dat[2] = (speed ? 1 : 0);
-    dat[3] = (dma_executing ? 1 : 0);
-    dat[4] = dma_src;
-    dat[5] = dma_dest;
-    dat[6] = dma_rest;
-    dat[7] = (speed_change ? 1 : 0);
-}
-
-void cpu::save_state_ex(int *dat) {
-    dat[0] = div_clock;
-    dat[1] = rest_clock;
-    dat[2] = sys_clock;
-    dat[3] = total_clock;
-}
-
-void cpu::restore_state(int *dat) {
-    ram_bank = ram + dat[0] * 0x1000;
-    vram_bank = vram + dat[1] * 0x2000;
-
-    speed = dat[2] != 0;
-    dma_executing = dat[3] != 0;
-    dma_src = dat[4];
-    dma_dest = dat[5];
-    dma_rest = dat[6];
-    speed_change = dat[7] != 0;
-}
-
-void cpu::restore_state_ex(int *dat) {
-    div_clock = dat[0];
-    rest_clock = dat[1];
-    sys_clock = dat[2];
-    total_clock = dat[3];
 }
 
 uint8_t cpu::read_direct(uint16_t adr) {
@@ -232,6 +192,8 @@ uint8_t cpu::io_read(uint16_t adr) {
                                               (tmp & 0x20 ? 0 : 4) | (tmp & 0x10 ? 0 : 8)));
                 case 3:
                     return 0xFF;
+                default:
+                    break;
             }
             return 0x00;
         case 0xFF01:
@@ -453,6 +415,8 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
                             memcpy(oam, ram + (dat & 0x0F) * 256, 0xA0);
                     }
                     break;
+                default:
+                    break;
             }
             return;
         case 0xFF47: // BGP(背景パレット) // BGP (background palette)
@@ -558,6 +522,7 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
                                    (size_t) (16 * (dat & 0x7F) + 16));
                         break;
                     case 7:
+                    default:
                         break;
                 }
                 dma_src += ((dat & 0x7F) + 1) * 16;
@@ -737,27 +702,22 @@ void cpu::irq_process() {
         if (ref_gb->get_regs()->IF & ref_gb->get_regs()->IE & INT_VBLANK) { // VBlank
             regs.PC = 0x40;
             ref_gb->get_regs()->IF &= 0xFE;
-            last_int = INT_VBLANK;
         } else if (ref_gb->get_regs()->IF & ref_gb->get_regs()->IE &
                    INT_LCDC) { // LCDC
             regs.PC = 0x48;
             ref_gb->get_regs()->IF &= 0xFD;
-            last_int = INT_LCDC;
         } else if (ref_gb->get_regs()->IF & ref_gb->get_regs()->IE &
                    INT_TIMER) { // Timer
             regs.PC = 0x50;
             ref_gb->get_regs()->IF &= 0xFB;
-            last_int = INT_TIMER;
         } else if (ref_gb->get_regs()->IF & ref_gb->get_regs()->IE & INT_SERIAL) { // Serial
             regs.PC = 0x58;
             ref_gb->get_regs()->IF &= 0xF7;
-            last_int = INT_SERIAL;
             //ref_gb->get_regs()->SC |= (ref_gb->get_regs()->SB &0x1) << 7;
         } else if (ref_gb->get_regs()->IF & ref_gb->get_regs()->IE &
                    INT_PAD) { // Pad
             regs.PC = 0x60;
             ref_gb->get_regs()->IF &= 0xEF;
-            last_int = INT_PAD;
         } else {
         }
 
@@ -768,8 +728,9 @@ void cpu::irq_process() {
 }
 
 void cpu::exec(int clocks) {
-    if (speed)
+    if (speed) {
         clocks *= 2;
+    }
 
     rp_que[0] = (uint32_t) (clocks + 8);
     rp_que[1] = 0x00000000;
@@ -817,7 +778,6 @@ void cpu::exec(int clocks) {
 #define REG_E regs.DE.b.l
 #define REG_H regs.HL.b.h
 #define REG_L regs.HL.b.l
-#define REG_AF regs.AF.w
 #define REG_BC regs.BC.w
 #define REG_DE regs.DE.w
 #define REG_HL regs.HL.w
