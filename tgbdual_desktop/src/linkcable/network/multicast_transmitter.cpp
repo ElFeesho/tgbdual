@@ -106,8 +106,7 @@ void multicast_transmitter::transcieve(std::function<void(std::string)> connectC
         std::cout << "Sending pings every 5 seconds" << std::endl;
         while (shouldBroadcast) {
             std::string message{"{\"name\":\"Desktop\",\"addr\":\"" + ip + "\",\"action\":\"announce\"}"};
-            if (sendto(mc_socket_out, (void *) message.c_str(), message.length(), 0,
-                       (struct sockaddr *) &mc_sockaddr_out, sizeof(struct sockaddr)) != message.length()) {
+            if (sendto(mc_socket_out, (void *) message.c_str(), message.length(), 0, (struct sockaddr *) &mc_sockaddr_out, sizeof(struct sockaddr)) != (ssize_t)message.length()) {
                 printf("Failed to send ping!\n");
             }
             std::cout << "." << std::flush;

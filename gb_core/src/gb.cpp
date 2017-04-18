@@ -339,7 +339,7 @@ uint32_t convert_to_second(struct tm *sys) {
     uint32_t i, ret = 0;
     static int month_days[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-    for (i = 1; i + 1950 < sys->tm_year; i++) {
+    for (i = 1; i + 1950 < (uint32_t)sys->tm_year; i++) {
         if ((i & 3) == 0) {
             if ((i % 100) == 0) {
                 ret += 365 + ((i % 400) == 0 ? 1 : 0);
@@ -351,7 +351,7 @@ uint32_t convert_to_second(struct tm *sys) {
         }
     }
 
-    for (i = 1; i < sys->tm_mon; i++) {
+    for (i = 1; i < (uint32_t) sys->tm_mon; i++) {
         if (i == 2) {
             if ((sys->tm_year & 3) == 0) {
                 if ((sys->tm_year % 100) == 0) {

@@ -27,7 +27,7 @@ set(GB_CORE_SOURCES
 add_library(gb_core STATIC ${GB_CORE_SOURCES})
 target_include_directories(gb_core PUBLIC include/)
 target_compile_features(gb_core PRIVATE cxx_auto_type)
-target_compile_options(gb_core PRIVATE -Wall)
+target_compile_options(gb_core PRIVATE -pipe -m64 -ansi -fPIC -g -O3 -fno-exceptions -fstack-protector -fvisibility=hidden -W -Wall -Wno-unused-parameter -Wno-unused-function -Wno-unused-label -Wpointer-arith -Wformat -Wreturn-type -Wsign-compare -Wmultichar -Wformat-nonliteral -Winit-self -Wuninitialized -Wno-deprecated -Wformat-security -Werror)
 
 #
 # Tests

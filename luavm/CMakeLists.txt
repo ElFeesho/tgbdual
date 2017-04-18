@@ -14,3 +14,4 @@ target_include_directories(luavm PUBLIC ${LUA_INCLUDE_DIR})
 target_include_directories(luavm PUBLIC include/)
 target_compile_features(luavm PRIVATE cxx_lambdas cxx_aggregate_default_initializers)
 
+target_compile_options(luavm PRIVATE -pipe -m64 -ansi -fPIC -g -O3 -fno-exceptions -fstack-protector -fvisibility=hidden -W -Wall -Wno-unused-parameter -Wno-unused-function -Wno-unused-label -Wpointer-arith -Wformat -Wreturn-type -Wsign-compare -Wmultichar -Wformat-nonliteral -Winit-self -Wuninitialized -Wno-deprecated -Wformat-security -Werror)

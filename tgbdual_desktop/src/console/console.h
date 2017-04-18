@@ -52,7 +52,7 @@ private:
     std::string _currentLine { "" };
     unsigned long _cursorPos {0 };
     std::vector<HistoryLine> _history;
-    int _historyIndex{0};
+    size_t _historyIndex{0};
 
     std::map<std::string, std::unique_ptr<console_cmd>> _cmds;
 

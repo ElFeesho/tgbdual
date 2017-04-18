@@ -14,8 +14,8 @@ void gb_video_renderer::render_screen(uint8_t *buf, uint32_t width, uint32_t hei
     uint16_t *originalPixels = (uint16_t*)buf;
     uint16_t *doublePixels = (uint16_t*)_doublePixelBuffer.get();
 
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
+    for (uint32_t y = 0; y < height; y++) {
+        for (uint32_t x = 0; x < width; x++) {
             uint16_t currentPixel = originalPixels[y * width + x];
 
             doublePixels[(y * 2) * 320 + x * 2 + 0]   = currentPixel;

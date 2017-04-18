@@ -24,7 +24,7 @@ void console::draw() {
         _renderer->text("_", (int32_t) (10 + _cursorPos * 6), _height - 10, 0xffffffff);
         _renderer->text(_currentLine.c_str(), 10, _height -10, 0xffffffff);
 
-        for (int i = 0; i < _history.size(); i++) {
+        for (size_t i = 0; i < _history.size(); i++) {
             auto history = _history[i];
             int32_t historyLineY = (int32_t) ((_height - 10) - (10 * (_history.size() - i)));
             if (history.outputType() == OutputType::stdout) {
@@ -100,8 +100,8 @@ void console::scrollDownHistory() {
         _currentLine = "";
         _cursorPos = 0;
     } else {
-        for (int i = 0, j = 0; i < _history.size(); i++) {
-            unsigned long index = (_history.size() - 1) - i;
+        for (size_t i = 0, j = 0; i < _history.size(); i++) {
+            size_t index = (_history.size() - 1) - i;
             if (_history[index].outputType() == OutputType::command) {
                 j++;
                 if (j == _historyIndex) {
@@ -117,8 +117,8 @@ void console::scrollDownHistory() {
 void console::scrollUpHistory() {
     _historyIndex++;
     bool found = false;
-    for (int i = 0, j = 0; i < _history.size(); i++) {
-        unsigned long index = (_history.size() - 1) - i;
+    for (size_t i = 0, j = 0; i < _history.size(); i++) {
+        size_t index = (_history.size() - 1) - i;
         if (_history[index].outputType() == OutputType::command) {
             j++;
             if (j == _historyIndex) {

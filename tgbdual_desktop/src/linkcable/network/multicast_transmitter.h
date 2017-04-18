@@ -18,8 +18,8 @@ private:
     int mc_socket_out;
     int mc_socket_in;
 
-    struct sockaddr_in mc_sockaddr_out { 0 };
-    struct sockaddr_in mc_sockaddr_in { 0 };
+    struct sockaddr_in mc_sockaddr_out;
+    struct sockaddr_in mc_sockaddr_in;
 
     bool shouldBroadcast{true};
 

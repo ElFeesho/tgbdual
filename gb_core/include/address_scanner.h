@@ -94,7 +94,7 @@ public:
     template<typename T>
     address_scan_result find_value(T target_value) {
         std::vector<ptrdiff_t> locations;
-        for (long i = 0; i <= _size - sizeof(T); i++) {
+        for (size_t i = 0; i <= _size - sizeof(T); i++) {
             T value = swapEndianness(*((T *) (_memory + i)));
             if (value == target_value) {
                 locations.push_back(i);

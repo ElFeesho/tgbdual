@@ -377,7 +377,7 @@ inline short apu_snd::wav_produce(int freq, bool interpolation) {
 
 static inline unsigned int _mrand(uint32_t degree) {
     static int shift_reg = 0x7f;
-    static int bef_degree = 0;
+    static uint32_t bef_degree = 0;
     int xor_reg = 0;
     int masked;
 

@@ -41,7 +41,7 @@ void scan_engine::clear_scan() {
 
 std::vector<ptrdiff_t> scan_engine::toVector(address_scan_result &scanResult) {
     std::vector<ptrdiff_t> results{};
-    for (int i = 0; i < scanResult.size(); i++) {
+    for (size_t i = 0; i < scanResult.size(); i++) {
         results.push_back(scanResult[i]);
     }
     return results;

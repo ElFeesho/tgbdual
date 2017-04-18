@@ -4,7 +4,7 @@
 
 sdl_audio_renderer::sdl_audio_renderer() {
 
-    SDL_AudioSpec wanted = {0};
+    SDL_AudioSpec wanted;
 
     wanted.freq = 44100;
     wanted.format = AUDIO_S16;
