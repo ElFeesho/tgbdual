@@ -109,6 +109,7 @@ void mbc::write(uint16_t adr, uint8_t dat) {
 
 uint8_t mbc::ext_read(uint16_t adr) {
     switch (ref_gb->get_rom()->get_info()->cart_type) {
+        default:
         case 1:
         case 2:
         case 3:
@@ -120,8 +121,6 @@ uint8_t mbc::ext_read(uint16_t adr) {
         case 0x11:
         case 0x12:
         case 0x13:
-            //		extern FILE *file;
-            //		fprintf(file,"external read [%04X]\n",adr);
             if (mbc3_latch) {
                 switch (mbc3_timer) {
                     case 8:
@@ -144,20 +143,20 @@ uint8_t mbc::ext_read(uint16_t adr) {
         case 0x1D:
         case 0x1E:
             return 0;
-        case 0x22: // コロコロカービィ // Korokoro Kirby
+        case 0x22:
             switch (adr & 0xa0f0) {
                 case 0xA000:
                     return 0;
                 case 0xA010:
                     return 0;
                 case 0xA020:
-                    return ref_gb->get_sensor(true) & 0xff;
+                    return (uint8_t) (ref_gb->get_sensor(true) & 0xff);
                 case 0xA030:
-                    return (ref_gb->get_sensor(true) >> 8) & 0xf;
+                    return (uint8_t) ((ref_gb->get_sensor(true) >> 8) & 0xf);
                 case 0xA040:
-                    return ref_gb->get_sensor(false) & 0xff;
+                    return (uint8_t) (ref_gb->get_sensor(false) & 0xff);
                 case 0xA050:
-                    return (ref_gb->get_sensor(false) >> 8) & 0xf;
+                    return (uint8_t) ((ref_gb->get_sensor(false) >> 8) & 0xf);
                 case 0xA060:
                     return 0;
                 case 0xA070:
@@ -167,19 +166,12 @@ uint8_t mbc::ext_read(uint16_t adr) {
             }
             return 0xff;
         case 0xFD:
-            //		extern FILE *file;
-            //		fprintf(file,"%04X : TAMA5 ext_read %04X
-            //\n",ref_gb->get_cpu()->get_regs()->PC,adr);
             return 1;
         case 0xFE:
-            //		extern FILE *file;
-            //		fprintf(file,"%04X : HuC-3 ext_read %04X
-            //\n",ref_gb->get_cpu()->get_regs()->PC,adr);
             return 1;
         case 0xFF:
             return 0;
     }
-    return 0;
 }
 
 void mbc::ext_write(uint16_t adr, uint8_t dat) {
@@ -231,73 +223,45 @@ void mbc::ext_write(uint16_t adr, uint8_t dat) {
                     }
                 }
 
-                if (!bef_sk &&
-                    mbc7_sk) {       // クロック立ち上がり // Rising edge of the clock
-                    if (mbc7_idle) { // アイドル状態であれば // If idle
+                if (!bef_sk && mbc7_sk) {
+                    if (mbc7_idle) {
                         if (dat & 0x02) {
-                            mbc7_idle = false; // アイドル状態解除 // Idle state release
+                            mbc7_idle = false;
                             mbc7_count = 0;
                             mbc7_state = 1;
-                            ////						fprintf(file,"アイドル状態解除
-                            ///ステート:コマンド認識\n");
-                            //						fprintf(file,"Command recognition: release idle
-                            //state\n");
                         }
                     } else {
                         switch (mbc7_state) {
-                            case 1: // コマンド受付 // Command reception
+                            case 1:
                                 mbc7_buf <<= 1;
                                 mbc7_buf |= (dat & 0x02) ? 1 : 0;
                                 mbc7_count++;
-                                if (mbc7_count == 2) { // 受付終了 // Exit Reception
+                                if (mbc7_count == 2) {
                                     mbc7_state = 2;
                                     mbc7_count = 0;
-                                    mbc7_op_code = mbc7_buf & 3;
-                                    ////
-                                    ///fprintf(file,"コマンド:%s
-                                    ///ステート:アドレス受信\n",op_name[mbc7_op_code]);
-                                    //							fprintf(file,"Command:
-                                    //%s state: Address received\n",op_name[mbc7_op_code]);
+                                    mbc7_op_code = (uint8_t) (mbc7_buf & 3);
                                 }
                                 break;
-                            case 2: // アドレス受信 // Address received
+                            case 2:
                                 mbc7_buf <<= 1;
                                 mbc7_buf |= (dat & 0x02) ? 1 : 0;
                                 mbc7_count++;
-                                if (mbc7_count == 8) { // 受付終了 // Exit Reception
+                                if (mbc7_count == 8) {
                                     mbc7_state = 3;
                                     mbc7_count = 0;
-                                    mbc7_adr = mbc7_buf & 0xff;
+                                    mbc7_adr = (uint8_t) (mbc7_buf & 0xff);
                                     if (mbc7_op_code == 0) {
                                         if ((mbc7_adr >> 6) == 0) {
-                                            ////									fprintf(file,"書き込み消去禁止
-                                            ///ステート:なし\n");
-                                            //									fprintf(file,"erasing
-                                            //state prohibited : No\n");
                                             mbc7_write_enable = false;
                                             mbc7_state = 0;
                                         } else if ((mbc7_adr >> 6) == 3) {
-                                            ////									fprintf(file,"書き込み消去許可
-                                            ///ステート:なし\n");
-                                            //									fprintf(file,"erasing
-                                            //the authorized state : No\n");
                                             mbc7_write_enable = true;
                                             mbc7_state = 0;
                                         }
-                                        ////
-                                        ///fprintf(file,"プリフィックスオペコード:%s
-                                        ///ステート:データ受信\n",pre_op_name[mbc7_adr>>6]);
-                                        //								fprintf(file,"Opcode
-                                        //prefix: %s state: Data reception\n",pre_op_name[mbc7_adr>>6]);
-                                    } else {
-                                        ////
-                                        ///fprintf(file,"アドレス:%02X ステート:データ受信\n",mbc7_adr);
-                                        //								fprintf(file,"Address:
-                                        //%02X State: Data reception\n",mbc7_adr);
                                     }
                                 }
                                 break;
-                            case 3: // データ // Data
+                            case 3:
                                 mbc7_buf <<= 1;
                                 mbc7_buf |= (dat & 0x02) ? 1 : 0;
                                 mbc7_count++;
@@ -306,41 +270,23 @@ void mbc::ext_write(uint16_t adr, uint8_t dat) {
                                     case 0:
                                         if (mbc7_count == 16) {
                                             if ((mbc7_adr >> 6) == 0) {
-                                                ////									fprintf(file,"書き込み消去禁止
-                                                ///ステート:なし\n");
-                                                //									fprintf(file,"erasing
-                                                //state prohibited : No\n");
                                                 mbc7_write_enable = false;
                                                 mbc7_state = 0;
                                             } else if ((mbc7_adr >> 6) == 1) {
                                                 if (mbc7_write_enable) {
                                                     for (i = 0; i < 256; i++) {
-                                                        *(ref_gb->get_rom()->get_sram() + i * 2) = mbc7_buf >> 8;
-                                                        *(ref_gb->get_rom()->get_sram() + i * 2) =
-                                                                mbc7_buf & 0xff;
+                                                        *(ref_gb->get_rom()->get_sram() + i * 2) = (uint8_t) (mbc7_buf >> 8);
+                                                        *(ref_gb->get_rom()->get_sram() + i * 2) = (uint8_t) (mbc7_buf & 0xff);
                                                     }
                                                 }
-                                                ////
-                                                ///fprintf(file,"全アドレス書き込み %04X
-                                                ///ステート:なし\n",mbc7_buf);
-                                                //									fprintf(file,"Write all
-                                                //addresses %04X State: No\n",mbc7_buf);
                                                 mbc7_state = 5;
                                             } else if ((mbc7_adr >> 6) == 2) {
                                                 if (mbc7_write_enable) {
                                                     for (i = 0; i < 256; i++)
                                                         *(uint16_t *) (ref_gb->get_rom()->get_sram() + i * 2) = 0xffff;
                                                 }
-                                                ////									fprintf(file,"全アドレス消去
-                                                ///ステート:なし\n");
-                                                //									fprintf(file,"erased
-                                                //state all addresses : None\n");
                                                 mbc7_state = 5;
                                             } else if ((mbc7_adr >> 6) == 3) {
-                                                ////									fprintf(file,"書き込み消去許可
-                                                ///ステート:なし\n");
-                                                //									fprintf(file,"erasing
-                                                //the authorized state : No\n");
                                                 mbc7_write_enable = true;
                                                 mbc7_state = 0;
                                             }
@@ -349,12 +295,6 @@ void mbc::ext_write(uint16_t adr, uint8_t dat) {
                                         break;
                                     case 1:
                                         if (mbc7_count == 16) {
-                                            ////
-                                            ///fprintf(file,"書き込み [%02X]<-%04X
-                                            ///ステート:書き込み待ちフレーム\n",mbc7_adr,mbc7_buf);
-                                            //								fprintf(file,"Writing
-                                            //[%02X]<-%04X State: Frame waiting to be
-                                            //written\n",mbc7_adr,mbc7_buf);
                                             mbc7_count = 0;
                                             mbc7_state = 5;
                                             mbc7_ret = 0;
@@ -362,27 +302,13 @@ void mbc::ext_write(uint16_t adr, uint8_t dat) {
                                         break;
                                     case 2:
                                         if (mbc7_count == 1) {
-                                            ////
-                                            ///fprintf(file,"ダミー受信完了 ステート:読み出し可\n");
-                                            //								fprintf(file,"Readable:
-                                            //State reception complete dummy\n");
                                             mbc7_state = 4;
                                             mbc7_count = 0;
-                                            mbc7_buf = (ref_gb->get_rom()->get_sram()[mbc7_adr * 2] << 8) |
-                                                       (ref_gb->get_rom()->get_sram()[mbc7_adr * 2 + 1]);
-                                            ////
-                                            ///fprintf(file,"受信データ %04X\n",mbc7_buf);
-                                            //								fprintf(file,"Received
-                                            //data %04X\n",mbc7_buf);
+                                            mbc7_buf = (ref_gb->get_rom()->get_sram()[mbc7_adr * 2] << 8) | (ref_gb->get_rom()->get_sram()[mbc7_adr * 2 + 1]);
                                         }
                                         break;
                                     case 3:
                                         if (mbc7_count == 16) {
-                                            ////								fprintf(file,"消去
-                                            ///[%02X] ステート:書き込み待ちフレーム\n",mbc7_adr,mbc7_buf);
-                                            //								fprintf(file,"Elimination
-                                            //[%02X] State: Frame waiting to be
-                                            //written\n",mbc7_adr,mbc7_buf);
                                             mbc7_count = 0;
                                             mbc7_state = 5;
                                             mbc7_ret = 0;
@@ -395,22 +321,15 @@ void mbc::ext_write(uint16_t adr, uint8_t dat) {
                     }
                 }
 
-                if (bef_sk && !mbc7_sk) {  // クロック立ち下り // Falling clock
-                    if (mbc7_state == 4) { // 読み出し中 // While reading
-                        mbc7_ret = (mbc7_buf & 0x8000) ? 1 : 0;
+                if (bef_sk && !mbc7_sk) {
+                    if (mbc7_state == 4) {
+                        mbc7_ret = (uint8_t) ((mbc7_buf & 0x8000) ? 1 : 0);
                         mbc7_buf <<= 1;
                         mbc7_count++;
-                        ////					fprintf(file,"読み出し中 %d
-                        ///ビット目\n",mbc7_count);
-                        //					fprintf(file,"While reading %dth
-                        //bit\n",mbc7_count);
+
                         if (mbc7_count == 16) {
                             mbc7_count = 0;
                             mbc7_state = 0;
-                            ////						fprintf(file,"読み出し完了
-                            ///ステート:なし\n");
-                            //						fprintf(file,"Read state complete:
-                            //No\n");
                         }
                     }
                 }
@@ -457,8 +376,8 @@ void mbc::set_state(int dat) {
         case 1:
         case 2:
         case 3:
-            mbc1_dat = dat & 0xFF;
-            mbc1_16_8 = ((dat >> 8) & 1 ? true : false);
+            mbc1_dat = (uint8_t) (dat & 0xFF);
+            mbc1_16_8 = ((dat >> 8) & 1) != 0;
             break;
         case 5:
         case 6:
@@ -468,19 +387,19 @@ void mbc::set_state(int dat) {
         case 0x11:
         case 0x12:
         case 0x13:
-            mbc3_timer = dat & 0x0F;
+            mbc3_timer = (uint8_t) (dat & 0x0F);
             dat >>= 4;
-            mbc3_latch = dat & 1;
+            mbc3_latch = (uint8_t) (dat & 1);
             dat >>= 1;
-            mbc3_sec = dat & 0x3f;
+            mbc3_sec = (uint8_t) (dat & 0x3f);
             dat >>= 6;
-            mbc3_min = dat & 0x3f;
+            mbc3_min = (uint8_t) (dat & 0x3f);
             dat >>= 6;
-            mbc3_hour = dat & 0x1f;
+            mbc3_hour = (uint8_t) (dat & 0x1f);
             dat >>= 5;
-            mbc3_dayl = dat & 0xff;
+            mbc3_dayl = (uint8_t) (dat & 0xff);
             dat >>= 8;
-            mbc3_dayh = dat & 1;
+            mbc3_dayh = (uint8_t) (dat & 1);
             break;
         case 0x19:
         case 0x1A:
@@ -491,8 +410,8 @@ void mbc::set_state(int dat) {
             mbc5_dat = dat & 0xFFFF;
             break;
         case 0xFF:
-            huc1_dat = dat & 0xFF;
-            huc1_16_8 = ((dat >> 8) & 1 ? true : false);
+            huc1_dat = (uint8_t) (dat & 0xFF);
+            huc1_16_8 = ((dat >> 8) & 1) != 0;
             break;
     }
 }
@@ -506,57 +425,34 @@ static int rom_size_tbl[] = {2, 4, 8, 16, 32, 64, 128, 256, 512};
 static int ram_size_tbl[] = {0, 1, 1, 4, 16, 8};
 
 void mbc::mbc1_write(uint16_t adr, uint8_t dat) {
-    if (mbc1_16_8) { // 16/8モード
+    if (mbc1_16_8) {
         switch (adr >> 13) {
             case 0:
                 break;
             case 1:
-                mbc1_dat = (mbc1_dat & 0x60) + (dat & 0x1F);
-                rom_page =
-                        ref_gb->get_rom()->get_rom() +
-                        0x4000 *
-                        ((mbc1_dat == 0 ? 1 : mbc1_dat) &
-                         (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
-                        0x4000;
+                mbc1_dat = (uint8_t) ((mbc1_dat & 0x60) + (dat & 0x1F));
+                rom_page = ref_gb->get_rom()->get_rom() + 0x4000 * ((mbc1_dat == 0 ? 1 : mbc1_dat) & (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) - 0x4000;
                 break;
             case 2:
-                mbc1_dat = ((dat << 5) & 0x60) + (mbc1_dat & 0x1F);
-                rom_page =
-                        ref_gb->get_rom()->get_rom() +
-                        0x4000 *
-                        ((mbc1_dat == 0 ? 1 : mbc1_dat) &
-                         (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
-                        0x4000;
+                mbc1_dat = (uint8_t) (((dat << 5) & 0x60) + (mbc1_dat & 0x1F));
+                rom_page = ref_gb->get_rom()->get_rom() + 0x4000 * ((mbc1_dat == 0 ? 1 : mbc1_dat) & (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) - 0x4000;
                 break;
             case 3:
-                if (dat & 1)
-                    mbc1_16_8 = false;
-                else
-                    mbc1_16_8 = true;
-                //			mbc1_dat=0;
+                mbc1_16_8 = (dat & 1) == 0;
                 break;
         }
-    } else { // 4/32モード
+    } else {
         switch (adr >> 13) {
             case 0:
                 break;
             case 1:
-                rom_page =
-                        ref_gb->get_rom()->get_rom() +
-                        0x4000 *
-                        ((dat == 0 ? 1 : dat) & 0x1F &
-                         (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
-                        0x4000;
+                rom_page = ref_gb->get_rom()->get_rom() + 0x4000 * ((dat == 0 ? 1 : dat) & 0x1F & (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) - 0x4000;
                 break;
             case 2:
                 sram_page = ref_gb->get_rom()->get_sram() + 0x2000 * (dat & 3);
                 break;
             case 3:
-                if (dat & 1)
-                    mbc1_16_8 = false;
-                else
-                    mbc1_16_8 = true;
-                //			mbc1_dat=0;
+                mbc1_16_8 = (dat & 1) == 0;
                 break;
         }
     }
@@ -593,13 +489,13 @@ void mbc::mbc3_write(uint16_t adr, uint8_t dat) {
                 ext_is_ram = true;
             } else {
                 ext_is_ram = false;
-                mbc3_timer = dat & 0x0F;
+                mbc3_timer = (uint8_t) (dat & 0x0F);
             }
             break;
-        case 3:             // RTCラッチ // RTC latch
-            if (dat == 0) { // Latchはずす // Disconnect latch
+        case 3:
+            if (dat == 0) {
                 mbc3_latch = 0;
-            } else if (dat == 1) { // データをLatchする // Latch the data to
+            } else if (dat == 1) {
                 if (!mbc3_latch) {
                     mbc3_sec = ref_gb->get_time(8);
                     mbc3_min = ref_gb->get_time(9);
@@ -616,6 +512,7 @@ void mbc::mbc3_write(uint16_t adr, uint8_t dat) {
 
 void mbc::mbc5_write(uint16_t adr, uint8_t dat) {
     switch (adr >> 12) {
+        default:
         case 0:
         case 1:
             break;
@@ -654,6 +551,7 @@ void mbc::mbc5_write(uint16_t adr, uint8_t dat) {
 
 void mbc::mbc7_write(uint16_t adr, uint8_t dat) {
     switch (adr >> 13) {
+        default:
         case 0:
             break;
         case 1:
@@ -682,10 +580,11 @@ void mbc::mbc7_write(uint16_t adr, uint8_t dat) {
 void mbc::huc1_write(uint16_t adr, uint8_t dat) {
     if (huc1_16_8) { // 16/8モード
         switch (adr >> 13) {
+            default:
             case 0:
                 break;
             case 1:
-                huc1_dat = (huc1_dat & 0x60) + (dat & 0x3F);
+                huc1_dat = (uint8_t) ((huc1_dat & 0x60) + (dat & 0x3F));
                 rom_page =
                         ref_gb->get_rom()->get_rom() +
                         0x4000 *
@@ -694,7 +593,7 @@ void mbc::huc1_write(uint16_t adr, uint8_t dat) {
                         0x4000;
                 break;
             case 2:
-                huc1_dat = ((dat << 5) & 0x60) + (huc1_dat & 0x3F);
+                huc1_dat = (uint8_t) (((dat << 5) & 0x60) + (huc1_dat & 0x3F));
                 rom_page =
                         ref_gb->get_rom()->get_rom() +
                         0x4000 *
@@ -703,15 +602,13 @@ void mbc::huc1_write(uint16_t adr, uint8_t dat) {
                         0x4000;
                 break;
             case 3:
-                if (dat & 1)
-                    huc1_16_8 = false;
-                else
-                    huc1_16_8 = true;
+                huc1_16_8 = (dat & 1) == 0;
                 huc1_dat = 0;
                 break;
         }
     } else { // 4/32モード
         switch (adr >> 13) {
+            default:
             case 0:
                 break;
             case 1:
@@ -726,10 +623,7 @@ void mbc::huc1_write(uint16_t adr, uint8_t dat) {
                 sram_page = ref_gb->get_rom()->get_sram() + 0x2000 * (dat & 3);
                 break;
             case 3:
-                if (dat & 1)
-                    huc1_16_8 = false;
-                else
-                    huc1_16_8 = true;
+                huc1_16_8 = (dat & 1) == 0;
                 huc1_dat = 0;
                 break;
         }
@@ -737,96 +631,53 @@ void mbc::huc1_write(uint16_t adr, uint8_t dat) {
 }
 
 void mbc::huc3_write(uint16_t adr, uint8_t dat) {
-    //	extern FILE *file;
-    //	fprintf(file,"%04X : HuC-3 write %04X <=
-    //%02X\n",ref_gb->get_cpu()->get_regs()->PC,adr,dat);
     switch (adr >> 13) {
         case 0:
-            if (dat == 0xA) {
-                ext_is_ram = true;
-            } else if (dat == 0x0B) {
-                ext_is_ram = false;
-            } else if (dat == 0x0C) {
-                ext_is_ram = false;
-            } else if (dat == 0x0D) {
-                ext_is_ram = false;
-            } else {
-                ext_is_ram = false;
-            }
+            ext_is_ram = dat == 0xA;
             break;
         case 1:
-            rom_page =
-                    ref_gb->get_rom()->get_rom() +
-                    0x4000 * ((dat == 0 ? 1 : dat) & 0x7F &
-                              (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
-                    0x4000;
+            rom_page = ref_gb->get_rom()->get_rom() + 0x4000 * ((dat == 0 ? 1 : dat) & 0x7F & (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) - 0x4000;
             break;
         case 2:
             if (dat < 8) {
                 sram_page = ref_gb->get_rom()->get_sram() + 0x2000 * (dat & 3);
                 ext_is_ram = true;
-            } else {
-                //			ext_is_ram=false;
-                //			mbc3_timer=dat&0x0F;
             }
             break;
-        case 3: // RTCラッチ
-            /*		if (dat==0){ // Latchはずす // Disconnect Latch
-                            mbc3_latch=0;
-                    }
-                    else if (dat==1){ // データをLatchする // Latch the data to
-                            if (!mbc3_latch){
-                                    mbc3_sec=ref_gb->get_renderer()->get_time(8);
-                                    mbc3_min=ref_gb->get_renderer()->get_time(9);
-                                    mbc3_hour=ref_gb->get_renderer()->get_time(10);
-                                    mbc3_dayl=ref_gb->get_renderer()->get_time(11);
-                                    mbc3_dayh=ref_gb->get_stream_provider()->get_time(12);
-                            }
-                            mbc3_latch=1;
-                    }
-    */
+        default:
             break;
     }
 }
 
 void mbc::tama5_write(uint16_t adr, uint8_t dat) {
-    //	extern FILE *file;
-    //	fprintf(file,"TAMA5 write %04X <= %02X\n",adr,dat);
 }
 
 void mbc::mmm01_write(uint16_t adr, uint8_t dat) {
-    if (mbc1_16_8) { // 16/8モード // 16/8 mode
+    if (mbc1_16_8) {
         switch (adr >> 13) {
+            default:
             case 0:
                 break;
             case 1:
-                mbc1_dat = (mbc1_dat & 0x60) + (dat & 0x1F);
+                mbc1_dat = (uint8_t) ((mbc1_dat & 0x60) + (dat & 0x1F));
                 rom_page =
                         ref_gb->get_rom()->get_rom() +
                         0x4000 *
-                        ((mbc1_dat == 0 ? 1 : mbc1_dat) &
-                         (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
-                        0x4000;
+                        ((mbc1_dat == 0 ? 1 : mbc1_dat) & (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) - 0x4000;
                 break;
             case 2:
-                mbc1_dat = ((dat << 5) & 0x60) + (mbc1_dat & 0x1F);
+                mbc1_dat = (uint8_t) (((dat << 5) & 0x60) + (mbc1_dat & 0x1F));
                 rom_page =
-                        ref_gb->get_rom()->get_rom() +
-                        0x4000 *
-                        ((mbc1_dat == 0 ? 1 : mbc1_dat) &
-                         (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) -
-                        0x4000;
+                        ref_gb->get_rom()->get_rom() + 0x4000 * ((mbc1_dat == 0 ? 1 : mbc1_dat) & (rom_size_tbl[ref_gb->get_rom()->get_info()->rom_size] - 1)) - 0x4000;
                 break;
             case 3:
-                if (dat & 1)
-                    mbc1_16_8 = false;
-                else
-                    mbc1_16_8 = true;
+                mbc1_16_8 = (dat & 1) == 0;
                 mbc1_dat = 0;
                 break;
         }
     } else { // 4/32モード // 4/32 mode
         switch (adr >> 13) {
+            default:
             case 0:
                 break;
             case 1:
@@ -840,15 +691,10 @@ void mbc::mmm01_write(uint16_t adr, uint8_t dat) {
             case 2:
                 ref_gb->get_rom()->set_first((dat & 3) * 0x10);
                 rom_page = ref_gb->get_rom()->get_rom() + 0x4000 * ((dat & 3) * 0x10);
-                mbc1_dat = dat & 3;
-                //			sram_page=ref_gb->get_rom()->get_sram()+0x2000*(dat&3);
+                mbc1_dat = (uint8_t) (dat & 3);
                 break;
             case 3:
-                if (dat & 1)
-                    mbc1_16_8 = false;
-                else
-                    mbc1_16_8 = true;
-                //			mbc1_dat=0;
+                mbc1_16_8 = (dat & 1) == 0;
                 break;
         }
     }
@@ -860,10 +706,10 @@ void mbc::serialize(serializer &s) {
 
     int tmp;
 
-    tmp = (rom_page - rom) / 0x4000;
+    tmp = (int) ((rom_page - rom) / 0x4000);
     s_VAR(tmp);
     rom_page = rom + tmp * 0x4000;
-    tmp = (sram_page - sram) / 0x2000;
+    tmp = (int) ((sram_page - sram) / 0x2000);
     s_VAR(tmp);
     sram_page = sram + tmp * 0x2000;
 
