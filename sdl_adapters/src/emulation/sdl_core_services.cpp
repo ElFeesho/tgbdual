@@ -32,8 +32,8 @@ std::unique_ptr<core_services, void(*)(core_services*)> createCoreServices() {
     emulator_time::set_time_provider(&SDL_GetTicks);
     emulator_time::set_sleep_provider(&SDL_Delay);
     return std::unique_ptr<core_services, void(*)(core_services*)>(new sdl_core_services(), [](core_services* services){
+        delete services;
         TTF_Quit();
         SDL_QuitSubSystem(SDL_INIT_VIDEO);
-        delete services;
     });
 }
