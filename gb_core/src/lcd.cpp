@@ -70,8 +70,8 @@ void lcd::bg_render(void *buf, int scanline) {
         return;
     }
 
-    uint16_t back = (ref_gb->get_regs()->LCDC & 0x08) ? 0x1C00 : 0x1800;
-    uint16_t pat = (ref_gb->get_regs()->LCDC & 0x10) ? 0x0000 : 0x1000;
+    uint16_t back = (uint16_t) ((ref_gb->get_regs()->LCDC & 0x08) ? 0x1C00 : 0x1800);
+    uint16_t pat = (uint16_t) ((ref_gb->get_regs()->LCDC & 0x10) ? 0x0000 : 0x1000);
     uint16_t share = 0x0000; // prefix
     uint16_t pal[4];
     uint8_t tile;
@@ -285,11 +285,11 @@ void lcd::sprite_render(void *buf, int scanline) {
                 (y > scanline + 15))
                 continue;
             if (scanline - y + 15 < 8) {
-                now = (atr & 0x40) ? ((y - scanline) & 7) : (7 - (y - scanline) & 7);
+                now = (atr & 0x40) ? ((y - scanline) & 7) : (7 - ((y - scanline) & 7));
                 tmp_dat = *(uint16_t *) (vram + (tile & 0xfe) * 16 + now * 2 +
                                          ((atr & 0x40) ? 16 : 0));
             } else {
-                now = (atr & 0x40) ? ((y - scanline) & 7) : (7 - (y - scanline) & 7);
+                now = (atr & 0x40) ? ((y - scanline) & 7) : (7 - ((y - scanline) & 7));
                 tmp_dat = *(uint16_t *) (vram + (tile & 0xfe) * 16 + now * 2 +
                                          ((atr & 0x40) ? 0 : 16));
             }
@@ -299,7 +299,7 @@ void lcd::sprite_render(void *buf, int scanline) {
             if ((x == -8 && y == -16) || (x > 160) || (y > 144 + 7) ||
                 (y < scanline) || (y > scanline + 7))
                 continue;
-            now = (atr & 0x40) ? ((y - scanline) & 7) : (7 - (y - scanline) & 7);
+            now = (atr & 0x40) ? ((y - scanline) & 7) : (7 - ((y - scanline) & 7));
             tmp_dat = *(uint16_t *) (vram + tile * 16 + now * 2);
         }
         sprite_count++;
@@ -481,7 +481,7 @@ void lcd::bg_render_color(void *buf, int scanline) {
     atr = *(now_atr++);
 
     pal = mapped_pal[atr & 7];
-    bank = (atr << 9) & 0x1000;
+    bank = (uint16_t) ((atr << 9) & 0x1000);
     tmp_dat =
             (tile & 0x80)
             ? *(((atr & 0x40) ? now_share2 : now_share) + (tile << 3) + bank)
@@ -498,10 +498,10 @@ void lcd::bg_render_color(void *buf, int scanline) {
     calc2 |= tmp_dat;
 
     if (atr & 0x20) { // 反転する
-        uint8_t tmp_p = calc2;
+        uint8_t tmp_p = (uint8_t) calc2;
         calc2 = ((calc1 >> 2) & 0x33) | ((calc1 << 2) & 0xcc);
         ROL_BYTE(calc2, 4);
-        calc1 = ((tmp_p >> 2) & 0x33) | ((tmp_p << 2) & 0xcc);
+        calc1 = (uint32_t) (((tmp_p >> 2) & 0x33) | ((tmp_p << 2) & 0xcc));
         ROL_BYTE(calc1, 4);
     }
 
@@ -514,14 +514,14 @@ void lcd::bg_render_color(void *buf, int scanline) {
     *(dat++) = pal[calc2 & 3];
     *(dat++) = pal[calc1 & 3];
 
-    *(trans++) = (calc2 >> 6);
-    *(trans++) = (calc1 >> 6);
-    *(trans++) = (calc2 >> 4) & 3;
-    *(trans++) = (calc1 >> 4) & 3;
-    *(trans++) = (calc2 >> 2) & 3;
-    *(trans++) = (calc1 >> 2) & 3;
-    *(trans++) = calc2 & 3;
-    *(trans++) = calc1 & 3;
+    *(trans++) = (uint8_t) (calc2 >> 6);
+    *(trans++) = (uint8_t) ((calc1 >> 6));
+    *(trans++) = (uint8_t) ((calc2 >> 4) & 3);
+    *(trans++) = (uint8_t) ((calc1 >> 4) & 3);
+    *(trans++) = (uint8_t) ((calc2 >> 2) & 3);
+    *(trans++) = (uint8_t) ((calc1 >> 2) & 3);
+    *(trans++) = (uint8_t) (calc2 & 3);
+    *(trans++) = (uint8_t) (calc1 & 3);
 
     memset(priority, (atr & 0x80), 8);
     priority += 8;
@@ -550,7 +550,7 @@ void lcd::bg_render_color(void *buf, int scanline) {
         atr = *(now_atr++);
 
         pal = mapped_pal[atr & 7];
-        bank = (atr << 9) & 0x1000;
+        bank = (uint16_t) ((atr << 9) & 0x1000);
         tmp_dat =
                 (tile & 0x80)
                 ? *(((atr & 0x40) ? now_share2 : now_share) + (tile << 3) + bank)
@@ -568,10 +568,10 @@ void lcd::bg_render_color(void *buf, int scanline) {
         calc2 |= tmp_dat;
 
         if (atr & 0x20) { // 反転する
-            uint8_t tmp_p = calc2;
+            uint8_t tmp_p = (uint8_t) calc2;
             calc2 = ((calc1 >> 2) & 0x33) | ((calc1 << 2) & 0xcc);
             ROL_BYTE(calc2, 4);
-            calc1 = ((tmp_p >> 2) & 0x33) | ((tmp_p << 2) & 0xcc);
+            calc1 = (uint32_t) (((tmp_p >> 2) & 0x33) | ((tmp_p << 2) & 0xcc));
             ROL_BYTE(calc1, 4);
         }
 
@@ -592,21 +592,21 @@ void lcd::bg_render_color(void *buf, int scanline) {
         *(dat) = pal[calc1 & 3];
         dat++;
 
-        *(trans) = (calc2 >> 6);
+        *(trans) = (uint8_t) (calc2 >> 6);
         trans++;
-        *(trans) = (calc1 >> 6);
+        *(trans) = (uint8_t) (calc1 >> 6);
         trans++;
-        *(trans) = (calc2 >> 4) & 3;
+        *(trans) = (uint8_t) ((calc2 >> 4) & 3);
         trans++;
-        *(trans) = (calc1 >> 4) & 3;
+        *(trans) = (uint8_t) ((calc1 >> 4) & 3);
         trans++;
-        *(trans) = (calc2 >> 2) & 3;
+        *(trans) = (uint8_t) ((calc2 >> 2) & 3);
         trans++;
-        *(trans) = (calc1 >> 2) & 3;
+        *(trans) = (uint8_t) ((calc1 >> 2) & 3);
         trans++;
-        *(trans) = calc2 & 3;
+        *(trans) = (uint8_t) (calc2 & 3);
         trans++;
-        *(trans) = calc1 & 3;
+        *(trans) = (uint8_t) (calc1 & 3);
         trans++;
 
         memset(priority, (atr & 0x80), 8);
@@ -635,8 +635,8 @@ void lcd::win_render_color(void *buf, int scanline) {
     uint8_t *vrams[2] = {ref_gb->get_cpu()->get_vram(),
                          ref_gb->get_cpu()->get_vram() + 0x2000};
 
-    uint16_t back = (ref_gb->get_regs()->LCDC & 0x40) ? 0x1C00 : 0x1800;
-    uint16_t pat = (ref_gb->get_regs()->LCDC & 0x10) ? 0x0000 : 0x1000;
+    uint16_t back = (uint16_t) ((ref_gb->get_regs()->LCDC & 0x40) ? 0x1C00 : 0x1800);
+    uint16_t pat = (uint16_t) ((ref_gb->get_regs()->LCDC & 0x10) ? 0x0000 : 0x1000);
     uint16_t share = 0x0000; // prefix
     uint16_t *pal;
     uint16_t *dat = (uint16_t *) buf;
@@ -665,7 +665,7 @@ void lcd::win_render_color(void *buf, int scanline) {
     for (i = ref_gb->get_regs()->WX >> 3; i < 21; i++) {
         tile = *(now_tile++);
         atr = *(now_atr++);
-        bank = (atr << 9) & 0x1000;
+        bank = (uint16_t) ((atr << 9) & 0x1000);
         pal = mapped_pal[atr & 7];
         tmp_dat =
                 (tile & 0x80)
@@ -683,10 +683,10 @@ void lcd::win_render_color(void *buf, int scanline) {
         calc2 |= tmp_dat;
 
         if (atr & 0x20) { // 反転する
-            uint8_t tmp_p = calc2;
+            uint8_t tmp_p = (uint8_t) calc2;
             calc2 = ((calc1 >> 2) & 0x33) | ((calc1 << 2) & 0xcc);
             ROL_BYTE(calc2, 4);
-            calc1 = ((tmp_p >> 2) & 0x33) | ((tmp_p << 2) & 0xcc);
+            calc1 = (uint32_t) (((tmp_p >> 2) & 0x33) | ((tmp_p << 2) & 0xcc));
             ROL_BYTE(calc1, 4);
         }
 
@@ -699,14 +699,14 @@ void lcd::win_render_color(void *buf, int scanline) {
         *(dat++) = pal[calc2 & 3];
         *(dat++) = pal[calc1 & 3];
 
-        *(trans++) = (calc2 >> 6);
-        *(trans++) = (calc1 >> 6);
-        *(trans++) = (calc2 >> 4) & 3;
-        *(trans++) = (calc1 >> 4) & 3;
-        *(trans++) = (calc2 >> 2) & 3;
-        *(trans++) = (calc1 >> 2) & 3;
-        *(trans++) = calc2 & 3;
-        *(trans++) = calc1 & 3;
+        *(trans++) = (uint8_t) (calc2 >> 6);
+        *(trans++) = (uint8_t) (calc1 >> 6);
+        *(trans++) = (uint8_t) ((calc2 >> 4) & 3);
+        *(trans++) = (uint8_t) ((calc1 >> 4) & 3);
+        *(trans++) = (uint8_t) ((calc2 >> 2) & 3);
+        *(trans++) = (uint8_t) ((calc1 >> 2) & 3);
+        *(trans++) = (uint8_t) (calc2 & 3);
+        *(trans++) = (uint8_t) (calc1 & 3);
 
         memset(priority, (atr & 0x80), 8);
         priority += 8;
@@ -724,7 +724,7 @@ void lcd::sprite_render_color(void *buf, int scanline) {
     uint8_t *oam = ref_gb->get_cpu()->get_oam(),
             *vram = ref_gb->get_cpu()->get_vram();
 
-    bool sp_size = (ref_gb->get_regs()->LCDC & 0x04) ? true : false;
+    bool sp_size = (ref_gb->get_regs()->LCDC & 0x04) != 0;
 
     uint16_t bank;
 
@@ -732,7 +732,7 @@ void lcd::sprite_render_color(void *buf, int scanline) {
         tile = oam[i * 4 + 2];
         atr = oam[i * 4 + 3];
         cur_p = mapped_pal[(atr & 7) + 8];
-        bank = (atr & 0x08 ? 0x2000 : 0);
+        bank = (uint16_t) (atr & 0x08 ? 0x2000 : 0);
 
         if (sp_size) { // 8*16
             y = oam[i * 4] - 1;
@@ -742,11 +742,11 @@ void lcd::sprite_render_color(void *buf, int scanline) {
                 continue;
 
             if (scanline - y + 15 < 8) { //上半分
-                now = (atr & 0x40) ? ((y - scanline) & 7) : (7 - (y - scanline) & 7);
+                now = (atr & 0x40) ? ((y - scanline) & 7) : (7 - ((y - scanline) & 7));
                 tmp_dat = *(uint16_t *) (vram + bank + (tile & 0xfe) * 16 + now * 2 +
                                          ((atr & 0x40) ? 16 : 0));
             } else { // 下半分
-                now = (atr & 0x40) ? ((y - scanline) & 7) : (7 - (y - scanline) & 7);
+                now = (atr & 0x40) ? ((y - scanline) & 7) : (7 - ((y - scanline) & 7));
                 tmp_dat = *(uint16_t *) (vram + bank + (tile & 0xfe) * 16 + now * 2 +
                                          ((atr & 0x40) ? 0 : 16));
             }
@@ -757,11 +757,11 @@ void lcd::sprite_render_color(void *buf, int scanline) {
                 (y < scanline) || (y > scanline + 7))
                 continue;
 
-            now = (atr & 0x40) ? ((y - scanline) & 7) : (7 - (y - scanline) & 7);
+            now = (atr & 0x40) ? ((y - scanline) & 7) : (7 - ((y - scanline) & 7));
             tmp_dat = *(uint16_t *) (vram + tile * 16 + now * 2 + bank);
         }
         sprite_count++;
-        now_pos = sdat + x; // now_pos=現在地点
+        now_pos = sdat + x;
 
         l1 = tmp_dat;
         l2 = tmp_dat >> 7;
@@ -775,10 +775,10 @@ void lcd::sprite_render_color(void *buf, int scanline) {
         l2 |= tmp_dat;
 
         if (atr & 0x20) { // 反転する
-            uint8_t tmp_p = l2;
-            l2 = ((l1 >> 2) & 0x33) | ((l1 << 2) & 0xcc);
+            uint8_t tmp_p = (uint8_t) l2;
+            l2 = (uint16_t) (((l1 >> 2) & 0x33) | ((l1 << 2) & 0xcc));
             ROL_BYTE(l2, 4);
-            l1 = ((tmp_p >> 2) & 0x33) | ((tmp_p << 2) & 0xcc);
+            l1 = (uint16_t) (((tmp_p >> 2) & 0x33) | ((tmp_p << 2) & 0xcc));
             ROL_BYTE(l1, 4);
         }
 
