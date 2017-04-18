@@ -47,14 +47,14 @@ void apu::reset() {
 
 uint8_t apu::read(uint16_t adr) {
     if (adr == 0xff26) {
-        return (!snd.stat.master_enable) ? 0x00 : (0x80 |
-                                                   (((snd.stat.sq1_playing && snd.stat.wav_vol) ? 1 : 0) |
-                                                    ((snd.stat.sq2_playing && snd.stat.wav_vol) ? 2 : 0) |
-                                                    ((snd.stat.wav_enable && snd.stat.wav_playing &&
-                                                      snd.stat.wav_vol)
-                                                     ? 4
-                                                     : 0) |
-                                                    ((snd.stat.noi_playing && snd.stat.noi_vol) ? 8 : 0)));
+        return (uint8_t) ((!snd.stat.master_enable) ? 0x00 : (0x80 |
+                                                              (((snd.stat.sq1_playing && snd.stat.wav_vol) ? 1 : 0) |
+                                                               ((snd.stat.sq2_playing && snd.stat.wav_vol) ? 2 : 0) |
+                                                               ((snd.stat.wav_enable && snd.stat.wav_playing &&
+                                                                 snd.stat.wav_vol)
+                                                                ? 4
+                                                                : 0) |
+                                                               ((snd.stat.noi_playing && snd.stat.noi_vol) ? 8 : 0))));
     } else {
         return snd.mem[adr - 0xff10];
     }
@@ -114,12 +114,13 @@ void apu_snd::reset() {
 
     memcpy(&stat_cpy, &stat, sizeof(stat));
 
-    uint8_t gb_init_wav[] =  {0x06, 0xFE, 0x0E, 0x7F, 0x00, 0xFF, 0x58, 0xDF, 0x00, 0xEC, 0x00, 0xBF, 0x0C, 0xED, 0x03, 0xF7};
+    uint8_t gb_init_wav[] = {0x06, 0xFE, 0x0E, 0x7F, 0x00, 0xFF, 0x58, 0xDF, 0x00, 0xEC, 0x00, 0xBF, 0x0C, 0xED, 0x03, 0xF7};
     uint8_t gbc_init_wav[] = {0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF};
 
-    if (ref_apu->ref_gb->get_rom()->get_info()->gb_type == 1) {
+    int32_t gbType = ref_apu->ref_gb->get_rom()->get_info()->gb_type;
+    if (gbType == 1) {
         memcpy(mem + 20, gb_init_wav, 16);
-    } else if (ref_apu->ref_gb->get_rom()->get_info()->gb_type >= 3) {
+    } else if (gbType >= 3) {
         memcpy(mem + 20, gbc_init_wav, 16);
     }
 }
@@ -349,7 +350,7 @@ inline short apu_snd::wav_produce(int freq, bool interpolation) {
     if (freq) {
         if (interpolation) {
             ret = (short) (((cur_sample * 2500 - 15000) * wav_cur_pos +
-                               (bef_sample * 2500 - 15000) * (0x10000 - wav_cur_pos)) /
+                            (bef_sample * 2500 - 15000) * (0x10000 - wav_cur_pos)) /
                            0x10000);
         } else {
             ret = (short) (cur_sample * 2500 - 15000);
@@ -361,8 +362,7 @@ inline short apu_snd::wav_produce(int freq, bool interpolation) {
             cur_pos2 = (cur_pos2 + (wav_cur_pos >> 16)) & 31;
             if (cur_pos2 & 1) {
                 cur_sample = (uint8_t) (mem[0x20 + cur_pos2 / 2] & 0xf);
-            }
-            else {
+            } else {
                 cur_sample = mem[0x20 + cur_pos2 / 2] >> 4;
             }
             wav_cur_pos &= 0xffff;
@@ -397,8 +397,7 @@ static inline unsigned int _mrand(uint32_t degree) {
 
     if (xor_reg) {
         shift_reg |= (degree ? 0x8000 : 0x80);
-    }
-    else {
+    } else {
         shift_reg &= ~(degree ? 0x8000 : 0x80);
     }
     shift_reg >>= 1;
@@ -441,8 +440,7 @@ inline short apu_snd::noi_produce(int freq) {
         while (noi_cur_pos > 44100) {
             if (sc == 0) {
                 cur_sample = (short) ((_mrand(stat.noi_step) & 1) ? 12000 : -10000);
-            }
-            else {
+            } else {
                 cur_sample += (_mrand(stat.noi_step) & 1) ? 12000 : -10000;
             }
 
@@ -628,9 +626,9 @@ void apu_snd::populate_audio_buffer(short *buf, int sample) {
             tmp_l = (bef_sample_l[4] + bef_sample_l[3] * 2 + bef_sample_l[2] * 8 + bef_sample_l[1] * 2 + bef_sample_l[0]) / 14;
             tmp_r = (bef_sample_r[4] + bef_sample_r[3] * 2 + bef_sample_r[2] * 8 + bef_sample_r[1] * 2 + bef_sample_r[0]) / 14;
         }
-        tmp_l = (tmp_l >  32767) ?  32767 : tmp_l;
+        tmp_l = (tmp_l > 32767) ? 32767 : tmp_l;
         tmp_l = (tmp_l < -32767) ? -32767 : tmp_l;
-        tmp_r = (tmp_r >  32767) ?  32767 : tmp_r;
+        tmp_r = (tmp_r > 32767) ? 32767 : tmp_r;
         tmp_r = (tmp_r < -32767) ? -32767 : tmp_r;
 
         buf[i * 2] = (short) tmp_r;
