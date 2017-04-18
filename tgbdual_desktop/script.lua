@@ -366,7 +366,7 @@ function filter()
 end
 
 function tick()
---    render_hud(filter(team))
+    render_hud(filter(team))
 end
 
 function onLoad()

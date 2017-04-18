@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include <map>
-#include "lua_script_vm.h"
+#include <lua_script_vm.h>
 
 static std::map<lua_State *, script_context *> contexts;
 

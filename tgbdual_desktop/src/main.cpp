@@ -26,7 +26,6 @@
 #include <gameboy.h>
 
 #include <script_manager.h>
-#include <scripting/wren_script_vm.h>
 
 #include "console/console.h"
 #include "emulator_time.h"

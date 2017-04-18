@@ -1,8 +1,8 @@
 #include "script_commands.h"
 
-#include <scripting/wren_script_vm.h>
+#include <wren_script_vm.h>
 #include <io/file_buffer.h>
-#include <scripting/lua_script_vm.h>
+#include <lua_script_vm.h>
 
 void registerScriptCommands(script_manager &scriptManager, console &console, script_context &context) {
     console.addCommand("load_script", [&](std::vector<std::string> args) {

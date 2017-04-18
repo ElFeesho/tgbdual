@@ -1,8 +1,6 @@
 set(CMAKE_CXX_FLAGS "-O3 -Wall")
 
-set(USE_SDL OFF)
-
-set(TGBDUAL_LIBS wren z)
+set(USE_SDL ON)
 
 set(TGBDUAL_INTERFACE_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/rendering/audio_renderer.h
@@ -11,8 +9,7 @@ set(TGBDUAL_INTERFACE_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/input/console_driver.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/input/sys_command_source.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/emulation/core_services.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/emulator_time.h
-        )
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/emulator_time.h)
 
 set(LINKCABLE_SOURCES
         src/linkcable/null_link_source.h
@@ -28,20 +25,6 @@ set(LINKCABLE_SOURCES
         src/linkcable/tcp_link_cable.h
         src/linkcable/link_cable_source_provider.cpp
         src/linkcable/link_cable_source_provider.h)
-
-if (USE_SDL)
-    list(APPEND TGBDUAL_LIBS sdl_adapters)
-    message("SDL it is")
-    add_definitions(-DUSE_SDL)
-else()
-    list(APPEND TGBDUAL_LIBS sfml_adapters)
-endif()
-
-set(SCRIPTING_SOURCES
-        src/scripting/lua_script_vm.cpp
-        src/scripting/lua_script_vm.h
-        src/scripting/wren_script_vm.cpp
-        src/scripting/wren_script_vm.h)
 
 set(CONSOLE_SOURCES
         src/console/console.cpp
@@ -93,16 +76,17 @@ add_library(tgbdual_impls INTERFACE)
 target_sources(tgbdual_impls INTERFACE ${TGBDUAL_INTERFACE_SOURCES})
 target_include_directories(tgbdual_impls INTERFACE src/)
 
-find_package(LUA)
 
-if (NOT Lua_FOUND)
-    set(LUA_LIB lua5.2)
-    set(LUA_INCLUDE_DIR "/usr/include/lua5.2/")
-    message("Set LUA lib to ${LUA_LIB} and include directory to ${LUA_INCLUDE_DIR}")
+set(TGBDUAL_LIBS z wrenvm luavm)
+
+if (USE_SDL)
+    list(APPEND TGBDUAL_LIBS sdl_adapters)
+    message("Using SDL adapters")
+    add_definitions(-DUSE_SDL)
 else()
-    set(LUA_LIB lua)
+    list(APPEND TGBDUAL_LIBS sfml_adapters)
+    message("Using SFML adapters")
 endif()
-list(APPEND TGBDUAL_LIBS ${LUA_LIB})
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     add_executable(tgbdual MACOSX_BUNDLE ${TGBDUAL_DESKTOP_SOURCES})
@@ -110,16 +94,12 @@ else ()
     add_executable(tgbdual ${TGBDUAL_DESKTOP_SOURCES})
 endif ()
 
-target_include_directories(tgbdual PRIVATE ${SDL_INCLUDE_DIR})
-target_include_directories(tgbdual PRIVATE ${PROJECT_SOURCE_DIR}/extlibs/wren/src/include)
-
-target_include_directories(tgbdual PRIVATE ${LUA_INCLUDE_DIR})
 
 target_include_directories(tgbdual PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-target_include_directories(tgbdual PRIVATE ${LUA_INCLUDE_DIR})
-target_link_libraries(tgbdual gb_core script_layer -L${PROJECT_SOURCE_DIR}/extlibs/wren/lib ${TGBDUAL_LIBS} -L/usr/local/lib)
-target_compile_features(tgbdual PRIVATE cxx_lambdas cxx_aggregate_default_initializers)
 
+target_link_libraries(tgbdual gb_core script_layer ${TGBDUAL_LIBS})
+
+target_compile_features(tgbdual PRIVATE cxx_lambdas cxx_aggregate_default_initializers)
 
 #
 # Tests
