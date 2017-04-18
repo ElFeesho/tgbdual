@@ -34,7 +34,7 @@ static inline uint8_t blue(uint32_t colour) { return (uint8_t) ((colour & 0x00ff
 static inline uint8_t alpha(uint32_t colour) { return (uint8_t) ((colour & 0xff000000) >> 24); }
 
 
-sdl_video_renderer::sdl_video_renderer(SDL_Surface *screen) : _screen{screen}, _font{TTF_OpenFont("font.ttf", 10)} {
+sdl_video_renderer::sdl_video_renderer(SDL_Surface *screen) : _screen{screen}, _font{TTF_OpenFont("font.ttf", 10), TTF_CloseFont} {
 
 }
 
@@ -66,8 +66,8 @@ void sdl_video_renderer::text(const char *text, int32_t x, int32_t y, uint32_t c
     uint8_t g = green(colour);
     uint8_t r = red(colour);
 
-    SDL_Surface *textSurface = TTF_RenderText_Blended(_font, text, SDL_Color{r, g, b, a});
-    SDL_Surface *shadowSurface = TTF_RenderText_Blended(_font, text, SDL_Color{0, 0, 0, 220});
+    SDL_Surface *textSurface = TTF_RenderText_Blended(_font.get(), text, SDL_Color{r, g, b, a});
+    SDL_Surface *shadowSurface = TTF_RenderText_Blended(_font.get(), text, SDL_Color{0, 0, 0, 220});
     if (textSurface != nullptr) {
         pos.x = (int16_t)x;
         pos.y = (int16_t)y;

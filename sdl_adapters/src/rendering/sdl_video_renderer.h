@@ -50,6 +50,6 @@ private:
     SDL_Surface *lookupImage(const std::string &name);
 
     SDL_Surface *_screen;
-    TTF_Font *_font;
+    std::unique_ptr<TTF_Font, void(*)(TTF_Font*)> _font;
     std::map<std::string, std::unique_ptr<SDL_Surface, void(*)(SDL_Surface*)>> image_cache;
 };
