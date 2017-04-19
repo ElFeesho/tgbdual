@@ -44,10 +44,11 @@ void sfml_video_renderer::text(const char *text, int32_t x, int32_t y, uint32_t 
 }
 
 void sfml_video_renderer::pixels(void *pixels, int32_t x, int32_t y, uint32_t w, uint32_t h) {
+    static sf::Uint8 *pixels_32bit = new sf::Uint8[w * h * 4];
     sf::Texture m{};
     m.create(w, h);
     sf::Uint16* pixels_16bit = (sf::Uint16 *) pixels;
-    sf::Uint8* pixels_32bit = new sf::Uint8[w * h * 4];
+
     for(unsigned int i = 0; i < h; i++)
     {
         for(unsigned int j = 0; j < w; j++)
