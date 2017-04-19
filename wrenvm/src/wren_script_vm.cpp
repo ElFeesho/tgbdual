@@ -9,7 +9,6 @@
 struct WrenVMMetadata {
     WrenVMMetadata(script_context *context) : scriptContext{context} {}
 
-    std::vector<std::string> registeredCommands;
     script_context *scriptContext;
 
     static WrenVMMetadata *fromWrenVM(WrenVM *vm) {
@@ -20,13 +19,6 @@ struct WrenVMMetadata {
 WrenForeignMethodFn boundFunction(std::string name, std::string signature);
 
 void populateWrenList(WrenVM *wrenVm, const std::vector<std::string> &args);
-
-void destroyWrenVM(WrenVM *vm) {
-    wrenGetUserData(vm);
-    WrenVMMetadata *wrenVmMetadata = WrenVMMetadata::fromWrenVM(vm);
-    wrenFreeVM(vm);
-    delete wrenVmMetadata;
-}
 
 void errorHandler(WrenVM *vm, WrenErrorType type, const char *module, int line, const char *message) {
     std::cerr << "ERR: ";
@@ -49,14 +41,6 @@ wren_script_vm::wren_script_vm(script_context &context) : _wrenVm{nullptr, wrenF
         std::cout << "VM: " << text << std::endl;
     };
 
-    config.bindForeignClassFn = [](WrenVM *vm, const char *module, const char *className) -> WrenForeignClassMethods {
-        WrenForeignClassMethods ctorDtor;
-        ctorDtor.allocate = [](WrenVM *wrenVm) {
-            std::cout << "BEEN CTORRED" << std::endl;
-        };
-        return ctorDtor;
-    };
-
     config.bindForeignMethodFn = [](WrenVM *vm,
                                     const char *module,
                                     const char *className,
@@ -71,7 +55,12 @@ wren_script_vm::wren_script_vm(script_context &context) : _wrenVm{nullptr, wrenF
     config.userData = metadata;
 
     WrenVM *vm = wrenNewVM(&config);
-    _wrenVm = wrenvm_holder(vm, destroyWrenVM);
+    _wrenVm = wrenvm_holder(vm, [](WrenVM *vm) {
+        wrenGetUserData(vm);
+        WrenVMMetadata *wrenVmMetadata = WrenVMMetadata::fromWrenVM(vm);
+        wrenFreeVM(vm);
+        delete wrenVmMetadata;
+    });
 }
 
 void wren_script_vm::tick() {
@@ -82,7 +71,9 @@ void wren_script_vm::invokeWrenMethod(const std::string &methodName) {
     wrenEnsureSlots(_wrenVm.get(), 1);
     wrenGetVariable(_wrenVm.get(), "main", methodName.c_str(), 0);
     if (wrenGetSlotType(_wrenVm.get(), 0) == WREN_TYPE_UNKNOWN) {
-        wrenCall(_wrenVm.get(), wrenGetSlotHandle(_wrenVm.get(), 0));
+        WrenHandle *callHandle = wrenMakeCallHandle(_wrenVm.get(), "call()");
+        wrenCall(_wrenVm.get(), callHandle);
+        wrenReleaseHandle(_wrenVm.get(), callHandle);
     }
 }
 
@@ -122,9 +113,7 @@ bool wren_script_vm::handleUnhandledCommand(const std::string &command, std::vec
     wrenGetVariable(_wrenVm.get(), "main", "handleCommand", 0);
     WrenInterpretResult result = wrenCall(_wrenVm.get(), handle);
     if (result == WREN_RESULT_SUCCESS) {
-        bool result = wrenGetSlotBool(_wrenVm.get(), 0);
-        std::cout << "Result: " << result << std::endl;
-        return result;
+        return wrenGetSlotBool(_wrenVm.get(), 0);
     }
 
     wrenReleaseHandle(_wrenVm.get(), handle);
@@ -192,7 +181,6 @@ WrenForeignMethodFn boundFunction(std::string name, std::string signature) {
 
                 std::string command = wrenGetSlotString(wrenVm, 1);
                 WrenHandle *consoleCommandHandle = wrenGetSlotHandle(wrenVm, 2);
-                WrenVMMetadata::fromWrenVM(wrenVm)->registeredCommands.push_back(command);
                 
                 context->register_command(command, [=](std::vector<std::string> args) {
                     populateWrenList(wrenVm, args);
