@@ -17,7 +17,6 @@ TEST(scan_engine, will_return_all_scan_results) {
         std::copy(results.begin(), results.end(), std::back_inserter(capturedResults));
     });
 
-    EXPECT_EQ(1, capturedResults.size());
     EXPECT_EQ(2, capturedResults[0]);
 }
 
@@ -37,7 +36,6 @@ TEST(scan_engine, will_only_return_subsets) {
         std::copy(results.begin(), results.end(), std::back_inserter(capturedResults));
     });
 
-    EXPECT_EQ(1, capturedResults.size());
     EXPECT_EQ(2, capturedResults[0]);
 }
 
@@ -51,7 +49,6 @@ TEST(scan_engine, scan_state_can_be_reset) {
         std::copy(results.begin(), results.end(), std::back_inserter(capturedResults));
     });
 
-    EXPECT_EQ(1, capturedResults.size());
     EXPECT_EQ(2, capturedResults[0]);
     capturedResults.clear();
 
@@ -63,9 +60,9 @@ TEST(scan_engine, scan_state_can_be_reset) {
         std::copy(results.begin(), results.end(), std::back_inserter(capturedResults));
     });
 
-    EXPECT_EQ(3, capturedResults.size());
     EXPECT_EQ(1, capturedResults[0]);
     EXPECT_EQ(2, capturedResults[1]);
+    EXPECT_EQ(3, capturedResults[2]);
 }
 
 

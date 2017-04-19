@@ -91,6 +91,7 @@ endif()
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     add_executable(tgbdual MACOSX_BUNDLE ${TGBDUAL_DESKTOP_SOURCES})
 else ()
+    list(APPEND TGBDUAL_LIBS pthread)
     add_executable(tgbdual ${TGBDUAL_DESKTOP_SOURCES})
 endif ()
 

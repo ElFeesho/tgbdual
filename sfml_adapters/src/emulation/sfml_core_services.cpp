@@ -3,6 +3,7 @@
 //
 
 #include <SFML/System.hpp>
+#include <SFML/System/Clock.hpp>
 #include <emulator_time.h>
 #include <iostream>
 #include "sfml_core_services.h"
