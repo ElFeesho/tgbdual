@@ -72,7 +72,7 @@ TEST(scan_engine, number_of_matches_returned) {
 
     size_t resultCount = engine.scan(0x02, [&](std::vector<ptrdiff_t> &results) {});
 
-    EXPECT_EQ(2, resultCount);
+    EXPECT_EQ(2u, resultCount);
 }
 
 TEST(scan_engine, results_not_provided_when_more_results_than_scan_threshold) {
@@ -116,17 +116,17 @@ TEST(scan_engine, can_scan_for_16bit_values) {
     engine.set_scan_threshold(1);
 
     size_t results = engine.scan(0x0102, [&](std::vector<ptrdiff_t> &) {});
-    EXPECT_EQ(1, results);
+    EXPECT_EQ(1u, results);
 
     engine.clear_scan();
 
     results = engine.scan(0x02ff, [&](std::vector<ptrdiff_t> &) {});
-    EXPECT_EQ(1, results);
+    EXPECT_EQ(1u, results);
 
     engine.clear_scan();
 
     results = engine.scan(0xffff, [&](std::vector<ptrdiff_t> &) {});
-    EXPECT_EQ(1, results);
+    EXPECT_EQ(1u, results);
 }
 
 TEST(scan_engine, can_scan_for_32bit_values) {
@@ -135,11 +135,11 @@ TEST(scan_engine, can_scan_for_32bit_values) {
 
     engine.set_scan_threshold(1);
 
-    EXPECT_EQ(1, engine.scan(0x01ffffff, [&](std::vector<ptrdiff_t> &) {}));
+    EXPECT_EQ(1u, engine.scan(0x01ffffff, [&](std::vector<ptrdiff_t> &) {}));
 
     engine.clear_scan();
 
-    EXPECT_EQ(1, engine.scan(0xffffffff, [&](std::vector<ptrdiff_t> &) {}));
+    EXPECT_EQ(1u, engine.scan(0xffffffff, [&](std::vector<ptrdiff_t> &) {}));
 }
 
 TEST(scan_engine, will_report_initial_search_state) {
