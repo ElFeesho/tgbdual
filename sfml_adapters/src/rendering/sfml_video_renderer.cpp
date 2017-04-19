@@ -25,7 +25,7 @@ sfml_video_renderer::sfml_video_renderer(sf::RenderWindow &window, sf::Font &fon
 }
 
 void sfml_video_renderer::fillRect(int32_t x, int32_t y, uint32_t w, uint32_t h, uint32_t stroke, uint32_t fill) {
-    sf::RectangleShape r{{(float)w, (float)h}};
+    sf::RectangleShape r{{(float) w, (float) h}};
     r.move(x, y);
     r.setFillColor(sf::Color{swapEndianness(fill)});
     r.setOutlineColor(sf::Color{swapEndianness(stroke)});
@@ -45,24 +45,23 @@ void sfml_video_renderer::text(const char *text, int32_t x, int32_t y, uint32_t 
 
 void sfml_video_renderer::pixels(void *pixels, int32_t x, int32_t y, uint32_t w, uint32_t h) {
     static sf::Uint8 *pixels_32bit = new sf::Uint8[w * h * 4];
+    static float rbFactory = 255.f / 31.f;
+    static float gFactory = 255.f / 63.f;
+
     sf::Texture m{};
     m.create(w, h);
-    sf::Uint16* pixels_16bit = (sf::Uint16 *) pixels;
+    sf::Uint16 *pixels_16bit = (sf::Uint16 *) pixels;
 
-    for(unsigned int i = 0; i < h; i++)
-    {
-        for(unsigned int j = 0; j < w; j++)
-        {
-            unsigned short cpixel = pixels_16bit[w*i + j];
-            unsigned char red = (unsigned char) ((cpixel & 0xf800) >> 11);
-            unsigned char green = (unsigned char) ((cpixel & 0x07e0) >> 5);
-            unsigned char blue = (unsigned char) (cpixel & 0x001f);
+    for (unsigned int i = 0, j = 0; i < w * h; i++, j+=4) {
+        unsigned short cpixel = pixels_16bit[i];
+        unsigned char red = (unsigned char) ((cpixel & 0xf800) >> 11);
+        unsigned char green = (unsigned char) ((cpixel & 0x07e0) >> 5);
+        unsigned char blue = (unsigned char) (cpixel & 0x001f);
 
-            pixels_32bit[(w*i*4)+j*4 + 0] = (sf::Uint8) ((red / 31.f) * 255.f);
-            pixels_32bit[(w*i*4)+j*4 + 1] = (sf::Uint8) ((green / 63.f) * 255.f);
-            pixels_32bit[(w*i*4)+j*4 + 2] = (sf::Uint8) ((blue / 31.f) * 255.f);
-            pixels_32bit[(w*i*4)+j*4 + 3] = 255;
-        }
+        pixels_32bit[j + 0] = (sf::Uint8) (red * rbFactory);
+        pixels_32bit[j + 1] = (sf::Uint8) (green * gFactory);
+        pixels_32bit[j + 2] = (sf::Uint8) (blue * rbFactory);
+        pixels_32bit[j + 3] = 255;
     }
 
     m.update(pixels_32bit);
@@ -75,8 +74,7 @@ void sfml_video_renderer::pixels(void *pixels, int32_t x, int32_t y, uint32_t w,
 
 void sfml_video_renderer::image(const char *imgFile, int32_t x, int32_t y) {
     static std::map<std::string, sf::Texture> imageMap;
-    if (imageMap.find(imgFile) == imageMap.end())
-    {
+    if (imageMap.find(imgFile) == imageMap.end()) {
         imageMap[imgFile].loadFromFile(imgFile);
     }
     sf::Sprite s{imageMap[imgFile]};

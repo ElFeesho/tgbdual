@@ -21,7 +21,6 @@ public:
     void flip() override;
 
 private:
-    sf::Clock _clock;
     sf::RenderWindow &_window;
     sf::Font &_font;
 };
