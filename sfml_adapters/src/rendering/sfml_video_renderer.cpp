@@ -36,10 +36,18 @@ void sfml_video_renderer::fillRect(int32_t x, int32_t y, uint32_t w, uint32_t h,
 void sfml_video_renderer::text(const char *text, int32_t x, int32_t y, uint32_t colour) {
     sf::Text t{text, _font, 10};
     t.move(x, y);
+#if SFML_VERSION_MINOR < 4
+    t.setColor(sf::Color{0x00000088});
+#else
     t.setFillColor(sf::Color{0x00000088});
+#endif
     _window.draw(t);
     t.move(-1, -1);
+#if SFML_VERSION_MINOR < 4
+    t.setColor(sf::Color{swapEndianness(colour)});
+#else
     t.setFillColor(sf::Color{swapEndianness(colour)});
+#endif
     _window.draw(t);
 }
 
