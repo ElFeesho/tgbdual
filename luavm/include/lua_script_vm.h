@@ -29,5 +29,7 @@ private:
     void invokeLuaFunction(const char *functionName) const;
 
     void bindFunction(const char *fnName, int (*fn)(lua_State *)) const;
+
+    void registerConstants() const;
 };
 
