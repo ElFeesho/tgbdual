@@ -29,7 +29,7 @@ before_install:
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo cp -r SFML-2.4.0/include/* /usr/local/include/.; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update; export COMPILER=clang++-3.6; fi
 
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install sfml sdl sdl_image sdl_gfx lua; export COMPILER=clang++; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install sfml sdl sdl_image sdl_gfx sdl_ttf lua; export COMPILER=clang++; fi
 
 script: 
   - git submodule update
