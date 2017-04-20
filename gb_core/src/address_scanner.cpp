@@ -8,7 +8,6 @@ address_scanner::address_scanner(uint8_t *memory, size_t size) : _memory{memory}
 
 }
 
-
 address_scan_result::address_scan_result() : _locations{} {
 
 }

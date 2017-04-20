@@ -23,6 +23,7 @@ function(create_test_target target_name)
     target_compile_features(${target_name} PRIVATE cxx_lambdas cxx_aggregate_default_initializers)
     target_compile_options(${target_name} PRIVATE ${TGBDUAL_COMPILE_OPTIONS})
     target_link_libraries(${target_name} ${OTHER_LIBS} gtest gtest_main)
+    set_target_properties(${target_name} PROPERTIES COMPILE_FLAGS "-O0 -ftest-coverage -fprofile-arcs" LINK_FLAGS "--coverage")
 endfunction()
 
 set(TGBDUAL_COMPILE_OPTIONS -pipe -ansi -fPIC -g -O3 -fstack-protector -fvisibility=hidden
