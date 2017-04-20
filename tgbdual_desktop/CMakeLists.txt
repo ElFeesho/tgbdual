@@ -109,6 +109,7 @@ target_compile_features(tgbdual PRIVATE cxx_lambdas cxx_aggregate_default_initia
 enable_testing()
 create_test_target(console_cmd src/console/console_cmd.cpp)
 create_test_target(scan_engine src/memory/scan_engine.cpp)
+create_test_target(limitter src/limitter.cpp src/emulator_time.cpp)
 target_link_libraries(scan_engine gb_core)
 
 target_compile_options(tgbdual PRIVATE -pipe -m64 -ansi -fPIC -g -O3 -fstack-protector -fvisibility=hidden -W -Wall -Wno-unused-parameter -Wno-unused-function -Wno-unused-label -Wpointer-arith -Wformat -Wreturn-type -Wsign-compare -Wmultichar -Wformat-nonliteral -Winit-self -Wuninitialized -Wno-deprecated -Wformat-security -Werror)
