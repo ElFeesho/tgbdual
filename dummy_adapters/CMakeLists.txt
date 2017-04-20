@@ -13,3 +13,4 @@ add_library(dummy_adapters
 target_link_libraries(dummy_adapters PUBLIC tgbdual_impls)
 target_include_directories(dummy_adapters PUBLIC src/)
 target_compile_features(dummy_adapters PRIVATE cxx_lambdas cxx_aggregate_default_initializers)
+target_compile_options(dummy_adapters PRIVATE ${TGBDUAL_COMPILE_OPTIONS})

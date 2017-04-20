@@ -10,9 +10,14 @@ function(create_test_target target_name)
     target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/include)
     target_include_directories(${target_name} PRIVATE ${PROJECT_SOURCE_DIR}/gtest/include)
     target_compile_features(${target_name} PRIVATE cxx_lambdas cxx_aggregate_default_initializers)
-
+    target_compile_options(${target_name} PRIVATE ${TGBDUAL_COMPILE_OPTIONS})
     target_link_libraries(${target_name} gtest gtest_main)
 endfunction()
+
+set(TGBDUAL_COMPILE_OPTIONS -pipe -ansi -fPIC -g -O3 -fstack-protector -fvisibility=hidden
+        -W -Wall -Wno-unused-parameter -Wno-unused-function -Wno-unused-label -Wpointer-arith
+        -Wformat -Wreturn-type -Wsign-compare -Wmultichar -Wformat-nonliteral -Winit-self
+        -Wuninitialized -Wno-deprecated -Wformat-security -Werror)
 
 enable_testing()
 
