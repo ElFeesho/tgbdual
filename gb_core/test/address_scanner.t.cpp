@@ -1,7 +1,3 @@
-//
-// Created by Christopher Sawczuk on 16/07/2016.
-//
-
 #include <address_scanner.h>
 
 #include <gtest/gtest.h>
@@ -49,9 +45,9 @@ TEST(address_scanner, two_results_can_be_combined_to_find_matching_addresses) {
     dummy_data[2] = 0;
     address_scan_result addressOfTwoWhichWasOnceZero = scanner.find_value<uint8_t>(2);
 
-    EXPECT_EQ(0, addressOfZero.mutual_set(addressOfTwo).size());
-    EXPECT_EQ(1, addressOfZero.mutual_set(addressOfZero).size());
-    EXPECT_EQ(1, addressOfZero.mutual_set(addressOfTwoWhichWasOnceZero).size());
+    EXPECT_EQ(0u, addressOfZero.mutual_set(addressOfTwo).size());
+    EXPECT_EQ(1u, addressOfZero.mutual_set(addressOfZero).size());
+    EXPECT_EQ(1u, addressOfZero.mutual_set(addressOfTwoWhichWasOnceZero).size());
 }
 
 TEST(address_scanner, can_find_a_16bit_value) {
@@ -60,7 +56,7 @@ TEST(address_scanner, can_find_a_16bit_value) {
 
     uint16_t targetValue = 0x3366;
     address_scan_result address = scanner.find_value(targetValue);
-    EXPECT_EQ(1, address.size());
+    EXPECT_EQ(1u, address.size());
     EXPECT_EQ(1, address[0]);
 }
 
@@ -72,7 +68,7 @@ TEST(address_scanner, can_find_a_32bit_value) {
     uint32_t targetValue = 0x00336603;
 
     address_scan_result address = scanner.find_value(targetValue);
-    EXPECT_EQ(1, address.size());
+    EXPECT_EQ(1u, address.size());
     EXPECT_EQ(0, address[0]);
 }
 
@@ -83,7 +79,7 @@ TEST(address_scanner, can_find_a_32bit_value_at_the_end_of_memory) {
     uint32_t targetValue = 0xffffffff;
 
     address_scan_result address = scanner.find_value(targetValue);
-    EXPECT_EQ(1, address.size());
+    EXPECT_EQ(1u, address.size());
     EXPECT_EQ(1, address[0]);
 }
 
@@ -97,7 +93,7 @@ TEST(address_scanner, can_find_changed_values) {
 
     result = scanner.changed_value(result);
 
-    EXPECT_EQ(1, result.size());
+    EXPECT_EQ(1u, result.size());
 }
 
 
@@ -112,15 +108,15 @@ TEST(address_scanner, can_find_changed_values_twice) {
 
     result = scanner.changed_value(result);
 
-    EXPECT_EQ(2, result.size());
+    EXPECT_EQ(2u, result.size());
 
     dummy_data[0] = 0;
 
     result = scanner.changed_value(result);
-    EXPECT_EQ(1, result.size());
+    EXPECT_EQ(1u, result.size());
 
     result = scanner.changed_value(result);
-    EXPECT_EQ(0, result.size());
+    EXPECT_EQ(0u, result.size());
 }
 
 
@@ -135,7 +131,7 @@ TEST(address_scanner, can_find_increased_values) {
 
     result = scanner.increased_value(result);
 
-    EXPECT_EQ(2, result.size());
+    EXPECT_EQ(2u, result.size());
 
     EXPECT_EQ(1, result.values().at(0));
     EXPECT_EQ(3, result.values().at(2));
@@ -145,7 +141,7 @@ TEST(address_scanner, can_find_increased_values) {
 
     result = scanner.increased_value(result);
 
-    EXPECT_EQ(0, result.size());
+    EXPECT_EQ(0u, result.size());
 }
 
 TEST(address_scanner, can_find_increased_and_changed_values) {
@@ -159,7 +155,7 @@ TEST(address_scanner, can_find_increased_and_changed_values) {
 
     result = scanner.increased_value(result);
 
-    EXPECT_EQ(2, result.size());
+    EXPECT_EQ(2u, result.size());
 
     EXPECT_EQ(1, result.values().at(0));
     EXPECT_EQ(3, result.values().at(2));
@@ -169,7 +165,7 @@ TEST(address_scanner, can_find_increased_and_changed_values) {
 
     result = scanner.changed_value(result);
 
-    EXPECT_EQ(2, result.size());
+    EXPECT_EQ(2u, result.size());
 }
 
 
@@ -184,7 +180,7 @@ TEST(address_scanner, can_find_decreased_values) {
 
     result = scanner.decreased_value(result);
 
-    EXPECT_EQ(2, result.size());
+    EXPECT_EQ(2u, result.size());
 
     EXPECT_EQ(4, result.values().at(0));
     EXPECT_EQ(3, result.values().at(1));
@@ -198,7 +194,7 @@ TEST(address_scanner, can_find_unchanged) {
 
     result = scanner.unchanged_value(result);
 
-    EXPECT_EQ(7, result.size());
+    EXPECT_EQ(7u, result.size());
 
     EXPECT_EQ(5, result.values().at(0));
     EXPECT_EQ(4, result.values().at(1));
