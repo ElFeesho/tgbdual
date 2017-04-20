@@ -83,7 +83,42 @@ void wren_script_vm::activate() {
 }
 
 void wren_script_vm::loadScript(const std::string &scriptFile) {
-    auto result = wrenInterpret(_wrenVm.get(), scriptFile.c_str());
+    std::string script = "foreign class GameBoy {\n"
+            "    construct new() {}\n"
+            "\n"
+            "    foreign static print(text)\n"
+            "    foreign static addRect(x, y, w, h, stroke, fill)\n"
+            "    foreign static addImage(image, x, y)\n"
+            "    foreign static addText(text, x, y)\n"
+            "    foreign static get8bit(address)\n"
+            "    foreign static get16bit(address)\n"
+            "    foreign static set8bit(address, value)\n"
+            "    foreign static set16bit(address, value)\n"
+            "    foreign static registerConsoleCommand(name, func)\n"
+            "\n"
+            "    static get24bit(address) {\n"
+            "        return get8bit(address) + (get8bit(address-1) << 8) + (get8bit(address-2) << 16)\n"
+            "    }\n"
+            "\n"
+            "    static set24bit(address, value) {\n"
+            "        set8bit(address, value & 0xff)\n"
+            "        set8bit(address-1, (value >> 8) & 0xff)\n"
+            "        set8bit(address-2, (value >> 16) & 0xff)\n"
+            "    }\n"
+            "\n"
+            "    foreign static queueKey(key, delay, duration)\n"
+            "\n"
+            "    static KEY_A { 0x01 }\n"
+            "    static KEY_B { 0x02 }\n"
+            "    static KEY_SELECT { 0x04 }\n"
+            "    static KEY_START { 0x08 }\n"
+            "    static KEY_DOWN { 0x10 }\n"
+            "    static KEY_UP { 0x20 }\n"
+            "    static KEY_LEFT { 0x40 }\n"
+            "    static KEY_RIGHT { 0x80 }\n"
+            "}\n" + scriptFile;
+
+    auto result = wrenInterpret(_wrenVm.get(), script.c_str());
     if (result == WREN_RESULT_COMPILE_ERROR) {
         std::cerr << "Failed to compile wren script" << std::endl;
         script_context *context = (script_context *) wrenGetUserData(_wrenVm.get());
@@ -99,26 +134,22 @@ void wren_script_vm::loadScript(const std::string &scriptFile) {
 }
 
 bool wren_script_vm::handleUnhandledCommand(const std::string &command, std::vector<std::string> args) {
-    wrenEnsureSlots(_wrenVm.get(), 2);
+    wrenEnsureSlots(_wrenVm.get(), 3);
+    WrenHandle *handle = wrenMakeCallHandle(_wrenVm.get(), "call(_,_)");
+    wrenGetVariable(_wrenVm.get(), "main", "handleCommand", 0);
+
     wrenSetSlotString(_wrenVm.get(), 1, command.c_str());
     wrenSetSlotNewList(_wrenVm.get(), 2);
     for (std::string &arg : args) {
         wrenEnsureSlots(_wrenVm.get(), 1);
         wrenSetSlotString(_wrenVm.get(), 3, arg.c_str());
         wrenInsertInList(_wrenVm.get(), 2, -1, 3);
-        std::cout << "Inserted arg " << arg << std::endl;
     }
 
-    WrenHandle *handle = wrenMakeCallHandle(_wrenVm.get(), "call(_,_)");
-
-    wrenGetVariable(_wrenVm.get(), "main", "handleCommand", 0);
     WrenInterpretResult result = wrenCall(_wrenVm.get(), handle);
-    if (result == WREN_RESULT_SUCCESS) {
-        return wrenGetSlotBool(_wrenVm.get(), 0);
-    }
-
     wrenReleaseHandle(_wrenVm.get(), handle);
-    return false;
+
+    return result == WREN_RESULT_SUCCESS && wrenGetSlotBool(_wrenVm.get(), 0);
 }
 
 WrenForeignMethodFn boundFunction(std::string name, std::string signature) {

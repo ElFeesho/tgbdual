@@ -7,3 +7,5 @@ target_include_directories(wrenvm PUBLIC include/ ${PROJECT_SOURCE_DIR}/extlibs/
 target_compile_features(wrenvm PRIVATE cxx_lambdas cxx_aggregate_default_initializers)
 
 target_compile_options(wrenvm PRIVATE ${TGBDUAL_COMPILE_OPTIONS})
+
+create_test_target(wren_script_vm LINK wrenvm)
