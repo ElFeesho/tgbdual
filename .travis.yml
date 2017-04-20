@@ -13,7 +13,6 @@ addons:
     packages:
     - cmake
     - cmake-data
-    - libsfml-dev
     - libsdl1.2-dev
     - libsdl-image1.2-dev
     - libsdl-gfx1.2-dev
@@ -23,7 +22,12 @@ addons:
 before_install:
   - echo $LANG
   - echo $LC_ALL
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update; export COMPILER=clang++-3.6; ls -lah /usr/include/lua*; ls -lah /usr/local/include/; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then wget http://www.sfml-dev.org/files/SFML-2.4.0-linux-gcc-64-bit.tar.gz; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then tar xf SFML-2.4.0-linux-gcc-64-bit.tar.gz; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo cp -r SFML-2.4.0/lib/* /usr/local/lib/.; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo cp -r SFML-2.4.0/include/* /usr/local/include/.; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update; export COMPILER=clang++-3.6; fi
+
   - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install sfml sdl sdl_image sdl_gfx lua; export COMPILER=clang++; fi
 
 script: 
