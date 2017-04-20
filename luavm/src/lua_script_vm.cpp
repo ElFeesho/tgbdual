@@ -70,6 +70,15 @@ lua_script_vm::lua_script_vm(script_context &scriptContext) : state{luaL_newstat
         return 0;
     });
 
+    bindFunction("add_text", [](lua_State *state) -> int {
+        const char *text = lua_tolstring(state, 1, nullptr);
+        int16_t x = (int16_t) lua_tointegerx(state, 2, nullptr);
+        int16_t y = (int16_t) lua_tointegerx(state, 3, nullptr);
+
+        getContext(state)->add_text(text, x, y);
+        return 0;
+    });
+
     bindFunction("add_image", [](lua_State *state) -> int {
         const char *name = lua_tolstring(state, 1, nullptr);
         int16_t x = (int16_t) lua_tointegerx(state, 2, nullptr);
