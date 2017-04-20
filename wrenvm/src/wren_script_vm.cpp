@@ -3,6 +3,7 @@
 //
 
 #include <wren.hpp>
+#include <iostream>
 
 #include "wren_script_vm.h"
 

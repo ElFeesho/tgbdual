@@ -15,3 +15,5 @@ target_include_directories(luavm PUBLIC include/)
 target_compile_features(luavm PRIVATE cxx_lambdas cxx_aggregate_default_initializers)
 
 target_compile_options(luavm PRIVATE ${TGBDUAL_COMPILE_OPTIONS})
+
+create_test_target(lua_script_vm LINK luavm)

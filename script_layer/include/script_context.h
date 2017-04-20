@@ -5,16 +5,16 @@
 #pragma once
 
 #include <functional>
-
-#include <gameboy.h>
+#include <vector>
 #include "osd_renderer.h"
+#include "memory_bridge.h"
 #include "input_queue.h"
 
 class script_context {
 public:
     using script_command = std::function<void(std::vector<std::string>)>;
 
-    script_context(osd_renderer *osd, input_queue *queue, gameboy *gb, std::function<void(const std::string &, script_command)> consoleCommandRegistrar);
+    script_context(osd_renderer *osd, input_queue *queue, memory_bridge *memoryBridge, std::function<void(const std::string &, script_command)> consoleCommandRegistrar);
 
     void print_string(const std::string &);
 
@@ -39,7 +39,7 @@ public:
 private:
     osd_renderer *_osd;
     input_queue *_queue;
-    gameboy *_gameboy;
+    memory_bridge *_memoryBridge;
     std::function<void(const std::string&, script_command)> _consoleCommandRegistrar;
 };
 

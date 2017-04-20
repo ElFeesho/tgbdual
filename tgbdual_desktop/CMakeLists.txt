@@ -29,7 +29,7 @@ set(TGBDUAL_DESKTOP_SOURCES
         src/io/rom_file.h src/memory/scan_engine.cpp src/memory/scan_engine.h src/emulator_time.cpp src/emulator_time.h src/rendering/gb_video_renderer.cpp
         src/rendering/gb_video_renderer.h src/rendering/gb_osd_renderer.cpp src/rendering/gb_osd_renderer.h src/rendering/gb_audio_renderer.cpp
         src/rendering/gb_audio_renderer.h src/input/gb_gamepad_source.cpp src/input/gb_gamepad_source.h src/input/gb_sys_command_source.cpp
-        src/input/gb_sys_command_source.h src/input/gb_console_driver.cpp src/input/gb_console_driver.h src/emulation/core_services.h src/main.cpp)
+        src/input/gb_sys_command_source.h src/input/gb_console_driver.cpp src/input/gb_console_driver.h src/emulation/core_services.h src/main.cpp src/gameboy_memory_bridge.cpp src/gameboy_memory_bridge.h)
 
 
 set(TGBDUAL_LIBS z wrenvm luavm)

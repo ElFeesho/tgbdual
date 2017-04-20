@@ -29,6 +29,7 @@
 
 #include "console/console.h"
 #include "emulator_time.h"
+#include "gameboy_memory_bridge.h"
 
 #include <limitter.h>
 
@@ -108,7 +109,8 @@ int main(int argc, char *argv[]) {
     gbInst.load_rom(romBuffer, romBuffer.length(), saveBuffer, saveBuffer.length());
     loadState(gbInst, romFile);
 
-    script_context context{&osdRenderer, &gp_source, &gbInst, [&](const std::string &name, script_context::script_command command) {
+    gameboy_memory_bridge memoryBridge{gbInst};
+    script_context context{&osdRenderer, &gp_source, &memoryBridge, [&](const std::string &name, script_context::script_command command) {
         cons.removeCommand(name);
         cons.addCommand(name, command);
     }};

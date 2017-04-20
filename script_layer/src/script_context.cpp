@@ -5,10 +5,10 @@
 #include <osd_renderer.h>
 #include <script_context.h>
 
-script_context::script_context(osd_renderer *osd, input_queue *queue, gameboy *gb, std::function<void(const std::string &, script_command)> consoleCommandRegistrar) :
+script_context::script_context(osd_renderer *osd, input_queue *queue, memory_bridge *memoryBridge, std::function<void(const std::string &, script_context::script_command)> consoleCommandRegistrar) :
         _osd{osd},
         _queue{queue},
-        _gameboy{gb},
+        _memoryBridge{memoryBridge},
         _consoleCommandRegistrar{consoleCommandRegistrar}
 {
 }
@@ -18,20 +18,19 @@ void script_context::print_string(const std::string &msg) {
 }
 
 void script_context::set_16bit_value(uint32_t address, uint16_t value) {
-    _gameboy->override_ram(address - 1, value & 0x00ff);
-    _gameboy->override_ram(address, (value & 0xff00) >> 8);
+    _memoryBridge->write_16bit(address, value);
 }
 
 void script_context::set_8bit_value(uint32_t address, uint8_t value) {
-    _gameboy->override_ram(address, value);
+    _memoryBridge->write_8bit(address, value);
 }
 
 uint8_t script_context::read_8bit_value(uint32_t address) {
-    return _gameboy->read_ram<uint8_t>(address);
+    return _memoryBridge->read_8bit(address);
 }
 
 uint16_t script_context::read_16bit_value(uint32_t address) {
-    return (((uint16_t) _gameboy->read_ram<uint8_t>(address)) << 8) | (_gameboy->read_ram<uint8_t>(address + 1));
+    return _memoryBridge->read_16bit(address);
 }
 
 void script_context::add_image(const std::string &name, int16_t x, int16_t y) {
