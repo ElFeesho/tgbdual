@@ -83,7 +83,7 @@ public:
         _registeredCommands[commandName] = command;
     }};
 
-    wren_script_vm vm{_ctx};
+    wren_script_vm vm{&_ctx};
 };
 
 TEST_F(WrenVMTest, canLoadEmptyScript) {

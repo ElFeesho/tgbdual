@@ -14,7 +14,7 @@
 
 class lua_script_vm : public script_vm {
 public:
-    lua_script_vm(script_context &scriptContext);
+    lua_script_vm(script_services *scriptServices);
 
     void loadScript(const std::string &script) override;
 

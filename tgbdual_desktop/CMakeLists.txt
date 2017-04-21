@@ -57,6 +57,8 @@ target_link_libraries(tgbdual gb_core script_layer ${TGBDUAL_LIBS})
 
 target_compile_features(tgbdual PRIVATE cxx_lambdas cxx_aggregate_default_initializers)
 
+coverage_config(tgbdual)
+
 #
 # Tests
 #

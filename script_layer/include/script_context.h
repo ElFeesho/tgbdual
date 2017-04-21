@@ -9,8 +9,9 @@
 #include "osd_renderer.h"
 #include "memory_bridge.h"
 #include "input_queue.h"
+#include "script_services.h"
 
-class script_context {
+class script_context : public script_services {
 public:
     using script_command = std::function<void(std::vector<std::string>)>;
 

@@ -29,10 +29,12 @@ target_include_directories(gb_core PUBLIC include/)
 target_compile_features(gb_core PRIVATE cxx_auto_type)
 target_compile_options(gb_core PRIVATE ${TGBDUAL_COMPILE_OPTIONS})
 
+coverage_config(gb_core)
+
 #
 # Tests
 #
 enable_testing()
 
-create_test_target(cheat src/cheat.cpp)
-create_test_target(address_scanner src/address_scanner.cpp)
+create_test_target(cheat LINK gb_core)
+create_test_target(address_scanner LINK gb_core)

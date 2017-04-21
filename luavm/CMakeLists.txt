@@ -16,4 +16,6 @@ target_compile_features(luavm PRIVATE cxx_lambdas cxx_aggregate_default_initiali
 
 target_compile_options(luavm PRIVATE ${TGBDUAL_COMPILE_OPTIONS})
 
+coverage_config(luavm)
+
 create_test_target(lua_script_vm LINK luavm)

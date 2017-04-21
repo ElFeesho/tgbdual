@@ -14,7 +14,7 @@ class wren_script_vm : public script_vm {
 public:
     using wrenvm_holder = std::unique_ptr<WrenVM, void(*)(WrenVM*)>;
 
-    wren_script_vm(script_context &context);
+    wren_script_vm(script_services *context);
 
     void tick() override;
     void activate() override;

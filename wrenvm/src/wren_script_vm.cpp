@@ -8,9 +8,9 @@
 #include "wren_script_vm.h"
 
 struct WrenVMMetadata {
-    WrenVMMetadata(script_context *context) : scriptContext{context} {}
+    WrenVMMetadata(script_services *context) : scriptContext{context} {}
 
-    script_context *scriptContext;
+    script_services *scriptContext;
 
     static WrenVMMetadata *fromWrenVM(WrenVM *vm) {
         return (WrenVMMetadata *) wrenGetUserData(vm);
@@ -34,7 +34,7 @@ void errorHandler(WrenVM *vm, WrenErrorType type, const char *module, int line, 
     std::cerr << std::endl;
 }
 
-wren_script_vm::wren_script_vm(script_context &context) : _wrenVm{nullptr, wrenFreeVM} {
+wren_script_vm::wren_script_vm(script_services *context) : _wrenVm{nullptr, wrenFreeVM} {
     WrenConfiguration config;
     wrenInitConfiguration(&config);
 
@@ -52,7 +52,7 @@ wren_script_vm::wren_script_vm(script_context &context) : _wrenVm{nullptr, wrenF
 
     config.errorFn = errorHandler;
 
-    WrenVMMetadata *metadata = new WrenVMMetadata(&context);
+    WrenVMMetadata *metadata = new WrenVMMetadata(context);
     config.userData = metadata;
 
     WrenVM *vm = wrenNewVM(&config);
@@ -121,12 +121,12 @@ void wren_script_vm::loadScript(const std::string &scriptFile) {
     auto result = wrenInterpret(_wrenVm.get(), script.c_str());
     if (result == WREN_RESULT_COMPILE_ERROR) {
         std::cerr << "Failed to compile wren script" << std::endl;
-        script_context *context = (script_context *) wrenGetUserData(_wrenVm.get());
+        script_services *context = (script_services *) wrenGetUserData(_wrenVm.get());
         context->print_string("Failed to compile wren script");
     } else if (result == WREN_RESULT_RUNTIME_ERROR) {
         std::cerr << "Failed to execute wren script" << std::endl;
 
-        script_context *context = (script_context *) wrenGetUserData(_wrenVm.get());
+        script_services *context = (script_services *) wrenGetUserData(_wrenVm.get());
         context->print_string("Failed to execute wren script");
     }
 
@@ -156,44 +156,44 @@ WrenForeignMethodFn boundFunction(std::string name, std::string signature) {
     if (name == "GameBoy") {
         if (signature == "print(_)") {
             return [](WrenVM *wrenVm) {
-                script_context *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
+                script_services *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
                 context->print_string(wrenGetSlotString(wrenVm, 1));
             };
         } else if (signature == "set8bit(_,_)") {
             return [](WrenVM *wrenVm) {
-                script_context *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
+                script_services *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
                 context->set_8bit_value((uint32_t) wrenGetSlotDouble(wrenVm, 1), (uint8_t) wrenGetSlotDouble(wrenVm, 2));
             };
         } else if (signature == "set16bit(_,_)") {
             return [](WrenVM *wrenVm) {
-                script_context *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
+                script_services *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
                 context->set_16bit_value((uint32_t) wrenGetSlotDouble(wrenVm, 1), (uint16_t) wrenGetSlotDouble(wrenVm, 2));
             };
         } else if (signature == "get8bit(_)") {
             return [](WrenVM *wrenVm) {
-                script_context *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
+                script_services *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
                 wrenSetSlotDouble(wrenVm, 0, context->read_8bit_value((uint32_t) wrenGetSlotDouble(wrenVm, 1)));
             };
         } else if (signature == "get16bit(_)") {
             return [](WrenVM *wrenVm) {
-                script_context *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
+                script_services *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
                 wrenSetSlotDouble(wrenVm, 0, context->read_16bit_value((uint32_t) wrenGetSlotDouble(wrenVm, 1)));
             };
         } else if (signature == "addImage(_,_,_)") {
             return [](WrenVM *wrenVm) {
-                script_context *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
+                script_services *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
                 context->add_image(wrenGetSlotString(wrenVm, 1), (int16_t) wrenGetSlotDouble(wrenVm, 2),
                                    (int16_t) wrenGetSlotDouble(wrenVm, 3));
             };
         } else if (signature == "addText(_,_,_)") {
             return [](WrenVM *wrenVm) {
-                script_context *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
+                script_services *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
                 context->add_text(wrenGetSlotString(wrenVm, 1), (int16_t) wrenGetSlotDouble(wrenVm, 2),
                                   (int16_t) wrenGetSlotDouble(wrenVm, 3));
             };
         } else if (signature == "addRect(_,_,_,_,_,_)") {
             return [](WrenVM *wrenVm) {
-                script_context *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
+                script_services *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
                 context->add_rect((int16_t) wrenGetSlotDouble(wrenVm, 1), (int16_t) wrenGetSlotDouble(wrenVm, 2),
                                   (int16_t) wrenGetSlotDouble(wrenVm, 3),
                                   (int16_t) wrenGetSlotDouble(wrenVm, 4),
@@ -202,14 +202,14 @@ WrenForeignMethodFn boundFunction(std::string name, std::string signature) {
             };
         } else if (signature == "queueKey(_,_,_)") {
             return [](WrenVM *wrenVm) {
-                script_context *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
+                script_services *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
                 context->queue_key((uint8_t) wrenGetSlotDouble(wrenVm, 1),
                                    (uint32_t) wrenGetSlotDouble(wrenVm, 2),
                                    (uint32_t) wrenGetSlotDouble(wrenVm, 3));
             };
         } else if (signature == "registerConsoleCommand(_,_)") {
             return [](WrenVM *wrenVm) {
-                script_context *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
+                script_services *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
 
                 std::string command = wrenGetSlotString(wrenVm, 1);
                 WrenHandle *consoleCommandHandle = wrenGetSlotHandle(wrenVm, 2);

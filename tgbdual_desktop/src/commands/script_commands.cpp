@@ -10,7 +10,7 @@ void registerScriptCommands(script_manager &scriptManager, console &console, scr
             std::string &file = args[0];
             if (file.find(".wren") != std::string::npos) {
 
-                wren_script_vm *wrenVm = new wren_script_vm(context);
+                wren_script_vm *wrenVm = new wren_script_vm(&context);
                 try {
                     wrenVm->loadScript(file_buffer{file});
                     scriptManager.remove_vm(file);
@@ -22,7 +22,7 @@ void registerScriptCommands(script_manager &scriptManager, console &console, scr
                     delete wrenVm;
                 }
             } else if (file.find(".lua") != std::string::npos) {
-                lua_script_vm *luaVm = new lua_script_vm(context);
+                lua_script_vm *luaVm = new lua_script_vm(&context);
                 try {
                     luaVm->loadScript((file_buffer{file}));
                     scriptManager.remove_vm(file);

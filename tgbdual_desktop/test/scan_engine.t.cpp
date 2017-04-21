@@ -3,14 +3,26 @@
 #include <memory/scan_engine.h>
 #include <algorithm>
 
+class ScanEngineTest : public ::testing::Test {
+public:
+    ScanEngineTest() : memory{0x00, 0x01, 0x02, 0x03, 0x02}, engine{address_scanner{memory, sizeof(memory)}, []{}} {}
+
+    void fillMemory(uint8_t val) {
+        for (size_t i = 0; i < sizeof(memory); i++)
+        {
+            memory[i] = val;
+        }
+    }
+
+    uint8_t memory[5];
+    scan_engine engine;
+};
+
 static inline scan_engine withMemory(uint8_t *memory, size_t memorySize, scan_engine::initial_scan_state_created_callback initialStateCallback = [] {}) {
     return scan_engine{address_scanner{memory, memorySize}, initialStateCallback};
 }
 
-TEST(scan_engine, will_return_all_scan_results) {
-    uint8_t memory[] = {0x00, 0x01, 0x02, 0x03};
-    scan_engine engine = withMemory(memory, sizeof(memory));
-
+TEST_F(ScanEngineTest, will_return_all_scan_results) {
     std::vector<ptrdiff_t> capturedResults;
 
     engine.scan(0x02, [&](std::vector<ptrdiff_t> &results) {
@@ -20,39 +32,31 @@ TEST(scan_engine, will_return_all_scan_results) {
     EXPECT_EQ(2, capturedResults[0]);
 }
 
-TEST(scan_engine, will_only_return_subsets) {
-    uint8_t memory[] = {0x00, 0x00, 0x01, 0x00};
-    scan_engine engine = withMemory(memory, sizeof(memory));
-
+TEST_F(ScanEngineTest, will_only_return_subsets) {
     std::vector<ptrdiff_t> capturedResults;
 
-    engine.scan(0x01, [&](std::vector<ptrdiff_t> &results) {
+    engine.scan(0x01, [&](std::vector<ptrdiff_t> &results) {});
 
-    });
-
-    memory[2] = 0x00;
+    memory[1] = 0x00;
 
     engine.scan(0x00, [&](std::vector<ptrdiff_t> &results) {
         std::copy(results.begin(), results.end(), std::back_inserter(capturedResults));
     });
 
-    EXPECT_EQ(2, capturedResults[0]);
+    EXPECT_EQ(1, capturedResults[0]);
 }
 
-TEST(scan_engine, scan_state_can_be_reset) {
-    uint8_t memory[] = {0x00, 0x02, 0x01, 0x02};
-    scan_engine engine = withMemory(memory, sizeof(memory));
-
+TEST_F(ScanEngineTest, scan_state_can_be_reset) {
     std::vector<ptrdiff_t> capturedResults;
 
     engine.scan(0x01, [&](std::vector<ptrdiff_t> &results) {
         std::copy(results.begin(), results.end(), std::back_inserter(capturedResults));
     });
 
-    EXPECT_EQ(2, capturedResults[0]);
+    EXPECT_EQ(1, capturedResults[0]);
     capturedResults.clear();
 
-    memory[2] = 0x02;
+    memory[1] = 0x02;
 
     engine.clear_scan();
 
@@ -62,36 +66,28 @@ TEST(scan_engine, scan_state_can_be_reset) {
 
     EXPECT_EQ(1, capturedResults[0]);
     EXPECT_EQ(2, capturedResults[1]);
-    EXPECT_EQ(3, capturedResults[2]);
 }
 
 
-TEST(scan_engine, number_of_matches_returned) {
-    uint8_t memory[] = {0x00, 0x02, 0x01, 0x02};
-    scan_engine engine = withMemory(memory, sizeof(memory));
-
+TEST_F(ScanEngineTest, number_of_matches_returned) {
     size_t resultCount = engine.scan(0x02, [&](std::vector<ptrdiff_t> &results) {});
 
     EXPECT_EQ(2u, resultCount);
 }
 
-TEST(scan_engine, results_not_provided_when_more_results_than_scan_threshold) {
-    uint8_t memory[] = {0x02, 0x02, 0x02, 0x02};
-    scan_engine engine = withMemory(memory, sizeof(memory));
-
+TEST_F(ScanEngineTest, results_not_provided_when_more_results_than_scan_threshold) {
     bool reported = false;
-    engine.scan(0x02, [&](std::vector<ptrdiff_t> &results) {
+    engine.scan(0xff, [&](std::vector<ptrdiff_t> &results) {
         reported = true;
     });
 
     EXPECT_FALSE(reported);
 }
 
-TEST(scan_engine, scan_threshold_configurable) {
-    uint8_t memory[] = {0x02, 0x02, 0x02, 0x02};
-    scan_engine engine = withMemory(memory, sizeof(memory));
+TEST_F(ScanEngineTest, scan_threshold_configurable) {
+    fillMemory(0x02);
 
-    engine.set_scan_threshold(4);
+    engine.set_scan_threshold(8);
 
     bool reported = false;
     engine.scan(0x02, [&](std::vector<ptrdiff_t> &results) {
@@ -101,18 +97,13 @@ TEST(scan_engine, scan_threshold_configurable) {
     EXPECT_TRUE(reported);
 }
 
-TEST(scan_engine, scan_threshold_can_be_reported) {
-    uint8_t memory[] = {0x02, 0x02, 0x02, 0x02};
-    scan_engine engine = withMemory(memory, sizeof(memory));
+TEST_F(ScanEngineTest, scan_threshold_can_be_reported) {
+    engine.set_scan_threshold(5u);
 
-    engine.set_scan_threshold(5);
     EXPECT_EQ(5u, engine.scan_threshold());
 }
 
-TEST(scan_engine, can_scan_for_16bit_values) {
-    uint8_t memory[] = {0x01, 0x02, 0xff, 0xff};
-    scan_engine engine = withMemory(memory, sizeof(memory));
-
+TEST_F(ScanEngineTest, can_scan_for_16bit_values) {
     engine.set_scan_threshold(1);
 
     size_t results = engine.scan(0x0102, [&](std::vector<ptrdiff_t> &) {});
@@ -120,16 +111,11 @@ TEST(scan_engine, can_scan_for_16bit_values) {
 
     engine.clear_scan();
 
-    results = engine.scan(0x02ff, [&](std::vector<ptrdiff_t> &) {});
-    EXPECT_EQ(1u, results);
-
-    engine.clear_scan();
-
-    results = engine.scan(0xffff, [&](std::vector<ptrdiff_t> &) {});
+    results = engine.scan(0x0203, [&](std::vector<ptrdiff_t> &) {});
     EXPECT_EQ(1u, results);
 }
 
-TEST(scan_engine, can_scan_for_32bit_values) {
+TEST_F(ScanEngineTest, can_scan_for_32bit_values) {
     uint8_t memory[] = {0x01, 0xff, 0xff, 0xff, 0xff};
     scan_engine engine = withMemory(memory, sizeof(memory));
 
@@ -142,7 +128,7 @@ TEST(scan_engine, can_scan_for_32bit_values) {
     EXPECT_EQ(1u, engine.scan(0xffffffff, [&](std::vector<ptrdiff_t> &) {}));
 }
 
-TEST(scan_engine, will_report_initial_search_state) {
+TEST_F(ScanEngineTest, will_report_initial_search_state) {
     bool initialSearchStateCreated = false;
 
     uint8_t memory[] = {0, 0, 0, 0, 0, 0};
@@ -154,7 +140,7 @@ TEST(scan_engine, will_report_initial_search_state) {
 
     EXPECT_TRUE(initialSearchStateCreated);
 }
-TEST(scan_engine, will_report_initial_search_state_when_searching_changed) {
+TEST_F(ScanEngineTest, will_report_initial_search_state_when_searching_changed) {
     bool initialSearchStateCreated = false;
 
     uint8_t memory[] = {0, 0, 0, 0, 0, 0};
@@ -166,7 +152,7 @@ TEST(scan_engine, will_report_initial_search_state_when_searching_changed) {
 
     EXPECT_TRUE(initialSearchStateCreated);
 }
-TEST(scan_engine, will_report_initial_search_state_when_searching_lesser) {
+TEST_F(ScanEngineTest, will_report_initial_search_state_when_searching_lesser) {
     bool initialSearchStateCreated = false;
 
     uint8_t memory[] = {0, 0, 0, 0, 0, 0};
@@ -178,7 +164,7 @@ TEST(scan_engine, will_report_initial_search_state_when_searching_lesser) {
 
     EXPECT_TRUE(initialSearchStateCreated);
 }
-TEST(scan_engine, will_report_initial_search_state_when_searching_greater) {
+TEST_F(ScanEngineTest, will_report_initial_search_state_when_searching_greater) {
     bool initialSearchStateCreated = false;
 
     uint8_t memory[] = {0, 0, 0, 0, 0, 0};
@@ -191,7 +177,7 @@ TEST(scan_engine, will_report_initial_search_state_when_searching_greater) {
     EXPECT_TRUE(initialSearchStateCreated);
 }
 
-TEST(scan_engine, initial_state_can_be_directly_created) {
+TEST_F(ScanEngineTest, initial_state_can_be_directly_created) {
     bool initialSearchStateCreated = false;
 
     uint8_t memory[] = {0, 0, 0, 0, 0, 0};
@@ -204,7 +190,7 @@ TEST(scan_engine, initial_state_can_be_directly_created) {
     EXPECT_TRUE(initialSearchStateCreated);
 }
 
-TEST(scan_engine, can_search_for_unchanged_values) {
+TEST_F(ScanEngineTest, can_search_for_unchanged_values) {
     uint8_t memory[] = {0, 0, 0, 0, 0, 0};
     scan_engine engine = withMemory(memory, sizeof(memory));
 
@@ -215,7 +201,7 @@ TEST(scan_engine, can_search_for_unchanged_values) {
     EXPECT_EQ(6u, count);
 }
 
-TEST(scan_engine, only_notify_of_state_created_when_required) {
+TEST_F(ScanEngineTest, only_notify_of_state_created_when_required) {
     bool stateCreated = false;
 
     uint8_t memory[] = {0, 0, 0, 0, 0, 0};
@@ -231,7 +217,7 @@ TEST(scan_engine, only_notify_of_state_created_when_required) {
     EXPECT_FALSE(stateCreated);
 }
 
-TEST(scan_engine, will_report_unchanged_values) {
+TEST_F(ScanEngineTest, will_report_unchanged_values) {
     uint8_t memory[] = {2, 2, 2, 2, 2, 2};
     scan_engine engine = withMemory(memory, sizeof(memory));
 
@@ -254,7 +240,7 @@ TEST(scan_engine, will_report_unchanged_values) {
 }
 
 
-TEST(scan_engine, will_not_report_unchanged_values_when_more_results_than_threshold) {
+TEST_F(ScanEngineTest, will_not_report_unchanged_values_when_more_results_than_threshold) {
     uint8_t memory[] = {2, 2, 2, 2, 2, 2};
     scan_engine engine = withMemory(memory, sizeof(memory));
 
@@ -273,7 +259,7 @@ TEST(scan_engine, will_not_report_unchanged_values_when_more_results_than_thresh
     EXPECT_FALSE(capturedCalled);
 }
 
-TEST(scan_engine, will_report_changed_values) {
+TEST_F(ScanEngineTest, will_report_changed_values) {
     uint8_t memory[] = {2, 2, 2, 2, 2, 2};
     scan_engine engine = withMemory(memory, sizeof(memory));
 
@@ -293,7 +279,7 @@ TEST(scan_engine, will_report_changed_values) {
     EXPECT_EQ(1, capturedValues[0x2]);
 }
 
-TEST(scan_engine, will_report_decreased_values) {
+TEST_F(ScanEngineTest, will_report_decreased_values) {
     uint8_t memory[] = {2, 2, 2, 2, 2, 2};
     scan_engine engine = withMemory(memory, sizeof(memory));
 
@@ -314,7 +300,7 @@ TEST(scan_engine, will_report_decreased_values) {
 }
 
 
-TEST(scan_engine, will_report_increased_values) {
+TEST_F(ScanEngineTest, will_report_increased_values) {
     uint8_t memory[] = {2, 2, 2, 2, 2, 2};
     scan_engine engine = withMemory(memory, sizeof(memory));
 

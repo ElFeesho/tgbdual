@@ -6,19 +6,19 @@
 #include <map>
 #include <lua_script_vm.h>
 
-void storeContext(script_context &scriptContext, lua_State *luaVm) {
-    lua_pushlightuserdata(luaVm, &scriptContext);
+void storeContext(script_services *scriptContext, lua_State *luaVm) {
+    lua_pushlightuserdata(luaVm, scriptContext);
     lua_setglobal(luaVm, "__context");
 }
 
-script_context *getContext(lua_State *luaVm) {
+script_services *getContext(lua_State *luaVm) {
     lua_getglobal(luaVm, "__context");
-    script_context *context = (script_context*)lua_touserdata(luaVm, lua_gettop(luaVm));
+    script_services *context = (script_services*)lua_touserdata(luaVm, lua_gettop(luaVm));
     lua_pop(luaVm, 1);
     return context;
 }
 
-lua_script_vm::lua_script_vm(script_context &scriptContext) : state{luaL_newstate(), lua_close} {
+lua_script_vm::lua_script_vm(script_services *scriptContext) : state{luaL_newstate(), lua_close} {
     luaL_openlibs(state.get());
 
     storeContext(scriptContext, state.get());

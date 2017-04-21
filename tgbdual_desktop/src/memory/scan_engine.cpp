@@ -26,7 +26,7 @@ size_t scan_engine::scan(uint32_t value, scan_engine::scan_callback cb) {
 
     _lastResult = result;
 
-    if (_lastResult.size() <= _scanThreshold) {
+    if (_lastResult.size() > 0 && _lastResult.size() <= _scanThreshold) {
         std::vector<ptrdiff_t> results = toVector(_lastResult);
 
         cb(results);

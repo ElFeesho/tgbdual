@@ -8,4 +8,6 @@ target_compile_features(wrenvm PRIVATE cxx_lambdas cxx_aggregate_default_initial
 
 target_compile_options(wrenvm PRIVATE ${TGBDUAL_COMPILE_OPTIONS})
 
+coverage_config(wrenvm)
+
 create_test_target(wren_script_vm LINK wrenvm)
