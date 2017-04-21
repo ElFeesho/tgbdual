@@ -33,7 +33,7 @@ before_install:
 
   - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install sfml sdl sdl_image sdl_gfx sdl_ttf lua lcov pyenv; export COMPILER=clang++; fi
 
-  - if [ $TRAVIS_OS_NAME == osx ]; the eval "$(pyenv init -); fi
+  - if [ $TRAVIS_OS_NAME == osx ]; the eval "$(pyenv init -)"; fi
   - if [ $TRAVIS_OS_NAME == osx ]; the pyenv install 2.7.6; fi
   - if [ $TRAVIS_OS_NAME == osx ]; the pyenv global 2.7.6; fi
   - if [ $TRAVIS_OS_NAME == osx ]; the pyenv rehash; fi
