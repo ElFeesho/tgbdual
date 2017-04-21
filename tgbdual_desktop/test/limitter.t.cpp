@@ -2,93 +2,80 @@
 #include <limitter.h>
 #include <emulator_time.h>
 
-TEST(Limitter, will_sleep_16ms_whenOperationTakes0ms) {
+class LimitterTest : public ::testing::Test {
+public:
+protected:
+    void SetUp() override {
+        emulator_time::set_sleep_provider([&](uint32_t timeToSleep) {
+            sleptFor = timeToSleep;
+            slept = true;
+        });
+        emulator_time::set_time_provider([&]{ return timeToProvide; });
+    }
 
-    uint32_t sleepDuration = INT32_MAX;
+    bool slept{false};
+    uint32_t sleptFor{INT32_MAX};
+    uint32_t timeToProvide{0};
+    uint32_t nextTimeToProvide{0};
 
-    emulator_time::set_sleep_provider([&](uint32_t timeToSleep) {
-        sleepDuration = timeToSleep;
-    });
+    limitter rate_limitter{[&]{
+        timeToProvide = nextTimeToProvide;
+    }};
+};
 
-    emulator_time::set_time_provider([]{ return 0; });
-
-    limitter rate_limitter{[]{}};
+TEST_F(LimitterTest, will_sleep_16ms_whenOperationTakes0ms) {
 
     rate_limitter.limit();
 
-    EXPECT_EQ(16u, sleepDuration);
+    EXPECT_EQ(16u, sleptFor);
 }
 
-TEST(Limitter, will_sleep_1ms_whenOperationTakes0ms_in_fast_mode) {
-
-    uint32_t sleepDuration = INT32_MAX;
-
-    emulator_time::set_sleep_provider([&](uint32_t timeToSleep) {
-        sleepDuration = timeToSleep;
-    });
-
-    emulator_time::set_time_provider([]{ return 0; });
-
-    limitter rate_limitter{[]{}};
-
+TEST_F(LimitterTest, will_sleep_1ms_whenOperationTakes0ms_in_fast_mode) {
     rate_limitter.fast();
 
     rate_limitter.limit();
 
-    EXPECT_EQ(1u, sleepDuration);
+    EXPECT_EQ(1u, sleptFor);
 }
 
-TEST(Limitter, will_sleep_8ms_when_operation_takes_8ms) {
+TEST_F(LimitterTest, will_sleep_8ms_when_operation_takes_8ms) {
 
-    uint32_t sleepDuration = INT32_MAX;
-
-    emulator_time::set_sleep_provider([&](uint32_t timeToSleep) {
-        sleepDuration = timeToSleep;
-    });
-
-    emulator_time::set_time_provider([]{ return 0; });
-
-    limitter rate_limitter{[]{
-        emulator_time::set_time_provider([]{ return 8; });
-    }};
+    nextTimeToProvide = 8u;
 
     rate_limitter.limit();
 
-    EXPECT_EQ(8u, sleepDuration);
+    EXPECT_EQ(8u, sleptFor);
 }
 
-TEST(Limitter, will_not_sleep_when_operation_takes_longer_than_16ms) {
-    bool didntSleep = true;
-
-    emulator_time::set_sleep_provider([&](uint32_t timeToSleep) {
-        didntSleep = false;
-    });
-
-    emulator_time::set_time_provider([]{ return 0; });
-
-    limitter rate_limitter{[]{
-        emulator_time::set_time_provider([]{ return 17; });
-    }};
+TEST_F(LimitterTest, will_not_sleep_when_operation_takes_longer_than_16ms) {
+    nextTimeToProvide = 17u;
 
     rate_limitter.limit();
 
-    EXPECT_TRUE(didntSleep);
+    EXPECT_FALSE(slept);
 }
 
-TEST(Limitter, will_not_sleep_when_operation_takes_longer_than_1ms_in_fast_mode) {
-    bool didntSleep = true;
+TEST_F(LimitterTest, will_not_sleep_when_operation_takes_longer_than_1ms_in_fast_mode) {
+    nextTimeToProvide = 1;
 
-    emulator_time::set_sleep_provider([&](uint32_t timeToSleep) {
-        didntSleep = false;
-    });
-
-    emulator_time::set_time_provider([]{ return 0; });
-
-    limitter rate_limitter{[]{
-        emulator_time::set_time_provider([]{ return 1; });
-    }};
     rate_limitter.fast();
     rate_limitter.limit();
 
-    EXPECT_TRUE(didntSleep);
+    EXPECT_FALSE(slept);
+}
+
+TEST_F(LimitterTest, will_return_to_normal_speed) {
+    nextTimeToProvide = 1;
+
+    rate_limitter.fast();
+    rate_limitter.limit();
+
+    EXPECT_FALSE(slept);
+
+    rate_limitter.normal();
+    slept = false;
+
+    rate_limitter.limit();
+
+    EXPECT_TRUE(slept);
 }
