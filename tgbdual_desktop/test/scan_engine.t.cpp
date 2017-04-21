@@ -154,6 +154,42 @@ TEST(scan_engine, will_report_initial_search_state) {
 
     EXPECT_TRUE(initialSearchStateCreated);
 }
+TEST(scan_engine, will_report_initial_search_state_when_searching_changed) {
+    bool initialSearchStateCreated = false;
+
+    uint8_t memory[] = {0, 0, 0, 0, 0, 0};
+    scan_engine engine = withMemory(memory, sizeof(memory), [&] {
+        initialSearchStateCreated = true;
+    });
+
+    engine.search_changed([](const std::map<ptrdiff_t, uint8_t> &) {});
+
+    EXPECT_TRUE(initialSearchStateCreated);
+}
+TEST(scan_engine, will_report_initial_search_state_when_searching_lesser) {
+    bool initialSearchStateCreated = false;
+
+    uint8_t memory[] = {0, 0, 0, 0, 0, 0};
+    scan_engine engine = withMemory(memory, sizeof(memory), [&] {
+        initialSearchStateCreated = true;
+    });
+
+    engine.search_decreased([](const std::map<ptrdiff_t, uint8_t> &) {});
+
+    EXPECT_TRUE(initialSearchStateCreated);
+}
+TEST(scan_engine, will_report_initial_search_state_when_searching_greater) {
+    bool initialSearchStateCreated = false;
+
+    uint8_t memory[] = {0, 0, 0, 0, 0, 0};
+    scan_engine engine = withMemory(memory, sizeof(memory), [&] {
+        initialSearchStateCreated = true;
+    });
+
+    engine.search_increased([](const std::map<ptrdiff_t, uint8_t> &) {});
+
+    EXPECT_TRUE(initialSearchStateCreated);
+}
 
 TEST(scan_engine, initial_state_can_be_directly_created) {
     bool initialSearchStateCreated = false;
