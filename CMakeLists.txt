@@ -53,6 +53,8 @@ add_subdirectory(wrenvm)
 add_subdirectory(luavm)
 add_subdirectory(gtest)
 
-add_custom_target(gather-coverage COMMAND lcov --directory ${CMAKE_CURRENT_BINARY_DIR} --capture --output-file coverage.info)
-add_custom_target(generate-coverage-report COMMAND genhtml coverage.info -o report)
-add_custom_target(reset-coverage-count COMMAND lcov --directory ${CMAKE_CURRENT_BINARY_DIR} --zerocounters)
+add_custom_target(coverage-report
+        COMMAND lcov --directory ${CMAKE_CURRENT_BINARY_DIR} --capture --output-file coverage.info
+        COMMAND lcov --remove coverage.info '*/test/*' '/usr/*' '*v1*' --output-file coverage-clean.info
+        COMMAND genhtml coverage-clean.info -o report
+        COMMAND lcov --directory ${CMAKE_CURRENT_BINARY_DIR} --zerocounters)

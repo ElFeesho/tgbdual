@@ -29,16 +29,8 @@ before_install:
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo cp -r SFML-2.4.0/lib/* /usr/local/lib/.; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo cp -r SFML-2.4.0/include/* /usr/local/include/.; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update; export COMPILER=clang++-3.6; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then pip install --user cpp-coveralls; fi
 
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install sfml sdl sdl_image sdl_gfx sdl_ttf lua lcov pyenv; export COMPILER=clang++; fi
-
-  - if [ $TRAVIS_OS_NAME == osx ]; the eval "$(pyenv init -)"; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; the pyenv install 2.7.6; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; the pyenv global 2.7.6; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; the pyenv rehash; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; the pip install cpp-coveralls; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; the pyenv rehash; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install sfml sdl sdl_image sdl_gfx sdl_ttf lua lcov; export COMPILER=clang++; fi
 
 script: 
   - git submodule update
@@ -50,7 +42,7 @@ script:
   - cmake .. -DCMAKE_CXX_COMPILER=$COMPILER -DENABLE_CODE_COVERAGE=ON
   - make -j 64
   - make test
-  - coveralls --gcov-options '\-lp'
+  - make coverage-report
 after_success:
   - echo Success
 
