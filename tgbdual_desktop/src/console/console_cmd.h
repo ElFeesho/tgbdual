@@ -6,8 +6,7 @@
 class console_cmd {
 public:
     using ConsoleCallback = std::function<void(std::vector<std::string>)>;
-    console_cmd(std::string name, ConsoleCallback cb);
-    const std::string &name();
+    console_cmd(ConsoleCallback cb);
 
     void invoke(const std::string &args = "");
 

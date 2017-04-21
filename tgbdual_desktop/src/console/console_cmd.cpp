@@ -3,12 +3,8 @@
 #include <iomanip>
 #include "console_cmd.h"
 
-console_cmd::console_cmd(std::string name, console_cmd::ConsoleCallback cb) : _name{name}, _cb{cb} {
+console_cmd::console_cmd(ConsoleCallback cb) : _cb{cb} {
 
-}
-
-const std::string &console_cmd::name() {
-    return _name;
 }
 
 std::string stringUntil(const std::string &input, char delim) {

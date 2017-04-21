@@ -52,3 +52,6 @@ add_subdirectory(script_layer)
 add_subdirectory(wrenvm)
 add_subdirectory(luavm)
 add_subdirectory(gtest)
+
+add_custom_target(gather-coverage COMMAND lcov --directory ${CMAKE_CURRENT_BINARY_DIR} --capture --output-file coverage.info)
+add_custom_target(generate-coverage-report COMMAND genhtml coverage.info)

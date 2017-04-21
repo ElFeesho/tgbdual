@@ -233,7 +233,7 @@ void console::addError(std::string error) {
 }
 
 void console::addCommand(const std::string &command, std::function<void(std::vector<std::string>)> commandFunc) {
-    _cmds.emplace(command, std::unique_ptr<console_cmd>(new console_cmd(command, commandFunc)));
+    _cmds.emplace(command, std::unique_ptr<console_cmd>(new console_cmd(commandFunc)));
 }
 
 void console::removeCommand(const std::string &command) {
