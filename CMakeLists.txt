@@ -54,4 +54,5 @@ add_subdirectory(luavm)
 add_subdirectory(gtest)
 
 add_custom_target(gather-coverage COMMAND lcov --directory ${CMAKE_CURRENT_BINARY_DIR} --capture --output-file coverage.info)
-add_custom_target(generate-coverage-report COMMAND genhtml coverage.info)
+add_custom_target(generate-coverage-report COMMAND genhtml coverage.info -o report)
+add_custom_target(reset-coverage-count COMMAND lcov --directory ${CMAKE_CURRENT_BINARY_DIR} --zerocounters)
