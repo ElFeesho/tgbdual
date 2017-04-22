@@ -65,6 +65,7 @@ coverage_config(tgbdual)
 
 enable_testing()
 create_test_target(console_cmd src/console/console_cmd.cpp)
+create_test_target(gb_console_driver src/input/gb_console_driver.cpp src/console/console.cpp src/console/console_cmd.cpp)
 create_test_target(scan_engine src/memory/scan_engine.cpp)
 create_test_target(limitter src/limitter.cpp src/emulator_time.cpp)
 create_test_target(emulator_time src/emulator_time.cpp)
