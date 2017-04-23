@@ -98,31 +98,37 @@ uint8_t cpu::read_direct(uint16_t adr) {
         case 4:
             return vram_bank[adr & 0x1FFF]; // 8KBVRAM
         case 5:
-            if (ref_gb->get_mbc()->is_ext_ram())
-                return ref_gb->get_mbc()->get_sram()[adr & 0x1FFF]; //カートリッジRAM // cartridge RAM
-            else
-                return ref_gb->get_mbc()->ext_read(adr);
+            if (ref_gb->get_mbc()->is_ext_ram()) {
+                return ref_gb->get_mbc()->get_sram()[adr & 0x1FFF];
+            }
+            return ref_gb->get_mbc()->ext_read(adr);
         case 6:
-            if (adr & 0x1000)
+            if ((adr & 0x1000) != 0) {
                 return ram_bank[adr & 0x0fff];
-            else
-                return ram[adr & 0x0fff];
+            }
+            return ram[adr & 0x0fff];
         case 7:
             if (adr < 0xFE00) {
-                if (adr & 0x1000)
+                if ((adr & 0x1000) != 0) {
                     return ram_bank[adr & 0x0fff];
-                else
-                    return ram[adr & 0x0fff];
-            } else if (adr < 0xFEA0)
-                return oam[adr - 0xFE00]; // object attribute memory
-            else if (adr < 0xFF00)
+                }
+                return ram[adr & 0x0fff];
+            }
+            if (adr < 0xFEA0) {
+                return oam[adr - 0xFE00];
+            }
+            if (adr < 0xFF00) {
                 return spare_oam[(((adr - 0xFFA0) >> 5) << 3) | (adr & 7)];
-            else if (adr < 0xFF80)
-                return io_read(adr); // I/O
-            else if (adr < 0xFFFF)
-                return stack[adr - 0xFF80]; // stack
-            else
-                return io_read(adr); // I/O
+            }
+            if (adr < 0xFF80) {
+                return io_read(adr);
+            }
+            if (adr < 0xFFFF) {
+                return stack[adr - 0xFF80];
+            }
+            return io_read(adr); // I/O
+        default:
+            break;
     }
     return 0;
 }
@@ -147,27 +153,32 @@ void cpu::write(uint16_t adr, uint8_t dat) {
             }
             break;
         case 6:
-            if (adr & 0x1000)
+            if ((adr & 0x1000) != 0) {
                 ram_bank[adr & 0x0fff] = dat;
-            else
+            } else {
                 ram[adr & 0x0fff] = dat;
+            }
             break;
         case 7:
             if (adr < 0xFE00) {
-                if (adr & 0x1000)
+                if ((adr & 0x1000) != 0) {
                     ram_bank[adr & 0x0fff] = dat;
-                else
+                } else {
                     ram[adr & 0x0fff] = dat;
-            } else if (adr < 0xFEA0)
+                }
+            } else if (adr < 0xFEA0) {
                 oam[adr - 0xFE00] = dat;
-            else if (adr < 0xFF00)
+            } else if (adr < 0xFF00) {
                 spare_oam[(((adr - 0xFFA0) >> 5) << 3) | (adr & 7)] = dat;
-            else if (adr < 0xFF80)
-                io_write(adr, dat); // I/O
-            else if (adr < 0xFFFF)
-                stack[adr - 0xFF80] = dat; // stack
-            else
-                io_write(adr, dat); // I/O
+            } else if (adr < 0xFF80) {
+                io_write(adr, dat);
+            } else if (adr < 0xFFFF) {
+                stack[adr - 0xFF80] = dat;
+            } else {
+                io_write(adr, dat);
+            }
+            break;
+        default:
             break;
     }
 }
@@ -238,7 +249,7 @@ uint8_t cpu::io_read(uint16_t adr) {
 
             //以下カラーでの追加 // Adding color below // TODO: continue translation
         case 0xFF4D: // KEY1システムクロック変更 // KEY1 change system clock
-            return (uint8_t) (speed ? 0x80 : (ref_gb->get_cregs()->KEY1 & 1) ? 1 : 0x7E);
+            return (uint8_t) (speed ? 0x80 : (ref_gb->get_cregs()->KEY1 & 1) != 0 ? 1 : 0x7E);
         case 0xFF4F: // VBK(内部VRAMバンク切り替え) // VBK (Internal bank switching
             // VRAM)
             return ref_gb->get_cregs()->VBK;
@@ -259,20 +270,20 @@ uint8_t cpu::io_read(uint16_t adr) {
         case 0xFF69: // BCPD(BGパレット書きこみデータ) // BG palette data written
             if (ref_gb->get_cregs()->BCPS & 1)
                 ret = (uint8_t) (ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[
-                                        (ref_gb->get_cregs()->BCPS >> 1) & 3] >> 8);
+                        (ref_gb->get_cregs()->BCPS >> 1) & 3] >> 8);
             else
                 ret = (uint8_t) (ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[
-                                              (ref_gb->get_cregs()->BCPS >> 1) & 3] & 0xff);
+                                         (ref_gb->get_cregs()->BCPS >> 1) & 3] & 0xff);
             return ret;
         case 0xFF6A: // OCPS(OBJパレット書きこみ指定) // OBJ palette specified written
             return ref_gb->get_cregs()->OCPS;
         case 0xFF6B: // OCPD(OBJパレット書きこみデータ) // Write data OBJ palette
             if (ref_gb->get_cregs()->OCPS & 1) {
                 ret = (uint8_t) (ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->OCPS >> 3 & 7) + 8)[
-                                        (ref_gb->get_cregs()->OCPS >> 1) & 3] >> 8);
+                        (ref_gb->get_cregs()->OCPS >> 1) & 3] >> 8);
             } else {
                 ret = (uint8_t) (ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->OCPS >> 3 & 7) + 8)[
-                                              (ref_gb->get_cregs()->OCPS >> 1) & 3] & 0xff);
+                                         (ref_gb->get_cregs()->OCPS >> 1) & 3] & 0xff);
             }
             return ret;
         case 0xFF70: // SVBK(内部RAMバンク切り替え) // Internal RAM bank switching
@@ -319,7 +330,7 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
         case 0xFF02: // SC (control)
             if (ref_gb->gb_type() == 1) {
                 ref_gb->get_regs()->SC = (uint8_t) (dat & 0x81);
-                if ((dat & 0x80) && (dat & 1)) {
+                if (((dat & 0x80) != 0) && (dat & 1)) {
                     // Internal clock
                     seri_occer = total_clock + 512;
                 } else if ((dat & 0x80)) {
@@ -1581,17 +1592,17 @@ void cpu::exec(int clocks) {
                 tmp.b.h = (uint8_t) (REG_A & 0x0F);
                 tmp.w =
                         (uint16_t) ((REG_F & N_FLAG)
-                                                ? ((REG_F & C_FLAG) ? (((REG_F & H_FLAG) ? 0x9A00 : 0xA000) + C_FLAG)
-                                                                    : ((REG_F & H_FLAG) ? 0xFA00 : 0x0000))
-                                                : ((REG_F & C_FLAG)
-                                                   ? (((REG_F & H_FLAG) ? 0x6600
-                                                                        : ((tmp.b.h < 0x0A) ? 0x6000 : 0x6600)) +
-                                                      C_FLAG)
-                                                   : ((REG_F & H_FLAG)
-                                                      ? ((REG_A < 0xA0) ? 0x0600 : (0x6600 + C_FLAG))
-                                                      : ((tmp.b.h < 0x0A)
-                                                         ? ((REG_A < 0xA0) ? 0x0000 : (0x6000 + C_FLAG))
-                                                         : ((REG_A < 0x90) ? 0x0600 : (0x6600 + C_FLAG))))));
+                                    ? ((REG_F & C_FLAG) ? (((REG_F & H_FLAG) ? 0x9A00 : 0xA000) + C_FLAG)
+                                                        : ((REG_F & H_FLAG) ? 0xFA00 : 0x0000))
+                                    : ((REG_F & C_FLAG)
+                                       ? (((REG_F & H_FLAG) ? 0x6600
+                                                            : ((tmp.b.h < 0x0A) ? 0x6000 : 0x6600)) +
+                                          C_FLAG)
+                                       : ((REG_F & H_FLAG)
+                                          ? ((REG_A < 0xA0) ? 0x0600 : (0x6600 + C_FLAG))
+                                          : ((tmp.b.h < 0x0A)
+                                             ? ((REG_A < 0xA0) ? 0x0000 : (0x6000 + C_FLAG))
+                                             : ((REG_A < 0x90) ? 0x0600 : (0x6600 + C_FLAG))))));
                 REG_A += tmp.b.h;
                 REG_F = (uint8_t) (ZTable[REG_A] | (tmp.b.l | (REG_F & N_FLAG)));
                 //  FLAGS(REG_A,tmp.b.l|(REG_F&N_FLAG));
@@ -1626,7 +1637,7 @@ void cpu::exec(int clocks) {
 #ifndef EXSACT_CORE
                 if (ref_gb->get_regs()->TAC & 0x04) { //タイマ割りこみ
                     uint16_t value = (uint16_t) (ref_gb->get_regs()->TIMA +
-                                              (sys_clock + rest_clock) / timer_clocks[ref_gb->get_regs()->TAC & 0x03]);
+                                                 (sys_clock + rest_clock) / timer_clocks[ref_gb->get_regs()->TAC & 0x03]);
 
                     if (value & 0xFF00) { // HALT中に割りこみがかかる場合
                         total_clock += (256 - ref_gb->get_regs()->TIMA) *
