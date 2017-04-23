@@ -1,10 +1,10 @@
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 class link_cable_source {
 public:
-    virtual ~link_cable_source() {}
+    virtual ~link_cable_source() = default;
 
     virtual uint8_t readByte() = 0;
 

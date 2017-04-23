@@ -27,7 +27,7 @@
 
 class audio_renderer {
 public:
-    virtual ~audio_renderer() {}
+    virtual ~audio_renderer() = default;
 
     virtual void connect_audio_provider(sound_provider *sound_provider) = 0;
 };

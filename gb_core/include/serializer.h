@@ -1,7 +1,7 @@
 #pragma once
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 
 // convenience macros for common uses
 #define s_ARRAY(a) s.process((a), sizeof(a))

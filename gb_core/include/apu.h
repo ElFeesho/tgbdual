@@ -66,7 +66,7 @@ struct apu_stat {
     int32_t noi_step{0};
 
     int32_t master_enable{1};
-    int32_t ch_enable[4][2];
+    int32_t ch_enable[4][2]{};
     int32_t master_vol[2]{0};
     int32_t ch_on[4]{0};
     int32_t wav_enable{0};
@@ -84,9 +84,9 @@ class apu_snd : public sound_provider {
     friend class apu;
 
 public:
-    apu_snd(apu *papu);
+    explicit apu_snd(apu *papu);
 
-    void populate_audio_buffer(short *buf, int sample);
+    void populate_audio_buffer(short *buf, int sample) override;
 
     void reset();
 
@@ -123,7 +123,7 @@ class apu {
     friend class apu_snd;
 
 public:
-    apu(gb *ref);
+    explicit apu(gb *ref);
 
     apu_snd *get_stream_provider() { return &snd; }
 
