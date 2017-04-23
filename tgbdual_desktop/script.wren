@@ -1,38 +1,3 @@
-foreign class GameBoy {
-    construct new() {}
-
-    foreign static print(text)
-    foreign static addRect(x, y, w, h, stroke, fill)
-    foreign static addImage(image, x, y)
-    foreign static addText(text, x, y)
-    foreign static get8bit(address)
-    foreign static get16bit(address)
-    foreign static set8bit(address, value)
-    foreign static set16bit(address, value)
-    foreign static registerConsoleCommand(name, func)
-
-    static get24bit(address) {
-        return get8bit(address) + (get8bit(address-1) << 8) + (get8bit(address-2) << 16)
-    }
-
-    static set24bit(address, value) {
-        set8bit(address, value & 0xff)
-        set8bit(address-1, (value >> 8) & 0xff)
-        set8bit(address-2, (value >> 16) & 0xff)
-    }
-
-    foreign static queueKey(key, delay, duration)
-
-    static KEY_A { 0x01 }
-    static KEY_B { 0x02 }
-    static KEY_SELECT { 0x04 }
-    static KEY_START { 0x08 }
-    static KEY_DOWN { 0x10 }
-    static KEY_UP { 0x20 }
-    static KEY_LEFT { 0x40 }
-    static KEY_RIGHT { 0x80 }
-}
-
 class Enemy {
     construct new(x, y) {
         _x = x
