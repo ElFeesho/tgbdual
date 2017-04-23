@@ -55,6 +55,6 @@ add_subdirectory(gtest)
 
 add_custom_target(coverage-report
         COMMAND lcov --directory ${CMAKE_CURRENT_BINARY_DIR} --capture --output-file coverage.info
-        COMMAND lcov --remove coverage.info '*/test/*' '/usr/*' '*v1*' --output-file coverage-clean.info
+        COMMAND lcov --remove coverage.info '*/test/*' '*gtest*' '/usr/*' '*v1*' --output-file coverage-clean.info
         COMMAND genhtml coverage-clean.info -o report
         COMMAND lcov --directory ${CMAKE_CURRENT_BINARY_DIR} --zerocounters)
