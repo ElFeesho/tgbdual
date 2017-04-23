@@ -30,11 +30,11 @@
 #define C_FLAG 0x01
 
 constexpr uint8_t initialiseZ802GBTable(int i) {
-    return (uint8_t) (((i & 0x40) ? 0x80 : 0) | ((i & 0x10) ? 0x20 : 0) | ((i & 0x02) ? 0x40 : 0) | ((i & 0x01) ? 0x10 : 0));
+    return (uint8_t) (((i & 0x40) != 0 ? 0x80 : 0) | ((i & 0x10) != 0 ? 0x20 : 0) | ((i & 0x02) != 0 ? 0x40 : 0) | ((i & 0x01) != 0 ? 0x10 : 0));
 }
 
 constexpr uint8_t initialiseGB2Z80Table(int i) {
-    return (uint8_t) (((i & 0x80) ? 0x40 : 0) | ((i & 0x40) ? 0x02 : 0) | ((i & 0x20) ? 0x10 : 0) | ((i & 0x10) ? 0x01 : 0));
+    return (uint8_t) (((i & 0x80) != 0 ? 0x40 : 0) | ((i & 0x40) != 0 ? 0x02 : 0) | ((i & 0x20) != 0 ? 0x10 : 0) | ((i & 0x10) != 0 ? 0x01 : 0));
 }
 
 cpu::cpu(gb *ref) {

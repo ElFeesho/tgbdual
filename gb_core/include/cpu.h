@@ -26,7 +26,7 @@ class cpu {
     friend class gb;
 
    public:
-    cpu(gb *ref);
+    explicit cpu(gb *ref);
 
     uint8_t read(uint16_t adr);
 
@@ -39,27 +39,19 @@ class cpu {
     }
 
     void exec(int clocks);
-    uint8_t seri_send(uint8_t dat);
+
     void irq(int irq_type);
     void inline irq_process();
     void reset();
-    void set_trace(bool trace) {}
 
     uint8_t *get_vram() { return vram; }
     uint8_t *get_ram() { return ram; }
     uint8_t *get_oam() { return oam; }
-    uint8_t *get_stack() { return stack; }
 
-    uint8_t *get_ram_bank() { return ram_bank; }
-    void set_ram_bank(int bank) { ram_bank = ram + bank * 0x1000; }
     uint8_t get_ram_bank_number() { return (uint8_t) ((ram - ram_bank) / 0x1000); }
-
-    cpu_regs *get_regs() { return &regs; }
 
     int get_clock() { return total_clock; }
     bool get_speed() { return speed; }
-
-    bool *get_halt() { return &halt; }
 
     void serialize(serializer &s);
 
@@ -88,7 +80,6 @@ class cpu {
     uint8_t z802gb[256], gb2z80[256];
     uint32_t rp_que[256];
     int que_cur;
-    //	uint16_t org_pal[16][4];
     int total_clock, rest_clock, sys_clock, seri_occer, div_clock;
     bool halt, speed, speed_change, dma_executing;
     int dma_src;
