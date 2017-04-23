@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 class serializer;
 
@@ -8,7 +8,7 @@ class gb;
 
 class mbc {
 public:
-    mbc(gb *ref);
+    explicit mbc(gb *ref);
 
     uint8_t *get_rom() { return rom_page; }
 
@@ -16,15 +16,9 @@ public:
 
     bool is_ext_ram() { return ext_is_ram; }
 
-    void set_ext_is(bool ext) { ext_is_ram = ext; }
-
     int get_state();
 
     void set_state(int dat);
-
-    void set_page(int rom, int sram);
-
-    uint8_t read(uint16_t adr);
 
     void write(uint16_t adr, uint8_t dat);
 

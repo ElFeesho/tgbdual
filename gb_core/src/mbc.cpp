@@ -59,10 +59,6 @@ void mbc::reset() {
     }
 }
 
-uint8_t mbc::read(uint16_t adr) {
-    return 0;
-}
-
 void mbc::write(uint16_t adr, uint8_t dat) {
     switch (ref_gb->get_rom()->get_info()->cart_type) {
         case 1:
@@ -104,6 +100,8 @@ void mbc::write(uint16_t adr, uint8_t dat) {
         case 0x100:
             mmm01_write(adr, dat);
             break;
+        default:
+            break;
     }
 }
 
@@ -121,7 +119,7 @@ uint8_t mbc::ext_read(uint16_t adr) {
         case 0x11:
         case 0x12:
         case 0x13:
-            if (mbc3_latch) {
+            if (mbc3_latch != 0u) {
                 switch (mbc3_timer) {
                     case 8:
                         return mbc3_sec;
@@ -133,6 +131,8 @@ uint8_t mbc::ext_read(uint16_t adr) {
                         return mbc3_dayl;
                     case 12:
                         return mbc3_dayh;
+                    default:
+                        break;
                 }
             }
             return ref_gb->get_time(mbc3_timer);
@@ -163,6 +163,8 @@ uint8_t mbc::ext_read(uint16_t adr) {
                     return 0;
                 case 0xA080:
                     return mbc7_ret;
+                default:
+                    break;
             }
             return 0xff;
         case 0xFD:
@@ -209,7 +211,7 @@ void mbc::ext_write(uint16_t adr, uint8_t dat) {
                 mbc7_cs = dat >> 7;
                 mbc7_sk = (uint8_t) ((dat >> 6) & 1);
 
-                if (!bef_cs && mbc7_cs) {
+                if ((bef_cs == 0) && (mbc7_cs != 0u)) {
                     if (mbc7_state == 5) {
                         if (mbc7_write_enable) {
                             *(ref_gb->get_rom()->get_sram() + mbc7_adr * 2) = (uint8_t) (mbc7_buf >> 8);
@@ -223,9 +225,9 @@ void mbc::ext_write(uint16_t adr, uint8_t dat) {
                     }
                 }
 
-                if (!bef_sk && mbc7_sk) {
+                if ((bef_sk == 0) && (mbc7_sk != 0u)) {
                     if (mbc7_idle) {
-                        if (dat & 0x02) {
+                        if ((dat & 0x02) != 0) {
                             mbc7_idle = false;
                             mbc7_count = 0;
                             mbc7_state = 1;
@@ -234,7 +236,7 @@ void mbc::ext_write(uint16_t adr, uint8_t dat) {
                         switch (mbc7_state) {
                             case 1:
                                 mbc7_buf <<= 1;
-                                mbc7_buf |= (dat & 0x02) ? 1 : 0;
+                                mbc7_buf |= (dat & 0x02) != 0 ? 1 : 0;
                                 mbc7_count++;
                                 if (mbc7_count == 2) {
                                     mbc7_state = 2;
@@ -244,7 +246,7 @@ void mbc::ext_write(uint16_t adr, uint8_t dat) {
                                 break;
                             case 2:
                                 mbc7_buf <<= 1;
-                                mbc7_buf |= (dat & 0x02) ? 1 : 0;
+                                mbc7_buf |= (dat & 0x02) != 0 ? 1 : 0;
                                 mbc7_count++;
                                 if (mbc7_count == 8) {
                                     mbc7_state = 3;
@@ -263,7 +265,7 @@ void mbc::ext_write(uint16_t adr, uint8_t dat) {
                                 break;
                             case 3:
                                 mbc7_buf <<= 1;
-                                mbc7_buf |= (dat & 0x02) ? 1 : 0;
+                                mbc7_buf |= (dat & 0x02) != 0 ? 1 : 0;
                                 mbc7_count++;
 
                                 switch (mbc7_op_code) {
@@ -315,15 +317,19 @@ void mbc::ext_write(uint16_t adr, uint8_t dat) {
                                             mbc7_buf = 0xffff;
                                         }
                                         break;
+                                    default:
+                                        break;
                                 }
+                                break;
+                            default:
                                 break;
                         }
                     }
                 }
 
-                if (bef_sk && !mbc7_sk) {
+                if ((bef_sk != 0) && (mbc7_sk == 0u)) {
                     if (mbc7_state == 4) {
-                        mbc7_ret = (uint8_t) ((mbc7_buf & 0x8000) ? 1 : 0);
+                        mbc7_ret = (uint8_t) ((mbc7_buf & 0x8000) != 0 ? 1 : 0);
                         mbc7_buf <<= 1;
                         mbc7_count++;
 
@@ -335,6 +341,8 @@ void mbc::ext_write(uint16_t adr, uint8_t dat) {
                 }
             }
 
+            break;
+        default:
             break;
     }
 }
@@ -413,12 +421,9 @@ void mbc::set_state(int dat) {
             huc1_dat = (uint8_t) (dat & 0xFF);
             huc1_16_8 = ((dat >> 8) & 1) != 0;
             break;
+        default:
+            break;
     }
-}
-
-void mbc::set_page(int rom, int sram) {
-    rom_page = ref_gb->get_rom()->get_rom() + rom * 0x4000;
-    sram_page = ref_gb->get_rom()->get_sram() + sram * 0x2000;
 }
 
 static int rom_size_tbl[] = {2, 4, 8, 16, 32, 64, 128, 256, 512};
@@ -440,6 +445,8 @@ void mbc::mbc1_write(uint16_t adr, uint8_t dat) {
             case 3:
                 mbc1_16_8 = (dat & 1) == 0;
                 break;
+            default:
+                break;
         }
     } else {
         switch (adr >> 13) {
@@ -453,6 +460,8 @@ void mbc::mbc1_write(uint16_t adr, uint8_t dat) {
                 break;
             case 3:
                 mbc1_16_8 = (dat & 1) == 0;
+                break;
+            default:
                 break;
         }
     }
@@ -496,7 +505,7 @@ void mbc::mbc3_write(uint16_t adr, uint8_t dat) {
             if (dat == 0) {
                 mbc3_latch = 0;
             } else if (dat == 1) {
-                if (!mbc3_latch) {
+                if (mbc3_latch == 0u) {
                     mbc3_sec = ref_gb->get_time(8);
                     mbc3_min = ref_gb->get_time(9);
                     mbc3_hour = ref_gb->get_time(10);
@@ -506,6 +515,8 @@ void mbc::mbc3_write(uint16_t adr, uint8_t dat) {
                 mbc3_latch = 1;
             }
 
+            break;
+        default:
             break;
     }
 }
