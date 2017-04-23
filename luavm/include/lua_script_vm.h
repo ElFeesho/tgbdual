@@ -1,7 +1,3 @@
-//
-// Created by Christopher Sawczuk on 15/07/2016.
-//
-
 #pragma once
 
 #include <script_vm.h>
@@ -14,7 +10,7 @@
 
 class lua_script_vm : public script_vm {
 public:
-    lua_script_vm(script_services *scriptServices);
+    explicit lua_script_vm(script_services *scriptServices);
 
     void loadScript(const std::string &script) override;
 

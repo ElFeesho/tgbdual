@@ -4,7 +4,7 @@
 
 class tcp_link_cable : public link_cable_source {
 public:
-    tcp_link_cable(int tcp_socket);
+    explicit tcp_link_cable(int tcp_socket);
 
     uint8_t readByte() override;
 

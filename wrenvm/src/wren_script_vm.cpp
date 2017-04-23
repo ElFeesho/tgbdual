@@ -1,14 +1,10 @@
-//
-// Created by chris on 30/03/17.
-//
-
 #include <wren.hpp>
 #include <iostream>
 
 #include "wren_script_vm.h"
 
 struct WrenVMMetadata {
-    WrenVMMetadata(script_services *context) : scriptContext{context} {}
+    explicit WrenVMMetadata(script_services *context) : scriptContext{context} {}
 
     script_services *scriptContext;
 
@@ -17,7 +13,7 @@ struct WrenVMMetadata {
     }
 };
 
-WrenForeignMethodFn boundFunction(std::string name, std::string signature);
+WrenForeignMethodFn boundFunction(const std::string& name, const std::string& signature);
 
 void populateWrenList(WrenVM *wrenVm, const std::vector<std::string> &args);
 
@@ -52,7 +48,7 @@ wren_script_vm::wren_script_vm(script_services *context) : _wrenVm{nullptr, wren
 
     config.errorFn = errorHandler;
 
-    WrenVMMetadata *metadata = new WrenVMMetadata(context);
+    auto metadata = new WrenVMMetadata(context);
     config.userData = metadata;
 
     WrenVM *vm = wrenNewVM(&config);
@@ -84,49 +80,49 @@ void wren_script_vm::activate() {
 
 void wren_script_vm::loadScript(const std::string &scriptFile) {
     std::string script = "foreign class GameBoy {\n"
-            "    construct new() {}\n"
-            "\n"
-            "    foreign static print(text)\n"
-            "    foreign static addRect(x, y, w, h, stroke, fill)\n"
-            "    foreign static addImage(image, x, y)\n"
-            "    foreign static addText(text, x, y)\n"
-            "    foreign static get8bit(address)\n"
-            "    foreign static get16bit(address)\n"
-            "    foreign static set8bit(address, value)\n"
-            "    foreign static set16bit(address, value)\n"
-            "    foreign static registerConsoleCommand(name, func)\n"
-            "\n"
-            "    static get24bit(address) {\n"
-            "        return get8bit(address) + (get8bit(address-1) << 8) + (get8bit(address-2) << 16)\n"
-            "    }\n"
-            "\n"
-            "    static set24bit(address, value) {\n"
-            "        set8bit(address, value & 0xff)\n"
-            "        set8bit(address-1, (value >> 8) & 0xff)\n"
-            "        set8bit(address-2, (value >> 16) & 0xff)\n"
-            "    }\n"
-            "\n"
-            "    foreign static queueKey(key, delay, duration)\n"
-            "\n"
-            "    static KEY_A { 0x01 }\n"
-            "    static KEY_B { 0x02 }\n"
-            "    static KEY_SELECT { 0x04 }\n"
-            "    static KEY_START { 0x08 }\n"
-            "    static KEY_DOWN { 0x10 }\n"
-            "    static KEY_UP { 0x20 }\n"
-            "    static KEY_LEFT { 0x40 }\n"
-            "    static KEY_RIGHT { 0x80 }\n"
-            "}\n" + scriptFile;
+                                 "    construct new() {}\n"
+                                 "\n"
+                                 "    foreign static print(text)\n"
+                                 "    foreign static addRect(x, y, w, h, stroke, fill)\n"
+                                 "    foreign static addImage(image, x, y)\n"
+                                 "    foreign static addText(text, x, y)\n"
+                                 "    foreign static get8bit(address)\n"
+                                 "    foreign static get16bit(address)\n"
+                                 "    foreign static set8bit(address, value)\n"
+                                 "    foreign static set16bit(address, value)\n"
+                                 "    foreign static registerConsoleCommand(name, func)\n"
+                                 "\n"
+                                 "    static get24bit(address) {\n"
+                                 "        return get8bit(address) + (get8bit(address-1) << 8) + (get8bit(address-2) << 16)\n"
+                                 "    }\n"
+                                 "\n"
+                                 "    static set24bit(address, value) {\n"
+                                 "        set8bit(address, value & 0xff)\n"
+                                 "        set8bit(address-1, (value >> 8) & 0xff)\n"
+                                 "        set8bit(address-2, (value >> 16) & 0xff)\n"
+                                 "    }\n"
+                                 "\n"
+                                 "    foreign static queueKey(key, delay, duration)\n"
+                                 "\n"
+                                 "    static KEY_A { 0x01 }\n"
+                                 "    static KEY_B { 0x02 }\n"
+                                 "    static KEY_SELECT { 0x04 }\n"
+                                 "    static KEY_START { 0x08 }\n"
+                                 "    static KEY_DOWN { 0x10 }\n"
+                                 "    static KEY_UP { 0x20 }\n"
+                                 "    static KEY_LEFT { 0x40 }\n"
+                                 "    static KEY_RIGHT { 0x80 }\n"
+                                 "}\n" + scriptFile;
 
     auto result = wrenInterpret(_wrenVm.get(), script.c_str());
     if (result == WREN_RESULT_COMPILE_ERROR) {
         std::cerr << "Failed to compile wren script" << std::endl;
-        script_services *context = (script_services *) wrenGetUserData(_wrenVm.get());
+        auto context = (script_services *) wrenGetUserData(_wrenVm.get());
         context->print_string("Failed to compile wren script");
     } else if (result == WREN_RESULT_RUNTIME_ERROR) {
         std::cerr << "Failed to execute wren script" << std::endl;
 
-        script_services *context = (script_services *) wrenGetUserData(_wrenVm.get());
+        auto context = (script_services *) wrenGetUserData(_wrenVm.get());
         context->print_string("Failed to execute wren script");
     }
 
@@ -152,46 +148,59 @@ bool wren_script_vm::handleUnhandledCommand(const std::string &command, std::vec
     return result == WREN_RESULT_SUCCESS && wrenGetSlotBool(_wrenVm.get(), 0);
 }
 
-WrenForeignMethodFn boundFunction(std::string name, std::string signature) {
+WrenForeignMethodFn boundFunction(const std::string& name, const std::string& signature) {
     if (name == "GameBoy") {
         if (signature == "print(_)") {
             return [](WrenVM *wrenVm) {
                 script_services *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
                 context->print_string(wrenGetSlotString(wrenVm, 1));
             };
-        } else if (signature == "set8bit(_,_)") {
+        }
+        if (signature == "set8bit(_,_)") {
             return [](WrenVM *wrenVm) {
                 script_services *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
                 context->set_8bit_value((uint32_t) wrenGetSlotDouble(wrenVm, 1), (uint8_t) wrenGetSlotDouble(wrenVm, 2));
             };
-        } else if (signature == "set16bit(_,_)") {
+        }
+
+        if (signature == "set16bit(_,_)") {
             return [](WrenVM *wrenVm) {
                 script_services *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
                 context->set_16bit_value((uint32_t) wrenGetSlotDouble(wrenVm, 1), (uint16_t) wrenGetSlotDouble(wrenVm, 2));
             };
-        } else if (signature == "get8bit(_)") {
+        }
+
+        if (signature == "get8bit(_)") {
             return [](WrenVM *wrenVm) {
                 script_services *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
                 wrenSetSlotDouble(wrenVm, 0, context->read_8bit_value((uint32_t) wrenGetSlotDouble(wrenVm, 1)));
             };
-        } else if (signature == "get16bit(_)") {
+        }
+
+        if (signature == "get16bit(_)") {
             return [](WrenVM *wrenVm) {
                 script_services *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
                 wrenSetSlotDouble(wrenVm, 0, context->read_16bit_value((uint32_t) wrenGetSlotDouble(wrenVm, 1)));
             };
-        } else if (signature == "addImage(_,_,_)") {
+        }
+
+        if (signature == "addImage(_,_,_)") {
             return [](WrenVM *wrenVm) {
                 script_services *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
                 context->add_image(wrenGetSlotString(wrenVm, 1), (int16_t) wrenGetSlotDouble(wrenVm, 2),
                                    (int16_t) wrenGetSlotDouble(wrenVm, 3));
             };
-        } else if (signature == "addText(_,_,_)") {
+        }
+
+        if (signature == "addText(_,_,_)") {
             return [](WrenVM *wrenVm) {
                 script_services *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
                 context->add_text(wrenGetSlotString(wrenVm, 1), (int16_t) wrenGetSlotDouble(wrenVm, 2),
                                   (int16_t) wrenGetSlotDouble(wrenVm, 3));
             };
-        } else if (signature == "addRect(_,_,_,_,_,_)") {
+        }
+
+        if (signature == "addRect(_,_,_,_,_,_)") {
             return [](WrenVM *wrenVm) {
                 script_services *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
                 context->add_rect((int16_t) wrenGetSlotDouble(wrenVm, 1), (int16_t) wrenGetSlotDouble(wrenVm, 2),
@@ -200,20 +209,24 @@ WrenForeignMethodFn boundFunction(std::string name, std::string signature) {
                                   (uint32_t) wrenGetSlotDouble(wrenVm, 5),
                                   (uint32_t) wrenGetSlotDouble(wrenVm, 6));
             };
-        } else if (signature == "queueKey(_,_,_)") {
+        }
+
+        if (signature == "queueKey(_,_,_)") {
             return [](WrenVM *wrenVm) {
                 script_services *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
                 context->queue_key((uint8_t) wrenGetSlotDouble(wrenVm, 1),
                                    (uint32_t) wrenGetSlotDouble(wrenVm, 2),
                                    (uint32_t) wrenGetSlotDouble(wrenVm, 3));
             };
-        } else if (signature == "registerConsoleCommand(_,_)") {
+        }
+
+        if (signature == "registerConsoleCommand(_,_)") {
             return [](WrenVM *wrenVm) {
                 script_services *context = WrenVMMetadata::fromWrenVM(wrenVm)->scriptContext;
 
                 std::string command = wrenGetSlotString(wrenVm, 1);
                 WrenHandle *consoleCommandHandle = wrenGetSlotHandle(wrenVm, 2);
-                
+
                 context->register_command(command, [=](std::vector<std::string> args) {
                     populateWrenList(wrenVm, args);
                     WrenHandle *callHandle = wrenMakeCallHandle(wrenVm, "call(_)");

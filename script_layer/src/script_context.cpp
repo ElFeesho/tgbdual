@@ -1,7 +1,3 @@
-//
-// Created by Christopher Sawczuk on 16/07/2016.
-//
-
 #include <osd_renderer.h>
 #include <script_context.h>
 

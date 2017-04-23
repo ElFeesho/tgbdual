@@ -10,7 +10,7 @@ void gameboy::load_rom(uint8_t *romData, uint32_t romLength, uint8_t *ram, uint3
     _gb.load_rom(romData, romLength, ram, ramLength);
 }
 
-void gameboy::save_state(std::function<uint8_t *(size_t)> functor) {
+void gameboy::save_state(const std::function<uint8_t *(size_t)> &functor) {
     _gb.save_state_mem(functor(_gb.get_state_size()));
 }
 
@@ -18,7 +18,7 @@ void gameboy::load_state(uint8_t *state) {
     _gb.restore_state_mem(state);
 }
 
-void gameboy::save_sram(std::function<void(uint8_t *, uint32_t)> functor) {
+void gameboy::save_sram(const std::function<void(uint8_t *, uint32_t)> &functor) {
     functor(_gb.get_rom()->get_sram(), _gb.get_rom()->get_sram_size());
 }
 

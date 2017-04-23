@@ -1,10 +1,5 @@
-//
-// Created by Christopher Sawczuk on 16/04/2017.
-//
-
 #include <emulator_time.h>
 #include <iostream>
-#include <algorithm>
 #include "gb_osd_renderer.h"
 
 gb_osd_renderer::gb_osd_renderer(tgb::video_renderer *renderer) : _renderer{renderer} {
@@ -53,7 +48,6 @@ void gb_osd_renderer::renderOSDMessages() {
         msg_number++;
     }
 
-    osd_messages.erase(
-            remove_if(osd_messages.begin(), osd_messages.end(), [](pending_osd_message &msg) { return emulator_time::current_time() > msg.first; }), osd_messages.end());
+    osd_messages.erase(remove_if(osd_messages.begin(), osd_messages.end(), [](pending_osd_message &msg) { return emulator_time::current_time() > msg.first; }), osd_messages.end());
 
 }

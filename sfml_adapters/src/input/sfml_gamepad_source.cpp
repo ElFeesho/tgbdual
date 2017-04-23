@@ -1,7 +1,3 @@
-//
-// Created by Christopher Sawczuk on 17/04/2017.
-//
-
 #include <SFML/Window/Event.hpp>
 #include <map>
 #include "sfml_gamepad_source.h"

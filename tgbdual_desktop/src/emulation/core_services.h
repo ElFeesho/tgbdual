@@ -10,7 +10,7 @@
 
 class core_services {
 public:
-    virtual ~core_services(){}
+    virtual ~core_services() = default;
 
     virtual tgb::gamepad_source *gamepadSource() = 0;
 
@@ -23,4 +23,4 @@ public:
     virtual tgb::audio_renderer *audioRenderer() = 0;
 };
 
-std::unique_ptr<core_services, void(*)(core_services*)> createCoreServices();
+std::unique_ptr<core_services, void (*)(core_services *)> createCoreServices();

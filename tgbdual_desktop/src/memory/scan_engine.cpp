@@ -11,13 +11,13 @@ size_t scan_engine::scan(uint32_t value, scan_engine::scan_callback cb) {
     address_scan_result result;
 
     if (value < 256) {
-        result = _scanner.find_value<uint8_t>(value);
+        result = _scanner.find_value((uint8_t) value);
     }
     else if(value < (1<<16)){
-        result = _scanner.find_value<uint16_t>(value);
+        result = _scanner.find_value((uint16_t) value);
     }
     else {
-        result = _scanner.find_value<uint32_t>(value);
+        result = _scanner.find_value(value);
     }
 
     if (_lastResult.size() > 0) {

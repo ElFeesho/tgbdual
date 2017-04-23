@@ -8,7 +8,7 @@ class script_services {
 public:
     using script_command = std::function<void(std::vector<std::string>)>;
 
-    virtual ~script_services() {}
+    virtual ~script_services() = default;
 
     virtual void print_string(const std::string &) = 0;
 

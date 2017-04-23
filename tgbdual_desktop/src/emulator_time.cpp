@@ -1,7 +1,3 @@
-//
-// Created by Christopher Sawczuk on 14/04/2017.
-//
-
 #include "emulator_time.h"
 
 uint32_t emulator_time::current_time() {

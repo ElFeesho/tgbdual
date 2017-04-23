@@ -1,7 +1,5 @@
 #include "scan_commands.h"
 
-#include <vector>
-#include <map>
 #include <sstream>
 
 static inline void printAddressValue(console &console, uint32_t address, uint8_t value) {

@@ -5,7 +5,7 @@
 namespace tgb {
     class video_renderer {
     public:
-        virtual ~video_renderer(){}
+        virtual ~video_renderer()= default;
 
         virtual void fillRect(int32_t x, int32_t y, uint32_t w, uint32_t h, uint32_t stroke, uint32_t fill) = 0;
         virtual void text(const char *text, int32_t x, int32_t y, uint32_t colour) = 0;

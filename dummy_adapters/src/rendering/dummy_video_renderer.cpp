@@ -1,7 +1,3 @@
-//
-// Created by Christopher Sawczuk on 17/04/2017.
-//
-
 #include "dummy_video_renderer.h"
 
 void dummy_video_renderer::fillRect(int32_t x, int32_t y, uint32_t w, uint32_t h, uint32_t stroke, uint32_t fill) {

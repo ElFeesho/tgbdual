@@ -11,7 +11,7 @@ void gb_console_driver::update() {
                 _console.key_down(key);
             },
             [&](char key) {
-                _console.key_up(key);
+                _console.key_up();
             },
             [&](tgb::console_driver::CommandKey key) {
                 if (key == tgb::console_driver::CommandKey::CLOSE_CONSOLE) {
@@ -22,6 +22,6 @@ void gb_console_driver::update() {
                 }
             },
             [&](tgb::console_driver::CommandKey key) {
-                _console.key_up(commandKeyMap[key]);
+                _console.key_up();
             });
 }

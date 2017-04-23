@@ -17,7 +17,6 @@
    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#include <stdio.h>
 #include <rendering/video_renderer.h>
 
 #include <SDL.h>
@@ -32,7 +31,7 @@ class sdl_video_renderer : public tgb::video_renderer {
 public:
     using surf_ptr = std::unique_ptr<SDL_Surface, void (*)(SDL_Surface *)>;
 
-    sdl_video_renderer(SDL_Surface *screen);
+    explicit sdl_video_renderer(SDL_Surface *screen);
 
     void fillRect(int32_t x, int32_t y, uint32_t w, uint32_t h, uint32_t stroke, uint32_t fill) override;
 

@@ -8,7 +8,7 @@
 
 class gb_osd_renderer : public osd_renderer{
 public:
-    gb_osd_renderer(tgb::video_renderer *renderer);
+    explicit gb_osd_renderer(tgb::video_renderer *renderer);
 
     void render();
 

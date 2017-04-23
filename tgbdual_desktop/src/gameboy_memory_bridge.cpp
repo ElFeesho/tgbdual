@@ -1,7 +1,3 @@
-//
-// Created by Christopher Sawczuk on 20/04/2017.
-//
-
 #include "gameboy_memory_bridge.h"
 
 gameboy_memory_bridge::gameboy_memory_bridge(gameboy &gb) : _gb{gb} {

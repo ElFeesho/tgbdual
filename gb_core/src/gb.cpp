@@ -99,7 +99,7 @@ void gb::serialize(serializer &s) {
     m_apu.serialize(s);
 }
 
-size_t gb::get_state_size(void) {
+size_t gb::get_state_size() {
     size_t ret = 0;
     serializer s(&ret, serializer::COUNT);
     serialize(s);
@@ -126,13 +126,13 @@ void gb::read_linkcable_byte(uint8_t *buff) {
 
 void gb::run() {
     for (int i = 0; i < 154; i++) {
-        if (regs.LCDC & 0x80) {
+        if ((regs.LCDC & 0x80) != 0) {
             regs.LY = (uint8_t) ((regs.LY + 1) % 154);
 
             regs.STAT &= 0xF8;
             if (regs.LYC == regs.LY) {
                 regs.STAT |= 4;
-                if (regs.STAT & 0x40) {
+                if ((regs.STAT & 0x40) != 0) {
                     m_cpu.irq(INT_LCDC);
                 }
             }
@@ -145,7 +145,7 @@ void gb::run() {
                 if (regs.LY == 144) {
                     m_cpu.exec(72);
                     m_cpu.irq(INT_VBLANK);
-                    if (regs.STAT & 0x10) {
+                    if ((regs.STAT & 0x10) != 0) {
                         m_cpu.irq(INT_LCDC);
                     }
                     m_cpu.exec(456 - 80);
@@ -159,7 +159,7 @@ void gb::run() {
                 }
             } else { // VBlank 期間外 // Period outside VBlank
                 regs.STAT |= 2;
-                if (regs.STAT & 0x20) {
+                if ((regs.STAT & 0x20) != 0) {
                     m_cpu.irq(INT_LCDC);
                 }
                 m_cpu.exec(80); // state=2
@@ -173,7 +173,7 @@ void gb::run() {
                     if (now_frame >= skip) {
                         m_lcd.render(vframe, regs.LY);
                     }
-                    if ((regs.STAT & 0x08)) {
+                    if ((regs.STAT & 0x08) != 0) {
                         m_cpu.irq(INT_LCDC);
                     }
                     m_cpu.exec(207);
@@ -218,7 +218,7 @@ void inline gb::hblank_dma() {
         } else if (m_cpu.dma_src >= 0xD000 && m_cpu.dma_src < 0xE000) {
             m_cpu.dma_src_bank = m_cpu.ram_bank - 0xD000;
         } else {
-            m_cpu.dma_src_bank = NULL;
+            m_cpu.dma_src_bank = nullptr;
         }
         m_cpu.b_dma_first = false;
     }
@@ -243,12 +243,12 @@ void inline gb::hblank_dma() {
     m_cpu.exec(207);
 }
 
-uint16_t gb::get_sensor(bool) {
+uint16_t gb::get_sensor(bool /*unused*/) {
     return 0;
 }
 
 uint8_t gb::get_time(int type) {
-    struct tm sys;
+    struct tm sys{};
     time_t t = time(0);
     localtime_r(&t, &sys);
 
@@ -272,8 +272,8 @@ uint8_t gb::get_time(int type) {
 }
 
 void gb::set_time(int type, uint8_t dat) {
-    struct tm sys;
-    time_t t = time(0);
+    struct tm sys{};
+    time_t t = time(nullptr);
     localtime_r(&t, &sys);
 
     uint32_t now = convert_to_second(&sys);
@@ -314,7 +314,7 @@ uint8_t gb::check_pad() {
 }
 
 address_scanner gb::create_address_scanner() {
-	return address_scanner(m_cpu.ram, 0x2000 * 4);
+	return {m_cpu.ram, 0x2000 * 4};
 }
 
 gbc_regs *gb::get_cregs() { return &c_regs; }

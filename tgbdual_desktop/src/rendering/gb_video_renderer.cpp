@@ -1,7 +1,3 @@
-//
-// Created by Christopher Sawczuk on 16/04/2017.
-//
-
 #include "gb_video_renderer.h"
 
 gb_video_renderer::gb_video_renderer(tgb::video_renderer *renderer, gb_video_renderer::render_callback callback, uint32_t bevel) : _renderer{renderer}, _callback{callback}, _bevel{bevel} {

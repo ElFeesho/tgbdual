@@ -21,7 +21,8 @@ namespace tgb {
         using commandkey_down = std::function<void(CommandKey)>;
         using commandkey_up = std::function<void(CommandKey)>;
 
-        virtual ~console_driver(){}
+        virtual ~console_driver() = default;
+
         virtual void update(key_down, key_up, commandkey_down, commandkey_up) = 0;
     };
 }

@@ -1,7 +1,3 @@
-//
-// Created by Christopher Sawczuk on 15/07/2016.
-//
-
 #include <iostream>
 #include <map>
 #include <lua_script_vm.h>
@@ -13,7 +9,7 @@ void storeContext(script_services *scriptContext, lua_State *luaVm) {
 
 script_services *getContext(lua_State *luaVm) {
     lua_getglobal(luaVm, "__context");
-    script_services *context = (script_services*)lua_touserdata(luaVm, lua_gettop(luaVm));
+    auto context = (script_services*)lua_touserdata(luaVm, lua_gettop(luaVm));
     lua_pop(luaVm, 1);
     return context;
 }
@@ -40,8 +36,8 @@ lua_script_vm::lua_script_vm(script_services *scriptContext) : state{luaL_newsta
     });
 
     bindFunction("set_8bit_value", [](lua_State *state) -> int {
-        uint32_t address = (uint32_t) lua_tointegerx(state, 1, nullptr);
-        uint8_t value = (uint8_t) lua_tointegerx(state, 2, nullptr);
+        auto address = (uint32_t) lua_tointegerx(state, 1, nullptr);
+        auto value = (uint8_t) lua_tointegerx(state, 2, nullptr);
 
         getContext(state)->set_8bit_value(address, value);
         return 0;
@@ -60,20 +56,20 @@ lua_script_vm::lua_script_vm(script_services *scriptContext) : state{luaL_newsta
     });
 
     bindFunction("add_rect", [](lua_State *state) -> int {
-        int16_t x = (int16_t) lua_tointegerx(state, 1, nullptr);
-        int16_t y = (int16_t) lua_tointegerx(state, 2, nullptr);
-        int16_t w = (int16_t) lua_tointegerx(state, 3, nullptr);
-        int16_t h = (int16_t) lua_tointegerx(state, 4, nullptr);
-        uint32_t s = (uint32_t) lua_tointegerx(state, 5, nullptr);
-        uint32_t f = (uint32_t) lua_tointegerx(state, 6, nullptr);
+        auto x = (int16_t) lua_tointegerx(state, 1, nullptr);
+        auto y = (int16_t) lua_tointegerx(state, 2, nullptr);
+        auto w = (int16_t) lua_tointegerx(state, 3, nullptr);
+        auto h = (int16_t) lua_tointegerx(state, 4, nullptr);
+        auto s = (uint32_t) lua_tointegerx(state, 5, nullptr);
+        auto f = (uint32_t) lua_tointegerx(state, 6, nullptr);
         getContext(state)->add_rect(x, y, w, h, s, f);
         return 0;
     });
 
     bindFunction("add_text", [](lua_State *state) -> int {
         const char *text = lua_tolstring(state, 1, nullptr);
-        int16_t x = (int16_t) lua_tointegerx(state, 2, nullptr);
-        int16_t y = (int16_t) lua_tointegerx(state, 3, nullptr);
+        auto x = (int16_t) lua_tointegerx(state, 2, nullptr);
+        auto y = (int16_t) lua_tointegerx(state, 3, nullptr);
 
         getContext(state)->add_text(text, x, y);
         return 0;
@@ -81,17 +77,17 @@ lua_script_vm::lua_script_vm(script_services *scriptContext) : state{luaL_newsta
 
     bindFunction("add_image", [](lua_State *state) -> int {
         const char *name = lua_tolstring(state, 1, nullptr);
-        int16_t x = (int16_t) lua_tointegerx(state, 2, nullptr);
-        int16_t y = (int16_t) lua_tointegerx(state, 3, nullptr);
+        auto x = (int16_t) lua_tointegerx(state, 2, nullptr);
+        auto y = (int16_t) lua_tointegerx(state, 3, nullptr);
 
         getContext(state)->add_image(name, x, y);
         return 0;
     });
 
     bindFunction("queue_key", [](lua_State *state) -> int {
-        uint8_t key = (uint8_t) lua_tointegerx(state, 1, nullptr);
-        uint32_t when = (uint32_t) lua_tointegerx(state, 2, nullptr);
-        uint32_t duration = (uint32_t) lua_tointegerx(state, 3, nullptr);
+        auto key = (uint8_t) lua_tointegerx(state, 1, nullptr);
+        auto when = (uint32_t) lua_tointegerx(state, 2, nullptr);
+        auto duration = (uint32_t) lua_tointegerx(state, 3, nullptr);
 
         getContext(state)->queue_key(key, when, duration);
         return 0;
@@ -104,14 +100,14 @@ lua_script_vm::lua_script_vm(script_services *scriptContext) : state{luaL_newsta
             getContext(state)->register_command(commandName, [=](std::vector<std::string> args) {
                 lua_rawgeti(state, LUA_REGISTRYINDEX, funcRef);
                 lua_createtable(state, (int) args.size(), 0);
-                if (args.size() > 0) {
+                if (!args.empty()) {
                     int i = 0;
                     for (std::string &value : args) {
                         lua_pushstring(state, value.c_str());
                         lua_rawseti(state, -2, ++i);
                     }
                 }
-                lua_pcallk(state, 1, 0, 0, 0, 0);
+                lua_pcallk(state, 1, 0, 0, 0, nullptr);
             });
         }
 
@@ -159,7 +155,7 @@ void lua_script_vm::invokeLuaFunction(const char *functionName) const {
     lua_getglobal(state.get(), functionName);
     int function = lua_type(state.get(), -1);
     if (function == LUA_TFUNCTION) {
-        if (lua_pcallk(state.get(), 0, 0, 0, 0, 0) != 0) {
+        if (lua_pcallk(state.get(), 0, 0, 0, 0, nullptr) != 0) {
             getContext(state.get())->print_string("Lua Error: " + std::string(lua_tolstring(state.get(), -1, nullptr)));
         }
     }
@@ -179,14 +175,14 @@ bool lua_script_vm::handleUnhandledCommand(const std::string &command, std::vect
     if (function == LUA_TFUNCTION) {
         lua_pushstring(state.get(), command.c_str());
         lua_createtable(state.get(), (int) args.size(), 0);
-        if (args.size() > 0) {
+        if (!args.empty()) {
             int i = 0;
             for (std::string &value : args) {
                 lua_pushstring(state.get(), value.c_str());
                 lua_rawseti(state.get(), -2, ++i);
             }
         }
-        if (lua_pcallk(state.get(), 2, 1, 0, 0, 0)) {
+        if (lua_pcallk(state.get(), 2, 1, 0, 0, nullptr) != 0) {
             getContext(state.get())->print_string("Lua Error: " + std::string(lua_tolstring(state.get(), -1, nullptr)));
         }
         return (bool) lua_toboolean(state.get(), lua_gettop(state.get()));

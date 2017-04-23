@@ -1,7 +1,3 @@
-//
-// Created by Christopher Sawczuk on 08/04/2017.
-//
-
 #include "script_manager.h"
 
 void script_manager::add_vm(const std::string &name, script_vm *vm) {

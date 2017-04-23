@@ -7,7 +7,7 @@
 
 class gb_gamepad_source : public gamepad_source, public input_queue {
 public:
-    gb_gamepad_source(tgb::gamepad_source *gamepad_source);
+    explicit gb_gamepad_source(tgb::gamepad_source *gamepad_source);
 
     void enable();
     void disable();

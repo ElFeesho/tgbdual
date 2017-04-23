@@ -1,7 +1,3 @@
-//
-// Created by chris on 30/03/17.
-//
-
 #pragma once
 
 #include <script_vm.h>
@@ -14,7 +10,7 @@ class wren_script_vm : public script_vm {
 public:
     using wrenvm_holder = std::unique_ptr<WrenVM, void(*)(WrenVM*)>;
 
-    wren_script_vm(script_services *context);
+    explicit wren_script_vm(script_services *context);
 
     void tick() override;
     void activate() override;

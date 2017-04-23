@@ -1,7 +1,3 @@
-//
-// Created by Christopher Sawczuk on 16/04/2017.
-//
-
 #include "gb_audio_renderer.h"
 
 gb_audio_renderer::gb_audio_renderer(tgb::audio_renderer *audioRenderer) {

@@ -53,8 +53,8 @@ void console::key_down(char key) {
     queueRepeats(key);
 }
 
-void console::key_up(char key) {
-    unqueueRepeats(key);
+void console::key_up() {
+    unqueueRepeats();
 }
 
 void console::queueRepeats(char key) {
@@ -64,7 +64,7 @@ void console::queueRepeats(char key) {
     lastRepeat = _timeProvider();
 }
 
-void console::unqueueRepeats(char key) {
+void console::unqueueRepeats() {
     keyRepeatDelay = 0;
 }
 

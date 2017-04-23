@@ -30,10 +30,10 @@ std::string getLocalIp() {
         std::domain_error("Failed to get interface addresses");
     }
 
-    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
-        if (ifa->ifa_addr != NULL && ifa->ifa_addr->sa_family == AF_INET) {
+    for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next) {
+        if (ifa->ifa_addr != nullptr && ifa->ifa_addr->sa_family == AF_INET) {
             char host[NI_MAXHOST] = {0};
-            int s = getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+            int s = getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), host, NI_MAXHOST, nullptr, 0, NI_NUMERICHOST);
             if (s != 0) {
                 throw std::domain_error("Failed to resolve local address " + std::string{gai_strerror(s)});
             }

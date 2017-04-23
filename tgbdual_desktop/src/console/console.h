@@ -16,7 +16,7 @@ public:
 
     void open();
     void key_down(char key);
-    void key_up(char key);
+    void key_up();
     void close();
 
     void draw();
@@ -39,7 +39,7 @@ private:
     };
     class HistoryLine {
     public:
-        HistoryLine(std::string line, OutputType outputType = OutputType::stdout);
+        explicit HistoryLine(std::string line, OutputType outputType = OutputType::stdout);
         OutputType outputType();
         const std::string &line();
     private:
@@ -73,6 +73,6 @@ private:
     void scrollDownHistory();
     void insertKey(char key);
     void handleKeyDown(char key);
-    void unqueueRepeats(char key);
+    void unqueueRepeats();
     void queueRepeats(char key);
 };
