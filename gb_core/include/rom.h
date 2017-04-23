@@ -1,7 +1,7 @@
 #pragma once
 
-#include <stdint.h>
-#include <stdlib.h>
+#include <cstdint>
+#include <cstdlib>
 
 class gb;
 
@@ -35,7 +35,7 @@ public:
     void serialize(serializer &s);
 
 private:
-    rom_info info;
+    rom_info info{};
 
     uint8_t *dat { nullptr };
     uint8_t *sram { nullptr };

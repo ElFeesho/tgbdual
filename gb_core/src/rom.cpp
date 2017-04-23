@@ -54,7 +54,7 @@ bool rom::load_rom(uint8_t *buf, size_t size, uint8_t *ram, size_t ram_size) {
         info.cart_type = 0x100;
     }
 
-    info.gb_type = (buf[0x143] & 0x80) ? 3 : 1;
+    info.gb_type = (buf[0x143] & 0x80) != 0 ? 3 : 1;
 
     if (info.rom_size > 8) {
         return false;
@@ -65,7 +65,7 @@ bool rom::load_rom(uint8_t *buf, size_t size, uint8_t *ram, size_t ram_size) {
     first_page = dat;
 
     sram = (uint8_t *) malloc(get_sram_size());
-    if (ram) {
+    if (ram != nullptr) {
         memcpy(sram, ram, ram_size & 0xffffff00);
     }
 
