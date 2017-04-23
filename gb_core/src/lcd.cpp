@@ -42,17 +42,8 @@ lcd::lcd(gb *ref) {
     reset();
 }
 
-void lcd::set_enable(int layer, bool enable) {
-    layer_enable[layer] = enable;
-}
-
-bool lcd::get_enable(int layer) {
-    return layer_enable[layer];
-}
-
 void lcd::reset() {
     now_win_line = 0;
-    layer_enable[0] = layer_enable[1] = layer_enable[2] = true;
     sprite_count = 0;
 }
 
@@ -237,14 +228,14 @@ void lcd::win_render(void *buf, int scanline) {
         *(dat++) = pal[calc2 & 3];
         *(dat++) = pal[calc1 & 3];
 
-        *(trans++) = (uint8_t)((calc2 >> 6));
-        *(trans++) = (uint8_t)((calc1 >> 6));
-        *(trans++) = (uint8_t)((calc2 >> 4) & 3);
-        *(trans++) = (uint8_t)((calc1 >> 4) & 3);
-        *(trans++) = (uint8_t)((calc2 >> 2) & 3);
-        *(trans++) = (uint8_t)((calc1 >> 2) & 3);
-        *(trans++) = (uint8_t)(calc2 & 3);
-        *(trans++) = (uint8_t)(calc1 & 3);
+        *(trans++) = (uint8_t) ((calc2 >> 6));
+        *(trans++) = (uint8_t) ((calc1 >> 6));
+        *(trans++) = (uint8_t) ((calc2 >> 4) & 3);
+        *(trans++) = (uint8_t) ((calc1 >> 4) & 3);
+        *(trans++) = (uint8_t) ((calc2 >> 2) & 3);
+        *(trans++) = (uint8_t) ((calc1 >> 2) & 3);
+        *(trans++) = (uint8_t) (calc2 & 3);
+        *(trans++) = (uint8_t) (calc1 & 3);
     }
 }
 
@@ -902,43 +893,20 @@ void lcd::render(void *buf, int scanline) {
     sprite_count = 0;
 
     if (ref_gb->get_rom()->get_info()->gb_type >= 3) {
-        //		for (int i=0;i<64;i++)
-        //			mapped_pal[i>>2][i&3]=ref_gb->get_stream_provider()->map_color(col_pal[i>>2][i&3]);
-
-        if (layer_enable[0] && layer_enable[1] && layer_enable[2]) {
-            bg_render_color(buf, scanline);
-            win_render_color(buf, scanline);
-            sprite_render_color(buf, scanline);
-        } else {
-            memset(((uint16_t *) buf) + 160 * scanline, 0x00, 160 * 2);
-            if (layer_enable[0])
-                bg_render_color(buf, scanline);
-            if (layer_enable[1])
-                win_render_color(buf, scanline);
-            if (layer_enable[2])
-                sprite_render_color(buf, scanline);
-        }
+        bg_render_color(buf, scanline);
+        win_render_color(buf, scanline);
+        sprite_render_color(buf, scanline);
     } else {
-        if (layer_enable[0] && layer_enable[1] && layer_enable[2]) {
-            bg_render(buf, scanline);
-            win_render(buf, scanline);
-            sprite_render(buf, scanline);
-        } else {
-            memset(((uint16_t *) buf) + 160 * scanline, 0x00, 160 * 2);
-            if (layer_enable[0])
-                bg_render(buf, scanline);
-            if (layer_enable[1])
-                win_render(buf, scanline);
-            if (layer_enable[2])
-                sprite_render(buf, scanline);
-        }
+        bg_render(buf, scanline);
+        win_render(buf, scanline);
+        sprite_render(buf, scanline);
     }
 }
 
 void lcd::serialize(serializer &s) {
     s_ARRAY(m_pal16);
     s_ARRAY(m_pal32);
-    s_ARRAY(col_pal); // the only one that was in the original state format.
+    s_ARRAY(col_pal);
     s_ARRAY(mapped_pal);
     s_VAR(trans_count);
     s_ARRAY(trans_tbl);
@@ -946,5 +914,4 @@ void lcd::serialize(serializer &s) {
     s_VAR(now_win_line);
     s_VAR(mul);
     s_VAR(sprite_count);
-    s_ARRAY(layer_enable);
 }

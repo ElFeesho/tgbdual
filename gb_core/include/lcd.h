@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 class gb;
 
@@ -8,7 +8,7 @@ class serializer;
 
 class lcd {
 public:
-    lcd(gb *ref);
+    explicit lcd(gb *ref);
 
     void render(void *buf, int scanline);
 
@@ -19,12 +19,6 @@ public:
     uint16_t *get_pal(int num) { return col_pal[num]; }
 
     uint16_t *get_mapped_pal(int num) { return mapped_pal[num]; }
-
-    void set_enable(int layer, bool enable);
-
-    bool get_enable(int layer);
-
-    int get_sprite_count() { return sprite_count; };
 
     void serialize(serializer &s);
 
@@ -52,8 +46,6 @@ private:
     int now_win_line;
     int mul;
     int sprite_count;
-
-    bool layer_enable[3];
 
     gb *ref_gb;
 };
