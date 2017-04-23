@@ -39,6 +39,8 @@ void gb_osd_renderer::add_text(const std::string &text, int16_t x, int16_t y) {
 }
 
 void gb_osd_renderer::renderOSDMessages() {
+    osd_messages.erase(remove_if(osd_messages.begin(), osd_messages.end(), [](pending_osd_message &msg) { return emulator_time::current_time() > msg.first; }), osd_messages.end());
+
     int16_t msg_number = 0;
     for (pending_osd_message &osd_msg : osd_messages) {
         int16_t y = (int16_t)(11 + msg_number * 20);
@@ -47,7 +49,4 @@ void gb_osd_renderer::renderOSDMessages() {
 
         msg_number++;
     }
-
-    osd_messages.erase(remove_if(osd_messages.begin(), osd_messages.end(), [](pending_osd_message &msg) { return emulator_time::current_time() > msg.first; }), osd_messages.end());
-
 }
