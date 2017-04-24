@@ -31,18 +31,10 @@ void errorHandler(WrenVM *vm, WrenErrorType type, const char *module, int line, 
 }
 
 wren_script_vm::wren_script_vm(script_services *context) : _wrenVm{nullptr, wrenFreeVM} {
-    WrenConfiguration config;
+    WrenConfiguration config{};
     wrenInitConfiguration(&config);
 
-    config.writeFn = [](WrenVM *vm, const char *text) {
-        std::cout << "VM: " << text << std::endl;
-    };
-
-    config.bindForeignMethodFn = [](WrenVM *vm,
-                                    const char *module,
-                                    const char *className,
-                                    bool isStatic,
-                                    const char *signature) -> WrenForeignMethodFn {
+    config.bindForeignMethodFn = [](WrenVM *vm, const char *module, const char *className, bool isStatic, const char *signature) -> WrenForeignMethodFn {
         return boundFunction(className, signature);
     };
 
