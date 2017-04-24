@@ -195,7 +195,7 @@ void gb::run() {
 
 void inline gb::render_frame() {
     if (now_frame >= skip) {
-        m_renderer->render_screen((uint8_t *)vframe, 160, 144, 16);
+        m_renderer->render_screen((uint8_t *) vframe, 160, 144);
         now_frame = 0;
     } else {
         now_frame++;

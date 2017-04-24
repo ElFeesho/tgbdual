@@ -71,5 +71,6 @@ create_test_target(limitter src/limitter.cpp src/emulator_time.cpp)
 create_test_target(emulator_time src/emulator_time.cpp)
 create_test_target(gb_osd_renderer src/rendering/gb_osd_renderer.cpp src/emulator_time.cpp LINK script_layer)
 create_test_target(gb_audio_renderer src/rendering/gb_audio_renderer.cpp LINK gb_core)
+create_test_target(gb_video_renderer src/rendering/gb_video_renderer.cpp LINK gb_core)
 
 target_compile_options(tgbdual PRIVATE ${TGBDUAL_COMPILE_OPTIONS})
