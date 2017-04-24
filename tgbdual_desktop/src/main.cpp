@@ -51,8 +51,6 @@
 #include <input/gb_console_driver.h>
 #include <emulation/core_services.h>
 
-void loop(console &c, limitter &frameLimitter, gb_sys_command_source &, gb_console_driver &);
-
 void saveState(gameboy &gbInst, rom_file &romFile) {
     memory_buffer buffer;
 
@@ -77,17 +75,16 @@ int main(int argc, char *argv[]) {
 
     std::unique_ptr<link_cable_source> cable_source{provideLinkCableSource(&argc, &argv)};
 
-    script_manager scriptManager;
-
     auto services = createCoreServices();
 
+    script_manager scriptManager;
     console cons{services->videoRenderer(),
                  520, 488 / 2,
                  std::bind(&script_manager::handleUnhandledCommand, &scriptManager, std::placeholders::_1, std::placeholders::_2),
                  &emulator_time::current_time};
 
     gb_osd_renderer osdRenderer{services->videoRenderer()};
-    gb_video_renderer video_renderer{services->videoRenderer(), [&]() {
+    gb_video_renderer video_renderer{services->videoRenderer(), [&] {
         scriptManager.tick();
         osdRenderer.render();
         cons.draw();
@@ -161,7 +158,12 @@ int main(int argc, char *argv[]) {
     };
 
     while (!endGame) {
-        loop(cons, frameLimitter, sys_command_source, consoleDriver);
+        if (!cons.isOpen()) {
+            sys_command_source.update();
+        } else {
+            consoleDriver.update();
+        }
+        frameLimitter.limit();
     }
 
     gbInst.save_sram(std::bind(&rom_file::writeSram, &romFile, std::placeholders::_1, std::placeholders::_2));
@@ -169,11 +171,3 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-void loop(console &c, limitter &frameLimitter, gb_sys_command_source &sys_command_source, gb_console_driver &consoleDriver) {
-    if (!c.isOpen()) {
-        sys_command_source.update();
-    } else {
-        consoleDriver.update();
-    }
-    frameLimitter.limit();
-}
