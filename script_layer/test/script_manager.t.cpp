@@ -6,7 +6,7 @@
 
 class fake_vm : public script_vm {
 public:
-    fake_vm(bool canHandleCommand = true) : _handleCommand{canHandleCommand} {}
+    fake_vm(bool canHandleCommand = true, std::function<void()> activateDelegate = []{}) : _handleCommand{canHandleCommand}, _activateDelegate{activateDelegate} {}
     bool ticked{false};
     bool activated{false};
     bool handledUnhandledCommand{false};
@@ -17,6 +17,7 @@ public:
 
     void activate() override {
         activated = true;
+        _activateDelegate();
     }
 
     void loadScript(const std::string &string) override {
@@ -29,14 +30,18 @@ public:
     }
 private:
     bool _handleCommand;
+    std::function<void()> _activateDelegate;
 };
 
-TEST(script_manager, will_tick_all_vms) {
-    script_manager manager;
 
+class ScriptManagerTest : public ::testing::Test {
+public:
+    script_manager manager;
     fake_vm *fake_vm1 = new fake_vm;
     fake_vm *fake_vm2 = new fake_vm;
+};
 
+TEST_F(ScriptManagerTest, will_tick_all_vms) {
     manager.add_vm("one", fake_vm1);
     manager.add_vm("two", fake_vm2);
 
@@ -46,12 +51,7 @@ TEST(script_manager, will_tick_all_vms) {
     EXPECT_TRUE(fake_vm2->ticked);
 }
 
-TEST(script_manager, will_activate_all_vms) {
-    script_manager manager;
-
-    fake_vm *fake_vm1 = new fake_vm;
-    fake_vm *fake_vm2 = new fake_vm;
-
+TEST_F(ScriptManagerTest, will_activate_all_vms) {
     manager.add_vm("one", fake_vm1);
     manager.add_vm("two", fake_vm2);
 
@@ -61,9 +61,7 @@ TEST(script_manager, will_activate_all_vms) {
     EXPECT_TRUE(fake_vm2->activated);
 }
 
-TEST(script_manager, will_provide_unhandled_command) {
-    script_manager manager;
-
+TEST_F(ScriptManagerTest, will_provide_unhandled_command) {
     fake_vm *fake_vm1 = new fake_vm{false};
     fake_vm *fake_vm2 = new fake_vm{false};
 
@@ -102,12 +100,7 @@ TEST(script_manager, will_report_true_when_a_vms_handle_unhandled_command) {
 }
 
 
-TEST(script_manager, only_one_vm_will_handle_a_command) {
-    script_manager manager;
-
-    fake_vm *fake_vm1 = new fake_vm{true};
-    fake_vm *fake_vm2 = new fake_vm{true};
-
+TEST_F(ScriptManagerTest, only_one_vm_will_handle_a_command) {
     manager.add_vm("one", fake_vm1);
     manager.add_vm("two", fake_vm2);
 
@@ -116,43 +109,31 @@ TEST(script_manager, only_one_vm_will_handle_a_command) {
     EXPECT_NE(fake_vm1->handledUnhandledCommand, fake_vm2->handledUnhandledCommand);
 }
 
-TEST(script_manager, removing_non_existant_vm_is_noop) {
-    script_manager manager;
-
+TEST_F(ScriptManagerTest, removing_non_existant_vm_is_noop) {
     EXPECT_NO_FATAL_FAILURE(manager.remove_vm("doesnt exist"));
 }
 
 
-// Difficult to test these ones... smelly design?
-//TEST(script_manager, will_not_tick_unloaded_script_vms) {
-//    script_manager manager;
-//
-//    fake_vm *fake_vm1 = new fake_vm{true};
-//    fake_vm *fake_vm2 = new fake_vm{true};
-//
-//    manager.add_vm("one", fake_vm1);
-//    manager.add_vm("two", fake_vm2);
-//
-//    manager.remove_vm("one");
-//
-//    manager.tick();
-//
-//    EXPECT_FALSE(fake_vm1->ticked);
-//}
-//
-//TEST(script_manager, will_not_activate_unloaded_script_vms) {
-//    script_manager manager;
-//
-//    fake_vm *fake_vm1 = new fake_vm{true};
-//    bool &activated = fake_vm1->activated;
-//    fake_vm *fake_vm2 = new fake_vm{true};
-//
-//    manager.add_vm("one", fake_vm1);
-//    manager.add_vm("two", fake_vm2);
-//
-//    manager.remove_vm("one");
-//
-//    manager.activate();
-//
-//    EXPECT_FALSE(activated);
-//}
+TEST_F(ScriptManagerTest, will_not_tick_unloaded_script_vms) {
+    manager.add_vm("one", fake_vm1);
+    manager.add_vm("two", fake_vm2);
+
+    manager.remove_vm("one");
+
+    manager.tick();
+
+    EXPECT_FALSE(fake_vm1->ticked);
+}
+
+TEST_F(ScriptManagerTest, will_not_activate_unloaded_script_vms) {
+    bool &activated = fake_vm1->activated;
+
+    manager.add_vm("one", fake_vm1);
+    manager.add_vm("two", fake_vm2);
+
+    manager.remove_vm("one");
+
+    manager.activate();
+
+    EXPECT_FALSE(activated);
+}
