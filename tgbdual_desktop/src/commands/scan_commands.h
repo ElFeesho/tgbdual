@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory/scan_engine.h>
-#include <console/console.h>
+#include <tgbdual.h>
 
-void registerScanCommands(console &console, scan_engine &scanEngine);
+void registerScanCommands(tgbdual &tgb);

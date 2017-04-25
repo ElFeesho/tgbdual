@@ -1,7 +1,6 @@
 #pragma once
 
-#include <io/rom_file.h>
 #include <console/console.h>
-#include <gameboy.h>
+#include <tgbdual.h>
 
-void registerGameBoyCommands(console &console, gameboy &gbInst, rom_file &romFile);
+void registerGameBoyCommands(tgbdual &tgb);

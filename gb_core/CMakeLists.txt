@@ -1,6 +1,5 @@
 set(GB_CORE_SOURCES
         include/sound_provider.h
-        include/gameboy.h
         include/link_cable_source.h
         include/gamepad_source.h
         include/gb.h
@@ -15,7 +14,6 @@ set(GB_CORE_SOURCES
         include/mbc.h
         include/rom.h
         src/address_scanner.cpp
-        src/gameboy.cpp
         src/apu.cpp
         src/cheat.cpp
         src/cpu.cpp

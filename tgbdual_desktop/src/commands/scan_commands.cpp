@@ -1,6 +1,7 @@
 #include "scan_commands.h"
 
 #include <sstream>
+#include <memory/scan_engine.h>
 
 static inline void printAddressValue(console &console, uint32_t address, uint8_t value) {
     std::stringstream s;
@@ -25,66 +26,67 @@ void printScanResults(std::vector<ptrdiff_t> &results, console &console) {
     }
 }
 
-void registerScanCommands(console &console, scan_engine &scanEngine) {
-    console.addCommand("scan", [&](std::vector<std::string> args) {
+void registerScanCommands(tgbdual &tgb) {
+    static scan_engine scanEngine{tgb.getGameboy().createAddressScanner(), std::bind(&console::addOutput, &tgb.getConsole(), "Initial search state created")};
+    tgb.getConsole().addCommand("scan", [&](std::vector<std::string> args) {
 
         if (args.size() != 1) {
-            console.addError("Usage: scan [value]");
+            tgb.getConsole().addError("Usage: scan [value]");
             return;
         }
 
         uint32_t value = console_cmd::toInt<uint32_t>(args[0]);
         size_t resultCount{0};
         resultCount = scanEngine.scan(value, [&](std::vector<ptrdiff_t> &results) {
-            printScanResults(results, console);
+            printScanResults(results, tgb.getConsole());
         });
-        console.addOutput("Found " + std::to_string((int) resultCount) + " results");
+        tgb.getConsole().addOutput("Found " + std::to_string((int) resultCount) + " results");
     });
 
-    console.addCommand("start_search", [&](std::vector<std::string> args) {
+    tgb.getConsole().addCommand("start_search", [&](std::vector<std::string> args) {
         scanEngine.clear_search();
     });
 
-    console.addCommand("search_greater", [&](std::vector<std::string> args) {
+    tgb.getConsole().addCommand("search_greater", [&](std::vector<std::string> args) {
         size_t resultCount = scanEngine.search_increased([&](const std::map<ptrdiff_t, uint8_t> &results) {
-            print_scan_state(console, "Greater values", results);
+            print_scan_state(tgb.getConsole(), "Greater values", results);
         });
-        console.addOutput("Total values: " + std::to_string(resultCount));
+        tgb.getConsole().addOutput("Total values: " + std::to_string(resultCount));
     });
 
-    console.addCommand("search_lesser", [&](std::vector<std::string> args) {
+    tgb.getConsole().addCommand("search_lesser", [&](std::vector<std::string> args) {
         size_t resultCount = scanEngine.search_decreased([&](const std::map<ptrdiff_t, uint8_t> &results) {
-            print_scan_state(console, "Lesser values", results);
+            print_scan_state(tgb.getConsole(), "Lesser values", results);
         });
-        console.addOutput("Total values: " + std::to_string(resultCount));
+        tgb.getConsole().addOutput("Total values: " + std::to_string(resultCount));
     });
 
-    console.addCommand("search_changed", [&](std::vector<std::string> args) {
+    tgb.getConsole().addCommand("search_changed", [&](std::vector<std::string> args) {
         size_t resultCount = scanEngine.search_changed([&](const std::map<ptrdiff_t, uint8_t> &results) {
-            print_scan_state(console, "Changed values", results);
+            print_scan_state(tgb.getConsole(), "Changed values", results);
         });
-        console.addOutput("Total values: " + std::to_string(resultCount));
+        tgb.getConsole().addOutput("Total values: " + std::to_string(resultCount));
     });
 
-    console.addCommand("search_unchanged", [&](std::vector<std::string> args) {
+    tgb.getConsole().addCommand("search_unchanged", [&](std::vector<std::string> args) {
         size_t resultCount = scanEngine.search_unchanged([&](const std::map<ptrdiff_t, uint8_t> &results) {
-            print_scan_state(console, "Unchanged values", results);
+            print_scan_state(tgb.getConsole(), "Unchanged values", results);
         });
-        console.addOutput("Total values: " + std::to_string(resultCount));
+        tgb.getConsole().addOutput("Total values: " + std::to_string(resultCount));
     });
 
-    console.addCommand("scan_threshold", [&](std::vector<std::string> args) {
+    tgb.getConsole().addCommand("scan_threshold", [&](std::vector<std::string> args) {
         if (args.size() == 0) {
-            console.addOutput("Scan threshold: " + std::to_string(scanEngine.scan_threshold()));
+            tgb.getConsole().addOutput("Scan threshold: " + std::to_string(scanEngine.scan_threshold()));
         } else {
             scanEngine.set_scan_threshold(console_cmd::toInt<size_t>(args[0]));
-            console.addOutput("Scan threshold now: " + std::to_string(scanEngine.scan_threshold()));
+            tgb.getConsole().addOutput("Scan threshold now: " + std::to_string(scanEngine.scan_threshold()));
         }
     });
 
-    console.addCommand("clear_scan", [&](std::vector<std::string> args) {
+    tgb.getConsole().addCommand("clear_scan", [&](std::vector<std::string> args) {
         scanEngine.clear_scan();
-        console.addOutput("Cleared previous search results");
+        tgb.getConsole().addOutput("Cleared previous search results");
     });
 }
 

@@ -11,10 +11,14 @@
 #include "link_cable_source.h"
 
 #include <address_scanner.h>
+#include <emulation/core_services.h>
+#include <rendering/gb_video_renderer.h>
+#include <rendering/gb_audio_renderer.h>
+#include <input/gb_gamepad_source.h>
 
 class gameboy {
 public:
-	gameboy(video_renderer *video, audio_renderer *audio, gamepad_source *gp_source, link_cable_source *link_cable_source);
+	gameboy(core_services *services, gb_video_renderer::render_callback renderCallback, link_cable_source *link_cable_source);
 
 	void load_rom(uint8_t *romData, uint32_t romLength, uint8_t *ram = nullptr, uint32_t ramLength = 0);
 
@@ -27,6 +31,9 @@ public:
 	void tick();
 
 	void set_speed(uint32_t speed);
+
+	void disableInput();
+	void enableInput();
 
 	address_scanner createAddressScanner();
 
@@ -43,6 +50,9 @@ public:
 	}
 
 private:
+	gb_video_renderer _videoRenderer;
+	gb_audio_renderer _audioRenderer;
+	gb_gamepad_source _gamepadSource;
 	gb _gb;
 	address_scanner _address_scanner;
 };
