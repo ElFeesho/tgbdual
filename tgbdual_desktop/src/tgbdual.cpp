@@ -1,7 +1,12 @@
 #include <io/rom_file.h>
 #include <io/memory_buffer.h>
-#include "tgbdual.h"
-#include "emulator_time.h"
+#include <tgbdual.h>
+#include <emulator_time.h>
+
+#include <commands/scan_commands.h>
+#include <commands/script_commands.h>
+#include <commands/memory_commands.h>
+#include <commands/gameboy_commands.h>
 
 tgbdual::tgbdual(core_services *services, link_cable_source *cableSource, char *romFilePath) :
         _console{services->videoRenderer(), 520, 488 / 2, std::bind(&script_manager::handleUnhandledCommand, &_scriptManager, std::placeholders::_1, std::placeholders::_2),
@@ -49,6 +54,12 @@ tgbdual::tgbdual(core_services *services, link_cable_source *cableSource, char *
             _console.addCommand(name, command);
         }},
         _romFile{romFilePath} {
+
+    registerMemoryCommands(*this);
+    registerScanCommands(*this);
+    registerScriptCommands(*this);
+    registerGameBoyCommands(*this);
+
     file_buffer &romBuffer = _romFile.rom();
     file_buffer &saveBuffer = _romFile.sram();
 

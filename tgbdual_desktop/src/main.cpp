@@ -30,11 +30,6 @@
 
 #include <linkcable/link_cable_source_provider.h>
 
-#include <commands/scan_commands.h>
-#include <commands/script_commands.h>
-#include <commands/memory_commands.h>
-#include <commands/gameboy_commands.h>
-
 int main(int argc, char *argv[]) {
 
     if (argc == 1) {
@@ -47,11 +42,6 @@ int main(int argc, char *argv[]) {
     auto services = createCoreServices();
 
     tgbdual tgb{services.get(), cable_source.get(), argv[0]};
-
-    registerMemoryCommands(tgb);
-    registerScanCommands(tgb);
-    registerScriptCommands(tgb);
-    registerGameBoyCommands(tgb);
 
     tgb.getConsole().addCommand("quit", std::bind(&tgbdual::quit, &tgb));
 
