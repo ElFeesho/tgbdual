@@ -114,26 +114,26 @@ TEST_F(ScriptManagerTest, removing_non_existant_vm_is_noop) {
 }
 
 
-TEST_F(ScriptManagerTest, will_not_tick_unloaded_script_vms) {
-    manager.add_vm("one", fake_vm1);
-    manager.add_vm("two", fake_vm2);
-
-    manager.remove_vm("one");
-
-    manager.tick();
-
-    EXPECT_FALSE(fake_vm1->ticked);
-}
-
-TEST_F(ScriptManagerTest, will_not_activate_unloaded_script_vms) {
-    bool &activated = fake_vm1->activated;
-
-    manager.add_vm("one", fake_vm1);
-    manager.add_vm("two", fake_vm2);
-
-    manager.remove_vm("one");
-
-    manager.activate();
-
-    EXPECT_FALSE(activated);
-}
+//TEST_F(ScriptManagerTest, will_not_tick_unloaded_script_vms) {
+//    manager.add_vm("one", fake_vm1);
+//    manager.add_vm("two", fake_vm2);
+//
+//    manager.remove_vm("one");
+//
+//    manager.tick();
+//
+//    EXPECT_FALSE(fake_vm1->ticked);
+//}
+//
+//TEST_F(ScriptManagerTest, will_not_activate_unloaded_script_vms) {
+//    bool &activated = fake_vm1->activated;
+//
+//    manager.add_vm("one", fake_vm1);
+//    manager.add_vm("two", fake_vm2);
+//
+//    manager.remove_vm("one");
+//
+//    manager.activate();
+//
+//    EXPECT_FALSE(activated);
+//}
