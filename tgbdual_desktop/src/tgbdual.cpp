@@ -8,6 +8,8 @@
 #include <commands/memory_commands.h>
 #include <commands/gameboy_commands.h>
 
+#include <utility>
+
 tgbdual::tgbdual(core_services *services, link_cable_source *cableSource, char *romFilePath) :
         _console{services->videoRenderer(), 520, 488 / 2, std::bind(&script_manager::handleUnhandledCommand, &_scriptManager, std::placeholders::_1, std::placeholders::_2),
                  &emulator_time::current_time},
@@ -67,18 +69,6 @@ tgbdual::tgbdual(core_services *services, link_cable_source *cableSource, char *
     loadState();
 }
 
-gameboy &tgbdual::getGameboy() {
-    return _gameboy;
-}
-
-console &tgbdual::getConsole() {
-    return _console;
-}
-
-script_manager &tgbdual::getScriptManager() {
-    return _scriptManager;
-}
-
 script_services *tgbdual::getScriptServices() {
     return &_scriptContext;
 }
@@ -120,6 +110,30 @@ bool tgbdual::limit() {
 
 void tgbdual::quit() {
     _alive = false;
+}
+
+void tgbdual::addConsoleCommand(const std::string &command, std::function<void(std::vector<std::string>)> &&commandFunc) {
+    _console.addCommand(command, commandFunc);
+}
+
+void tgbdual::addConsoleOutput(const std::string &output) {
+    _console.addOutput(output);
+}
+
+void tgbdual::addConsoleErrorOutput(const std::string &output) {
+    _console.addError(output);
+}
+
+void tgbdual::addVm(const std::string &name, script_vm *vm) {
+    _scriptManager.add_vm(name, vm);
+}
+
+void tgbdual::removeVm(const std::string &name) {
+    _scriptManager.remove_vm(name);
+}
+
+address_scanner tgbdual::createAddressScanner() {
+    return _gameboy.createAddressScanner();
 }
 
 

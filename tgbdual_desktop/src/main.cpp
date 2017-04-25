@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
 
     tgbdual tgb{services.get(), cable_source.get(), argv[0]};
 
-    tgb.getConsole().addCommand("quit", std::bind(&tgbdual::quit, &tgb));
+    tgb.addConsoleCommand("quit", std::bind(&tgbdual::quit, &tgb));
 
     while (tgb.limit());
 

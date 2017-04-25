@@ -16,10 +16,25 @@ class tgbdual {
 public:
     explicit tgbdual(core_services *services, link_cable_source *cableSource, char *romFilePath);
 
-    gameboy &getGameboy();
-    console &getConsole();
-    script_manager &getScriptManager();
+    void addConsoleCommand(const std::string &command, std::function<void(std::vector<std::string>)> &&commandFunc);
+    void addConsoleOutput(const std::string &output);
+    void addConsoleErrorOutput(const std::string &output);
+    address_scanner createAddressScanner();
+
+    void addVm(const std::string &name, script_vm *vm);
+    void removeVm(const std::string &name);
+
     script_services *getScriptServices();
+
+    template<typename T>
+    T readRam(uint32_t address) {
+        return _gameboy.read_ram<T>(address);
+    }
+
+    template<typename T>
+    void writeRam(uint32_t address, T value) {
+        _gameboy.override_ram(address, value);
+    }
 
     void loadState();
     void saveState();

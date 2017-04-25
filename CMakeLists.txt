@@ -51,6 +51,7 @@ endif ()
 enable_testing()
 
 add_subdirectory(gb_core)
+add_subdirectory(tgbdual)
 add_subdirectory(tgbdual_desktop)
 add_subdirectory(sdl_adapters)
 add_subdirectory(sfml_adapters)

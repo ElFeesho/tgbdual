@@ -1,6 +1,5 @@
 #pragma once
 
-#include <console/console.h>
-#include <gameboy.h>
+#include <tgbdual.h>
 
 void registerMemoryCommands(tgbdual &tgb);
