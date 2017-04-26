@@ -29,7 +29,7 @@
 
 #include <linkcable/link_cable_source_provider.h>
 #include <io/rom_file.h>
-#include <commands/script_commands.h>
+#include <script_commands.h>
 
 int main(int argc, char *argv[]) {
 

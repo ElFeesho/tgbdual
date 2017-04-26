@@ -1,10 +1,7 @@
-#include <io/rom_file.h>
-#include <io/memory_buffer.h>
 #include <tgbdual.h>
 #include <emulator_time.h>
 
 #include <commands/scan_commands.h>
-#include <commands/script_commands.h>
 #include <commands/memory_commands.h>
 #include <commands/gameboy_commands.h>
 
