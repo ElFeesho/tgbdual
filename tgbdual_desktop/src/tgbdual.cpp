@@ -58,7 +58,6 @@ tgbdual::tgbdual(core_services *services, link_cable_source *cableSource, tgb::r
 
     registerMemoryCommands(*this);
     registerScanCommands(*this);
-    registerScriptCommands(*this);
     registerGameBoyCommands(*this);
 
     _gameboy.load_rom(rom->loadRom(), rom->romLength(), rom->loadSram(), rom->sramLength());

@@ -21,7 +21,7 @@ public:
 
     uint8_t *loadSram() override;
 
-    uint32_t sramLength() override;
+    size_t sramLength() override;
 
     file_buffer &rom();
 

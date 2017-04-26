@@ -14,6 +14,7 @@ namespace tgb {
         virtual uint8_t *loadState() = 0;
         virtual void saveSram(uint8_t *sram, size_t length) = 0;
         virtual uint8_t *loadSram() = 0;
-        virtual uint32_t sramLength() = 0;
+
+        virtual size_t sramLength() = 0;
     };
 }

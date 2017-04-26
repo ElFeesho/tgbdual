@@ -25,11 +25,11 @@
 
 #include <gameboy.h>
 
-#include "console/console.h"
 #include "tgbdual.h"
 
 #include <linkcable/link_cable_source_provider.h>
 #include <io/rom_file.h>
+#include <commands/script_commands.h>
 
 int main(int argc, char *argv[]) {
 
@@ -46,6 +46,8 @@ int main(int argc, char *argv[]) {
     tgbdual tgb{services.get(), cable_source.get(), &rom};
 
     tgb.addConsoleCommand("quit", std::bind(&tgbdual::quit, &tgb));
+
+    registerScriptCommands(tgb); // These commands use fs.
 
     while (tgb.limit());
 

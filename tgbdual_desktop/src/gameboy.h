@@ -22,7 +22,7 @@ public:
 
 	void addCheat(const std::string &cheat);
 
-	void load_rom(uint8_t *romData, uint32_t romLength, uint8_t *ram = nullptr, uint32_t ramLength = 0);
+	void load_rom(uint8_t *romData, size_t romLength, uint8_t *ram = nullptr, size_t ramLength = 0);
 
 	void save_state(const std::function<uint8_t *(size_t)> &functor);
 

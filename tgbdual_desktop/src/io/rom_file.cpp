@@ -70,6 +70,6 @@ uint8_t *rom_file::loadSram() {
     return _sramBuffer;
 }
 
-uint32_t rom_file::sramLength() {
+size_t rom_file::sramLength() {
     return _sramBuffer.length();
 }
