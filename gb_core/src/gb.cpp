@@ -75,17 +75,12 @@ void gb::set_skip(int frame) {
 
 void gb::add_cheat(const std::string &cheat_code)
 {
-    m_cheat.add_cheat(cheat_code, [&](uint16_t adr, uint8_t data) {
-        m_cpu.write(adr, data);
-    });
+    m_cheat.add_cheat(cheat_code, std::bind(&cpu::write, &m_cpu, std::placeholders::_1, std::placeholders::_2));
 }
 
 bool gb::load_rom(uint8_t *buf, size_t size, uint8_t *ram, size_t ram_size) {
-    bool loadedSuccessfully = m_rom.load_rom(buf, size, ram, ram_size);
-    if (loadedSuccessfully) {
-        reset();
-    }
-    return loadedSuccessfully;
+    reset();
+    return m_rom.load_rom(buf, size, ram, ram_size);
 }
 
 void gb::serialize(serializer &s) {

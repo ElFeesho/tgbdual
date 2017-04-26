@@ -21,13 +21,7 @@
 // ROMイメージ管理部 (含SRAM) // ROM image management unit (SRAM included)
 
 #include "rom.h"
-#include <memory.h>
 #include "serializer.h"
-
-rom::~rom() {
-    free(dat);
-    free(sram);
-}
 
 uint16_t rom::get_sram_size() {
     static const uint16_t tbl_ram[] = {1, 1, 1, 4, 16, 8};
@@ -37,11 +31,6 @@ uint16_t rom::get_sram_size() {
 bool rom::load_rom(uint8_t *buf, size_t size, uint8_t *ram, size_t ram_size) {
     uint8_t momocol_title[16] = {0x4D, 0x4F, 0x4D, 0x4F, 0x43, 0x4F, 0x4C, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                  0x00, 0x00};
-
-    if (b_loaded) {
-        free(dat);
-        free(sram);
-    }
 
     memcpy(info.cart_name, buf + 0x134, 16);
     info.cart_name[16] = '\0';
@@ -60,28 +49,26 @@ bool rom::load_rom(uint8_t *buf, size_t size, uint8_t *ram, size_t ram_size) {
         return false;
     }
 
-    dat = (uint8_t *) malloc(size);
-    memcpy(dat, buf, size);
-    first_page = dat;
+    dat = std::unique_ptr<uint8_t[]>(new uint8_t[size]);
+    memcpy(dat.get(), buf, size);
+    first_page = dat.get();
 
-    sram = (uint8_t *) malloc(get_sram_size());
+    sram = std::unique_ptr<uint8_t[]>(new uint8_t[get_sram_size()]);
     if (ram != nullptr) {
-        memcpy(sram, ram, ram_size & 0xffffff00);
+        memcpy(sram.get(), ram, ram_size & 0xffffff00);
     }
-
-    b_loaded = true;
 
     return true;
 }
 
 void rom::serialize(serializer &s) {
     s_VAR(info);
-    s.process(sram, get_sram_size());
+    s.process(sram.get(), get_sram_size());
 }
 
-void rom::set_first(int32_t page) { first_page = dat + 0x4000 * page; }
+void rom::set_first(int32_t page) { first_page = dat.get() + 0x4000 * page; }
 
-uint8_t *rom::get_sram() { return sram; }
+uint8_t *rom::get_sram() { return sram.get(); }
 
 uint8_t *rom::get_rom() { return first_page; }
 

@@ -10,4 +10,13 @@ void registerGameBoyCommands(tgbdual &tgb) {
         tgb.loadState();
         tgb.addConsoleOutput("State loaded");
     });
+
+    tgb.addConsoleCommand("cheat", [&](std::vector<std::string> args) {
+        if (args.empty()) {
+            tgb.addConsoleErrorOutput("Usage: cheat [game genie code]");
+        } else {
+            tgb.addCheat(args[0]);
+            tgb.addConsoleOutput("Cheat Added");
+        }
+    });
 }

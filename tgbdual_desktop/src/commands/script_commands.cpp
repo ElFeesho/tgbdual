@@ -2,6 +2,7 @@
 
 #include <wren_script_vm.h>
 #include <lua_script_vm.h>
+#include <io/file_buffer.h>
 
 void registerScriptCommands(tgbdual &tgb) {
     tgb.addConsoleCommand("load_script", [&](std::vector<std::string> args) {

@@ -1,14 +1,19 @@
 #include <stdexcept>
+#include <utility>
 #include <emulation/core_services.h>
 
 #include "gameboy.h"
 
-gameboy::gameboy(core_services *services, gb_video_renderer::render_callback renderCallback,  link_cable_source *link_cable_source)
-    : _videoRenderer{services->videoRenderer(), renderCallback, 100}, _audioRenderer{services->audioRenderer()}, _gamepadSource{services->gamepadSource()}, _gb{&_videoRenderer, &_audioRenderer, &_gamepadSource, [this] {}, [link_cable_source] { return link_cable_source->readByte(); }, [link_cable_source](uint8_t data) { link_cable_source->sendByte(data); }}, _address_scanner{_gb.create_address_scanner()} {
+gameboy::gameboy(core_services *services, gb_video_renderer::render_callback &&renderCallback,  link_cable_source *link_cable_source)
+        : _videoRenderer{services->videoRenderer(), renderCallback, 100}, _audioRenderer{services->audioRenderer()}, _gamepadSource{services->gamepadSource()}, _gb{&_videoRenderer, &_audioRenderer, &_gamepadSource, [this] {}, [link_cable_source] { return link_cable_source->readByte(); }, [link_cable_source](uint8_t data) { link_cable_source->sendByte(data); }}, _address_scanner{_gb.create_address_scanner()} {
 }
 
 void gameboy::load_rom(uint8_t *romData, uint32_t romLength, uint8_t *ram, uint32_t ramLength) {
     _gb.load_rom(romData, romLength, ram, ramLength);
+}
+
+void gameboy::addCheat(const std::string &cheat) {
+    _gb.add_cheat(cheat);
 }
 
 void gameboy::save_state(const std::function<uint8_t *(size_t)> &functor) {

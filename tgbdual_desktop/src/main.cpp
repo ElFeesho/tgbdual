@@ -29,6 +29,7 @@
 #include "tgbdual.h"
 
 #include <linkcable/link_cable_source_provider.h>
+#include <io/rom_file.h>
 
 int main(int argc, char *argv[]) {
 
@@ -41,7 +42,8 @@ int main(int argc, char *argv[]) {
 
     auto services = createCoreServices();
 
-    tgbdual tgb{services.get(), cable_source.get(), argv[0]};
+    rom_file rom{argv[0]};
+    tgbdual tgb{services.get(), cable_source.get(), &rom};
 
     tgb.addConsoleCommand("quit", std::bind(&tgbdual::quit, &tgb));
 

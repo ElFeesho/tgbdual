@@ -52,7 +52,7 @@ cheat_dat::cheat_dat(const std::string &cheat_code) {
     adr = extractAddress(cheat_code);
 }
 
-void cheat::add_cheat(const std::string &code, cpu_writecb writecb) {
+void cheat::add_cheat(const std::string &code, const cpu_writecb &writecb) {
     cheat_map.emplace(extractAddress(code), code);
     if (extractCode(code) == 0) {
         writecb(extractAddress(code), extractData(code));
@@ -64,24 +64,24 @@ uint8_t cheat::cheat_read(uint8_t ram_bank_num, uint16_t adr, uint8_t or_value) 
     {
         return or_value;
     }
-    else
+    
+    const auto &tmp = cheat_map.at(adr);
+    if (tmp.code == 0x01)
     {
-        const auto &tmp = cheat_map.at(adr);
-        if (tmp.code == 0x01)
-        {
-            return tmp.dat;
-        }
-        else if (tmp.code >= 0x90 && tmp.code <= 0x97)
-        {
-            if ((adr >= 0xD000) && (adr < 0xE000)) {
-                if (ram_bank_num == (tmp.code - 0x90)) {
-                    return tmp.dat;
-                }
-            } else {
+        return tmp.dat;
+    }
+
+    if (tmp.code >= 0x90 && tmp.code <= 0x97)
+    {
+        if ((adr >= 0xD000) && (adr < 0xE000)) {
+            if (ram_bank_num == (tmp.code - 0x90)) {
                 return tmp.dat;
             }
+        } else {
+            return tmp.dat;
         }
     }
+
 
     return or_value;
 }

@@ -18,7 +18,9 @@
 
 class gameboy {
 public:
-	gameboy(core_services *services, gb_video_renderer::render_callback renderCallback, link_cable_source *link_cable_source);
+	gameboy(core_services *services, gb_video_renderer::render_callback &&renderCallback, link_cable_source *link_cable_source);
+
+	void addCheat(const std::string &cheat);
 
 	void load_rom(uint8_t *romData, uint32_t romLength, uint8_t *ram = nullptr, uint32_t ramLength = 0);
 

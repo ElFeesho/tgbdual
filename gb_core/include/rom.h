@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <cstdlib>
+#include <memory>
 
 class gb;
 
@@ -18,8 +19,6 @@ struct rom_info {
 
 class rom {
 public:
-    ~rom();
-
     rom_info *get_info();
 
     uint8_t *get_rom();
@@ -37,10 +36,8 @@ public:
 private:
     rom_info info{};
 
-    uint8_t *dat { nullptr };
-    uint8_t *sram { nullptr };
+    std::unique_ptr<uint8_t[]> dat { nullptr };
+    std::unique_ptr<uint8_t[]> sram { nullptr };
 
     uint8_t *first_page { nullptr };
-
-    bool b_loaded { false };
 };

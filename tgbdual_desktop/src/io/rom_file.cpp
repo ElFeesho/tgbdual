@@ -30,7 +30,7 @@ file_buffer &rom_file::state() {
     return _stateBuffer;
 }
 
-void rom_file::writeSram(uint8_t *sramData, uint32_t length) {
+void rom_file::writeSram(uint8_t *sramData, size_t length) {
     std::fstream sram{_sramPath, std::ios::out};
     sram.write((const char *) sramData, length);
     sram.close();
@@ -38,10 +38,38 @@ void rom_file::writeSram(uint8_t *sramData, uint32_t length) {
     _sramBuffer = file_buffer{_sramPath};
 }
 
-void rom_file::writeState(uint8_t *stateData, uint32_t length) {
+void rom_file::writeState(uint8_t *stateData, size_t length) {
     std::fstream state{_statePath, std::ios::out};
     state.write((const char *) stateData, length);
     state.close();
 
     _stateBuffer = file_buffer{_statePath};
+}
+
+uint8_t *rom_file::loadRom() {
+    return _romBuffer;
+}
+
+size_t rom_file::romLength() {
+    return _romBuffer.length();
+}
+
+void rom_file::saveState(uint8_t *state, size_t length) {
+    writeState(state, length);
+}
+
+uint8_t *rom_file::loadState() {
+    return _stateBuffer;
+}
+
+void rom_file::saveSram(uint8_t *sram, size_t length) {
+    writeSram(sram, length);
+}
+
+uint8_t *rom_file::loadSram() {
+    return _sramBuffer;
+}
+
+uint32_t rom_file::sramLength() {
+    return _sramBuffer.length();
 }

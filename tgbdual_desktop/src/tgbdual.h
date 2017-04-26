@@ -10,11 +10,11 @@
 #include <input/gb_sys_command_source.h>
 #include "gameboy_memory_bridge.h"
 #include "limitter.h"
-#include <io/rom_file.h>
+#include <rom.h>
 
 class tgbdual {
 public:
-    explicit tgbdual(core_services *services, link_cable_source *cableSource, char *romFilePath);
+    explicit tgbdual(core_services *services, link_cable_source *cableSource, tgb::rom *rom);
 
     void addConsoleCommand(const std::string &command, std::function<void(std::vector<std::string>)> &&commandFunc);
     void addConsoleOutput(const std::string &output);
@@ -25,6 +25,8 @@ public:
     void removeVm(const std::string &name);
 
     script_services *getScriptServices();
+
+    void addCheat(const std::string &cheat);
 
     template<typename T>
     T readRam(uint32_t address) {
@@ -59,7 +61,7 @@ private:
     gameboy_memory_bridge _memoryBridge;
     script_context _scriptContext;
 
-    rom_file _romFile;
+    tgb::rom *_rom;
 
     limitter _frameLimitter{std::bind(&tgbdual::tick, this)};
 

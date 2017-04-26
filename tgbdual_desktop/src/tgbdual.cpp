@@ -8,9 +8,7 @@
 #include <commands/memory_commands.h>
 #include <commands/gameboy_commands.h>
 
-#include <utility>
-
-tgbdual::tgbdual(core_services *services, link_cable_source *cableSource, char *romFilePath) :
+tgbdual::tgbdual(core_services *services, link_cable_source *cableSource, tgb::rom *rom) :
         _console{services->videoRenderer(), 520, 488 / 2, std::bind(&script_manager::handleUnhandledCommand, &_scriptManager, std::placeholders::_1, std::placeholders::_2),
                  &emulator_time::current_time},
         _osdRenderer{services->videoRenderer()},
@@ -55,17 +53,15 @@ tgbdual::tgbdual(core_services *services, link_cable_source *cableSource, char *
             _console.removeCommand(name);
             _console.addCommand(name, command);
         }},
-        _romFile{romFilePath} {
+
+        _rom{rom} {
 
     registerMemoryCommands(*this);
     registerScanCommands(*this);
     registerScriptCommands(*this);
     registerGameBoyCommands(*this);
 
-    file_buffer &romBuffer = _romFile.rom();
-    file_buffer &saveBuffer = _romFile.sram();
-
-    _gameboy.load_rom(romBuffer, romBuffer.length(), saveBuffer, saveBuffer.length());
+    _gameboy.load_rom(rom->loadRom(), rom->romLength(), rom->loadSram(), rom->sramLength());
     loadState();
 }
 
@@ -82,25 +78,30 @@ void tgbdual::tick() {
     _gameboy.tick();
 }
 
+void tgbdual::addCheat(const std::string &cheat) {
+    _gameboy.addCheat(cheat);
+}
+
 void tgbdual::loadState() {
-    _gameboy.load_state(_romFile.state());
+    _gameboy.load_state(_rom->loadState());
     _osdRenderer.display_message("State loaded", 3000);
 }
 
 void tgbdual::saveState() {
-    memory_buffer buffer;
-
+    std::unique_ptr<uint8_t[]> stateBuffer;
+    uint32_t stateLength;
     _gameboy.save_state([&](uint32_t length) {
-        buffer.alloc(length);
-        return (uint8_t *) buffer;
+        stateBuffer = std::unique_ptr<uint8_t[]>(new uint8_t[length]);
+        stateLength = length;
+        return stateBuffer.get();
     });
 
-    _romFile.writeState(buffer, buffer.length());
+    _rom->saveState(stateBuffer.get(), stateLength);
     _osdRenderer.display_message("State saved", 3000);
 }
 
 void tgbdual::saveSram() {
-    _gameboy.save_sram(std::bind(&rom_file::writeSram, &_romFile, std::placeholders::_1, std::placeholders::_2));
+    _gameboy.save_sram(std::bind(&tgb::rom::saveSram, _rom, std::placeholders::_1, std::placeholders::_2));
 }
 
 bool tgbdual::limit() {
