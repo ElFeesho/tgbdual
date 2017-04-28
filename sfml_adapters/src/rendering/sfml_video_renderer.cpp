@@ -1,7 +1,3 @@
-//
-// Created by Christopher Sawczuk on 17/04/2017.
-//
-
 #include <emulator_time.h>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics/Color.hpp>
@@ -21,7 +17,8 @@ static inline uint32_t swapEndianness(uint32_t input) {
 }
 
 sfml_video_renderer::sfml_video_renderer(sf::RenderWindow &window, sf::Font &font) : _window{window}, _font{font} {
-
+    _screenBuffer.create(320, 288);
+    _screenSprite.setTexture(_screenBuffer);
 }
 
 void sfml_video_renderer::fillRect(int32_t x, int32_t y, uint32_t w, uint32_t h, uint32_t stroke, uint32_t fill) {
@@ -52,32 +49,12 @@ void sfml_video_renderer::text(const char *text, int32_t x, int32_t y, uint32_t 
 }
 
 void sfml_video_renderer::pixels(void *pixels, int32_t x, int32_t y, uint32_t w, uint32_t h) {
-    static sf::Uint8 *pixels_32bit = new sf::Uint8[w * h * 4];
-    static float rbFactory = 255.f / 31.f;
-    static float gFactory = 255.f / 63.f;
 
-    sf::Texture m{};
-    m.create(w, h);
-    sf::Uint16 *pixels_16bit = (sf::Uint16 *) pixels;
+    _screenBuffer.update((sf::Uint8 *) pixels);
 
-    for (unsigned int i = 0, j = 0; i < w * h; i++, j+=4) {
-        unsigned short cpixel = pixels_16bit[i];
-        unsigned char red = (unsigned char) ((cpixel & 0xf800) >> 11);
-        unsigned char green = (unsigned char) ((cpixel & 0x07e0) >> 5);
-        unsigned char blue = (unsigned char) (cpixel & 0x001f);
+    _screenSprite.setPosition(x, y);
 
-        pixels_32bit[j + 0] = (sf::Uint8) (red * rbFactory);
-        pixels_32bit[j + 1] = (sf::Uint8) (green * gFactory);
-        pixels_32bit[j + 2] = (sf::Uint8) (blue * rbFactory);
-        pixels_32bit[j + 3] = 255;
-    }
-
-    m.update(pixels_32bit);
-
-    sf::Sprite sprite{m};
-    sprite.move(x, y);
-
-    _window.draw(sprite);
+    _window.draw(_screenSprite);
 }
 
 void sfml_video_renderer::image(const char *imgFile, int32_t x, int32_t y) {

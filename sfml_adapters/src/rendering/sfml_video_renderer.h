@@ -23,5 +23,7 @@ public:
 private:
     sf::RenderWindow &_window;
     sf::Font &_font;
+    sf::Texture _screenBuffer{};
+    sf::Sprite _screenSprite{};
 };
 

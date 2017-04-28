@@ -28,7 +28,8 @@
 static uint32_t convert_to_second(struct tm *sys);
 
 gb::gb(video_renderer *ref, audio_renderer *audio, gamepad_source *gamepad_source_ref, std::function<void()> sram_updated, std::function<uint8_t()> link_read, std::function<void(uint8_t)> link_write)
-    : m_renderer{ref}, m_gamepad{gamepad_source_ref}, m_lcd{this}, m_cpu{this}, m_apu{this}, m_mbc{this}, m_cheat{}, sram_update_cb{sram_updated}, link_read_cb{link_read}, link_write_cb{link_write} {
+        : m_renderer{ref}, m_gamepad{gamepad_source_ref}, m_lcd{this}, m_cpu{this}, m_apu{this}, m_mbc{this}, m_cheat{}, sram_update_cb{sram_updated}, link_read_cb{link_read},
+          link_write_cb{link_write} {
 
     audio->connect_audio_provider(m_apu.get_stream_provider());
 
@@ -73,8 +74,7 @@ void gb::set_skip(int frame) {
     skip_buf = frame;
 }
 
-void gb::add_cheat(const std::string &cheat_code)
-{
+void gb::add_cheat(const std::string &cheat_code) {
     m_cheat.add_cheat(cheat_code, std::bind(&cpu::write, &m_cpu, std::placeholders::_1, std::placeholders::_2));
 }
 
@@ -179,6 +179,7 @@ void gb::run() {
             re_render++;
             if (re_render >= 154) {
                 memset(vframe, 0xff, 160 * 144 * 2);
+                memset(vframe_32bit, 0xff, 160 * 144 * 4);
                 render_frame();
                 re_render = 0;
             }
@@ -188,9 +189,23 @@ void gb::run() {
     }
 }
 
+static uint32_t rgb565_to8888(uint16_t c) {
+    static float rbFactory = 255.f / 31.f;
+    static float gFactory = 255.f / 63.f;
+    uint32_t r = (uint32_t) (((c >> 11) & 0x1f) * rbFactory) << 0;
+    uint32_t g = (uint32_t) (((c >> 5) & 0x3f) * gFactory) << 8;
+    uint32_t b = (uint32_t) (((c & 0x1f)) * rbFactory) << 16;
+    return (uint32_t) (r | g | b) | 0xff000000;
+}
+
 void inline gb::render_frame() {
+
     if (now_frame >= skip) {
-        m_renderer->render_screen((uint8_t *) vframe, 160, 144);
+        for (unsigned int i = 0; i < 160 * 144; i++) {
+            vframe_32bit[i] = rgb565_to8888(vframe[i]);
+        }
+
+        m_renderer->render_screen((uint8_t *) vframe_32bit, 160, 144);
         now_frame = 0;
     } else {
         now_frame++;
@@ -252,15 +267,15 @@ uint8_t gb::get_time(int type) {
 
     switch (type) {
         case 8:
-            return (uint8_t)(now % 60);
+            return (uint8_t) (now % 60);
         case 9:
-            return (uint8_t)((now / 60) % 60);
+            return (uint8_t) ((now / 60) % 60);
         case 10:
-            return (uint8_t)((now / (60 * 60)) % 24);
+            return (uint8_t) ((now / (60 * 60)) % 24);
         case 11:
-            return (uint8_t)((now / (24 * 60 * 60)) & 0xff);
+            return (uint8_t) ((now / (24 * 60 * 60)) & 0xff);
         case 12:
-            return (uint8_t)((now / (256 * 24 * 60 * 60)) & 1);
+            return (uint8_t) ((now / (256 * 24 * 60 * 60)) & 1);
         default:
             return 0;
     }
@@ -309,7 +324,7 @@ uint8_t gb::check_pad() {
 }
 
 address_scanner gb::create_address_scanner() {
-	return {m_cpu.ram, 0x2000 * 4};
+    return {m_cpu.ram, 0x2000 * 4};
 }
 
 gbc_regs *gb::get_cregs() { return &c_regs; }
@@ -334,7 +349,7 @@ uint32_t convert_to_second(struct tm *sys) {
     uint32_t i, ret = 0;
     static int month_days[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-    for (i = 1; i + 1950 < (uint32_t)sys->tm_year; i++) {
+    for (i = 1; i + 1950 < (uint32_t) sys->tm_year; i++) {
         if ((i & 3) == 0) {
             if ((i % 100) == 0) {
                 ret += 365 + ((i % 400) == 0 ? 1 : 0);

@@ -24,15 +24,10 @@ public:
 
 private:
     void bg_render(void *buf, int scanline);
-
     void win_render(void *buf, int scanline);
-
     void sprite_render(void *buf, int scanline);
-
     void bg_render_color(void *buf, int scanline);
-
     void win_render_color(void *buf, int scanline);
-
     void sprite_render_color(void *buf, int scanline);
 
     uint16_t m_pal16[4];

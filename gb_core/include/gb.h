@@ -135,6 +135,7 @@ private:
     gbc_regs c_regs;
 
     uint16_t vframe[160 * (144 + 100)];
+    uint32_t vframe_32bit[160 * (144 + 100)];
 
     int skip, skip_buf;
     int now_frame;

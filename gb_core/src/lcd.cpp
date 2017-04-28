@@ -139,8 +139,7 @@ void lcd::bg_render(void *buf, int scanline) {
             prefix = 256;
         }
         tile = *(now_tile++);
-        tmp_dat =
-                (tile & 0x80) ? *(now_share + (tile << 3)) : *(now_pat + (tile << 3));
+        tmp_dat = ((tile & 0x80) != 0) ? *(now_share + (tile << 3)) : *(now_pat + (tile << 3));
         calc1 = tmp_dat;
         calc2 = tmp_dat >> 7;
         calc1 &= 0x55;
@@ -173,14 +172,14 @@ void lcd::bg_render(void *buf, int scanline) {
 }
 
 void lcd::win_render(void *buf, int scanline) {
-    if (!(ref_gb->get_regs()->LCDC & 0x80) ||
-        !(ref_gb->get_regs()->LCDC & 0x20) ||
+    if (!((ref_gb->get_regs()->LCDC & 0x80) != 0) ||
+        !((ref_gb->get_regs()->LCDC & 0x20) != 0) ||
         ref_gb->get_regs()->WY >= (scanline + 1) ||
         ref_gb->get_regs()->WX > 166) {
         return;
     }
 
-    int y = now_win_line - 1 /*scanline-res->system_reg.WY*/;
+    int y = now_win_line - 1;
     now_win_line++;
     uint8_t *trans = trans_tbl;
 
@@ -199,15 +198,14 @@ void lcd::win_render(void *buf, int scanline) {
     dat += 160 * scanline + ref_gb->get_regs()->WX - 7;
     trans += ref_gb->get_regs()->WX - 7;
     uint8_t *now_tile = ref_gb->get_cpu()->get_vram() + back + (((y >> 3) - 1) << 5);
-    uint16_t *now_share = (uint16_t *) (ref_gb->get_cpu()->get_vram() + share + ((y & 7) << 1));
-    uint16_t *now_pat = (uint16_t *) (ref_gb->get_cpu()->get_vram() + pat + ((y & 7) << 1));
+    auto *now_share = (uint16_t *) (ref_gb->get_cpu()->get_vram() + share + ((y & 7) << 1));
+    auto *now_pat = (uint16_t *) (ref_gb->get_cpu()->get_vram() + pat + ((y & 7) << 1));
     uint32_t tmp_dat;
     uint32_t calc1, calc2;
 
     for (i = ref_gb->get_regs()->WX >> 3; i < 21; i++) {
         tile = *(now_tile++);
-        tmp_dat =
-                (tile & 0x80) ? *(now_share + (tile << 3)) : *(now_pat + (tile << 3));
+        tmp_dat = (tile & 0x80) != 0 ? *(now_share + (tile << 3)) : *(now_pat + (tile << 3));
         calc1 = tmp_dat;
         calc2 = tmp_dat >> 7;
         calc1 &= 0x55;
@@ -240,15 +238,15 @@ void lcd::win_render(void *buf, int scanline) {
 }
 
 void lcd::sprite_render(void *buf, int scanline) {
-    if (!(ref_gb->get_regs()->LCDC & 0x80) || !(ref_gb->get_regs()->LCDC & 0x02))
+    if (!((ref_gb->get_regs()->LCDC & 0x80) != 0) || !((ref_gb->get_regs()->LCDC & 0x02) != 0))
         return;
 
     uint16_t *sdat = ((uint16_t *) buf) + (scanline) * 160, *now_pos;
     int x, y, tile, atr, i, now;
     uint16_t l1, l2, tmp_dat;
     uint16_t pal[2][4], *cur_p;
-    uint8_t *oam = ref_gb->get_cpu()->get_oam(),
-            *vram = ref_gb->get_cpu()->get_vram();
+    uint8_t *oam = ref_gb->get_cpu()->get_oam();
+    uint8_t *vram = ref_gb->get_cpu()->get_vram();
 
     bool sp_size = (ref_gb->get_regs()->LCDC & 0x04) != 0;
     int palnum;
@@ -419,19 +417,13 @@ void lcd::sprite_render(void *buf, int scanline) {
 void lcd::bg_render_color(void *buf, int scanline) {
     trans_count = 0;
 
-    // カラーではOFF機能が働かない?(僕のキャンプ場､モンコレナイト)
-    // OFF function does not work in color? (my campsite, Moncolle Night)
-    if (!(ref_gb->get_regs()->LCDC &
-          0x80) /*||!(ref_gb->get_regs()->LCDC&0x01)*/ ||
-        (ref_gb->get_regs()->WY <= (uint32_t) scanline &&
-         ref_gb->get_regs()->WX < 8 && (ref_gb->get_regs()->LCDC & 0x20))) {
-        if (!(ref_gb->get_regs()->LCDC &
-              0x80) /*||!(ref_gb->get_regs()->LCDC&0x01)*/) {
+    if (!(ref_gb->get_regs()->LCDC & 0x80) || (ref_gb->get_regs()->WY <= (uint32_t) scanline && ref_gb->get_regs()->WX < 8 && (ref_gb->get_regs()->LCDC & 0x20))) {
+        if (!(ref_gb->get_regs()->LCDC & 0x80)) {
             uint16_t *tmp_w = (uint16_t *) buf + 160 * scanline;
             uint16_t tmp_dat = ref_gb->map_color(0x7fff);
-            for (int t = 0; t < 160; t++)
+            for (int t = 0; t < 160; t++) {
                 *(tmp_w++) = tmp_dat;
-            //			memset(()+160*scanline,0xff,160*2);
+            }
         }
         return;
     }
@@ -442,12 +434,14 @@ void lcd::bg_render_color(void *buf, int scanline) {
     uint16_t *pal;
     uint8_t tile;
     int i, x, y;
-    uint8_t *vrams[2] = {ref_gb->get_cpu()->get_vram(),
-                         ref_gb->get_cpu()->get_vram() + 0x2000};
+    uint8_t *vrams[2] = {ref_gb->get_cpu()->get_vram(), ref_gb->get_cpu()->get_vram() + 0x2000};
 
     y = scanline + ref_gb->get_regs()->SCY;
-    if (y >= 256)
+
+    if (y >= 256) {
         y -= 256;
+    }
+
     x = ref_gb->get_regs()->SCX;
 
     uint16_t *dat = ((uint16_t *) buf) + scanline * 160;
@@ -457,10 +451,10 @@ void lcd::bg_render_color(void *buf, int scanline) {
     int prefix = 0;
     uint8_t *now_tile = vrams[0] + back + ((y_div_8) << 5) + start;
     uint8_t *now_atr = vrams[0] + back + ((y_div_8) << 5) + start + 0x2000;
-    uint16_t *now_share = (uint16_t *) (vrams[0] + share + ((y & 7) << 1));
-    uint16_t *now_pat = (uint16_t *) (vrams[0] + pat + ((y & 7) << 1));
-    uint16_t *now_share2 = (uint16_t *) (vrams[0] + share + 14 - ((y & 7) << 1));
-    uint16_t *now_pat2 = (uint16_t *) (vrams[0] + pat + 14 - ((y & 7) << 1));
+    auto *now_share = (uint16_t *) (vrams[0] + share + ((y & 7) << 1));
+    auto *now_pat = (uint16_t *) (vrams[0] + pat + ((y & 7) << 1));
+    auto *now_share2 = (uint16_t *) (vrams[0] + share + 14 - ((y & 7) << 1));
+    auto *now_pat2 = (uint16_t *) (vrams[0] + pat + 14 - ((y & 7) << 1));
     uint32_t tmp_dat;
     uint32_t calc1, calc2;
     uint8_t atr;
@@ -559,7 +553,7 @@ void lcd::bg_render_color(void *buf, int scanline) {
         calc2 |= tmp_dat;
 
         if (atr & 0x20) { // 反転する
-            uint8_t tmp_p = (uint8_t) calc2;
+            auto tmp_p = (uint8_t) calc2;
             calc2 = ((calc1 >> 2) & 0x33) | ((calc1 << 2) & 0xcc);
             ROL_BYTE(calc2, 4);
             calc1 = (uint32_t) (((tmp_p >> 2) & 0x33) | ((tmp_p << 2) & 0xcc));
@@ -614,23 +608,20 @@ void lcd::win_render_color(void *buf, int scanline) {
         !(ref_gb->get_regs()->LCDC & 0x20) ||
         ref_gb->get_regs()->WY >= (scanline + 1) ||
         ref_gb->get_regs()->WX > 166) {
-        //		if
-        //((ref_gb->get_regs()->WY>=(scanline+1))&&((ref_gb->get_regs()->LCDC&0x21)!=0x21))
-        //			memset(((uint16_t*)buf)+160*scanline,0,160*2);
         return;
     }
 
-    int y = now_win_line - 1 /*scanline-res->system_reg.WY*/;
+    int y = now_win_line - 1;;
     now_win_line++;
 
     uint8_t *vrams[2] = {ref_gb->get_cpu()->get_vram(),
                          ref_gb->get_cpu()->get_vram() + 0x2000};
 
-    uint16_t back = (uint16_t) ((ref_gb->get_regs()->LCDC & 0x40) ? 0x1C00 : 0x1800);
-    uint16_t pat = (uint16_t) ((ref_gb->get_regs()->LCDC & 0x10) ? 0x0000 : 0x1000);
+    auto back = (uint16_t) ((ref_gb->get_regs()->LCDC & 0x40) ? 0x1C00 : 0x1800);
+    auto pat = (uint16_t) ((ref_gb->get_regs()->LCDC & 0x10) ? 0x0000 : 0x1000);
     uint16_t share = 0x0000; // prefix
     uint16_t *pal;
-    uint16_t *dat = (uint16_t *) buf;
+    auto *dat = (uint16_t *) buf;
     uint8_t *trans = trans_tbl;
     uint8_t *priority = priority_tbl;
     uint8_t tile;
@@ -642,12 +633,10 @@ void lcd::win_render_color(void *buf, int scanline) {
     uint8_t *now_tile = ref_gb->get_cpu()->get_vram() + back + (((y >> 3) - 1) << 5);
     uint8_t *now_atr =
             ref_gb->get_cpu()->get_vram() + back + (((y >> 3) - 1) << 5) + 0x2000;
-    uint16_t *now_share =
-            (uint16_t *) (ref_gb->get_cpu()->get_vram() + share + ((y & 7) << 1));
-    uint16_t *now_pat =
-            (uint16_t *) (ref_gb->get_cpu()->get_vram() + pat + ((y & 7) << 1));
-    uint16_t *now_share2 = (uint16_t *) (vrams[0] + share + 14 - ((y & 7) << 1));
-    uint16_t *now_pat2 = (uint16_t *) (vrams[0] + pat + 14 - ((y & 7) << 1));
+    auto *now_share = (uint16_t *) (ref_gb->get_cpu()->get_vram() + share + ((y & 7) << 1));
+    auto *now_pat = (uint16_t *) (ref_gb->get_cpu()->get_vram() + pat + ((y & 7) << 1));
+    auto *now_share2 = (uint16_t *) (vrams[0] + share + 14 - ((y & 7) << 1));
+    auto *now_pat2 = (uint16_t *) (vrams[0] + pat + 14 - ((y & 7) << 1));
     uint32_t tmp_dat;
     uint32_t calc1, calc2;
     uint8_t atr;
@@ -673,8 +662,8 @@ void lcd::win_render_color(void *buf, int scanline) {
         tmp_dat &= 0xAA;
         calc2 |= tmp_dat;
 
-        if (atr & 0x20) { // 反転する
-            uint8_t tmp_p = (uint8_t) calc2;
+        if (atr & 0x20) {
+            auto tmp_p = (uint8_t) calc2;
             calc2 = ((calc1 >> 2) & 0x33) | ((calc1 << 2) & 0xcc);
             ROL_BYTE(calc2, 4);
             calc1 = (uint32_t) (((tmp_p >> 2) & 0x33) | ((tmp_p << 2) & 0xcc));
@@ -744,9 +733,10 @@ void lcd::sprite_render_color(void *buf, int scanline) {
         } else { // 8*8
             y = oam[i * 4] - 9;
             x = oam[i * 4 + 1] - 8;
-            if ((x == -8 && y == -16) || (x > 160) || (y > 144 + 7) ||
-                (y < scanline) || (y > scanline + 7))
+
+            if ((x == -8 && y == -16) || (x > 160) || (y > 144 + 7) || (y < scanline) || (y > scanline + 7)) {
                 continue;
+            }
 
             now = (atr & 0x40) ? ((y - scanline) & 7) : (7 - ((y - scanline) & 7));
             tmp_dat = *(uint16_t *) (vram + tile * 16 + now * 2 + bank);

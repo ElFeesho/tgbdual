@@ -83,7 +83,7 @@ void sdl_video_renderer::text(const char *text, int32_t x, int32_t y, uint32_t c
 }
 
 void sdl_video_renderer::pixels(void *pixels, int32_t x, int32_t y, uint32_t w, uint32_t h) {
-    SDL_Surface* fromPixels = SDL_CreateRGBSurfaceFrom(pixels, w, h, 16, w*2, 0, 0, 0, 0);
+    SDL_Surface *fromPixels = SDL_CreateRGBSurfaceFrom(pixels, w, h, 32, w * 4, 0xff, 0xff00, 0xff0000, 0xff000000);
     SDL_Rect loc = {Sint16(x), Sint16(y), Uint16(w), Uint16(h) };
 
     SDL_BlitSurface(fromPixels, nullptr, _screen, &loc);
