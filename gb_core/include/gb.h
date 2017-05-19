@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include <stdio.h>
+#include <cstdio>
 #include <list>
 
 #include "apu.h"
@@ -33,6 +33,7 @@
 #include "video_renderer.h"
 #include "rom.h"
 #include "serializer.h"
+#include "gbtime.h"
 
 #include <functional>
 
@@ -90,7 +91,7 @@ public:
 
     void serialize(serializer &s);
 
-    size_t get_state_size(void);
+    size_t get_state_size();
 
     void save_state_mem(void *buf);
 
@@ -123,11 +124,13 @@ public:
 private:
     video_renderer *m_renderer;
     gamepad_source *m_gamepad;
+
     lcd m_lcd;
     cpu m_cpu;
     apu m_apu;
     rom m_rom;
     mbc m_mbc;
+    gbtime _time;
 
     cheat m_cheat;
 
@@ -137,13 +140,12 @@ private:
     uint16_t vframe[160 * (144 + 100)];
     uint32_t vframe_32bit[160 * (144 + 100)];
 
-    int skip, skip_buf;
+    int skip;
+    int skip_buf;
     int now_frame;
     int re_render;
 
     std::function<void()> sram_update_cb;
     std::function<uint8_t()> link_read_cb;
     std::function<void(uint8_t)> link_write_cb;
-
-    uint32_t cur_time;
 };

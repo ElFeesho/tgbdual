@@ -13,6 +13,7 @@ set(GB_CORE_SOURCES
         include/lcd.h
         include/mbc.h
         include/rom.h
+        include/gbtime.h
         src/address_scanner.cpp
         src/apu.cpp
         src/cheat.cpp
@@ -20,7 +21,8 @@ set(GB_CORE_SOURCES
         src/gb.cpp
         src/lcd.cpp
         src/mbc.cpp
-        src/rom.cpp)
+        src/rom.cpp
+        src/gbtime.cpp)
 
 add_library(gb_core STATIC ${GB_CORE_SOURCES})
 target_include_directories(gb_core PUBLIC include/)

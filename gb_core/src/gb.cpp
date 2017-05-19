@@ -42,8 +42,6 @@ gb::gb(video_renderer *ref, audio_renderer *audio, gamepad_source *gamepad_sourc
     audio->connect_audio_provider(m_apu.get_stream_provider());
 
     reset();
-
-    cur_time = 0;
 }
 
 void gb::reset() {
@@ -266,55 +264,11 @@ uint16_t gb::get_sensor(bool /*unused*/) {
 }
 
 uint8_t gb::get_time(int type) {
-    struct tm sys{};
-    time_t t = time(0);
-    localtime_r(&t, &sys);
-    uint32_t now = convert_to_second(&sys) - cur_time;
-
-    switch (type) {
-        case 8:
-            return (uint8_t) (now % 60);
-        case 9:
-            return (uint8_t) ((now / 60) % 60);
-        case 10:
-            return (uint8_t) ((now / (3600)) % 24);
-        case 11:
-            return (uint8_t) ((now / (86400)) & 0xff);
-        case 12:
-            return (uint8_t) ((now / (256 * 86400)) & 1);
-        default:
-            return 0;
-    }
+    return _time.get_time(type);
 }
 
 void gb::set_time(int type, uint8_t dat) {
-    struct tm sys{};
-    time_t t = time(nullptr);
-    localtime_r(&t, &sys);
-
-    uint32_t now = convert_to_second(&sys);
-    uint32_t adj = now - cur_time;
-
-    switch (type) {
-        case 8:
-            adj = (adj / 60) * 60 + (dat % 60);
-            break;
-        case 9:
-            adj = (adj / (60 * 60)) * 60 * 60 + (dat % 60) * 60 + (adj % 60);
-            break;
-        case 10:
-            adj = (adj / (24 * 60 * 60)) * 24 * 60 * 60 + (dat % 24) * 60 * 60 + (adj % (60 * 60));
-            break;
-        case 11:
-            adj = (adj / (256 * 24 * 60 * 60)) * 256 * 24 * 60 * 60 + (dat * 24 * 60 * 60) + (adj % (24 * 60 * 60));
-            break;
-        case 12:
-            adj = (dat & 1) * 256 * 24 * 60 * 60 + (adj % (256 * 24 * 60 * 60));
-            break;
-        default:
-            break;
-    }
-    cur_time = now - adj;
+    _time.set_time(type, dat);
 }
 
 uint16_t gb::map_color(uint16_t gb_col) {
@@ -350,50 +304,3 @@ cpu &gb::get_cpu() { return m_cpu; }
 lcd &gb::get_lcd() { return m_lcd; }
 
 int32_t gb::gb_type() { return m_rom.get_info()->gb_type; }
-
-uint32_t convert_to_second(struct tm *sys) {
-    uint32_t i, ret = 0;
-    static int month_days[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-
-    for (i = 1; i + 1950 < (uint32_t) sys->tm_year; i++) {
-        if ((i & 3) == 0) {
-            if ((i % 100) == 0) {
-                ret += 365 + ((i % 400) == 0 ? 1 : 0);
-            } else {
-                ret += 366;
-            }
-        } else {
-            ret += 365;
-        }
-    }
-
-    for (i = 1; i < (uint32_t) sys->tm_mon; i++) {
-        if (i == 2) {
-            if ((sys->tm_year & 3) == 0) {
-                if ((sys->tm_year % 100) == 0) {
-                    if ((sys->tm_year % 400) == 0) {
-                        ret += 29;
-                    } else {
-                        ret += 28;
-                    }
-                } else {
-                    ret += 29;
-                }
-            } else {
-                ret += 28;
-            }
-        } else {
-            ret += month_days[i];
-        }
-    }
-
-    ret += sys->tm_mday - 1;
-
-    ret *= 24 * 60 * 60;
-
-    ret += sys->tm_hour * 60 * 60;
-    ret += sys->tm_min * 60;
-    ret += sys->tm_sec;
-
-    return ret;
-}
