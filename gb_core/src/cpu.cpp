@@ -96,8 +96,7 @@ constexpr uint8_t initialiseGB2Z80Table(int i) {
     return (uint8_t) (((i & 0x80) != 0 ? 0x40 : 0) | ((i & 0x40) != 0 ? 0x02 : 0) | ((i & 0x20) != 0 ? 0x10 : 0) | ((i & 0x10) != 0 ? 0x01 : 0));
 }
 
-cpu::cpu(gb *ref) {
-    ref_gb = ref;
+cpu::cpu(gb &ref) : ref_gb{ref} {
 
     for (int i = 0; i < 256; i++) {
         z802gb[i] = initialiseZ802GBTable(i);
@@ -108,12 +107,12 @@ cpu::cpu(gb *ref) {
 }
 
 uint8_t cpu::read(uint16_t adr) {
-    return ref_gb->get_cheat()->cheat_read(get_ram_bank_number(), adr, read_direct(adr));
+    return ref_gb.get_cheat()->cheat_read(get_ram_bank_number(), adr, read_direct(adr));
 }
 
 void cpu::reset() {
-    regs.AF.w = (uint16_t) ((ref_gb->gb_type() >= 3) ? 0x11b0 : 0x01b0);
-    regs.BC.w = (uint16_t) ((ref_gb->gb_type() >= 4) ? 0x0113 : 0x0013);
+    regs.AF.w = (uint16_t) ((ref_gb.gb_type() >= 3) ? 0x11b0 : 0x01b0);
+    regs.BC.w = (uint16_t) ((ref_gb.gb_type() >= 4) ? 0x0113 : 0x0013);
     regs.DE.w = 0x00D8;
     regs.HL.w = 0x014D;
     regs.I = 0;
@@ -150,17 +149,17 @@ uint8_t cpu::read_direct(uint16_t adr) {
     switch (adr >> 13) {
         case 0:
         case 1:
-            return ref_gb->get_rom()->get_rom()[adr]; // ROM領域 // ROM area
+            return ref_gb.get_rom()->get_rom()[adr]; // ROM領域 // ROM area
         case 2:
         case 3:
-            return ref_gb->get_mbc()->get_rom()[adr]; //バンク可能ROM // ROM bank
+            return ref_gb.get_mbc()->get_rom()[adr]; //バンク可能ROM // ROM bank
         case 4:
             return vram_bank[adr & 0x1FFF]; // 8KBVRAM
         case 5:
-            if (ref_gb->get_mbc()->is_ext_ram()) {
-                return ref_gb->get_mbc()->get_sram()[adr & 0x1FFF];
+            if (ref_gb.get_mbc()->is_ext_ram()) {
+                return ref_gb.get_mbc()->get_sram()[adr & 0x1FFF];
             }
-            return ref_gb->get_mbc()->ext_read(adr);
+            return ref_gb.get_mbc()->ext_read(adr);
         case 6:
             if ((adr & 0x1000) != 0) {
                 return ram_bank[adr & 0x0fff];
@@ -198,17 +197,17 @@ void cpu::write(uint16_t adr, uint8_t dat) {
         case 1:
         case 2:
         case 3:
-            ref_gb->get_mbc()->write(adr, dat);
+            ref_gb.get_mbc()->write(adr, dat);
             break;
         case 4:
             vram_bank[adr & 0x1FFF] = dat;
             break;
         case 5:
-            if (ref_gb->get_mbc()->is_ext_ram()) {
-                ref_gb->get_mbc()->get_sram()[adr & 0x1FFF] = dat; //カートリッジRAM // cartridge RAM
-                ref_gb->notify_sram_written();
+            if (ref_gb.get_mbc()->is_ext_ram()) {
+                ref_gb.get_mbc()->get_sram()[adr & 0x1FFF] = dat; //カートリッジRAM // cartridge RAM
+                ref_gb.notify_sram_written();
             } else {
-                ref_gb->get_mbc()->ext_write(adr, dat);
+                ref_gb.get_mbc()->ext_write(adr, dat);
             }
             break;
         case 6:
@@ -247,10 +246,10 @@ uint8_t cpu::io_read(uint16_t adr) {
     switch (adr) {
         case 0xFF00: // P1(パッド制御) //P1 (control pad)
             int tmp;
-            tmp = ref_gb->check_pad();
-            if (ref_gb->get_regs()->P1 == 0x03)
+            tmp = ref_gb.check_pad();
+            if (ref_gb.get_regs()->P1 == 0x03)
                 return 0xff;
-            switch ((ref_gb->get_regs()->P1 >> 4) & 0x3) {
+            switch ((ref_gb.get_regs()->P1 >> 4) & 0x3) {
                 case 0:
                     return (uint8_t) (0xC0 | (((tmp & 0x81) != 0 ? 0 : 1) | ((tmp & 0x42) != 0 ? 0 : 2) | ((tmp & 0x24) != 0 ? 0 : 4) | ((tmp & 0x18) != 0 ? 0 : 8)));
                 case 1:
@@ -264,48 +263,48 @@ uint8_t cpu::io_read(uint16_t adr) {
             }
             return 0x00;
         case 0xFF01:
-            ref_gb->read_linkcable_byte(&ref_gb->get_regs()->SB);
-            return ref_gb->get_regs()->SB;
+            ref_gb.read_linkcable_byte(&ref_gb.get_regs()->SB);
+            return ref_gb.get_regs()->SB;
         case 0xFF02:
-            return (uint8_t) ((ref_gb->get_regs()->SC & 0x83) | 0x7C);
+            return (uint8_t) ((ref_gb.get_regs()->SC & 0x83) | 0x7C);
         case 0xFF04:
-            return ref_gb->get_regs()->DIV;
+            return ref_gb.get_regs()->DIV;
         case 0xFF05:
-            return ref_gb->get_regs()->TIMA;
+            return ref_gb.get_regs()->TIMA;
         case 0xFF06:
-            return ref_gb->get_regs()->TMA;
+            return ref_gb.get_regs()->TMA;
         case 0xFF07:
-            return ref_gb->get_regs()->TAC;
+            return ref_gb.get_regs()->TAC;
         case 0xFF0F:
-            return ref_gb->get_regs()->IF;
+            return ref_gb.get_regs()->IF;
         case 0xFF40:
-            return ref_gb->get_regs()->LCDC;
+            return ref_gb.get_regs()->LCDC;
         case 0xFF41:
-            return (uint8_t) (ref_gb->get_regs()->STAT | 0x80);
+            return (uint8_t) (ref_gb.get_regs()->STAT | 0x80);
         case 0xFF42:
-            return ref_gb->get_regs()->SCY;
+            return ref_gb.get_regs()->SCY;
         case 0xFF43:
-            return ref_gb->get_regs()->SCX;
+            return ref_gb.get_regs()->SCX;
         case 0xFF44:
-            return ref_gb->get_regs()->LY;
+            return ref_gb.get_regs()->LY;
         case 0xFF45:
-            return ref_gb->get_regs()->LYC;
+            return ref_gb.get_regs()->LYC;
         case 0xFF46:
             return 0;
         case 0xFF47:
-            return ref_gb->get_regs()->BGP;
+            return ref_gb.get_regs()->BGP;
         case 0xFF48:
-            return ref_gb->get_regs()->OBP1;
+            return ref_gb.get_regs()->OBP1;
         case 0xFF49:
-            return ref_gb->get_regs()->OBP2;
+            return ref_gb.get_regs()->OBP2;
         case 0xFF4A:
-            return ref_gb->get_regs()->WY;
+            return ref_gb.get_regs()->WY;
         case 0xFF4B:
-            return ref_gb->get_regs()->WX;
+            return ref_gb.get_regs()->WX;
         case 0xFF4D:
-            return (uint8_t) (speed ? 0x80 : (ref_gb->get_cregs()->KEY1 & 1) != 0 ? 1 : 0x7E);
+            return (uint8_t) (speed ? 0x80 : (ref_gb.get_cregs()->KEY1 & 1) != 0 ? 1 : 0x7E);
         case 0xFF4F:
-            return ref_gb->get_cregs()->VBK;
+            return ref_gb.get_cregs()->VBK;
         case 0xFF51:
             return (uint8_t) (dma_src >> 8);
         case 0xFF52:
@@ -317,32 +316,32 @@ uint8_t cpu::io_read(uint16_t adr) {
         case 0xFF55:
             return (uint8_t) (dma_executing ? ((dma_rest - 1) & 0x7f) : 0xFF);
         case 0xFF56:
-            return (uint8_t) (ref_gb->get_cregs()->RP & 0xC1);
+            return (uint8_t) (ref_gb.get_cregs()->RP & 0xC1);
         case 0xFF68:
-            return ref_gb->get_cregs()->BCPS;
+            return ref_gb.get_cregs()->BCPS;
         case 0xFF69:
-            if ((ref_gb->get_cregs()->BCPS & 1) != 0) {
-                ret = (uint8_t) (ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] >> 8);
+            if ((ref_gb.get_cregs()->BCPS & 1) != 0) {
+                ret = (uint8_t) (ref_gb.get_lcd()->get_pal((ref_gb.get_cregs()->BCPS >> 3) & 7)[(ref_gb.get_cregs()->BCPS >> 1) & 3] >> 8);
             } else {
-                ret = (uint8_t) (ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] & 0xff);
+                ret = (uint8_t) (ref_gb.get_lcd()->get_pal((ref_gb.get_cregs()->BCPS >> 3) & 7)[(ref_gb.get_cregs()->BCPS >> 1) & 3] & 0xff);
             }
             return ret;
         case 0xFF6A:
-            return ref_gb->get_cregs()->OCPS;
+            return ref_gb.get_cregs()->OCPS;
         case 0xFF6B:
-            if ((ref_gb->get_cregs()->OCPS & 1) != 0) {
-                ret = (uint8_t) (ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->OCPS >> 3 & 7) + 8)[
-                        (ref_gb->get_cregs()->OCPS >> 1) & 3] >> 8);
+            if ((ref_gb.get_cregs()->OCPS & 1) != 0) {
+                ret = (uint8_t) (ref_gb.get_lcd()->get_pal((ref_gb.get_cregs()->OCPS >> 3 & 7) + 8)[
+                        (ref_gb.get_cregs()->OCPS >> 1) & 3] >> 8);
             } else {
-                ret = (uint8_t) (ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->OCPS >> 3 & 7) + 8)[
-                                         (ref_gb->get_cregs()->OCPS >> 1) & 3] & 0xff);
+                ret = (uint8_t) (ref_gb.get_lcd()->get_pal((ref_gb.get_cregs()->OCPS >> 3 & 7) + 8)[
+                                         (ref_gb.get_cregs()->OCPS >> 1) & 3] & 0xff);
             }
             return ret;
         case 0xFF70:
-            return ref_gb->get_cregs()->SVBK;
+            return ref_gb.get_cregs()->SVBK;
 
         case 0xFFFF:
-            return ref_gb->get_regs()->IE;
+            return ref_gb.get_regs()->IE;
 
         case 0xFF6C:
             return (uint8_t) (_ff6c & 1);
@@ -360,7 +359,7 @@ uint8_t cpu::io_read(uint16_t adr) {
             return 0;
         default:
             if (adr > 0xFF0F && adr < 0xFF40) {
-                return ref_gb->get_apu()->read(adr);
+                return ref_gb.get_apu()->read(adr);
             } else if ((adr > 0xff70) && (adr < 0xff80)) {
                 return ext_mem[adr - 0xff71];
             } else {
@@ -372,89 +371,89 @@ uint8_t cpu::io_read(uint16_t adr) {
 void cpu::io_write(uint16_t adr, uint8_t dat) {
     switch (adr) {
         case 0xFF00:
-            ref_gb->get_regs()->P1 = dat;
+            ref_gb.get_regs()->P1 = dat;
             return;
         case 0xFF01:
-            ref_gb->get_regs()->SB = dat;
-            ref_gb->send_linkcable_byte(ref_gb->get_regs()->SB);
+            ref_gb.get_regs()->SB = dat;
+            ref_gb.send_linkcable_byte(ref_gb.get_regs()->SB);
             return;
         case 0xFF02:
-            if (ref_gb->gb_type() == 1) {
-                ref_gb->get_regs()->SC = (uint8_t) (dat & 0x81);
+            if (ref_gb.gb_type() == 1) {
+                ref_gb.get_regs()->SC = (uint8_t) (dat & 0x81);
                 if (((dat & 0x80) != 0) && ((dat & 1) != 0)) {
                     seri_occer = total_clock + 512;
                 } else if ((dat & 0x80) != 0) {
 
                 }
             } else {
-                ref_gb->get_regs()->SC = (uint8_t) (dat & 0x83);
+                ref_gb.get_regs()->SC = (uint8_t) (dat & 0x83);
                 if (((dat & 0x80) != 0) && ((dat & 1) != 0)) {
                     seri_occer = total_clock + ((dat & 2) != 0 ? 512 * 8 / 32 : 512 * 8);
                 }
             }
             return;
         case 0xFF04:
-            ref_gb->get_regs()->DIV = 0;
+            ref_gb.get_regs()->DIV = 0;
             return;
         case 0xFF05:
-            ref_gb->get_regs()->TIMA = dat;
+            ref_gb.get_regs()->TIMA = dat;
             return;
         case 0xFF06: // TMA(タイマ調整) // TMA (adjustment timer)
-            ref_gb->get_regs()->TMA = dat;
+            ref_gb.get_regs()->TMA = dat;
             //          sys_clock=0;
             return;
         case 0xFF07: // TAC(タイマコントロール) // TAC (timer control)
-            if (((dat & 0x04) != 0) && ((ref_gb->get_regs()->TAC & 0x04) == 0))
+            if (((dat & 0x04) != 0) && ((ref_gb.get_regs()->TAC & 0x04) == 0))
                 sys_clock = 0;
-            ref_gb->get_regs()->TAC = dat;
+            ref_gb.get_regs()->TAC = dat;
             return;
         case 0xFF0F: // IF(割りこみフラグ) // IF (Interrupt flag)
-            ref_gb->get_regs()->IF = dat;
+            ref_gb.get_regs()->IF = dat;
             return;
         case 0xFF40: // LCDC(LCDコントロール) // LCDC (LCD control)
-            if (((dat & 0x80) != 0) && ((ref_gb->get_regs()->LCDC & 0x80) == 0)) {
-                ref_gb->get_regs()->LY = 0;
-                ref_gb->get_lcd()->clear_win_count();
+            if (((dat & 0x80) != 0) && ((ref_gb.get_regs()->LCDC & 0x80) == 0)) {
+                ref_gb.get_regs()->LY = 0;
+                ref_gb.get_lcd()->clear_win_count();
             }
-            ref_gb->get_regs()->LCDC = dat;
+            ref_gb.get_regs()->LCDC = dat;
             return;
         case 0xFF41: // STAT(LCDステータス) // STAT (LCD status)
-            if (ref_gb->gb_type() == 1)
+            if (ref_gb.gb_type() == 1)
                 // オリジナルGBにおいてこのような現象が起こるらしい
                 // This phenomenon seems to occur in the original GB
-                if ((ref_gb->get_regs()->STAT & 0x02) == 0)
-                    ref_gb->get_regs()->IF |= INT_LCDC;
+                if ((ref_gb.get_regs()->STAT & 0x02) == 0)
+                    ref_gb.get_regs()->IF |= INT_LCDC;
 
-            ref_gb->get_regs()->STAT = (uint8_t) ((ref_gb->get_regs()->STAT & 0x7) | (dat & 0x78));
+            ref_gb.get_regs()->STAT = (uint8_t) ((ref_gb.get_regs()->STAT & 0x7) | (dat & 0x78));
             return;
         case 0xFF42: // SCY(スクロールY) // SCY (scroll Y)
-            ref_gb->get_regs()->SCY = dat;
+            ref_gb.get_regs()->SCY = dat;
             return;
         case 0xFF43: // SCX(スクロールX) // SCX (scroll X)
-            ref_gb->get_regs()->SCX = dat;
+            ref_gb.get_regs()->SCX = dat;
             return;
         case 0xFF44: // LY(LCDC Y座標) // LY (LCDC Y coordinate)
-            //          ref_gb->get_regs()->LY=0;
-            ref_gb->get_lcd()->clear_win_count();
+            //          ref_gb.get_regs()->LY=0;
+            ref_gb.get_lcd()->clear_win_count();
             return;
         case 0xFF45: // LYC(LY比較) // LYC (compare LY)
-            ref_gb->get_regs()->LYC = dat;
+            ref_gb.get_regs()->LYC = dat;
             return;
         case 0xFF46: // DMA(DMA転送) // DMA (DMA transfer)
             switch (dat >> 5) {
                 case 0:
                 case 1:
-                    memcpy(oam, ref_gb->get_rom()->get_rom() + dat * 256, 0xA0);
+                    memcpy(oam, ref_gb.get_rom()->get_rom() + dat * 256, 0xA0);
                     break;
                 case 2:
                 case 3:
-                    memcpy(oam, ref_gb->get_mbc()->get_rom() + dat * 256, 0xA0);
+                    memcpy(oam, ref_gb.get_mbc()->get_rom() + dat * 256, 0xA0);
                     break;
                 case 4:
                     memcpy(oam, vram_bank + (dat & 0x1F) * 256, 0xA0);
                     break;
                 case 5:
-                    memcpy(oam, ref_gb->get_mbc()->get_sram() + (dat & 0x1F) * 256, 0xA0);
+                    memcpy(oam, ref_gb.get_mbc()->get_sram() + (dat & 0x1F) * 256, 0xA0);
                     break;
                 case 6:
                     if ((dat & 0x10) != 0)
@@ -475,25 +474,25 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
             }
             return;
         case 0xFF47: // BGP(背景パレット) // BGP (background palette)
-            ref_gb->get_regs()->BGP = dat;
+            ref_gb.get_regs()->BGP = dat;
             return;
         case 0xFF48: // OBP1(オブジェクトパレット1) // OBP1 (object palette 1)
-            ref_gb->get_regs()->OBP1 = dat;
+            ref_gb.get_regs()->OBP1 = dat;
             return;
         case 0xFF49: // OBP2(オブジェクトパレット2) // OBP2 (object palette 2)
-            ref_gb->get_regs()->OBP2 = dat;
+            ref_gb.get_regs()->OBP2 = dat;
             return;
         case 0xFF4A: // WY(ウインドウY座標) // WY (window coordinates Y)
-            ref_gb->get_regs()->WY = dat;
+            ref_gb.get_regs()->WY = dat;
             return;
         case 0xFF4B: // WX(ウインドウX座標) // WX (window coordinates X)
-            ref_gb->get_regs()->WX = dat;
+            ref_gb.get_regs()->WX = dat;
             return;
 
             //以下カラーでの追加 // Add color below
         case 0xFF4D: // KEY1システムクロック変更 // KEY1 change system clock
             //          speed=dat&1;
-            ref_gb->get_cregs()->KEY1 = (uint8_t) (dat & 1);
+            ref_gb.get_cregs()->KEY1 = (uint8_t) (dat & 1);
             speed_change = (bool) (dat & 1);
             return;
         case 0xFF4F: // VBK(内部VRAMバンク切り替え) // VBK (VRAM internal bank
@@ -501,7 +500,7 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
             if (dma_executing)
                 return;
             vram_bank = vram + 0x2000 * (dat & 0x01);
-            ref_gb->get_cregs()->VBK = dat; //&0x01;
+            ref_gb.get_cregs()->VBK = dat; //&0x01;
             return;
         case 0xFF51: // HDMA1(転送元上位) // HDMA1 (upper source)
             dma_src &= 0x00F0;
@@ -524,47 +523,47 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
             tmp_adr = (uint16_t) (0x8000 + (dma_dest & 0x1ff0));
             if ((dma_src >= 0x8000 && dma_src < 0xA000) || (dma_src >= 0xE000) ||
                 (!(tmp_adr >= 0x8000 && tmp_adr < 0xA000))) {
-                ref_gb->get_cregs()->HDMA5 = 0;
+                ref_gb.get_cregs()->HDMA5 = 0;
                 return;
             }
             if ((dat & 0x80) != 0) { // HBlank毎 // Every HBlank
                 if (dma_executing) {
                     dma_executing = false;
                     dma_rest = 0;
-                    ref_gb->get_cregs()->HDMA5 = 0xFF;
+                    ref_gb.get_cregs()->HDMA5 = 0xFF;
                     return;
                 }
                 dma_executing = true;
                 b_dma_first = true;
                 dma_rest = (dat & 0x7F) + 1;
-                ref_gb->get_cregs()->HDMA5 = 0;
+                ref_gb.get_cregs()->HDMA5 = 0;
             } else { //通常DMA // Normal DMA
                 if (dma_executing) {
                     dma_executing = false;
                     dma_rest = 0;
-                    ref_gb->get_cregs()->HDMA5 = 0xFF;
+                    ref_gb.get_cregs()->HDMA5 = 0xFF;
                     return;
                 }
 
                 dma_executing = false;
                 dma_rest = 0;
-                ref_gb->get_cregs()->HDMA5 = 0xFF;
+                ref_gb.get_cregs()->HDMA5 = 0xFF;
 
                 switch (dma_src >> 13) {
                     case 0:
                     case 1:
                         memcpy(vram_bank + (dma_dest & 0x1ff0),
-                               ref_gb->get_rom()->get_rom() + (dma_src), (size_t) (16 * (dat & 0x7F) + 16));
+                               ref_gb.get_rom()->get_rom() + (dma_src), (size_t) (16 * (dat & 0x7F) + 16));
                         break;
                     case 2:
                     case 3:
                         memcpy(vram_bank + (dma_dest & 0x1ff0),
-                               ref_gb->get_mbc()->get_rom() + (dma_src), (size_t) (16 * (dat & 0x7F) + 16));
+                               ref_gb.get_mbc()->get_rom() + (dma_src), (size_t) (16 * (dat & 0x7F) + 16));
                         break;
                     case 4:
                         break;
                     case 5:
-                        memcpy(vram_bank + (dma_dest & 0x1ff0), ref_gb->get_mbc()->get_sram() + (dma_src & 0x1FFF), (size_t) (16 * (dat & 0x7F) + 16));
+                        memcpy(vram_bank + (dma_dest & 0x1ff0), ref_gb.get_mbc()->get_sram() + (dma_src & 0x1FFF), (size_t) (16 * (dat & 0x7F) + 16));
                         break;
                     case 6:
                         if ((dma_src & 0x1000) != 0)
@@ -584,53 +583,53 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
         case 0xFF56:
             rp_que[que_cur++] = (((uint32_t) dat) << 16) | ((uint16_t) rest_clock);
             rp_que[que_cur] = 0x00000000;
-            ref_gb->get_cregs()->RP = dat;
+            ref_gb.get_cregs()->RP = dat;
             return;
         case 0xFF68:
-            ref_gb->get_cregs()->BCPS = dat;
+            ref_gb.get_cregs()->BCPS = dat;
             return;
         case 0xFF69:
-            if ((ref_gb->get_cregs()->BCPS & 1) != 0) {
-                ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] = (uint16_t) (
-                        (ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] & 0xff) | (dat << 8));
+            if ((ref_gb.get_cregs()->BCPS & 1) != 0) {
+                ref_gb.get_lcd()->get_pal((ref_gb.get_cregs()->BCPS >> 3) & 7)[(ref_gb.get_cregs()->BCPS >> 1) & 3] = (uint16_t) (
+                        (ref_gb.get_lcd()->get_pal((ref_gb.get_cregs()->BCPS >> 3) & 7)[(ref_gb.get_cregs()->BCPS >> 1) & 3] & 0xff) | (dat << 8));
             } else {
-                ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] = (uint16_t) (
-                        (ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] & 0xff00) | dat);
+                ref_gb.get_lcd()->get_pal((ref_gb.get_cregs()->BCPS >> 3) & 7)[(ref_gb.get_cregs()->BCPS >> 1) & 3] = (uint16_t) (
+                        (ref_gb.get_lcd()->get_pal((ref_gb.get_cregs()->BCPS >> 3) & 7)[(ref_gb.get_cregs()->BCPS >> 1) & 3] & 0xff00) | dat);
             }
-            ref_gb->get_lcd()->get_mapped_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] = ref_gb->map_color(
-                    ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[(ref_gb->get_cregs()->BCPS >> 1) & 3]);
+            ref_gb.get_lcd()->get_mapped_pal((ref_gb.get_cregs()->BCPS >> 3) & 7)[(ref_gb.get_cregs()->BCPS >> 1) & 3] = ref_gb.map_color(
+                    ref_gb.get_lcd()->get_pal((ref_gb.get_cregs()->BCPS >> 3) & 7)[(ref_gb.get_cregs()->BCPS >> 1) & 3]);
 
-            ref_gb->get_cregs()->BCPD = dat;
-            if ((ref_gb->get_cregs()->BCPS & 0x80) != 0) {
-                ref_gb->get_cregs()->BCPS = (uint8_t) (0x80 | ((ref_gb->get_cregs()->BCPS + 1) & 0x3f));
+            ref_gb.get_cregs()->BCPD = dat;
+            if ((ref_gb.get_cregs()->BCPS & 0x80) != 0) {
+                ref_gb.get_cregs()->BCPS = (uint8_t) (0x80 | ((ref_gb.get_cregs()->BCPS + 1) & 0x3f));
             }
             return;
         case 0xFF6A:
-            ref_gb->get_cregs()->OCPS = dat;
+            ref_gb.get_cregs()->OCPS = dat;
             return;
         case 0xFF6B:
-            if ((ref_gb->get_cregs()->OCPS & 1) != 0) {
-                ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) + 8)[(ref_gb->get_cregs()->OCPS >> 1) & 3] = (uint16_t) (
-                        (ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) + 8)[(ref_gb->get_cregs()->OCPS >> 1) & 3] & 0xff) | (dat << 8));
+            if ((ref_gb.get_cregs()->OCPS & 1) != 0) {
+                ref_gb.get_lcd()->get_pal(((ref_gb.get_cregs()->OCPS >> 3) & 7) + 8)[(ref_gb.get_cregs()->OCPS >> 1) & 3] = (uint16_t) (
+                        (ref_gb.get_lcd()->get_pal(((ref_gb.get_cregs()->OCPS >> 3) & 7) + 8)[(ref_gb.get_cregs()->OCPS >> 1) & 3] & 0xff) | (dat << 8));
             } else {
-                ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) + 8)[(ref_gb->get_cregs()->OCPS >> 1) & 3] = (uint16_t) (
-                        (ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) + 8)[(ref_gb->get_cregs()->OCPS >> 1) & 3] & 0xff00) | dat);
+                ref_gb.get_lcd()->get_pal(((ref_gb.get_cregs()->OCPS >> 3) & 7) + 8)[(ref_gb.get_cregs()->OCPS >> 1) & 3] = (uint16_t) (
+                        (ref_gb.get_lcd()->get_pal(((ref_gb.get_cregs()->OCPS >> 3) & 7) + 8)[(ref_gb.get_cregs()->OCPS >> 1) & 3] & 0xff00) | dat);
             }
-            ref_gb->get_lcd()->get_mapped_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) + 8)[(ref_gb->get_cregs()->OCPS >> 1) & 3] = ref_gb->map_color(
-                    ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) + 8)[(ref_gb->get_cregs()->OCPS >> 1) & 3]);
-            ref_gb->get_cregs()->OCPD = dat;
-            if ((ref_gb->get_cregs()->OCPS & 0x80) != 0) {
-                ref_gb->get_cregs()->OCPS = (uint8_t) (0x80 | ((ref_gb->get_cregs()->OCPS + 1) & 0x3f));
+            ref_gb.get_lcd()->get_mapped_pal(((ref_gb.get_cregs()->OCPS >> 3) & 7) + 8)[(ref_gb.get_cregs()->OCPS >> 1) & 3] = ref_gb.map_color(
+                    ref_gb.get_lcd()->get_pal(((ref_gb.get_cregs()->OCPS >> 3) & 7) + 8)[(ref_gb.get_cregs()->OCPS >> 1) & 3]);
+            ref_gb.get_cregs()->OCPD = dat;
+            if ((ref_gb.get_cregs()->OCPS & 0x80) != 0) {
+                ref_gb.get_cregs()->OCPS = (uint8_t) (0x80 | ((ref_gb.get_cregs()->OCPS + 1) & 0x3f));
             }
             return;
         case 0xFF70:
             dat = (uint8_t) (((dat & 7) == 0) ? 1 : (dat & 7));
-            ref_gb->get_cregs()->SVBK = dat;
+            ref_gb.get_cregs()->SVBK = dat;
             ram_bank = ram + 0x1000 * dat;
             return;
 
         case 0xFFFF:
-            ref_gb->get_regs()->IE = dat;
+            ref_gb.get_regs()->IE = dat;
             return;
         case 0xFF6C:
             _ff6c = (uint8_t) (dat & 1);
@@ -650,7 +649,7 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
 
         default:
             if (adr > 0xFF0F && adr < 0xFF40) {
-                ref_gb->get_apu()->write(adr, dat, total_clock);
+                ref_gb.get_apu()->write(adr, dat, total_clock);
                 return;
             } else if ((adr > 0xff70) && (adr < 0xff80))
                 ext_mem[adr - 0xff71] = dat;
@@ -707,8 +706,8 @@ static const uint8_t ZTable[256] = {
 
 void cpu::irq(int irq_type) {
     if (!((irq_type == INT_VBLANK || irq_type == INT_LCDC) &&
-          ((ref_gb->get_regs()->LCDC & 0x80) == 0)))
-        ref_gb->get_regs()->IF |= (irq_type);
+          ((ref_gb.get_regs()->LCDC & 0x80) == 0)))
+        ref_gb.get_regs()->IF |= (irq_type);
 }
 
 void cpu::irq_process() {
@@ -717,28 +716,28 @@ void cpu::irq_process() {
         return;
     }
 
-    if (((ref_gb->get_regs()->IF & ref_gb->get_regs()->IE) != 0) && ((regs.I != 0u) || halt)) { //割りこみがかかる時 // Time-consuming interrupt
+    if (((ref_gb.get_regs()->IF & ref_gb.get_regs()->IE) != 0) && ((regs.I != 0u) || halt)) { //割りこみがかかる時 // Time-consuming interrupt
         if (halt)
             regs.PC++;
         write((uint16_t) (regs.SP - 2), (uint8_t) (regs.PC & 0xFF));
         write((uint16_t) (regs.SP - 1), (uint8_t) (regs.PC >> 8));
         regs.SP -= 2;
-        if ((ref_gb->get_regs()->IF & ref_gb->get_regs()->IE & INT_VBLANK) != 0) { // VBlank
+        if ((ref_gb.get_regs()->IF & ref_gb.get_regs()->IE & INT_VBLANK) != 0) { // VBlank
             regs.PC = 0x40;
-            ref_gb->get_regs()->IF &= 0xFE;
-        } else if ((ref_gb->get_regs()->IF & ref_gb->get_regs()->IE & INT_LCDC) != 0) { // LCDC
+            ref_gb.get_regs()->IF &= 0xFE;
+        } else if ((ref_gb.get_regs()->IF & ref_gb.get_regs()->IE & INT_LCDC) != 0) { // LCDC
             regs.PC = 0x48;
-            ref_gb->get_regs()->IF &= 0xFD;
-        } else if ((ref_gb->get_regs()->IF & ref_gb->get_regs()->IE & INT_TIMER) != 0) { // Timer
+            ref_gb.get_regs()->IF &= 0xFD;
+        } else if ((ref_gb.get_regs()->IF & ref_gb.get_regs()->IE & INT_TIMER) != 0) { // Timer
             regs.PC = 0x50;
-            ref_gb->get_regs()->IF &= 0xFB;
-        } else if ((ref_gb->get_regs()->IF & ref_gb->get_regs()->IE & INT_SERIAL) != 0) { // Serial
+            ref_gb.get_regs()->IF &= 0xFB;
+        } else if ((ref_gb.get_regs()->IF & ref_gb.get_regs()->IE & INT_SERIAL) != 0) { // Serial
             regs.PC = 0x58;
-            ref_gb->get_regs()->IF &= 0xF7;
-            //ref_gb->get_regs()->SC |= (ref_gb->get_regs()->SB &0x1) << 7;
-        } else if ((ref_gb->get_regs()->IF & ref_gb->get_regs()->IE & INT_PAD) != 0) { // Pad
+            ref_gb.get_regs()->IF &= 0xF7;
+            //ref_gb.get_regs()->SC |= (ref_gb.get_regs()->SB &0x1) << 7;
+        } else if ((ref_gb.get_regs()->IF & ref_gb.get_regs()->IE & INT_PAD) != 0) { // Pad
             regs.PC = 0x60;
-            ref_gb->get_regs()->IF &= 0xEF;
+            ref_gb.get_regs()->IF &= 0xEF;
         }
 
         halt = false;
@@ -825,7 +824,7 @@ void cpu::exec(int clocks) {
                 regs.I = 1;
                 REG_PC = readw(REG_SP);
                 REG_SP += 2;
-                int_desable = true;                                                                                                                                     /*;ref_gb->get_regs()->IF=0*/
+                int_desable = true;                                                                                                                                     /*;ref_gb.get_regs()->IF=0*/
                 ; /*res->system_reg.IF&=~Int_hist[(Int_depth>0)?--Int_depth:Int_depth]*/ /*Int_depth=((Int_depth>0)?--Int_depth:Int_depth);*/ /*res->system_reg.IF=0;*/ /*Log("RETI %d\n",Int_depth);*/
                 break;                                                                                                                                                  // RETI state 16
             case 0xE0:
@@ -1556,27 +1555,27 @@ void cpu::exec(int clocks) {
 
             case 0x76:
 
-                if ((ref_gb->get_regs()->TAC & 0x04) != 0) {
-                    auto value = (uint16_t) (ref_gb->get_regs()->TIMA +
-                                             (sys_clock + rest_clock) / timer_clocks[ref_gb->get_regs()->TAC & 0x03]);
+                if ((ref_gb.get_regs()->TAC & 0x04) != 0) {
+                    auto value = (uint16_t) (ref_gb.get_regs()->TIMA +
+                                             (sys_clock + rest_clock) / timer_clocks[ref_gb.get_regs()->TAC & 0x03]);
 
                     if ((value & 0xFF00) != 0) {
-                        total_clock += (256 - ref_gb->get_regs()->TIMA) *
-                                       timer_clocks[ref_gb->get_regs()->TAC & 0x03] -
+                        total_clock += (256 - ref_gb.get_regs()->TIMA) *
+                                       timer_clocks[ref_gb.get_regs()->TAC & 0x03] -
                                        sys_clock;
-                        rest_clock -= (256 - ref_gb->get_regs()->TIMA) *
-                                      timer_clocks[ref_gb->get_regs()->TAC & 0x03] -
+                        rest_clock -= (256 - ref_gb.get_regs()->TIMA) *
+                                      timer_clocks[ref_gb.get_regs()->TAC & 0x03] -
                                       sys_clock;
-                        ref_gb->get_regs()->TIMA = ref_gb->get_regs()->TMA;
+                        ref_gb.get_regs()->TIMA = ref_gb.get_regs()->TMA;
                         halt = true;
                         REG_PC--;
                         irq(INT_TIMER);
                         sys_clock = (sys_clock + rest_clock) &
-                                    (timer_clocks[ref_gb->get_regs()->TAC & 0x03] - 1);
+                                    (timer_clocks[ref_gb.get_regs()->TAC & 0x03] - 1);
                     } else {
-                        ref_gb->get_regs()->TIMA = (uint8_t) (value & 0xFF);
+                        ref_gb.get_regs()->TIMA = (uint8_t) (value & 0xFF);
                         sys_clock = (sys_clock + rest_clock) &
-                                    (timer_clocks[ref_gb->get_regs()->TAC & 0x03] - 1);
+                                    (timer_clocks[ref_gb.get_regs()->TAC & 0x03] - 1);
                         halt = true;
                         total_clock += rest_clock;
                         rest_clock = 0;
@@ -2829,27 +2828,27 @@ void cpu::exec(int clocks) {
         div_clock += tmp_clocks;
         total_clock += tmp_clocks;
 
-        if ((ref_gb->get_regs()->TAC & 0x04) != 0) { //タイマ割りこみ // Timer interrupt
+        if ((ref_gb.get_regs()->TAC & 0x04) != 0) { //タイマ割りこみ // Timer interrupt
             sys_clock += tmp_clocks;
-            if (sys_clock > timer_clocks[ref_gb->get_regs()->TAC & 0x03]) {
-                sys_clock &= timer_clocks[ref_gb->get_regs()->TAC & 0x03] - 1;
-                ref_gb->get_regs()->TIMA++;
-                if (ref_gb->get_regs()->TIMA == 0u) {
+            if (sys_clock > timer_clocks[ref_gb.get_regs()->TAC & 0x03]) {
+                sys_clock &= timer_clocks[ref_gb.get_regs()->TAC & 0x03] - 1;
+                ref_gb.get_regs()->TIMA++;
+                if (ref_gb.get_regs()->TIMA == 0u) {
                     irq(INT_TIMER);
-                    ref_gb->get_regs()->TIMA = ref_gb->get_regs()->TMA;
+                    ref_gb.get_regs()->TIMA = ref_gb.get_regs()->TMA;
                 }
             }
         }
 
         if ((div_clock & 0x100) != 0) {
-            ref_gb->get_regs()->DIV -= div_clock >> 8;
+            ref_gb.get_regs()->DIV -= div_clock >> 8;
             div_clock &= 0xff;
         }
 
         if (total_clock > seri_occer) {
             seri_occer = 0x7fffffff;
-            ref_gb->get_regs()->SB = 0xff;
-            ref_gb->get_regs()->SC &= 3;
+            ref_gb.get_regs()->SB = 0xff;
+            ref_gb.get_regs()->SC &= 3;
             irq(INT_SERIAL);
         }
     }
@@ -2867,7 +2866,7 @@ void cpu::serialize(serializer &s) {
 
     s_VAR(regs);
 
-    if (ref_gb->gb_type() >= 3) { // GB: 1, SGB: 2, GBC: 3...
+    if (ref_gb.gb_type() >= 3) { // GB: 1, SGB: 2, GBC: 3...
         s_ARRAY(ram);
         s_ARRAY(vram);
     } else {

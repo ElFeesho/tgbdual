@@ -8,7 +8,7 @@ class gb;
 
 class mbc {
 public:
-    explicit mbc(gb *ref);
+    explicit mbc(gb &ref);
 
     uint8_t *get_rom() { return rom_page; }
 
@@ -83,5 +83,5 @@ private:
     bool huc1_16_8;
     uint8_t huc1_dat;
 
-    gb *ref_gb;
+    gb &ref_gb;
 };

@@ -3,6 +3,7 @@
 static const int RAM_SIZE = 0x2000 * 4;
 
 class gb;
+
 class serializer;
 
 union pare_reg {
@@ -25,46 +26,57 @@ struct cpu_regs {
 class cpu {
     friend class gb;
 
-   public:
-    explicit cpu(gb *ref);
+public:
+    explicit cpu(gb &ref);
 
     uint8_t read(uint16_t adr);
 
     uint8_t read_direct(uint16_t adr);
+
     void write(uint16_t adr, uint8_t dat);
+
     uint16_t inline readw(uint16_t adr) { return read(adr) | (read((uint16_t) (adr + 1)) << 8); }
+
     void inline writew(uint16_t adr, uint16_t dat) {
-        write(adr, (uint8_t)dat);
+        write(adr, (uint8_t) dat);
         write((uint16_t) (adr + 1), (uint8_t) (dat >> 8));
     }
 
     void exec(int clocks);
 
     void irq(int irq_type);
+
     void inline irq_process();
+
     void reset();
 
     uint8_t *get_vram() { return vram; }
+
     uint8_t *get_ram() { return ram; }
+
     uint8_t *get_oam() { return oam; }
 
     uint8_t get_ram_bank_number() { return (uint8_t) ((ram - ram_bank) / 0x1000); }
 
     int get_clock() { return total_clock; }
+
     bool get_speed() { return speed; }
 
     void serialize(serializer &s);
 
-   private:
+private:
     uint8_t inline io_read(uint16_t adr);
+
     void inline io_write(uint16_t adr, uint8_t dat);
+
     uint8_t op_read() { return read(regs.PC++); }
+
     uint16_t op_readw() {
         regs.PC += 2;
         return readw((uint16_t) (regs.PC - 2));
     }
 
-    gb *ref_gb;
+    gb &ref_gb;
     cpu_regs regs;
 
     uint8_t ram[RAM_SIZE];

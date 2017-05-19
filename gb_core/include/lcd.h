@@ -8,7 +8,7 @@ class serializer;
 
 class lcd {
 public:
-    explicit lcd(gb *ref);
+    explicit lcd(gb &ref);
 
     void render(void *buf, int scanline);
 
@@ -42,5 +42,5 @@ private:
     int mul;
     int sprite_count;
 
-    gb *ref_gb;
+    gb &ref_gb;
 };

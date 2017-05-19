@@ -123,7 +123,7 @@ class apu {
     friend class apu_snd;
 
 public:
-    explicit apu(gb *ref);
+    explicit apu(gb &ref);
 
     apu_snd *get_stream_provider() { return &snd; }
 
@@ -136,6 +136,6 @@ public:
     void serialize(serializer &s);
 
 private:
-    gb *ref_gb { nullptr };
+    gb &ref_gb;
     apu_snd snd;
 };

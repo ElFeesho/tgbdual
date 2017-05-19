@@ -28,7 +28,8 @@
 static uint32_t convert_to_second(struct tm *sys);
 
 gb::gb(video_renderer *ref, audio_renderer *audio, gamepad_source *gamepad_source_ref, std::function<void()> sram_updated, std::function<uint8_t()> link_read, std::function<void(uint8_t)> link_write)
-        : m_renderer{ref}, m_gamepad{gamepad_source_ref}, m_lcd{this}, m_cpu{this}, m_apu{this}, m_mbc{this}, m_cheat{}, sram_update_cb{std::move(sram_updated)}, link_read_cb{std::move(link_read)},
+        : m_renderer{ref}, m_gamepad{gamepad_source_ref}, m_lcd{*this}, m_cpu{*this}, m_apu{*this}, m_mbc{*this}, m_cheat{}, sram_update_cb{std::move(sram_updated)},
+          link_read_cb{std::move(link_read)},
           link_write_cb{std::move(link_write)} {
 
     audio->connect_audio_provider(m_apu.get_stream_provider());

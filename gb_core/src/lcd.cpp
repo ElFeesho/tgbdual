@@ -25,17 +25,16 @@
 #include <memory.h>
 #include "gb.h"
 
-#define ROL_BYTE(var, bits)                                     \
-    (var = ((var) & (-(1 << 8))) | (((var) << (bits)) & 0xff) | \
-           ((var) >> (8 - (bits))))
+template<typename T>
+static inline void ROL_BYTE(T &var, int32_t bits) {
+    var = ((var) & (-(1 << 8))) | (((var) << (bits)) & 0xff) | ((var) >> (8 - (bits)));
+}
 
-lcd::lcd(gb *ref) {
-    ref_gb = ref;
-
+lcd::lcd(gb &ref) : ref_gb{ref} {
     uint8_t dat[] = {31, 21, 11, 0};
 
     for (int i = 0; i < 4; i++) {
-        m_pal16[i] = ref_gb->map_color(dat[i] | (dat[i] << 5) | (dat[i] << 10));
+        m_pal16[i] = ref_gb.map_color(dat[i] | (dat[i] << 5) | (dat[i] << 10));
         m_pal32[i] = ((dat[i] << 16) | (dat[i] << 8) | dat[i]);
     }
 
@@ -48,12 +47,12 @@ void lcd::reset() {
 }
 
 void lcd::bg_render(void *buf, int scanline) {
-    if (!(ref_gb->get_regs()->LCDC & 0x80) || !(ref_gb->get_regs()->LCDC & 0x01) ||
-        (ref_gb->get_regs()->WY <= (uint32_t) scanline && ref_gb->get_regs()->WX < 8 &&
-         (ref_gb->get_regs()->LCDC & 0x20))) {
-        if (!(ref_gb->get_regs()->LCDC & 0x80) || !(ref_gb->get_regs()->LCDC & 0x01)) {
+    if (!(ref_gb.get_regs()->LCDC & 0x80) || !(ref_gb.get_regs()->LCDC & 0x01) ||
+        (ref_gb.get_regs()->WY <= (uint32_t) scanline && ref_gb.get_regs()->WX < 8 &&
+         (ref_gb.get_regs()->LCDC & 0x20))) {
+        if (!(ref_gb.get_regs()->LCDC & 0x80) || !(ref_gb.get_regs()->LCDC & 0x01)) {
             uint16_t *tmp_w = (uint16_t *) buf + 160 * scanline;
-            uint16_t tmp_dat = ref_gb->map_color(0x7fff);
+            uint16_t tmp_dat = ref_gb.map_color(0x7fff);
             for (int t = 0; t < 160; t++) {
                 *(tmp_w++) = tmp_dat;
             }
@@ -61,29 +60,29 @@ void lcd::bg_render(void *buf, int scanline) {
         return;
     }
 
-    uint16_t back = (uint16_t) ((ref_gb->get_regs()->LCDC & 0x08) ? 0x1C00 : 0x1800);
-    uint16_t pat = (uint16_t) ((ref_gb->get_regs()->LCDC & 0x10) ? 0x0000 : 0x1000);
+    uint16_t back = (uint16_t) ((ref_gb.get_regs()->LCDC & 0x08) ? 0x1C00 : 0x1800);
+    uint16_t pat = (uint16_t) ((ref_gb.get_regs()->LCDC & 0x10) ? 0x0000 : 0x1000);
     uint16_t share = 0x0000; // prefix
     uint16_t pal[4];
     uint8_t tile;
     int i, x, y;
-    uint8_t *vrams[2] = {ref_gb->get_cpu()->get_vram(),
-                         ref_gb->get_cpu()->get_vram() + 0x2000};
+    uint8_t *vrams[2] = {ref_gb.get_cpu()->get_vram(),
+                         ref_gb.get_cpu()->get_vram() + 0x2000};
 
-    pal[0] = m_pal16[ref_gb->get_regs()->BGP & 0x3];
-    pal[1] = m_pal16[(ref_gb->get_regs()->BGP >> 2) & 0x3];
-    pal[2] = m_pal16[(ref_gb->get_regs()->BGP >> 4) & 0x3];
-    pal[3] = m_pal16[(ref_gb->get_regs()->BGP >> 6) & 0x3];
+    pal[0] = m_pal16[ref_gb.get_regs()->BGP & 0x3];
+    pal[1] = m_pal16[(ref_gb.get_regs()->BGP >> 2) & 0x3];
+    pal[2] = m_pal16[(ref_gb.get_regs()->BGP >> 4) & 0x3];
+    pal[3] = m_pal16[(ref_gb.get_regs()->BGP >> 6) & 0x3];
 
-    y = scanline + ref_gb->get_regs()->SCY;
+    y = scanline + ref_gb.get_regs()->SCY;
     if (y >= 256) {
         y -= 256;
     }
-    x = ref_gb->get_regs()->SCX;
+    x = ref_gb.get_regs()->SCX;
 
     uint16_t *dat = ((uint16_t *) buf) + scanline * 160;
 
-    int start = ref_gb->get_regs()->SCX >> 3;
+    int start = ref_gb.get_regs()->SCX >> 3;
     int y_div_8 = y >> 3;
     int prefix = 0;
     uint8_t *trans = trans_tbl;
@@ -135,7 +134,7 @@ void lcd::bg_render(void *buf, int scanline) {
 
     for (i = 0; i < 20; i++) {
         if ((x / 8 * 8 + i * 8) - prefix >= 248) {
-            now_tile = ref_gb->get_cpu()->get_vram() + back + ((y / 8) << 5);
+            now_tile = ref_gb.get_cpu()->get_vram() + back + ((y / 8) << 5);
             prefix = 256;
         }
         tile = *(now_tile++);
@@ -172,10 +171,10 @@ void lcd::bg_render(void *buf, int scanline) {
 }
 
 void lcd::win_render(void *buf, int scanline) {
-    if (!((ref_gb->get_regs()->LCDC & 0x80) != 0) ||
-        !((ref_gb->get_regs()->LCDC & 0x20) != 0) ||
-        ref_gb->get_regs()->WY >= (scanline + 1) ||
-        ref_gb->get_regs()->WX > 166) {
+    if (!((ref_gb.get_regs()->LCDC & 0x80) != 0) ||
+        !((ref_gb.get_regs()->LCDC & 0x20) != 0) ||
+        ref_gb.get_regs()->WY >= (scanline + 1) ||
+        ref_gb.get_regs()->WX > 166) {
         return;
     }
 
@@ -183,27 +182,27 @@ void lcd::win_render(void *buf, int scanline) {
     now_win_line++;
     uint8_t *trans = trans_tbl;
 
-    uint16_t back = (uint16_t) ((ref_gb->get_regs()->LCDC & 0x40) ? 0x1C00 : 0x1800);
-    uint16_t pat = (uint16_t) ((ref_gb->get_regs()->LCDC & 0x10) ? 0x0000 : 0x1000);
+    uint16_t back = (uint16_t) ((ref_gb.get_regs()->LCDC & 0x40) ? 0x1C00 : 0x1800);
+    uint16_t pat = (uint16_t) ((ref_gb.get_regs()->LCDC & 0x10) ? 0x0000 : 0x1000);
     uint16_t share = 0x0000; // prefix
     uint16_t pal[4];
     uint16_t *dat = (uint16_t *) buf;
     uint8_t tile;
     int i;
 
-    pal[0] = m_pal16[ref_gb->get_regs()->BGP & 0x3];
-    pal[1] = m_pal16[(ref_gb->get_regs()->BGP >> 2) & 0x3];
-    pal[2] = m_pal16[(ref_gb->get_regs()->BGP >> 4) & 0x3];
-    pal[3] = m_pal16[(ref_gb->get_regs()->BGP >> 6) & 0x3];
-    dat += 160 * scanline + ref_gb->get_regs()->WX - 7;
-    trans += ref_gb->get_regs()->WX - 7;
-    uint8_t *now_tile = ref_gb->get_cpu()->get_vram() + back + (((y >> 3) - 1) << 5);
-    auto *now_share = (uint16_t *) (ref_gb->get_cpu()->get_vram() + share + ((y & 7) << 1));
-    auto *now_pat = (uint16_t *) (ref_gb->get_cpu()->get_vram() + pat + ((y & 7) << 1));
+    pal[0] = m_pal16[ref_gb.get_regs()->BGP & 0x3];
+    pal[1] = m_pal16[(ref_gb.get_regs()->BGP >> 2) & 0x3];
+    pal[2] = m_pal16[(ref_gb.get_regs()->BGP >> 4) & 0x3];
+    pal[3] = m_pal16[(ref_gb.get_regs()->BGP >> 6) & 0x3];
+    dat += 160 * scanline + ref_gb.get_regs()->WX - 7;
+    trans += ref_gb.get_regs()->WX - 7;
+    uint8_t *now_tile = ref_gb.get_cpu()->get_vram() + back + (((y >> 3) - 1) << 5);
+    auto *now_share = (uint16_t *) (ref_gb.get_cpu()->get_vram() + share + ((y & 7) << 1));
+    auto *now_pat = (uint16_t *) (ref_gb.get_cpu()->get_vram() + pat + ((y & 7) << 1));
     uint32_t tmp_dat;
     uint32_t calc1, calc2;
 
-    for (i = ref_gb->get_regs()->WX >> 3; i < 21; i++) {
+    for (i = ref_gb.get_regs()->WX >> 3; i < 21; i++) {
         tile = *(now_tile++);
         tmp_dat = (tile & 0x80) != 0 ? *(now_share + (tile << 3)) : *(now_pat + (tile << 3));
         calc1 = tmp_dat;
@@ -238,28 +237,28 @@ void lcd::win_render(void *buf, int scanline) {
 }
 
 void lcd::sprite_render(void *buf, int scanline) {
-    if (!((ref_gb->get_regs()->LCDC & 0x80) != 0) || !((ref_gb->get_regs()->LCDC & 0x02) != 0))
+    if (!((ref_gb.get_regs()->LCDC & 0x80) != 0) || !((ref_gb.get_regs()->LCDC & 0x02) != 0))
         return;
 
     uint16_t *sdat = ((uint16_t *) buf) + (scanline) * 160, *now_pos;
     int x, y, tile, atr, i, now;
     uint16_t l1, l2, tmp_dat;
     uint16_t pal[2][4], *cur_p;
-    uint8_t *oam = ref_gb->get_cpu()->get_oam();
-    uint8_t *vram = ref_gb->get_cpu()->get_vram();
+    uint8_t *oam = ref_gb.get_cpu()->get_oam();
+    uint8_t *vram = ref_gb.get_cpu()->get_vram();
 
-    bool sp_size = (ref_gb->get_regs()->LCDC & 0x04) != 0;
+    bool sp_size = (ref_gb.get_regs()->LCDC & 0x04) != 0;
     int palnum;
 
-    pal[0][0] = m_pal16[ref_gb->get_regs()->OBP1 & 0x3];
-    pal[0][1] = m_pal16[(ref_gb->get_regs()->OBP1 >> 2) & 0x3];
-    pal[0][2] = m_pal16[(ref_gb->get_regs()->OBP1 >> 4) & 0x3];
-    pal[0][3] = m_pal16[(ref_gb->get_regs()->OBP1 >> 6) & 0x3];
+    pal[0][0] = m_pal16[ref_gb.get_regs()->OBP1 & 0x3];
+    pal[0][1] = m_pal16[(ref_gb.get_regs()->OBP1 >> 2) & 0x3];
+    pal[0][2] = m_pal16[(ref_gb.get_regs()->OBP1 >> 4) & 0x3];
+    pal[0][3] = m_pal16[(ref_gb.get_regs()->OBP1 >> 6) & 0x3];
 
-    pal[1][0] = m_pal16[ref_gb->get_regs()->OBP2 & 0x3];
-    pal[1][1] = m_pal16[(ref_gb->get_regs()->OBP2 >> 2) & 0x3];
-    pal[1][2] = m_pal16[(ref_gb->get_regs()->OBP2 >> 4) & 0x3];
-    pal[1][3] = m_pal16[(ref_gb->get_regs()->OBP2 >> 6) & 0x3];
+    pal[1][0] = m_pal16[ref_gb.get_regs()->OBP2 & 0x3];
+    pal[1][1] = m_pal16[(ref_gb.get_regs()->OBP2 >> 2) & 0x3];
+    pal[1][2] = m_pal16[(ref_gb.get_regs()->OBP2 >> 4) & 0x3];
+    pal[1][3] = m_pal16[(ref_gb.get_regs()->OBP2 >> 6) & 0x3];
 
     for (i = 39; i >= 0; i--) {
         tile = oam[i * 4 + 2];
@@ -417,10 +416,10 @@ void lcd::sprite_render(void *buf, int scanline) {
 void lcd::bg_render_color(void *buf, int scanline) {
     trans_count = 0;
 
-    if (!(ref_gb->get_regs()->LCDC & 0x80) || (ref_gb->get_regs()->WY <= (uint32_t) scanline && ref_gb->get_regs()->WX < 8 && (ref_gb->get_regs()->LCDC & 0x20))) {
-        if (!(ref_gb->get_regs()->LCDC & 0x80)) {
+    if (!(ref_gb.get_regs()->LCDC & 0x80) || (ref_gb.get_regs()->WY <= (uint32_t) scanline && ref_gb.get_regs()->WX < 8 && (ref_gb.get_regs()->LCDC & 0x20))) {
+        if (!(ref_gb.get_regs()->LCDC & 0x80)) {
             uint16_t *tmp_w = (uint16_t *) buf + 160 * scanline;
-            uint16_t tmp_dat = ref_gb->map_color(0x7fff);
+            uint16_t tmp_dat = ref_gb.map_color(0x7fff);
             for (int t = 0; t < 160; t++) {
                 *(tmp_w++) = tmp_dat;
             }
@@ -428,25 +427,25 @@ void lcd::bg_render_color(void *buf, int scanline) {
         return;
     }
 
-    uint16_t back = (uint16_t) ((ref_gb->get_regs()->LCDC & 0x08) ? 0x1C00 : 0x1800);
-    uint16_t pat = (uint16_t) ((ref_gb->get_regs()->LCDC & 0x10) ? 0x0000 : 0x1000);
+    uint16_t back = (uint16_t) ((ref_gb.get_regs()->LCDC & 0x08) ? 0x1C00 : 0x1800);
+    uint16_t pat = (uint16_t) ((ref_gb.get_regs()->LCDC & 0x10) ? 0x0000 : 0x1000);
     uint16_t share = 0x0000; // prefix
     uint16_t *pal;
     uint8_t tile;
     int i, x, y;
-    uint8_t *vrams[2] = {ref_gb->get_cpu()->get_vram(), ref_gb->get_cpu()->get_vram() + 0x2000};
+    uint8_t *vrams[2] = {ref_gb.get_cpu()->get_vram(), ref_gb.get_cpu()->get_vram() + 0x2000};
 
-    y = scanline + ref_gb->get_regs()->SCY;
+    y = scanline + ref_gb.get_regs()->SCY;
 
     if (y >= 256) {
         y -= 256;
     }
 
-    x = ref_gb->get_regs()->SCX;
+    x = ref_gb.get_regs()->SCX;
 
     uint16_t *dat = ((uint16_t *) buf) + scanline * 160;
 
-    int start = ref_gb->get_regs()->SCX >> 3;
+    int start = ref_gb.get_regs()->SCX >> 3;
     int y_div_8 = y >> 3;
     int prefix = 0;
     uint8_t *now_tile = vrams[0] + back + ((y_div_8) << 5) + start;
@@ -468,9 +467,8 @@ void lcd::bg_render_color(void *buf, int scanline) {
     pal = mapped_pal[atr & 7];
     bank = (uint16_t) ((atr << 9) & 0x1000);
     tmp_dat =
-            (tile & 0x80)
-            ? *(((atr & 0x40) ? now_share2 : now_share) + (tile << 3) + bank)
-            : *(((atr & 0x40) ? now_pat2 : now_pat) + (tile << 3) + bank);
+            (tile & 0x80) != 0 ? *(((atr & 0x40) != 0 ? now_share2 : now_share) + (tile << 3) + bank)
+                               : *(((atr & 0x40) != 0 ? now_pat2 : now_pat) + (tile << 3) + bank);
     calc1 = tmp_dat;
     calc2 = tmp_dat >> 7;
     calc1 &= 0x55;
@@ -526,8 +524,8 @@ void lcd::bg_render_color(void *buf, int scanline) {
 
     for (i = 0; i < 20; i++) {
         if ((x / 8 * 8 + i * 8) - prefix >= 248) {
-            now_tile = ref_gb->get_cpu()->get_vram() + back + ((y / 8) << 5);
-            now_atr = ref_gb->get_cpu()->get_vram() + back + ((y / 8) << 5) + 0x2000;
+            now_tile = ref_gb.get_cpu()->get_vram() + back + ((y / 8) << 5);
+            now_atr = ref_gb.get_cpu()->get_vram() + back + ((y / 8) << 5) + 0x2000;
             prefix = 256;
         }
 
@@ -599,26 +597,26 @@ void lcd::bg_render_color(void *buf, int scanline) {
     }
 
     // 多分こういうこと(僕のキャンプ場)
-    if (!(ref_gb->get_regs()->LCDC & 0x01))
+    if (!(ref_gb.get_regs()->LCDC & 0x01))
         memset(trans_tbl, 0, 160);
 }
 
 void lcd::win_render_color(void *buf, int scanline) {
-    if (!(ref_gb->get_regs()->LCDC & 0x80) ||
-        !(ref_gb->get_regs()->LCDC & 0x20) ||
-        ref_gb->get_regs()->WY >= (scanline + 1) ||
-        ref_gb->get_regs()->WX > 166) {
+    if (!(ref_gb.get_regs()->LCDC & 0x80) ||
+        !(ref_gb.get_regs()->LCDC & 0x20) ||
+        ref_gb.get_regs()->WY >= (scanline + 1) ||
+        ref_gb.get_regs()->WX > 166) {
         return;
     }
 
     int y = now_win_line - 1;;
     now_win_line++;
 
-    uint8_t *vrams[2] = {ref_gb->get_cpu()->get_vram(),
-                         ref_gb->get_cpu()->get_vram() + 0x2000};
+    uint8_t *vrams[2] = {ref_gb.get_cpu()->get_vram(),
+                         ref_gb.get_cpu()->get_vram() + 0x2000};
 
-    auto back = (uint16_t) ((ref_gb->get_regs()->LCDC & 0x40) ? 0x1C00 : 0x1800);
-    auto pat = (uint16_t) ((ref_gb->get_regs()->LCDC & 0x10) ? 0x0000 : 0x1000);
+    auto back = (uint16_t) ((ref_gb.get_regs()->LCDC & 0x40) ? 0x1C00 : 0x1800);
+    auto pat = (uint16_t) ((ref_gb.get_regs()->LCDC & 0x10) ? 0x0000 : 0x1000);
     uint16_t share = 0x0000; // prefix
     uint16_t *pal;
     auto *dat = (uint16_t *) buf;
@@ -627,14 +625,14 @@ void lcd::win_render_color(void *buf, int scanline) {
     uint8_t tile;
     int i;
 
-    dat += 160 * scanline + ref_gb->get_regs()->WX - 7;
-    trans += ref_gb->get_regs()->WX - 7;
-    priority += ref_gb->get_regs()->WX - 7;
-    uint8_t *now_tile = ref_gb->get_cpu()->get_vram() + back + (((y >> 3) - 1) << 5);
+    dat += 160 * scanline + ref_gb.get_regs()->WX - 7;
+    trans += ref_gb.get_regs()->WX - 7;
+    priority += ref_gb.get_regs()->WX - 7;
+    uint8_t *now_tile = ref_gb.get_cpu()->get_vram() + back + (((y >> 3) - 1) << 5);
     uint8_t *now_atr =
-            ref_gb->get_cpu()->get_vram() + back + (((y >> 3) - 1) << 5) + 0x2000;
-    auto *now_share = (uint16_t *) (ref_gb->get_cpu()->get_vram() + share + ((y & 7) << 1));
-    auto *now_pat = (uint16_t *) (ref_gb->get_cpu()->get_vram() + pat + ((y & 7) << 1));
+            ref_gb.get_cpu()->get_vram() + back + (((y >> 3) - 1) << 5) + 0x2000;
+    auto *now_share = (uint16_t *) (ref_gb.get_cpu()->get_vram() + share + ((y & 7) << 1));
+    auto *now_pat = (uint16_t *) (ref_gb.get_cpu()->get_vram() + pat + ((y & 7) << 1));
     auto *now_share2 = (uint16_t *) (vrams[0] + share + 14 - ((y & 7) << 1));
     auto *now_pat2 = (uint16_t *) (vrams[0] + pat + 14 - ((y & 7) << 1));
     uint32_t tmp_dat;
@@ -642,7 +640,7 @@ void lcd::win_render_color(void *buf, int scanline) {
     uint8_t atr;
     uint16_t bank;
 
-    for (i = ref_gb->get_regs()->WX >> 3; i < 21; i++) {
+    for (i = ref_gb.get_regs()->WX >> 3; i < 21; i++) {
         tile = *(now_tile++);
         atr = *(now_atr++);
         bank = (uint16_t) ((atr << 9) & 0x1000);
@@ -694,17 +692,17 @@ void lcd::win_render_color(void *buf, int scanline) {
 }
 
 void lcd::sprite_render_color(void *buf, int scanline) {
-    if (!(ref_gb->get_regs()->LCDC & 0x80) || !(ref_gb->get_regs()->LCDC & 0x02))
+    if (!(ref_gb.get_regs()->LCDC & 0x80) || !(ref_gb.get_regs()->LCDC & 0x02))
         return;
 
     uint16_t *sdat = ((uint16_t *) buf) + (scanline) * 160, *now_pos;
     int x, y, tile, atr, i, now;
     uint16_t l1, l2, tmp_dat;
     uint16_t *cur_p;
-    uint8_t *oam = ref_gb->get_cpu()->get_oam(),
-            *vram = ref_gb->get_cpu()->get_vram();
+    uint8_t *oam = ref_gb.get_cpu()->get_oam(),
+            *vram = ref_gb.get_cpu()->get_vram();
 
-    bool sp_size = (ref_gb->get_regs()->LCDC & 0x04) != 0;
+    bool sp_size = (ref_gb.get_regs()->LCDC & 0x04) != 0;
 
     uint16_t bank;
 
@@ -882,7 +880,7 @@ void lcd::sprite_render_color(void *buf, int scanline) {
 void lcd::render(void *buf, int scanline) {
     sprite_count = 0;
 
-    if (ref_gb->get_rom()->get_info()->gb_type >= 3) {
+    if (ref_gb.get_rom()->get_info()->gb_type >= 3) {
         bg_render_color(buf, scanline);
         win_render_color(buf, scanline);
         sprite_render_color(buf, scanline);
