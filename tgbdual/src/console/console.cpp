@@ -27,9 +27,9 @@ void console::draw() {
         for (size_t i = 0; i < _history.size(); i++) {
             auto history = _history[i];
             int32_t historyLineY = (int32_t) ((_height - 10) - (10 * (_history.size() - i)));
-            if (history.outputType() == OutputType::stdout) {
+            if (history.outputType() == OutputType::Output) {
                 _renderer->text(history.line().c_str(), 3, historyLineY, 0xffffffff);
-            } else if (history.outputType() == OutputType::command) {
+            } else if (history.outputType() == OutputType::Command) {
                 _renderer->text(history.line().c_str(), 3, historyLineY, 0xff00ff00);
             } else {
                 _renderer->text(history.line().c_str(), 3, historyLineY, 0xff0000ff);
@@ -102,7 +102,7 @@ void console::scrollDownHistory() {
     } else {
         for (size_t i = 0, j = 0; i < _history.size(); i++) {
             size_t index = (_history.size() - 1) - i;
-            if (_history[index].outputType() == OutputType::command) {
+            if (_history[index].outputType() == OutputType::Command) {
                 j++;
                 if (j == _historyIndex) {
                     _currentLine = _history[index].line();
@@ -119,7 +119,7 @@ void console::scrollUpHistory() {
     bool found = false;
     for (size_t i = 0, j = 0; i < _history.size(); i++) {
         size_t index = (_history.size() - 1) - i;
-        if (_history[index].outputType() == OutputType::command) {
+        if (_history[index].outputType() == OutputType::Command) {
             j++;
             if (j == _historyIndex) {
                 found = true;
@@ -225,11 +225,11 @@ void console::addOutput(std::string output) {
 }
 
 void console::addHistory(std::string output) {
-    _history.push_back(console::HistoryLine{output, OutputType::command});
+    _history.push_back(console::HistoryLine{output, OutputType::Command});
 }
 
 void console::addError(std::string error) {
-    _history.push_back(console::HistoryLine{error, OutputType::stderr});
+    _history.push_back(console::HistoryLine{error, OutputType::Error});
 }
 
 void console::addCommand(const std::string &command, std::function<void(std::vector<std::string>)> commandFunc) {

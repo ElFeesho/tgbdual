@@ -14,7 +14,7 @@
 
 class tgbdual {
 public:
-    explicit tgbdual(core_services *services, link_cable_source *cableSource, tgb::rom *rom);
+    tgbdual(core_services *services, link_cable_source *cableSource, tgb::rom *rom);
 
     void addConsoleCommand(const std::string &command, std::function<void(std::vector<std::string>)> &&commandFunc);
     void addConsoleOutput(const std::string &output);

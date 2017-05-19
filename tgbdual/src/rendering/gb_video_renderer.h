@@ -15,6 +15,6 @@ private:
     tgb::video_renderer *_renderer;
     render_callback _callback;
     uint32_t _bevel;
-    std::unique_ptr<uint8_t[]> _doublePixelBuffer;
+    std::unique_ptr<uint32_t[]> _doublePixelBuffer;
 };
 

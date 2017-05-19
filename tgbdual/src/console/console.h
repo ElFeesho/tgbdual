@@ -33,13 +33,13 @@ public:
 
 private:
     enum class OutputType {
-        stdout,
-        stderr,
-        command
+        Output,
+        Command,
+        Error
     };
     class HistoryLine {
     public:
-        explicit HistoryLine(std::string line, OutputType outputType = OutputType::stdout);
+        explicit HistoryLine(std::string line, OutputType outputType = OutputType::Output);
         OutputType outputType();
         const std::string &line();
     private:

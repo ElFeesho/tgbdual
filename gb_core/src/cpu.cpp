@@ -29,6 +29,65 @@
 #define N_FLAG 0x02
 #define C_FLAG 0x01
 
+#define REG_A regs.AF.b.h
+#define REG_F regs.AF.b.l
+#define REG_B regs.BC.b.h
+#define REG_C regs.BC.b.l
+#define REG_D regs.DE.b.h
+#define REG_E regs.DE.b.l
+#define REG_H regs.HL.b.h
+#define REG_L regs.HL.b.l
+#define REG_BC regs.BC.w
+#define REG_DE regs.DE.w
+#define REG_HL regs.HL.w
+#define REG_SP regs.SP
+#define REG_PC regs.PC
+
+#define ADD(arg)                                                            \
+    tmp.w = REG_A + arg;                                                    \
+    REG_F = tmp.b.h | ZTable[tmp.b.l] | ((REG_A ^ arg ^ tmp.b.l) & H_FLAG); \
+    REG_A = tmp.b.l
+#define ADC(arg)                                                            \
+    tmp.w = REG_A + arg + (REG_F & C_FLAG);                                 \
+    REG_F = tmp.b.h | ZTable[tmp.b.l] | ((REG_A ^ arg ^ tmp.b.l) & H_FLAG); \
+    REG_A = tmp.b.l
+#define SUB(arg)                                  \
+    tmp.w = REG_A - arg;                          \
+    REG_F = N_FLAG | -tmp.b.h | ZTable[tmp.b.l] | \
+            ((REG_A ^ arg ^ tmp.b.l) & H_FLAG);   \
+    REG_A = tmp.b.l
+#define SBC(arg)                                  \
+    tmp.w = REG_A - arg - (REG_F & C_FLAG);       \
+    REG_F = N_FLAG | -tmp.b.h | ZTable[tmp.b.l] | \
+            ((REG_A ^ arg ^ tmp.b.l) & H_FLAG);   \
+    REG_A = tmp.b.l
+#define CP(arg)          \
+    tmp.w = REG_A - arg; \
+    REG_F =              \
+        N_FLAG | -tmp.b.h | ZTable[tmp.b.l] | ((REG_A ^ arg ^ tmp.b.l) & H_FLAG)
+#define AND(arg)  \
+    REG_A &= arg; \
+    REG_F = H_FLAG | ZTable[REG_A]
+#define OR(arg)   \
+    REG_A |= arg; \
+    REG_F = ZTable[REG_A]
+#define XOR(arg)  \
+    REG_A ^= arg; \
+    REG_F = ZTable[REG_A]
+#define INC(arg) \
+    arg++;       \
+    REG_F = (REG_F & C_FLAG) | ZTable[arg] | ((arg & 0x0F) ? 0 : H_FLAG)
+#define DEC(arg)                                      \
+    arg--;                                            \
+    REG_F = N_FLAG | (REG_F & C_FLAG) | ZTable[arg] | \
+            (((arg & 0x0F) == 0x0F) ? H_FLAG : 0)
+#define ADDW(arg)                                                                \
+    tmp.w = REG_HL + arg;                                                        \
+    REG_F =                                                                      \
+        (REG_F & Z_FLAG) | (((REG_HL ^ arg ^ tmp.w) & 0x1000) ? H_FLAG : 0) |    \
+        ((((unsigned long)REG_HL + (unsigned long)arg) & 0x10000) ? C_FLAG : 0); \
+    REG_HL = tmp.w
+
 constexpr uint8_t initialiseZ802GBTable(int i) {
     return (uint8_t) (((i & 0x40) != 0 ? 0x80 : 0) | ((i & 0x10) != 0 ? 0x20 : 0) | ((i & 0x02) != 0 ? 0x40 : 0) | ((i & 0x01) != 0 ? 0x10 : 0));
 }
@@ -193,14 +252,11 @@ uint8_t cpu::io_read(uint16_t adr) {
                 return 0xff;
             switch ((ref_gb->get_regs()->P1 >> 4) & 0x3) {
                 case 0:
-                    return (uint8_t) (0xC0 | ((tmp & 0x81 ? 0 : 1) | (tmp & 0x42 ? 0 : 2) |
-                                              (tmp & 0x24 ? 0 : 4) | (tmp & 0x18 ? 0 : 8)));
+                    return (uint8_t) (0xC0 | (((tmp & 0x81) != 0 ? 0 : 1) | ((tmp & 0x42) != 0 ? 0 : 2) | ((tmp & 0x24) != 0 ? 0 : 4) | ((tmp & 0x18) != 0 ? 0 : 8)));
                 case 1:
-                    return (uint8_t) (0xD0 | ((tmp & 0x01 ? 0 : 1) | (tmp & 0x02 ? 0 : 2) |
-                                              (tmp & 0x04 ? 0 : 4) | (tmp & 0x08 ? 0 : 8)));
+                    return (uint8_t) (0xD0 | (((tmp & 0x01) != 0 ? 0 : 1) | ((tmp & 0x02) != 0 ? 0 : 2) | ((tmp & 0x04) != 0 ? 0 : 4) | ((tmp & 0x08) != 0 ? 0 : 8)));
                 case 2:
-                    return (uint8_t) (0xE0 | ((tmp & 0x80 ? 0 : 1) | (tmp & 0x40 ? 0 : 2) |
-                                              (tmp & 0x20 ? 0 : 4) | (tmp & 0x10 ? 0 : 8)));
+                    return (uint8_t) (0xE0 | (((tmp & 0x80) != 0 ? 0 : 1) | ((tmp & 0x40) != 0 ? 0 : 2) | ((tmp & 0x20) != 0 ? 0 : 4) | ((tmp & 0x10) != 0 ? 0 : 8)));
                 case 3:
                     return 0xFF;
                 default:
@@ -212,73 +268,69 @@ uint8_t cpu::io_read(uint16_t adr) {
             return ref_gb->get_regs()->SB;
         case 0xFF02:
             return (uint8_t) ((ref_gb->get_regs()->SC & 0x83) | 0x7C);
-        case 0xFF04: // DIV(ディバイダー?) // DIV (divider?)
+        case 0xFF04:
             return ref_gb->get_regs()->DIV;
-        case 0xFF05: // TIMA(タイマカウンタ) // TIMA (timer counter)
+        case 0xFF05:
             return ref_gb->get_regs()->TIMA;
-        case 0xFF06: // TMA(タイマ調整) // TMA (adjustment timer)
+        case 0xFF06:
             return ref_gb->get_regs()->TMA;
-        case 0xFF07: // TAC(タイマコントロール) // TAC (timer control)
+        case 0xFF07:
             return ref_gb->get_regs()->TAC;
-        case 0xFF0F: // IF(割りこみフラグ) // IF (Interrupt flag)
+        case 0xFF0F:
             return ref_gb->get_regs()->IF;
-        case 0xFF40: // LCDC(LCDコントロール) // LCDC (LCD control)
+        case 0xFF40:
             return ref_gb->get_regs()->LCDC;
-        case 0xFF41: // STAT(LCDステータス) // STAT (LCD status)
+        case 0xFF41:
             return (uint8_t) (ref_gb->get_regs()->STAT | 0x80);
-        case 0xFF42: // SCY(スクロールY) // SCY (scroll Y)
+        case 0xFF42:
             return ref_gb->get_regs()->SCY;
-        case 0xFF43: // SCX(スクロールX) // SCX (scroll X)
+        case 0xFF43:
             return ref_gb->get_regs()->SCX;
-        case 0xFF44: // LY(LCDC Y座標) // LY (LCDC Y coordinate)
+        case 0xFF44:
             return ref_gb->get_regs()->LY;
-        case 0xFF45: // LYC(LY比較) // LYC (compare LY)
+        case 0xFF45:
             return ref_gb->get_regs()->LYC;
-        case 0xFF46: // DMA(DMA転送) // DMA (DMA transfer)
+        case 0xFF46:
             return 0;
-        case 0xFF47: // BGP(背景パレット) BGP (background palette)
+        case 0xFF47:
             return ref_gb->get_regs()->BGP;
-        case 0xFF48: // OBP1(オブジェクトパレット1) // OBP1 (object palette 1)
+        case 0xFF48:
             return ref_gb->get_regs()->OBP1;
-        case 0xFF49: // OBP2(オブジェクトパレット2) // OBP2 (object palette 2)
+        case 0xFF49:
             return ref_gb->get_regs()->OBP2;
-        case 0xFF4A: // WY(ウインドウY座標) // WY (window coordinates Y)
+        case 0xFF4A:
             return ref_gb->get_regs()->WY;
-        case 0xFF4B: // WX(ウインドウX座標) // WX (window coordinates X)
+        case 0xFF4B:
             return ref_gb->get_regs()->WX;
-
-            //以下カラーでの追加 // Adding color below // TODO: continue translation
-        case 0xFF4D: // KEY1システムクロック変更 // KEY1 change system clock
+        case 0xFF4D:
             return (uint8_t) (speed ? 0x80 : (ref_gb->get_cregs()->KEY1 & 1) != 0 ? 1 : 0x7E);
-        case 0xFF4F: // VBK(内部VRAMバンク切り替え) // VBK (Internal bank switching
-            // VRAM)
+        case 0xFF4F:
             return ref_gb->get_cregs()->VBK;
-        case 0xFF51: // HDMA1(転送元上位) // HDMA (upper source)
+        case 0xFF51:
             return (uint8_t) (dma_src >> 8);
-        case 0xFF52: // HDMA2(転送元下位) // HDMA (lower source)
+        case 0xFF52:
             return (uint8_t) (dma_src & 0xff);
-        case 0xFF53: // HDMA3(転送先上位) // HDMA3 (upper destination)
+        case 0xFF53:
             return (uint8_t) (dma_dest >> 8);
-        case 0xFF54: // HDMA4(転送先下位) // HDMA4 (lower destination)
+        case 0xFF54:
             return (uint8_t) (dma_dest & 0xff);
-        case 0xFF55: // HDMA5(転送実行) // HDMA5 (run forward)
+        case 0xFF55:
             return (uint8_t) (dma_executing ? ((dma_rest - 1) & 0x7f) : 0xFF);
-        case 0xFF56: // RP(赤外線) // RP (infrared)
+        case 0xFF56:
             return (uint8_t) (ref_gb->get_cregs()->RP & 0xC1);
-        case 0xFF68: // BCPS(BGパレット書き込み指定) // BG write palette
+        case 0xFF68:
             return ref_gb->get_cregs()->BCPS;
-        case 0xFF69: // BCPD(BGパレット書きこみデータ) // BG palette data written
-            if (ref_gb->get_cregs()->BCPS & 1)
-                ret = (uint8_t) (ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[
-                        (ref_gb->get_cregs()->BCPS >> 1) & 3] >> 8);
-            else
-                ret = (uint8_t) (ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[
-                                         (ref_gb->get_cregs()->BCPS >> 1) & 3] & 0xff);
+        case 0xFF69:
+            if ((ref_gb->get_cregs()->BCPS & 1) != 0) {
+                ret = (uint8_t) (ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] >> 8);
+            } else {
+                ret = (uint8_t) (ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] & 0xff);
+            }
             return ret;
-        case 0xFF6A: // OCPS(OBJパレット書きこみ指定) // OBJ palette specified written
+        case 0xFF6A:
             return ref_gb->get_cregs()->OCPS;
-        case 0xFF6B: // OCPD(OBJパレット書きこみデータ) // Write data OBJ palette
-            if (ref_gb->get_cregs()->OCPS & 1) {
+        case 0xFF6B:
+            if ((ref_gb->get_cregs()->OCPS & 1) != 0) {
                 ret = (uint8_t) (ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->OCPS >> 3 & 7) + 8)[
                         (ref_gb->get_cregs()->OCPS >> 1) & 3] >> 8);
             } else {
@@ -286,13 +338,12 @@ uint8_t cpu::io_read(uint16_t adr) {
                                          (ref_gb->get_cregs()->OCPS >> 1) & 3] & 0xff);
             }
             return ret;
-        case 0xFF70: // SVBK(内部RAMバンク切り替え) // Internal RAM bank switching
+        case 0xFF70:
             return ref_gb->get_cregs()->SVBK;
 
-        case 0xFFFF: // IE(割りこみマスク) // Interrupt Mask
+        case 0xFFFF:
             return ref_gb->get_regs()->IE;
 
-            // undocumented register
         case 0xFF6C:
             return (uint8_t) (_ff6c & 1);
         case 0xFF72:
@@ -310,57 +361,50 @@ uint8_t cpu::io_read(uint16_t adr) {
         default:
             if (adr > 0xFF0F && adr < 0xFF40) {
                 return ref_gb->get_apu()->read(adr);
-            } else if ((adr > 0xff70) && (adr < 0xff80))
+            } else if ((adr > 0xff70) && (adr < 0xff80)) {
                 return ext_mem[adr - 0xff71];
-            else
+            } else {
                 return 0;
+            }
     }
 }
 
 void cpu::io_write(uint16_t adr, uint8_t dat) {
     switch (adr) {
-        case 0xFF00: // P1(パッド制御) // P1 (control pad)
+        case 0xFF00:
             ref_gb->get_regs()->P1 = dat;
             return;
-        case 0xFF01: // SB(シリアルシリアル通信送受信) // SB (sending and receiving
-            // serial communication)
+        case 0xFF01:
             ref_gb->get_regs()->SB = dat;
             ref_gb->send_linkcable_byte(ref_gb->get_regs()->SB);
             return;
-        case 0xFF02: // SC (control)
+        case 0xFF02:
             if (ref_gb->gb_type() == 1) {
                 ref_gb->get_regs()->SC = (uint8_t) (dat & 0x81);
-                if (((dat & 0x80) != 0) && (dat & 1)) {
-                    // Internal clock
+                if (((dat & 0x80) != 0) && ((dat & 1) != 0)) {
                     seri_occer = total_clock + 512;
-                } else if ((dat & 0x80)) {
-                    // External clock?
+                } else if ((dat & 0x80) != 0) {
+
                 }
-            } else { // GBCでの拡張 // Enhancements in GBC
+            } else {
                 ref_gb->get_regs()->SC = (uint8_t) (dat & 0x83);
-                if ((dat & 0x80) && (dat & 1)) //Transmission start
-                {
-                    if (dat & 2) {
-                        seri_occer = total_clock + 512 * 8 / 32; // 32 times the normal transfer rate
-                    } else {
-                        seri_occer = total_clock + 512 * 8;
-                    }
+                if (((dat & 0x80) != 0) && ((dat & 1) != 0)) {
+                    seri_occer = total_clock + ((dat & 2) != 0 ? 512 * 8 / 32 : 512 * 8);
                 }
             }
             return;
-        case 0xFF04: // DIV(ディバイダー) // DIV (divider)
+        case 0xFF04:
             ref_gb->get_regs()->DIV = 0;
             return;
-        case 0xFF05: // TIMA(タイマカウンタ) // TIMA (timer counter)
+        case 0xFF05:
             ref_gb->get_regs()->TIMA = dat;
-            //          sys_clock=0;
             return;
         case 0xFF06: // TMA(タイマ調整) // TMA (adjustment timer)
             ref_gb->get_regs()->TMA = dat;
             //          sys_clock=0;
             return;
         case 0xFF07: // TAC(タイマコントロール) // TAC (timer control)
-            if ((dat & 0x04) && !(ref_gb->get_regs()->TAC & 0x04))
+            if (((dat & 0x04) != 0) && ((ref_gb->get_regs()->TAC & 0x04) == 0))
                 sys_clock = 0;
             ref_gb->get_regs()->TAC = dat;
             return;
@@ -368,7 +412,7 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
             ref_gb->get_regs()->IF = dat;
             return;
         case 0xFF40: // LCDC(LCDコントロール) // LCDC (LCD control)
-            if ((dat & 0x80) && (!(ref_gb->get_regs()->LCDC & 0x80))) {
+            if (((dat & 0x80) != 0) && ((ref_gb->get_regs()->LCDC & 0x80) == 0)) {
                 ref_gb->get_regs()->LY = 0;
                 ref_gb->get_lcd()->clear_win_count();
             }
@@ -378,7 +422,7 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
             if (ref_gb->gb_type() == 1)
                 // オリジナルGBにおいてこのような現象が起こるらしい
                 // This phenomenon seems to occur in the original GB
-                if (!(ref_gb->get_regs()->STAT & 0x02))
+                if ((ref_gb->get_regs()->STAT & 0x02) == 0)
                     ref_gb->get_regs()->IF |= INT_LCDC;
 
             ref_gb->get_regs()->STAT = (uint8_t) ((ref_gb->get_regs()->STAT & 0x7) | (dat & 0x78));
@@ -413,14 +457,14 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
                     memcpy(oam, ref_gb->get_mbc()->get_sram() + (dat & 0x1F) * 256, 0xA0);
                     break;
                 case 6:
-                    if (dat & 0x10)
+                    if ((dat & 0x10) != 0)
                         memcpy(oam, ram_bank + (dat & 0x0F) * 256, 0xA0);
                     else
                         memcpy(oam, ram + (dat & 0x0F) * 256, 0xA0);
                     break;
                 case 7:
                     if (dat < 0xF2) {
-                        if (dat & 0x10)
+                        if ((dat & 0x10) != 0)
                             memcpy(oam, ram_bank + (dat & 0x0F) * 256, 0xA0);
                         else
                             memcpy(oam, ram + (dat & 0x0F) * 256, 0xA0);
@@ -483,7 +527,7 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
                 ref_gb->get_cregs()->HDMA5 = 0;
                 return;
             }
-            if (dat & 0x80) { // HBlank毎 // Every HBlank
+            if ((dat & 0x80) != 0) { // HBlank毎 // Every HBlank
                 if (dma_executing) {
                     dma_executing = false;
                     dma_rest = 0;
@@ -520,17 +564,13 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
                     case 4:
                         break;
                     case 5:
-                        memcpy(vram_bank + (dma_dest & 0x1ff0),
-                               ref_gb->get_mbc()->get_sram() + (dma_src & 0x1FFF),
-                               (size_t) (16 * (dat & 0x7F) + 16));
+                        memcpy(vram_bank + (dma_dest & 0x1ff0), ref_gb->get_mbc()->get_sram() + (dma_src & 0x1FFF), (size_t) (16 * (dat & 0x7F) + 16));
                         break;
                     case 6:
-                        if (dma_src & 0x1000)
-                            memcpy(vram_bank + (dma_dest & 0x1ff0), ram_bank + (dma_src & 0x0FFF),
-                                   (size_t) (16 * (dat & 0x7F) + 16));
+                        if ((dma_src & 0x1000) != 0)
+                            memcpy(vram_bank + (dma_dest & 0x1ff0), ram_bank + (dma_src & 0x0FFF), (size_t) (16 * (dat & 0x7F) + 16));
                         else
-                            memcpy(vram_bank + (dma_dest & 0x1ff0), ram + (dma_src & 0x0FFF),
-                                   (size_t) (16 * (dat & 0x7F) + 16));
+                            memcpy(vram_bank + (dma_dest & 0x1ff0), ram + (dma_src & 0x0FFF), (size_t) (16 * (dat & 0x7F) + 16));
                         break;
                     case 7:
                     default:
@@ -538,10 +578,7 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
                 }
                 dma_src += ((dat & 0x7F) + 1) * 16;
                 dma_dest += ((dat & 0x7F) + 1) * 16;
-
-                gdma_rest = 456 * 2 +
-                            ((dat & 0x7f) + 1) * 32 *
-                            (speed ? 2 : 1); // CPU パワーを占領 // Occupied the CPU power
+                gdma_rest = 456 * 2 + ((dat & 0x7f) + 1) * 32 * (speed ? 2 : 1);
             }
             return;
         case 0xFF56:
@@ -553,28 +590,18 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
             ref_gb->get_cregs()->BCPS = dat;
             return;
         case 0xFF69:
-            if (ref_gb->get_cregs()->BCPS & 1) {
-                ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) &
-                                           7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] =
-                        (uint16_t) ((ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) &
-                                                                7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] &
-                                     0xff) |
-                                    (dat << 8));
+            if ((ref_gb->get_cregs()->BCPS & 1) != 0) {
+                ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] = (uint16_t) (
+                        (ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] & 0xff) | (dat << 8));
             } else {
-                ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) &
-                                           7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] =
-                        (uint16_t) ((ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) &
-                                                                7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] &
-                                     0xff00) |
-                                    dat);
+                ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] = (uint16_t) (
+                        (ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] & 0xff00) | dat);
             }
-            ref_gb->get_lcd()->get_mapped_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[(ref_gb->get_cregs()->BCPS >> 1) &
-                                                                                    3] =
-                    ref_gb->map_color(ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[
-                                              (ref_gb->get_cregs()->BCPS >> 1) & 3]);
+            ref_gb->get_lcd()->get_mapped_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[(ref_gb->get_cregs()->BCPS >> 1) & 3] = ref_gb->map_color(
+                    ref_gb->get_lcd()->get_pal((ref_gb->get_cregs()->BCPS >> 3) & 7)[(ref_gb->get_cregs()->BCPS >> 1) & 3]);
 
             ref_gb->get_cregs()->BCPD = dat;
-            if (ref_gb->get_cregs()->BCPS & 0x80) {
+            if ((ref_gb->get_cregs()->BCPS & 0x80) != 0) {
                 ref_gb->get_cregs()->BCPS = (uint8_t) (0x80 | ((ref_gb->get_cregs()->BCPS + 1) & 0x3f));
             }
             return;
@@ -582,33 +609,22 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
             ref_gb->get_cregs()->OCPS = dat;
             return;
         case 0xFF6B:
-            if (ref_gb->get_cregs()->OCPS & 1) {
-                ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) +
-                                           8)[(ref_gb->get_cregs()->OCPS >> 1) & 3] =
-                        (uint16_t) ((ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) +
-                                                                8)[(ref_gb->get_cregs()->OCPS >> 1) & 3] &
-                                     0xff) |
-                                    (dat << 8));
+            if ((ref_gb->get_cregs()->OCPS & 1) != 0) {
+                ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) + 8)[(ref_gb->get_cregs()->OCPS >> 1) & 3] = (uint16_t) (
+                        (ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) + 8)[(ref_gb->get_cregs()->OCPS >> 1) & 3] & 0xff) | (dat << 8));
             } else {
-                ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) +
-                                           8)[(ref_gb->get_cregs()->OCPS >> 1) & 3] =
-                        (uint16_t) ((ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) +
-                                                                8)[(ref_gb->get_cregs()->OCPS >> 1) & 3] &
-                                     0xff00) |
-                                    dat);
+                ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) + 8)[(ref_gb->get_cregs()->OCPS >> 1) & 3] = (uint16_t) (
+                        (ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) + 8)[(ref_gb->get_cregs()->OCPS >> 1) & 3] & 0xff00) | dat);
             }
-            ref_gb->get_lcd()->get_mapped_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) +
-                                              8)[(ref_gb->get_cregs()->OCPS >> 1) & 3] =
-                    ref_gb->map_color(ref_gb->get_lcd()->get_pal(
-                            ((ref_gb->get_cregs()->OCPS >> 3) & 7) +
-                            8)[(ref_gb->get_cregs()->OCPS >> 1) & 3]);
+            ref_gb->get_lcd()->get_mapped_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) + 8)[(ref_gb->get_cregs()->OCPS >> 1) & 3] = ref_gb->map_color(
+                    ref_gb->get_lcd()->get_pal(((ref_gb->get_cregs()->OCPS >> 3) & 7) + 8)[(ref_gb->get_cregs()->OCPS >> 1) & 3]);
             ref_gb->get_cregs()->OCPD = dat;
-            if (ref_gb->get_cregs()->OCPS & 0x80)
-                ref_gb->get_cregs()->OCPS =
-                        (uint8_t) (0x80 | ((ref_gb->get_cregs()->OCPS + 1) & 0x3f));
+            if ((ref_gb->get_cregs()->OCPS & 0x80) != 0) {
+                ref_gb->get_cregs()->OCPS = (uint8_t) (0x80 | ((ref_gb->get_cregs()->OCPS + 1) & 0x3f));
+            }
             return;
         case 0xFF70:
-            dat = (uint8_t) ((!(dat & 7)) ? 1 : (dat & 7));
+            dat = (uint8_t) (((dat & 7) == 0) ? 1 : (dat & 7));
             ref_gb->get_cregs()->SVBK = dat;
             ram_bank = ram + 0x1000 * dat;
             return;
@@ -616,8 +632,6 @@ void cpu::io_write(uint16_t adr, uint8_t dat) {
         case 0xFFFF:
             ref_gb->get_regs()->IE = dat;
             return;
-
-            // undocumented register
         case 0xFF6C:
             _ff6c = (uint8_t) (dat & 1);
             return;
@@ -693,7 +707,7 @@ static const uint8_t ZTable[256] = {
 
 void cpu::irq(int irq_type) {
     if (!((irq_type == INT_VBLANK || irq_type == INT_LCDC) &&
-          (!(ref_gb->get_regs()->LCDC & 0x80))))
+          ((ref_gb->get_regs()->LCDC & 0x80) == 0)))
         ref_gb->get_regs()->IF |= (irq_type);
 }
 
@@ -703,38 +717,32 @@ void cpu::irq_process() {
         return;
     }
 
-    if ((ref_gb->get_regs()->IF & ref_gb->get_regs()->IE) &&
-        (regs.I || halt)) { //割りこみがかかる時 // Time-consuming interrupt
+    if (((ref_gb->get_regs()->IF & ref_gb->get_regs()->IE) != 0) && ((regs.I != 0u) || halt)) { //割りこみがかかる時 // Time-consuming interrupt
         if (halt)
             regs.PC++;
         write((uint16_t) (regs.SP - 2), (uint8_t) (regs.PC & 0xFF));
         write((uint16_t) (regs.SP - 1), (uint8_t) (regs.PC >> 8));
         regs.SP -= 2;
-        if (ref_gb->get_regs()->IF & ref_gb->get_regs()->IE & INT_VBLANK) { // VBlank
+        if ((ref_gb->get_regs()->IF & ref_gb->get_regs()->IE & INT_VBLANK) != 0) { // VBlank
             regs.PC = 0x40;
             ref_gb->get_regs()->IF &= 0xFE;
-        } else if (ref_gb->get_regs()->IF & ref_gb->get_regs()->IE &
-                   INT_LCDC) { // LCDC
+        } else if ((ref_gb->get_regs()->IF & ref_gb->get_regs()->IE & INT_LCDC) != 0) { // LCDC
             regs.PC = 0x48;
             ref_gb->get_regs()->IF &= 0xFD;
-        } else if (ref_gb->get_regs()->IF & ref_gb->get_regs()->IE &
-                   INT_TIMER) { // Timer
+        } else if ((ref_gb->get_regs()->IF & ref_gb->get_regs()->IE & INT_TIMER) != 0) { // Timer
             regs.PC = 0x50;
             ref_gb->get_regs()->IF &= 0xFB;
-        } else if (ref_gb->get_regs()->IF & ref_gb->get_regs()->IE & INT_SERIAL) { // Serial
+        } else if ((ref_gb->get_regs()->IF & ref_gb->get_regs()->IE & INT_SERIAL) != 0) { // Serial
             regs.PC = 0x58;
             ref_gb->get_regs()->IF &= 0xF7;
             //ref_gb->get_regs()->SC |= (ref_gb->get_regs()->SB &0x1) << 7;
-        } else if (ref_gb->get_regs()->IF & ref_gb->get_regs()->IE &
-                   INT_PAD) { // Pad
+        } else if ((ref_gb->get_regs()->IF & ref_gb->get_regs()->IE & INT_PAD) != 0) { // Pad
             regs.PC = 0x60;
             ref_gb->get_regs()->IF &= 0xEF;
-        } else {
         }
 
         halt = false;
         regs.I = 0;
-        //      ref_gb->get_regs()->IF=0;
     }
 }
 
@@ -755,7 +763,7 @@ void cpu::exec(int clocks) {
 
     rest_clock += clocks;
 
-    if (gdma_rest) {
+    if (gdma_rest != 0) {
         if (rest_clock <= gdma_rest) {
             gdma_rest -= rest_clock;
             sys_clock += rest_clock;
@@ -777,70 +785,7 @@ void cpu::exec(int clocks) {
         op_code = op_read();
         tmp_clocks = cycles[op_code];
 
-        //      if (b_trace)
-        //          log();
-
         switch (op_code) {
-#define REG_A regs.AF.b.h
-#define REG_F regs.AF.b.l
-#define REG_B regs.BC.b.h
-#define REG_C regs.BC.b.l
-#define REG_D regs.DE.b.h
-#define REG_E regs.DE.b.l
-#define REG_H regs.HL.b.h
-#define REG_L regs.HL.b.l
-#define REG_BC regs.BC.w
-#define REG_DE regs.DE.w
-#define REG_HL regs.HL.w
-#define REG_SP regs.SP
-#define REG_PC regs.PC
-
-#define ADD(arg)                                                            \
-    tmp.w = REG_A + arg;                                                    \
-    REG_F = tmp.b.h | ZTable[tmp.b.l] | ((REG_A ^ arg ^ tmp.b.l) & H_FLAG); \
-    REG_A = tmp.b.l
-#define ADC(arg)                                                            \
-    tmp.w = REG_A + arg + (REG_F & C_FLAG);                                 \
-    REG_F = tmp.b.h | ZTable[tmp.b.l] | ((REG_A ^ arg ^ tmp.b.l) & H_FLAG); \
-    REG_A = tmp.b.l
-#define SUB(arg)                                  \
-    tmp.w = REG_A - arg;                          \
-    REG_F = N_FLAG | -tmp.b.h | ZTable[tmp.b.l] | \
-            ((REG_A ^ arg ^ tmp.b.l) & H_FLAG);   \
-    REG_A = tmp.b.l
-#define SBC(arg)                                  \
-    tmp.w = REG_A - arg - (REG_F & C_FLAG);       \
-    REG_F = N_FLAG | -tmp.b.h | ZTable[tmp.b.l] | \
-            ((REG_A ^ arg ^ tmp.b.l) & H_FLAG);   \
-    REG_A = tmp.b.l
-#define CP(arg)          \
-    tmp.w = REG_A - arg; \
-    REG_F =              \
-        N_FLAG | -tmp.b.h | ZTable[tmp.b.l] | ((REG_A ^ arg ^ tmp.b.l) & H_FLAG)
-#define AND(arg)  \
-    REG_A &= arg; \
-    REG_F = H_FLAG | ZTable[REG_A]
-#define OR(arg)   \
-    REG_A |= arg; \
-    REG_F = ZTable[REG_A]
-#define XOR(arg)  \
-    REG_A ^= arg; \
-    REG_F = ZTable[REG_A]
-#define INC(arg) \
-    arg++;       \
-    REG_F = (REG_F & C_FLAG) | ZTable[arg] | ((arg & 0x0F) ? 0 : H_FLAG)
-#define DEC(arg)                                      \
-    arg--;                                            \
-    REG_F = N_FLAG | (REG_F & C_FLAG) | ZTable[arg] | \
-            (((arg & 0x0F) == 0x0F) ? H_FLAG : 0)
-#define ADDW(arg)                                                                \
-    tmp.w = REG_HL + arg;                                                        \
-    REG_F =                                                                      \
-        (REG_F & Z_FLAG) | (((REG_HL ^ arg ^ tmp.w) & 0x1000) ? H_FLAG : 0) |    \
-        ((((unsigned long)REG_HL + (unsigned long)arg) & 0x10000) ? C_FLAG : 0); \
-    REG_HL = tmp.w
-
-// GB orginal op_code
 
             case 0x08:
                 writew(op_readw(), REG_SP);
@@ -856,29 +801,25 @@ void cpu::exec(int clocks) {
                 }
                 break; // STOP(HALT?)
 
-// 0x2A LD A,(mn) -> LD A,(HLI) Load A from (HL) and decrement HL
             case 0x2A:
                 REG_A = read(REG_HL);
                 REG_HL++;
-                break; // LD A,(HLI) : 00 111 010 :state 13
+                break;
 
-// 0x22 LD (mn),A -> LD (HLI),A Save A at (HL) and decrement HL
             case 0x22:
                 write(REG_HL, REG_A);
                 REG_HL++;
-                break; // LD (HLI),A : 00 110 010 :state 13
+                break;
 
-// 0x3A LD A,(mn) -> LD A,(HLD) Load A from (HL) and decrement HL
             case 0x3A:
                 REG_A = read(REG_HL);
                 REG_HL--;
-                break; // LD A,(HLD) : 00 111 010 :state 13
+                break;
 
-// 0x32 LD (mn),A -> LD (HLD),A Save A at (HL) and decrement HL
             case 0x32:
                 write(REG_HL, REG_A);
                 REG_HL--;
-                break; // LD (HLD),A : 00 110 010 :state 13
+                break;
 
             case 0xD9: /*Log("Return Interrupts.\n");*/
                 regs.I = 1;
@@ -912,11 +853,6 @@ void cpu::exec(int clocks) {
             case 0xFA:
                 REG_A = read(op_readw());
                 break; // LD A,(mn);
-
-// 8bit load op_code
-
-// regs B 000 C 001 D 010 E 011 H 100 L 101 A 111
-// LD r,s  :01 r s :state 4(clocks)
 
             case 0x40:
                 break; // LD B,B
@@ -1150,10 +1086,6 @@ void cpu::exec(int clocks) {
                 write(REG_DE, REG_A);
                 break; // LD (DE),A : 00 010 010 :state 7
 
-// 16bit load opcode
-// rp Pair Reg 00 BC 01 DE 10 HL 11 SP
-
-// LD rp,mn : 00 rp0 001 n m :state 10
             case 0x01:
                 REG_BC = op_readw();
                 break; // LD BC,(mn)
@@ -1169,12 +1101,8 @@ void cpu::exec(int clocks) {
 
             case 0xF9:
                 REG_SP = REG_HL;
-                break; // LD SP,HL : 11 111 001 :state 6
+                break;
 
-// stack opcode
-// rq Pair Reg 00 BC 01 DE 10 HL 11 AF
-
-// PUSH rq : 11 rq0 101 : state 11(16?)
             case 0xC5:
                 REG_SP -= 2;
                 writew(REG_SP, REG_BC);
@@ -1193,7 +1121,6 @@ void cpu::exec(int clocks) {
                 REG_SP -= 2;
                 break; // PUSH AF // 未使用ビットは1になるみたい(メタルギアより)
 
-// POP rq : 11 rq0 001 : state 10 (12?)
             case 0xC1:
                 REG_B = read((uint16_t) (REG_SP + 1));
                 REG_C = read(REG_SP);
@@ -1213,12 +1140,8 @@ void cpu::exec(int clocks) {
                 REG_A = read((uint16_t) (REG_SP + 1));
                 REG_F = gb2z80[read(REG_SP) & 0xf0];
                 REG_SP += 2;
-                break; // POP AF
+                break;
 
-// 8bit arithmetic/logical opcode
-// regs B 000 C 001 D 010 E 011 H 100 L 101 A 111
-
-// ADD A,r : 10 000 r : state 4
             case 0x80:
             ADD(REG_B);
                 break; // ADD A,B
@@ -1282,7 +1205,6 @@ void cpu::exec(int clocks) {
                 ADC(tmpb);
                 break; // ADC A,(HL) : 10 001 110 :state 7
 
-// SUB A,r : 10 010 r : state 4
             case 0x90:
             SUB(REG_B);
                 break; // SUB A,B
@@ -1314,7 +1236,6 @@ void cpu::exec(int clocks) {
                 SUB(tmpb);
                 break; // SUB A,(HL) : 10 010 110 :state 7
 
-// SBC A,r : 10 011 r : state 4
             case 0x98:
             SBC(REG_B);
                 break; // SBC A,B
@@ -1591,14 +1512,14 @@ void cpu::exec(int clocks) {
             case 0x27: // DAA :state 4
                 tmp.b.h = (uint8_t) (REG_A & 0x0F);
                 tmp.w =
-                        (uint16_t) ((REG_F & N_FLAG)
-                                    ? ((REG_F & C_FLAG) ? (((REG_F & H_FLAG) ? 0x9A00 : 0xA000) + C_FLAG)
-                                                        : ((REG_F & H_FLAG) ? 0xFA00 : 0x0000))
-                                    : ((REG_F & C_FLAG)
-                                       ? (((REG_F & H_FLAG) ? 0x6600
-                                                            : ((tmp.b.h < 0x0A) ? 0x6000 : 0x6600)) +
+                        (uint16_t) ((REG_F & N_FLAG) != 0
+                                    ? ((REG_F & C_FLAG) != 0 ? (((REG_F & H_FLAG) != 0 ? 0x9A00 : 0xA000) + C_FLAG)
+                                                             : ((REG_F & H_FLAG) != 0 ? 0xFA00 : 0x0000))
+                                    : ((REG_F & C_FLAG) != 0
+                                       ? (((REG_F & H_FLAG) != 0 ? 0x6600
+                                                                 : ((tmp.b.h < 0x0A) ? 0x6000 : 0x6600)) +
                                           C_FLAG)
-                                       : ((REG_F & H_FLAG)
+                                       : ((REG_F & H_FLAG) != 0
                                           ? ((REG_A < 0xA0) ? 0x0600 : (0x6600 + C_FLAG))
                                           : ((tmp.b.h < 0x0A)
                                              ? ((REG_A < 0xA0) ? 0x0000 : (0x6000 + C_FLAG))
@@ -1634,12 +1555,12 @@ void cpu::exec(int clocks) {
                 break; // EI : state 4
 
             case 0x76:
-#ifndef EXSACT_CORE
-                if (ref_gb->get_regs()->TAC & 0x04) { //タイマ割りこみ
-                    uint16_t value = (uint16_t) (ref_gb->get_regs()->TIMA +
-                                                 (sys_clock + rest_clock) / timer_clocks[ref_gb->get_regs()->TAC & 0x03]);
 
-                    if (value & 0xFF00) { // HALT中に割りこみがかかる場合
+                if ((ref_gb->get_regs()->TAC & 0x04) != 0) {
+                    auto value = (uint16_t) (ref_gb->get_regs()->TIMA +
+                                             (sys_clock + rest_clock) / timer_clocks[ref_gb->get_regs()->TAC & 0x03]);
+
+                    if ((value & 0xFF00) != 0) {
                         total_clock += (256 - ref_gb->get_regs()->TIMA) *
                                        timer_clocks[ref_gb->get_regs()->TAC & 0x03] -
                                        sys_clock;
@@ -1669,13 +1590,8 @@ void cpu::exec(int clocks) {
                     REG_PC--;
                 }
                 tmp_clocks = 0;
-#else
-            halt = true;
-    REG_PC--;
-#endif
                 break; // HALT : state 4
 
-// rotate/shift opcode
             case 0x07:
                 REG_F = (REG_A >> 7);
                 REG_A = (REG_A << 1) | (REG_A >> 7);
@@ -1695,14 +1611,10 @@ void cpu::exec(int clocks) {
                 REG_F = tmp.b.l;
                 break; // RRA :state 4
 
-// jump opcode
-
-// cc 条件 000 NZ non zero 001 Z zero 010 NC non carry 011 C carry
             case 0xC3:
                 REG_PC = op_readw();
                 break; // JP mn : state 10 (16?)
 
-// JP cc,mn : 11 cc 010 : state 16 or 12
             case 0xC2:
                 if (REG_F & Z_FLAG)
                     REG_PC += 2;
@@ -1870,7 +1782,7 @@ void cpu::exec(int clocks) {
 
 // RET cc : 11 0cc 000 : state 20 or 8
             case 0xC0:
-                if (!(REG_F & Z_FLAG)) {
+                if ((REG_F & Z_FLAG) == 0) {
                     REG_PC = readw(REG_SP);
                     REG_SP += 2;
                     tmp_clocks = 20;
@@ -1884,7 +1796,7 @@ void cpu::exec(int clocks) {
                 }
                 break; // RETZ
             case 0xD0:
-                if (!(REG_F & C_FLAG)) {
+                if ((REG_F & C_FLAG) == 0) {
                     REG_PC = readw(REG_SP);
                     REG_SP += 2;
                     tmp_clocks = 20;
@@ -2111,10 +2023,7 @@ void cpu::exec(int clocks) {
                     case 0x7E:
                         tmp.b.l = read(REG_HL);
                         REG_F = (uint8_t) (((REG_F & C_FLAG) | H_FLAG) | (((tmp.b.l >> 1) & 0x40) ^ 0x40));
-                        break; // BIT 7,(HL)
-
-// bit set opcode
-// SET b,r :11 b r : state 8
+                        break;
 
                     case 0xC0:
                         REG_B |= 0x01;
@@ -2292,7 +2201,6 @@ void cpu::exec(int clocks) {
                         REG_A |= 0x80;
                         break; // SET 7,A
 
-// state 16
                     case 0xC6:
                         tmp.b.l = read(REG_HL);
                         tmp.b.l |= 0x01;
@@ -2334,8 +2242,6 @@ void cpu::exec(int clocks) {
                         write(REG_HL, tmp.b.l);
                         break; // SET 7,(HL)
 
-// bit reset opcode
-// RES b,r : 10 b r : state 8
                     case 0x80:
                         REG_B &= 0xFE;
                         break; // RES 0,B
@@ -2512,50 +2418,47 @@ void cpu::exec(int clocks) {
                         REG_A &= 0x7F;
                         break; // RES 7,A
 
-// state 16
                     case 0x86:
                         tmp.b.l = read(REG_HL);
                         tmp.b.l &= 0xFE;
                         write(REG_HL, tmp.b.l);
-                        break; // RES 0,(HL)
+                        break;
                     case 0x8E:
                         tmp.b.l = read(REG_HL);
                         tmp.b.l &= 0xFD;
                         write(REG_HL, tmp.b.l);
-                        break; // RES 1,(HL)
+                        break;
                     case 0x96:
                         tmp.b.l = read(REG_HL);
                         tmp.b.l &= 0xFB;
                         write(REG_HL, tmp.b.l);
-                        break; // RES 2,(HL)
+                        break;
                     case 0x9E:
                         tmp.b.l = read(REG_HL);
                         tmp.b.l &= 0xF7;
                         write(REG_HL, tmp.b.l);
-                        break; // RES 3,(HL)
+                        break;
                     case 0xA6:
                         tmp.b.l = read(REG_HL);
                         tmp.b.l &= 0xEF;
                         write(REG_HL, tmp.b.l);
-                        break; // RES 4,(HL)
+                        break;
                     case 0xAE:
                         tmp.b.l = read(REG_HL);
                         tmp.b.l &= 0xDF;
                         write(REG_HL, tmp.b.l);
-                        break; // RES 5,(HL)
+                        break;
                     case 0xB6:
                         tmp.b.l = read(REG_HL);
                         tmp.b.l &= 0xBF;
                         write(REG_HL, tmp.b.l);
-                        break; // RES 6,(HL)
+                        break;
                     case 0xBE:
                         tmp.b.l = read(REG_HL);
                         tmp.b.l &= 0x7F;
                         write(REG_HL, tmp.b.l);
-                        break; // RES 7,(HL)
+                        break;
 
-// shift rotate opcode
-// RLC s : 00 000 r : state 8
                     case 0x00:
                         REG_F = (REG_B >> 7);
                         REG_B = (REG_B << 1) | (REG_F);
@@ -2600,7 +2503,6 @@ void cpu::exec(int clocks) {
                         write(REG_HL, tmp.b.l);
                         break; // RLC (HL) : state 16
 
-// RRC s : 00 001 r : state 8
                     case 0x08:
                         REG_F = (uint8_t) (REG_B & 0x01);
                         REG_B = (REG_B >> 1) | (REG_F << 7);
@@ -2645,7 +2547,6 @@ void cpu::exec(int clocks) {
                         write(REG_HL, tmp.b.l);
                         break; // RRC (HL) :state 16
 
-// RL s : 00 010 r : state 8
                     case 0x10:
                         tmp.b.l = (uint8_t) (REG_F & 0x01);
                         REG_F = (REG_B >> 7);
@@ -2698,7 +2599,6 @@ void cpu::exec(int clocks) {
                         write(REG_HL, tmp.b.l);
                         break; // RL (HL) :state 16
 
-// RR s : 00 011 r : state 8
                     case 0x18:
                         tmp.b.l = (uint8_t) (REG_F & 0x01);
                         REG_F = (uint8_t) (REG_B & 0x01);
@@ -2751,7 +2651,6 @@ void cpu::exec(int clocks) {
                         write(REG_HL, tmp.b.l);
                         break; // RR (HL) :state 16
 
-// SLA s : 00 100 r : state 8
                     case 0x20:
                         REG_F = REG_B >> 7;
                         REG_B <<= 1;
@@ -2796,7 +2695,6 @@ void cpu::exec(int clocks) {
                         write(REG_HL, tmp.b.l);
                         break; // SLA (HL) :state 16
 
-// SRA s : 00 101 r : state 8
                     case 0x28:
                         REG_F = (uint8_t) (REG_B & 0x01);
                         REG_B = (uint8_t) ((REG_B >> 1) | (REG_B & 0x80));
@@ -2843,7 +2741,6 @@ void cpu::exec(int clocks) {
                         write(REG_HL, tmp.b.l);
                         break; // SRA (HL) :state 16
 
-// SRL s : 00 111 r : state 8
                     case 0x38:
                         REG_F = (uint8_t) (REG_B & 0x01);
                         REG_B >>= 1;
@@ -2888,8 +2785,6 @@ void cpu::exec(int clocks) {
                         write(REG_HL, tmp.b.l);
                         break; // SRL (HL) :state 16
 
-// swap opcode
-// SWAP n : 00 110 r :state 8
                     case 0x30:
                         REG_B = (REG_B >> 4) | (REG_B << 4);
                         REG_F = ZTable[REG_B];
@@ -2934,19 +2829,19 @@ void cpu::exec(int clocks) {
         div_clock += tmp_clocks;
         total_clock += tmp_clocks;
 
-        if (ref_gb->get_regs()->TAC & 0x04) { //タイマ割りこみ // Timer interrupt
+        if ((ref_gb->get_regs()->TAC & 0x04) != 0) { //タイマ割りこみ // Timer interrupt
             sys_clock += tmp_clocks;
             if (sys_clock > timer_clocks[ref_gb->get_regs()->TAC & 0x03]) {
                 sys_clock &= timer_clocks[ref_gb->get_regs()->TAC & 0x03] - 1;
                 ref_gb->get_regs()->TIMA++;
-                if (!ref_gb->get_regs()->TIMA) {
+                if (ref_gb->get_regs()->TIMA == 0u) {
                     irq(INT_TIMER);
                     ref_gb->get_regs()->TIMA = ref_gb->get_regs()->TMA;
                 }
             }
         }
 
-        if (div_clock & 0x100) {
+        if ((div_clock & 0x100) != 0) {
             ref_gb->get_regs()->DIV -= div_clock >> 8;
             div_clock &= 0xff;
         }
