@@ -42,13 +42,13 @@ public:
 	template<typename T>
 	void override_ram(uint32_t address, T value)
 	{
-		*(T*)(_gb.get_cpu()->get_ram()+address) = value;
+		*(T *) (_gb.get_cpu().get_ram() + address) = value;
 	}
 
 	template<typename T>
 	T read_ram(uint32_t address)
 	{
-		return *(T*)(_gb.get_cpu()->get_ram()+address);
+		return *(T *) (_gb.get_cpu().get_ram() + address);
 	}
 
 private:

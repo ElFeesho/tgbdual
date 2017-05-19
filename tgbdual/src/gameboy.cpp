@@ -25,7 +25,7 @@ void gameboy::load_state(uint8_t *state) {
 }
 
 void gameboy::save_sram(const std::function<void(uint8_t *, uint32_t)> &functor) {
-    functor(_gb.get_rom()->get_sram(), _gb.get_rom()->get_sram_size());
+    functor(_gb.get_rom().get_sram(), _gb.get_rom().get_sram_size());
 }
 
 void gameboy::tick() {

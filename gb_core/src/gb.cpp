@@ -28,7 +28,14 @@
 static uint32_t convert_to_second(struct tm *sys);
 
 gb::gb(video_renderer *ref, audio_renderer *audio, gamepad_source *gamepad_source_ref, std::function<void()> sram_updated, std::function<uint8_t()> link_read, std::function<void(uint8_t)> link_write)
-        : m_renderer{ref}, m_gamepad{gamepad_source_ref}, m_lcd{*this}, m_cpu{*this}, m_apu{*this}, m_mbc{*this}, m_cheat{}, sram_update_cb{std::move(sram_updated)},
+        : m_renderer{ref},
+          m_gamepad{gamepad_source_ref},
+          m_lcd{*this},
+          m_cpu{*this},
+          m_apu{*this},
+          m_mbc{*this},
+          m_cheat{},
+          sram_update_cb{std::move(sram_updated)},
           link_read_cb{std::move(link_read)},
           link_write_cb{std::move(link_write)} {
 
@@ -262,9 +269,7 @@ uint8_t gb::get_time(int type) {
     struct tm sys{};
     time_t t = time(0);
     localtime_r(&t, &sys);
-
-    uint32_t now = convert_to_second(&sys);
-    now -= cur_time;
+    uint32_t now = convert_to_second(&sys) - cur_time;
 
     switch (type) {
         case 8:
@@ -272,11 +277,11 @@ uint8_t gb::get_time(int type) {
         case 9:
             return (uint8_t) ((now / 60) % 60);
         case 10:
-            return (uint8_t) ((now / (60 * 60)) % 24);
+            return (uint8_t) ((now / (3600)) % 24);
         case 11:
-            return (uint8_t) ((now / (24 * 60 * 60)) & 0xff);
+            return (uint8_t) ((now / (86400)) & 0xff);
         case 12:
-            return (uint8_t) ((now / (256 * 24 * 60 * 60)) & 1);
+            return (uint8_t) ((now / (256 * 86400)) & 1);
         default:
             return 0;
     }
@@ -328,21 +333,21 @@ address_scanner gb::create_address_scanner() {
     return {m_cpu.ram, 0x2000 * 4};
 }
 
-gbc_regs *gb::get_cregs() { return &c_regs; }
+gbc_regs &gb::get_cregs() { return c_regs; }
 
-gb_regs *gb::get_regs() { return &regs; }
+gb_regs &gb::get_regs() { return regs; }
 
-cheat *gb::get_cheat() { return &m_cheat; }
+cheat &gb::get_cheat() { return m_cheat; }
 
-mbc *gb::get_mbc() { return &m_mbc; }
+mbc &gb::get_mbc() { return m_mbc; }
 
-rom *gb::get_rom() { return &m_rom; }
+rom &gb::get_rom() { return m_rom; }
 
-apu *gb::get_apu() { return &m_apu; }
+apu &gb::get_apu() { return m_apu; }
 
-cpu *gb::get_cpu() { return &m_cpu; }
+cpu &gb::get_cpu() { return m_cpu; }
 
-lcd *gb::get_lcd() { return &m_lcd; }
+lcd &gb::get_lcd() { return m_lcd; }
 
 int32_t gb::gb_type() { return m_rom.get_info()->gb_type; }
 

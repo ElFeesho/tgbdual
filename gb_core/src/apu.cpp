@@ -43,7 +43,7 @@ void apu::reset() {
     snd.reset();
 }
 
-uint8_t apu::read(uint16_t adr) {
+uint8_t apu::read(uint16_t adr) const {
     if (adr == 0xff26) {
         return (uint8_t) ((!snd.stat.master_enable) ? 0x00 : (0x80 |
                                                               (((snd.stat.sq1_playing && snd.stat.wav_vol) ? 1 : 0) |
@@ -78,9 +78,9 @@ void apu::write(uint16_t adr, uint8_t dat, int clock) {
 
     clocks += clock - bef_clock;
 
-    while (clocks > CLOCKS_PER_INTERVAL * (ref_gb.get_cpu()->get_speed() ? 2 : 1)) {
+    while (clocks > CLOCKS_PER_INTERVAL * (ref_gb.get_cpu().get_speed() ? 2 : 1)) {
         snd.update();
-        clocks -= CLOCKS_PER_INTERVAL * (ref_gb.get_cpu()->get_speed() ? 2 : 1);
+        clocks -= CLOCKS_PER_INTERVAL * (ref_gb.get_cpu().get_speed() ? 2 : 1);
     }
 
     bef_clock = clock;
@@ -115,7 +115,7 @@ void apu_snd::reset() {
     uint8_t gb_init_wav[] = {0x06, 0xFE, 0x0E, 0x7F, 0x00, 0xFF, 0x58, 0xDF, 0x00, 0xEC, 0x00, 0xBF, 0x0C, 0xED, 0x03, 0xF7};
     uint8_t gbc_init_wav[] = {0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF};
 
-    int32_t gbType = ref_apu->ref_gb.get_rom()->get_info()->gb_type;
+    int32_t gbType = ref_apu->ref_gb.get_rom().get_info()->gb_type;
     if (gbType == 1) {
         memcpy(mem + 20, gb_init_wav, 16);
     } else if (gbType >= 3) {
@@ -535,7 +535,7 @@ void apu_snd::populate_audio_buffer(short *buf, int sample) {
     memcpy(&stat, &stat_cpy, sizeof(stat_cpy));
 
     int tmp_l, tmp_r, tmp;
-    int now_clock = ref_apu->ref_gb.get_cpu()->get_clock();
+    int now_clock = ref_apu->ref_gb.get_cpu().get_clock();
     int cur = 0;
     int update_count = 0;
 
@@ -634,7 +634,7 @@ void apu_snd::populate_audio_buffer(short *buf, int sample) {
 
         tmp_sample++;
 
-        while (update_count * CLOCKS_PER_INTERVAL * (ref_apu->ref_gb.get_cpu()->get_speed() ? 2 : 1) < now_time - bef_clock) {
+        while (update_count * CLOCKS_PER_INTERVAL * (ref_apu->ref_gb.get_cpu().get_speed() ? 2 : 1) < now_time - bef_clock) {
             update();
             update_count++;
         }

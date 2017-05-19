@@ -127,7 +127,7 @@ public:
 
     apu_snd *get_stream_provider() { return &snd; }
 
-    uint8_t read(uint16_t adr);
+    uint8_t read(uint16_t adr) const;
 
     void write(uint16_t adr, uint8_t dat, int clock);
 

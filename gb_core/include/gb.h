@@ -62,21 +62,21 @@ class gb {
 public:
     gb(video_renderer *ref, audio_renderer *audio, gamepad_source *gamepad_source_ref, std::function<void()> sram_updated, std::function<uint8_t()> link_read, std::function<void(uint8_t)> link_write);
 
-    cpu *get_cpu();
+    cpu &get_cpu();
 
-    lcd *get_lcd();
+    lcd &get_lcd();
 
-    apu *get_apu();
+    apu &get_apu();
 
-    rom *get_rom();
+    rom &get_rom();
 
-    mbc *get_mbc();
+    mbc &get_mbc();
 
-    cheat *get_cheat();
+    cheat &get_cheat();
 
-    gb_regs *get_regs();
+    gb_regs &get_regs();
 
-    gbc_regs *get_cregs();
+    gbc_regs &get_cregs();
 
     void run();
 

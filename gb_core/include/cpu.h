@@ -29,13 +29,13 @@ class cpu {
 public:
     explicit cpu(gb &ref);
 
-    uint8_t read(uint16_t adr);
+    uint8_t read(uint16_t adr) const;
 
-    uint8_t read_direct(uint16_t adr);
+    uint8_t read_direct(uint16_t adr) const;
 
     void write(uint16_t adr, uint8_t dat);
 
-    uint16_t inline readw(uint16_t adr) { return read(adr) | (read((uint16_t) (adr + 1)) << 8); }
+    uint16_t inline readw(uint16_t adr) const { return read(adr) | (read((uint16_t) (adr + 1)) << 8); }
 
     void inline writew(uint16_t adr, uint16_t dat) {
         write(adr, (uint8_t) dat);
@@ -50,22 +50,22 @@ public:
 
     void reset();
 
-    uint8_t *get_vram() { return vram; }
+    const uint8_t *get_vram() const { return vram; }
 
-    uint8_t *get_ram() { return ram; }
+    const uint8_t *get_ram() const { return ram; }
 
-    uint8_t *get_oam() { return oam; }
+    const uint8_t *get_oam() const { return oam; }
 
-    uint8_t get_ram_bank_number() { return (uint8_t) ((ram - ram_bank) / 0x1000); }
+    uint8_t get_ram_bank_number() const { return (uint8_t) ((ram - ram_bank) / 0x1000); }
 
-    int get_clock() { return total_clock; }
+    int get_clock() const { return total_clock; }
 
-    bool get_speed() { return speed; }
+    bool get_speed() const { return speed; }
 
     void serialize(serializer &s);
 
 private:
-    uint8_t inline io_read(uint16_t adr);
+    uint8_t inline io_read(uint16_t adr) const;
 
     void inline io_write(uint16_t adr, uint8_t dat);
 
