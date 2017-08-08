@@ -59,6 +59,7 @@ add_subdirectory(dummy_adapters)
 add_subdirectory(script_layer)
 add_subdirectory(wrenvm)
 add_subdirectory(luavm)
+add_subdirectory(chaivm)
 add_subdirectory(gtest)
 
 add_custom_target(coverage-report

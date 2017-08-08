@@ -1,4 +1,4 @@
-set(USE_SDL ON)
+set(USE_SDL OFF)
 
 set(LINKCABLE_SOURCES
         src/linkcable/null_link_source.h src/linkcable/null_link_source.cpp src/linkcable/network/tcp_client.h src/linkcable/network/tcp_client.cpp
@@ -13,7 +13,7 @@ set(TGBDUAL_DESKTOP_SOURCES
         src/io/rom_file.h src/main.cpp)
 
 
-set(TGBDUAL_LIBS z wrenvm luavm tgbdual)
+set(TGBDUAL_LIBS z wrenvm luavm tgbdual chaivm)
 
 if (USE_SDL)
     list(APPEND TGBDUAL_LIBS sdl_adapters)

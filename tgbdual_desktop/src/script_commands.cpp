@@ -3,10 +3,12 @@
 #include <wren_script_vm.h>
 #include <lua_script_vm.h>
 #include <io/file_buffer.h>
+#include <chai_script_vm.h>
 
 enum class ScriptEngineType {
     Lua,
     Wren,
+    Chai,
     Unknown
 };
 
@@ -19,12 +21,20 @@ ScriptEngineType scriptEngineTypeForFile(const std::string &file) {
         return ScriptEngineType::Lua;
     }
 
+    if (file.find(".chai") != std::string::npos) {
+        return ScriptEngineType::Chai;
+    }
+
     return ScriptEngineType::Unknown;
 }
 
 script_vm *createVmForType(tgbdual &tgb, ScriptEngineType type) {
     if (type == ScriptEngineType::Wren) {
         return new wren_script_vm{tgb.getScriptServices()};
+    }
+
+    if (type == ScriptEngineType::Chai) {
+        return new chai_script_vm{tgb.getScriptServices()};
     }
 
     return new lua_script_vm{tgb.getScriptServices()};
