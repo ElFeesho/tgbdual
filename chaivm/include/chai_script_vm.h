@@ -23,12 +23,5 @@ public:
 private:
     script_services *_scriptServices;
     chaiscript::ChaiScript state;
-
-//
-//    void invokeLuaFunction(const char *functionName) const;
-//
-//    void bindFunction(const char *fnName, int (*fn)(lua_State *)) const;
-//
-    void registerConstants() const;
 };
 

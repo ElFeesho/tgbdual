@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.2)
 project(tgbdual C CXX)
 
+SET(CMAKE_CXX_FLAGS "-O0")
+SET(CMAKE_C_FLAGS "-O0")
+
 option(ENABLE_CODE_COVERAGE "Enable code coverage" OFF)
 
 function(coverage_config target_name)

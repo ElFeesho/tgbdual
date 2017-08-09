@@ -15,12 +15,8 @@ chai_script_vm::chai_script_vm(script_services *scriptContext) : _scriptServices
     state.add(chaiscript::fun(&script_services::set_8bit_value), "set_8bit_value");
     state.add(chaiscript::fun(&script_services::set_16bit_value), "set_16bit_value");
     state.add(chaiscript::fun(&script_services::register_command), "register_console_command");
+    state.add(chaiscript::vector_conversion<std::vector<std::string>>());
 }
-
-void chai_script_vm::registerConstants() const {
-
-}
-
 
 void chai_script_vm::activate() {
     state.eval("activate();");
@@ -40,11 +36,14 @@ void chai_script_vm::loadScript(const std::string &script) {
 
 bool chai_script_vm::handleUnhandledCommand(const std::string &command, std::vector<std::string> args) {
     try {
-        auto handleCommand = state.eval<std::function<bool(const std::string &, std::vector<std::string>)>>("handleCommand");
-        return handleCommand(command, args);
+        auto handleCommand = state.eval<std::function<bool(const std::string &, const std::vector<chaiscript::Boxed_Value> &)>>("handleCommand");
+        std::vector<chaiscript::Boxed_Value> boxedArgs;
+        std::transform(args.begin(), args.end(), std::back_inserter(boxedArgs), [](const std::string &arg) { return chaiscript::Boxed_Value(arg); });
+
+        return handleCommand(command, boxedArgs);
     }
     catch (chaiscript::exception::eval_error &e) {
-        std::cerr << "Failed to evaluate handleCommand" << std::endl;
+        std::cerr << "Failed to evaluate handleCommand " << e.what() << std::endl;
     }
 
     return false;

@@ -113,14 +113,14 @@ TEST_F(ChaiVMTest, ChaiVM_CanInvokeActivateFunction) {
 
 TEST_F(ChaiVMTest, ChaiVM_CanHandleUnhandledCommands) {
     vm.loadScript("def handleCommand(command, args) {\n"
-                          "   GameBoy.print(\"Got command: \" + command + \" args: \" + args[1])\n"
+                          "   GameBoy.print(\"${command} args: ${args[0]}\")\n"
                           "   return true;\n"
                           "}\n");
 
     bool result = vm.handleUnhandledCommand("test_command", {"one"});
 
     EXPECT_TRUE(result);
-    EXPECT_EQ("Got command: test_command args: one", scriptServices.printed_message);
+    EXPECT_EQ("test_command args: one", scriptServices.printed_message);
 }
 
 TEST_F(ChaiVMTest, ChaiVM_CanIndicatedInabilityToHandleUnhandledCommands) {
@@ -202,8 +202,7 @@ TEST_F(ChaiVMTest, ChaiVM_CanWrite16bitValue) {
 TEST_F(ChaiVMTest, ChaiVM_CanRegisterConsoleCommands) {
     vm.loadScript(
             "GameBoy.register_console_command(\"cfunc\", fun(args) {\n"
-                    "    var arg = args[0];\n"
-                    "    GameBoy.print(\"Expected Func ${arg}\");\n"
+                    "    GameBoy.print(\"Expected Func ${args}\");\n"
                     "});");
 
     EXPECT_TRUE(scriptServices._registeredCommands.find("cfunc") != scriptServices._registeredCommands.end());
