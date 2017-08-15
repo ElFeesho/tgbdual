@@ -202,7 +202,7 @@ TEST_F(ChaiVMTest, ChaiVM_CanWrite16bitValue) {
 TEST_F(ChaiVMTest, ChaiVM_CanRegisterConsoleCommands) {
     vm.loadScript(
             "GameBoy.register_console_command(\"cfunc\", fun(args) {\n"
-                    "    GameBoy.print(\"Expected Func ${args}\");\n"
+                    "    GameBoy.print(\"Expected Func ${args[0]}\");\n"
                     "});");
 
     EXPECT_TRUE(scriptServices._registeredCommands.find("cfunc") != scriptServices._registeredCommands.end());

@@ -21,7 +21,6 @@ public:
     bool handleUnhandledCommand(const std::string &command, std::vector<std::string> args) override;
 
 private:
-    script_services *_scriptServices;
     chaiscript::ChaiScript state;
 };
 
