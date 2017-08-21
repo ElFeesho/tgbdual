@@ -23,10 +23,12 @@
 
 #include "sdl_video_renderer.h"
 
-#include <SDL_gfxPrimitives.h>
-#include <SDL_image.h>
+#include <SDL/SDL_gfxPrimitives.h>
+#include <SDL/SDL_image.h>
 
 #include <string>
+
+extern DECLSPEC int SDLCALL SDL_Flip(SDL_Surface *screen); // <- Can't seem to import from SDL.h
 
 static inline uint8_t red(uint32_t colour) { return (uint8_t) (colour & 0x000000ff); }
 static inline uint8_t green(uint32_t colour) { return (uint8_t) ((colour & 0x0000ff00) >> 8); }

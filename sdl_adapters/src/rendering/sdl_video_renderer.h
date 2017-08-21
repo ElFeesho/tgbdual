@@ -25,7 +25,7 @@
 #include <map>
 #include <memory>
 #include <rendering/video_renderer.h>
-#include <SDL_ttf.h>
+#include <SDL/SDL_ttf.h>
 
 class sdl_video_renderer : public tgb::video_renderer {
 public:

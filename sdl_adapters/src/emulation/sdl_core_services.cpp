@@ -1,5 +1,6 @@
 #include <emulator_time.h>
-#include <SDL_ttf.h>
+#include <SDL/SDL.h>
+#include <SDL/SDL_ttf.h>
 #include "sdl_core_services.h"
 
 sdl_core_services::sdl_core_services() : _videoRenderer{SDL_SetVideoMode(520, 488, 0, SDL_SWSURFACE)}, _gamepadSource{}, _consoleDriver{}, _audioRenderer{}  {

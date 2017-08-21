@@ -3,7 +3,7 @@
 #include <map>
 #include <vector>
 
-#include <SDL.h>
+#include <SDL/SDL.h>
 #include <input/gamepad_source.h>
 #include <input/gamepad_source.h>
 #include <input/sys_command_source.h>

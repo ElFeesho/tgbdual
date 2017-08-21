@@ -2,7 +2,7 @@
 // Created by Christopher Sawczuk on 16/04/2017.
 //
 
-#include <SDL_events.h>
+#include <SDL/SDL_events.h>
 #include <map>
 #include "sdl_console_driver.h"
 
