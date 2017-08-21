@@ -208,7 +208,8 @@ TEST_F(WrenVMTest, WrenVM_CanWrite16bitValue) {
 TEST_F(WrenVMTest, WrenVM_CanRegisterConsoleCommands) {
     vm.loadScript(
             "GameBoy.registerConsoleCommand(\"cfunc\", Fn.new { |args|\n"
-            "    GameBoy.print(\"Expected Func %(args[0])\")\n"
+                    "    var arg = args[0]\n"
+                    "    GameBoy.print(\"Expected Func %(arg)\")\n"
             "})\n");
 
     EXPECT_TRUE(scriptServices._registeredCommands.find("cfunc") != scriptServices._registeredCommands.end());
