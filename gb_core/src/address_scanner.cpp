@@ -12,7 +12,7 @@ address_scan_result::address_scan_result() : _locations{} {
 
 }
 
-address_scan_result::address_scan_result(std::vector<ptrdiff_t> locations) : _locations{locations} {}
+address_scan_result::address_scan_result(std::vector<ptrdiff_t> locations) : _locations{std::move(locations)} {}
 
 ptrdiff_t address_scan_result::operator[](long index) {
     return _locations[index];
